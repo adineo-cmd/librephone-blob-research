@@ -28,10 +28,19 @@ from collections import Counter
 # ---------------------------------------------------------------- constants
 EM_NAMES = {
     2: "SPARC", 3: "x86", 8: "MIPS", 20: "PowerPC", 40: "ARM",
-    42: "SuperH", 50: "IA-64", 62: "x86-64", 83: "AVR",
-    92: "Altera Nios II", 94: "RISC-V (old, bespoke)", 183: "AArch64",
+    42: "SuperH", 45: "ARC (old)", 50: "IA-64", 62: "x86-64", 83: "AVR",
+    92: "Altera Nios II", 93: "ARCv1 ARCompact (EM_ARC_COMPACT)",
+    94: "RISC-V (old, bespoke)", 144: "TI PRU", 183: "AArch64",
     164: "QDSP6 / Hexagon", 243: "RISC-V", 247: "BPF", 252: "C-SKY",
-    166: "Xtensa", 190: "ARC", 216: "Kalimba (CSR)",
+    166: "Xtensa", 216: "Kalimba (CSR)",
+    # NOTE (rosemary census correction, 2026-11-11): the lab census.py said
+    # 190:"ARC" and 195:"TILE64" — both wrong. glibc elf.h: EM_TILE64=187,
+    # EM_TILEGX=191, EM_TI_PRU=144, and 195 is UNASSIGNED. binutils'
+    # include/elf/arc.h assigns 93=EM_ARC_COMPACT (ARCompact) and
+    # 195=EM_ARC_COMPACT2 (ARCv2) — readelf resolves 195 to "ARCv2".
+    # Empirically: MTK camera-CCU firmware (MT6785) ships ELF32
+    # e_machine=195 with GCC ident "ARCompact/ARCv2 ISA elf32 toolchain".
+    195: "ARCv2 (EM_ARC_COMPACT2)",
 }
 
 PF_NAMES = {1: "X", 2: "W", 4: "R"}
@@ -57,13 +66,13 @@ MD1_ENTRY_NAMES = re.compile(
 VERSION_PATTERNS = [
     ("moly", re.compile(rb"MOLY[.\w/:-]{4,80}")),
     ("mdl_rom", re.compile(rb"MDL_[A-Z_0-9]{2,40}")),
-    ("md_dbgi", re.compile(rb"DbgInfo [.\w_/-]{4,120}")),
-    ("tinysys", re.compile(rb"tinysys [.\w_/-]{2,60}")),
-    ("elbrus", re.compile(rb"ELBRUS [.\w_/-]{0,60}")),
+    ("md_dbgi", re.compile(rb"DbgInfo[.\w_/-]{4,120}")),
+    ("tinysys", re.compile(rb"tinysys[.\w_/-]{2,60}")),
+    ("elbrus", re.compile(rb"ELBRUS[.\w_/-]{0,60}")),
     ("ver_opt", re.compile(rb"VER(?:ION)?[ :=_]{0,3}[.\w/-]{4,60}")),
     ("mtk_chip", re.compile(rb"MT[0-9]{4}[A-Z0-9_]{0,8}")),
     ("pcm_spm", re.compile(rb"(?:PCM|SPM)[.\w_ -]{4,60}")),
-    ("scp_vcore", re.compile(rb"scp [.\w_/-]{2,60}", re.I)),
+    ("scp_vcore", re.compile(rb"scp[.\w_/-]{2,60}", re.I)),
     ("tee", re.compile(rb"(?:GenieZone|beanpod|TEE_[A-Za-z0-9_]{2,40}|tlApi|drApi|mtk_sec)[\w.:/-]{0,50}")),
     ("swver", re.compile(rb"SW(?:_)?VER[A-Z_0-9:= ./-]{2,60}")),
     ("flavor", re.compile(rb"(?:K69V1|K6853|MT6785|ELBRUS|LG855|G95)[\w.:/-]{0,60}")),
