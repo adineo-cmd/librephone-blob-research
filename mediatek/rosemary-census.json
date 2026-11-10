@@ -1,0 +1,328 @@
+{
+ "device": {
+  "marketing": "Xiaomi Redmi Note 10S (also POCO M5s / Note 10S variants)",
+  "codename": "rosemary",
+  "soc": "MediaTek Helio G95 (MT6785V family)",
+  "source": "official LineageOS nightly",
+  "build": "lineage-24.0-20261104-nightly-rosemary-signed.zip",
+  "mirror": "https://mirror.math.princeton.edu/pub/lineageos/full/rosemary/20261104/",
+  "zip_sha256": "6b4269e429a1e480fff5cdd1e0580abe6f69b47e37e6a365ac1c64a8966e7ff1",
+  "zip_bytes": 1172896925,
+  "census_date": "2026-11-11",
+  "payload_version": "CrAU payload, 21 partitions, ops: REPLACE/REPLACE_XZ/REPLACE_BZ (type-1 op = bzip2)"
+ },
+ "partitions": [
+  {
+   "partition": "audio_dsp",
+   "size": 1404928,
+   "sha256_16": "7815e3cef91517be",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "hifi3_a_dram", "size": 32768, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 33280, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 35504, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "hifi3_a_iram", "size": 36864, "offset": 36976, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 74352, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 76576, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "hifi3_a_sram", "size": 1320904, "offset": 78048, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 1399472, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 1401696, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "cam_vpu1",
+   "size": 1150976,
+   "sha256_16": "e92c83711309641d",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "cam_vpu1", "size": 1145104, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 1145616, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 1147840, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "cam_vpu2",
+   "size": 8286208,
+   "sha256_16": "fc8dd9ff829d042b",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "cam_vpu2", "size": 8280528, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 8281040, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 8283264, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "cam_vpu3",
+   "size": 8192,
+   "sha256_16": "bd663ba065b3cb23",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "cam_vpu3", "size": 3392, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 3904, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 6128, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "gz",
+   "size": 1265664,
+   "sha256_16": "c50f87b64c9bb5df",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "gz", "size": 1115632, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 1116144, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 1118368, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "unmap2", "size": 143072, "offset": 1119840, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "lk",
+   "size": 1855488,
+   "sha256_16": "638282c9e873d240",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "lk", "size": 1665018, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 1665536, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 1667760, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "lk_main_dtb", "size": 168829, "offset": 1669232, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 1838576, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 1840800, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "kaeru", "size": 10839, "offset": 1842272, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 8}}
+   ]
+  },
+  {
+   "partition": "md1img",
+   "size": 60190720,
+   "sha256_16": "a8794e441345863a",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "md1rom", "size": 26682512, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 16777216, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 26683024, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 26685248, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "md1drdi", "size": 1368064, "offset": 26686720, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 28055296, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 28057520, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "md1dsp", "size": 6783260, "offset": 28058992, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 34842768, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 34844992, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "md1_filter__Default", "size": 9858, "offset": 34846464, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_filter", "size": 9858, "offset": 34856848, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_filter_FullLog", "size": 9674, "offset": 34867232, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_filter_SlimLog_DspAllOff", "size": 9674, "offset": 34877424, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_filter_LowPowerMonitor", "size": 9674, "offset": 34887616, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_filter_meta", "size": 9674, "offset": 34897808, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_filter_PLS_PS_ONLY", "size": 9674, "offset": 34908000, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_emfilter", "size": 2252, "offset": 34918192, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_mddbmeta", "size": 522288, "offset": 34920960, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_mddbmetaodb", "size": 353832, "offset": 35443760, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_mddb", "size": 16329713, "offset": 35798112, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_mdmlayout", "size": 8060675, "offset": 52128352, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "md1_file_map", "size": 618, "offset": 60189552, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}}
+   ]
+  },
+  {"partition": "preloader_raw", "size": 352256, "sha256_16": "0fd6e853e1186d25", "magic": "MTK-MMM-CHAIN"},
+  {
+   "partition": "scp",
+   "size": 2207744,
+   "sha256_16": "0e60a8ead9923273",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "tinysys-loader-CM4_A", "size": 1080, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 1600, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 3824, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "tinysys-scp-CM4_A", "size": 1824584, "offset": 5296, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 1830400, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 1832624, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "tinysys-scp-CM4_A_dram", "size": 366952, "offset": 1834096, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 2201568, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 2203792, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "spmfw",
+   "size": 16384,
+   "sha256_16": "09db4f7832a79df8",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "spmfw", "size": 11119, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 11632, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 13856, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "sspm",
+   "size": 663552,
+   "sha256_16": "e2a6794a4a0eb93f",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "tinysys-sspm", "size": 657704, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 658224, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 660448, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {
+   "partition": "tee",
+   "size": 2560000,
+   "sha256_16": "e8eab3d9b194db32",
+   "magic": "MTK-LK-CONTAINER",
+   "records": [
+    {"name": "atf", "size": 170496, "offset": 0, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 171008, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 173232, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}},
+    {"name": "tee", "size": 2377216, "offset": 174704, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 0, "align44": 16}},
+    {"name": "cert1", "size": 1709, "offset": 2552432, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554432, "align44": 16}},
+    {"name": "cert2", "size": 957, "offset": 2554656, "ext": {"hdr_size": 512, "flag38": 1, "w3c": 33554434, "align44": 16}}
+   ]
+  },
+  {"partition": "vbmeta", "size": 4096, "sha256_16": "22b92bee62f93a28", "magic": "AVB"},
+  {"partition": "vbmeta_system", "size": 4096, "sha256_16": "ff8efe0a76f5a913", "magic": "AVB"},
+  {"partition": "vbmeta_vendor", "size": 4096, "sha256_16": "7bc282b7d56178a0", "magic": "AVB"}
+ ],
+ "payloads": [
+  {"path": "audio_dsp/00_hifi3_a_dram.bin", "size": 32768, "sha256_16": "5d2327f3ef8c6b0b", "magic": null},
+  {"path": "audio_dsp/01_cert1.bin", "size": 1709, "sha256_16": "6bc9bf7f1a56de0a", "magic": null},
+  {"path": "audio_dsp/02_cert2.bin", "size": 957, "sha256_16": "07bcec7a78da68ab", "magic": null},
+  {"path": "audio_dsp/03_hifi3_a_iram.bin", "size": 36864, "sha256_16": "37e2538997b265d0", "magic": null},
+  {"path": "audio_dsp/04_cert1.bin", "size": 1709, "sha256_16": "dcbe2243c3fab83d", "magic": null},
+  {"path": "audio_dsp/05_cert2.bin", "size": 957, "sha256_16": "942c16d1979dd8f9", "magic": null},
+  {"path": "audio_dsp/06_hifi3_a_sram.bin", "size": 1320904, "sha256_16": "53f03a1a0d50dcbb", "magic": null},
+  {"path": "audio_dsp/07_cert1.bin", "size": 1709, "sha256_16": "689446bf9b54b92b", "magic": null},
+  {"path": "audio_dsp/08_cert2.bin", "size": 957, "sha256_16": "6cba8bccb3d79fc7", "magic": null},
+  {"path": "lk/00_lk.bin", "size": 1665018, "sha256_16": "754c8b53f22af85f", "magic": null, "strings": {"tinysys": ["tinysys-loader-CM4_A", "tinysys-scp-CM4_A", "tinysys-scp-CM4_A_dram"], "flavor": ["MT6785", "MT6785V/CB", "MT6785V/CC", "MT6785V/CU"]}},
+  {"path": "lk/01_cert1.bin", "size": 1709, "sha256_16": "b6d459ebecce30cc", "magic": null},
+  {"path": "lk/02_cert2.bin", "size": 957, "sha256_16": "0e052f21bcb7afc5", "magic": null},
+  {"path": "lk/03_lk_main_dtb.bin", "size": 168829, "sha256_16": "5022510f9bdad1a8", "magic": null, "strings": {"flavor": ["MT6785"]}},
+  {"path": "lk/04_cert1.bin", "size": 1709, "sha256_16": "b6d459ebecce30cc", "magic": null},
+  {"path": "lk/05_cert2.bin", "size": 957, "sha256_16": "b85b05583bf46f8c", "magic": null},
+  {"path": "lk/06_kaeru.bin", "size": 10839, "sha256_16": "f90eb3b638acff12", "magic": null},
+  {"path": "cam_vpu3/00_cam_vpu3.bin", "size": 3392, "sha256_16": "96b2a669432eac99", "magic": null},
+  {"path": "cam_vpu3/01_cert1.bin", "size": 1709, "sha256_16": "41a8750121523ee3", "magic": null},
+  {"path": "cam_vpu3/02_cert2.bin", "size": 957, "sha256_16": "bd018242fead0e55", "magic": null},
+  {"path": "cam_vpu2/00_cam_vpu2.bin", "size": 8280528, "sha256_16": "f4dd8f4fa853ff07", "magic": null},
+  {"path": "cam_vpu2/01_cert1.bin", "size": 1709, "sha256_16": "6060314f8e4b3058", "magic": null},
+  {"path": "cam_vpu2/02_cert2.bin", "size": 957, "sha256_16": "5ee04a79e9ce0111", "magic": null},
+  {"path": "scp/00_tinysys-loader-CM4_A.bin", "size": 1080, "sha256_16": "e5f98ba5fe72809b", "magic": null},
+  {"path": "scp/01_cert1.bin", "size": 1709, "sha256_16": "c8e3f0432cc520a9", "magic": null},
+  {"path": "scp/02_cert2.bin", "size": 957, "sha256_16": "565a88310d9200ad", "magic": null},
+  {"path": "scp/03_tinysys-scp-CM4_A.bin", "size": 1824584, "sha256_16": "ed9d1cd4da8ab712", "magic": null},
+  {"path": "scp/04_cert1.bin", "size": 1709, "sha256_16": "22bc16263bd52eb6", "magic": null},
+  {"path": "scp/05_cert2.bin", "size": 957, "sha256_16": "97de088959e4436f", "magic": null},
+  {"path": "scp/06_tinysys-scp-CM4_A_dram.bin", "size": 366952, "sha256_16": "d8eefa8a69435db0", "magic": null},
+  {"path": "scp/07_cert1.bin", "size": 1709, "sha256_16": "9abe71967bff4f1a", "magic": null},
+  {"path": "scp/08_cert2.bin", "size": 957, "sha256_16": "19ebe60c456aa3af", "magic": null},
+  {"path": "cam_vpu1/00_cam_vpu1.bin", "size": 1145104, "sha256_16": "b1326ba0e5a7d5e5", "magic": null, "strings": {"swver": ["SW_VERSION"]}},
+  {"path": "cam_vpu1/01_cert1.bin", "size": 1709, "sha256_16": "0df5c1112b9d72e0", "magic": null},
+  {"path": "cam_vpu1/02_cert2.bin", "size": 957, "sha256_16": "2797f8b3b5b3a74a", "magic": null},
+  {"path": "tee/00_atf.bin", "size": 170496, "sha256_16": "703a700516da907f", "magic": null},
+  {"path": "tee/01_cert1.bin", "size": 1709, "sha256_16": "a6db6818c9b53e13", "magic": null},
+  {"path": "tee/02_cert2.bin", "size": 957, "sha256_16": "815000de84bfb737", "magic": null},
+  {"path": "tee/03_tee.bin", "size": 2377216, "sha256_16": "293e67eb4abf6d94", "magic": null},
+  {"path": "tee/04_cert1.bin", "size": 1709, "sha256_16": "14e71acbb24df34e", "magic": null},
+  {"path": "tee/05_cert2.bin", "size": 957, "sha256_16": "b20a9c54691f3c56", "magic": null},
+  {"path": "sspm/00_tinysys-sspm.bin", "size": 657704, "sha256_16": "4f5751ee436cc85b", "magic": null},
+  {"path": "sspm/01_cert1.bin", "size": 1709, "sha256_16": "116ad6c92a880f40", "magic": null},
+  {"path": "sspm/02_cert2.bin", "size": 957, "sha256_16": "63a822c3e620f5f3", "magic": null},
+  {"path": "md1img/00_md1rom.bin", "size": 26682512, "sha256_16": "05d194ae666b432d", "magic": null, "strings": {"moly": ["MOLY.LR13.R1.MP.V89.6.P79", "MOLY_LR13_R1_MP_V89_6_P79.bin"], "swver": ["SW_VERSION"], "flavor": ["MT6785", "MT6785/custom_sim_driver.c", "MT6785_S00", "MT6785_S00.MOLY_LR13_R1_MP_V89_6_P79.bin"]}},
+  {"path": "md1img/01_cert1.bin", "size": 1709, "sha256_16": "d59c8eb6d350a1ad", "magic": null},
+  {"path": "md1img/02_cert2.bin", "size": 957, "sha256_16": "cebcdcf16b434ce0", "magic": null},
+  {"path": "md1img/03_md1drdi.bin", "size": 1368064, "sha256_16": "1397547ba2f3206c", "magic": null},
+  {"path": "md1img/04_cert1.bin", "size": 1709, "sha256_16": "4718486c636e15e3", "magic": null},
+  {"path": "md1img/05_cert2.bin", "size": 957, "sha256_16": "7c72dd2c180b2f2f", "magic": null},
+  {"path": "md1img/06_md1dsp.bin", "size": 6783260, "sha256_16": "265e2c5a5561287d", "magic": "MTK-MMM-CHAIN", "strings": {"moly": ["MOLY.LR13.R1.MP.V89.6.P79"], "flavor": ["MT6785", "MT6785_HW"]}, "gfh": true},
+  {"path": "md1img/07_cert1.bin", "size": 1709, "sha256_16": "c9622cb4848a0d3d", "magic": null},
+  {"path": "md1img/08_cert2.bin", "size": 957, "sha256_16": "f398696ba0ec28ae", "magic": null},
+  {"path": "md1img/09_md1_filter__Default.bin", "size": 9858, "sha256_16": "20ad4124bc0a2bf3", "magic": null},
+  {"path": "md1img/10_md1_filter.bin", "size": 9858, "sha256_16": "20ad4124bc0a2bf3", "magic": null},
+  {"path": "md1img/11_md1_filter_FullLog.bin", "size": 9674, "sha256_16": "4c7eff9ddee36cac", "magic": null},
+  {"path": "md1img/12_md1_filter_SlimLog_DspAllOff.bin", "size": 9674, "sha256_16": "2c06ac4feb5499b3", "magic": null},
+  {"path": "md1img/13_md1_filter_LowPowerMonitor.bin", "size": 9674, "sha256_16": "d7f2b349a2172fa4", "magic": null},
+  {"path": "md1img/14_md1_filter_meta.bin", "size": 9674, "sha256_16": "61e75ea6b21e8423", "magic": null},
+  {"path": "md1img/15_md1_filter_PLS_PS_ONLY.bin", "size": 9674, "sha256_16": "ab428058e51c476f", "magic": null},
+  {"path": "md1img/16_md1_emfilter.bin", "size": 2252, "sha256_16": "c0feff7e068c03c4", "magic": null},
+  {"path": "md1img/17_md1_mddbmeta.bin", "size": 522288, "sha256_16": "7b1e56fa95032e3c", "magic": null},
+  {"path": "md1img/18_md1_mddbmetaodb.bin", "size": 353832, "sha256_16": "d5707eb4e9ef8d39", "magic": "GZIP"},
+  {"path": "md1img/19_md1_mddb.bin", "size": 16329713, "sha256_16": "f6cdb9ae79d5a1fd", "magic": null, "strings": {"flavor": ["G95UySW"]}},
+  {"path": "md1img/20_md1_mdmlayout.bin", "size": 8060675, "sha256_16": "d4502c26cd8f6d5d", "magic": null},
+  {"path": "md1img/21_md1_file_map.bin", "size": 618, "sha256_16": "ab0e82695f67cd9d", "magic": null, "strings": {"moly": ["MOLY_LR13_R1_MP_V89_6_P79.EDB", "MOLY_LR13_R1_MP_V89_6_P79.XML.GZ"], "flavor": ["MT6785_S00_MOLY_LR13_R1_MP_V89_6_P79.EDB", "MT6785_S00_MOLY_LR13_R1_MP_V89_6_P79.XML.GZ"]}},
+  {"path": "spmfw/00_spmfw.bin", "size": 11119, "sha256_16": "34953672b8ee626f", "magic": null},
+  {"path": "spmfw/01_cert1.bin", "size": 1709, "sha256_16": "aa906a6e4cff0db2", "magic": null},
+  {"path": "spmfw/02_cert2.bin", "size": 957, "sha256_16": "5c9173716e13e9e4", "magic": null},
+  {"path": "gz/00_gz.bin", "size": 1115632, "sha256_16": "38ec8b959f14e7b5", "magic": null},
+  {"path": "gz/01_cert1.bin", "size": 1709, "sha256_16": "5260880290f943e9", "magic": null},
+  {"path": "gz/02_cert2.bin", "size": 957, "sha256_16": "460aa32ba76ac017", "magic": null},
+  {"path": "gz/03_unmap2.bin", "size": 143072, "sha256_16": "0a947877b2c6ca48", "magic": null}
+ ],
+ "userspace_census": {
+  "vendor": {
+   "image": "vendor",
+   "files": 2500,
+   "bytes": 843948054,
+   "elf_machines": {"AArch64": 1281, "BPF": 1, "ARM": 263, "ARCv2 (EM_ARC_COMPACT2)": 21},
+   "note": "MTK HAL services (bin/hw), lib64 1162 files, thh/ta 30 Trustonic UUID trustlets (census-level only), etc/mdota 142 modem-OTA configs, firmware/ 106 files incl. 21 CCU ARCv2 ELFs"
+  },
+  "system_ext": {
+   "image": "system_ext",
+   "files": 3512,
+   "bytes": 460338798,
+   "elf_machines": {"AArch64": 58, "ARM": 12},
+   "note": "mostly AOSP share/terminfo; MTK IMS/telephony extension jars; no coprocessor firmware"
+  },
+  "system": {
+   "image": "system",
+   "files": 3244,
+   "bytes": 1058749057,
+   "elf_machines": {"AArch64": 1108, "BPF": 11, "ARM": 472},
+   "note": "AOSP framework; 11 standard eBPF .o"
+  },
+  "product": {
+   "image": "product",
+   "files": 496,
+   "bytes": 503268027,
+   "elf_machines": {"AArch64": 34, "ARM": 3},
+   "note": "media + priv-apps; nothing proprietary-ISA"
+  }
+ },
+ "ccu_arcv2": {
+  "claim": "camera CCU = 2x Synopsys ARC EM4-FPU cores (ARCv2), e_machine=195 EM_ARC_COMPACT2",
+  "evidence": [
+   "readelf resolves e_machine 195 to ARCv2 (binutils include/elf/arc.h EM_ARC_COMPACT2)",
+   "GCC ident in libccu_*: 'GCC: (ARCompact/ARCv2 ISA elf32 toolchain 2017.09) 7.1.1 20170710'",
+   "ARC ISA extension string 'BITSCAN,CD,DIV_REM,FPUDA,BS' in each per-sensor image",
+   "leaked MTK build config mtk-watch/android_ccu_tool mt6779/custsensor/ccu_arc_binary.mk: arc-elf32, -mcpu=em4_fpus, -DCPU_ARCEM, custsensor1.ld/custsensor2.ld, pm/dm/ddr artifacts",
+   "dual entries 0x10038000/0x1003c000 = 16 KB apart = two link scripts = two cores"
+  ],
+  "lib3a.ccu": {
+   "size": 1429664,
+   "entry": "0xb4",
+   "sha256_16": "13cbabedb3d7ff71",
+   "loads": [
+    {"vaddr": "0x0", "filesz": "0x7640", "flags": "RWX"},
+    {"vaddr": "0x10000000", "filesz": "0x27d0c", "flags": "RWX"},
+    {"vaddr": "0x80000000", "filesz": "0xc14", "flags": "RW"},
+    {"vaddr": "0x80000c18", "filesz": "0x0", "memsz": "0x6b64", "flags": "RW"}
+   ]
+  },
+  "per_sensor_files": 20,
+  "prior_art": "build-flags-level implication only (leaked mk, MT6779 gen); no public binary-level identification of a production CCU build found (GitHub code search + web, 2026-11-11)"
+ },
+ "scp_freertos": {
+  "claim": "SCP = Cortex-M4F running FreeRTOS (ARM_CM4F port)",
+  "evidence": "strings in tinysys-scp-CM4_A_dram: kernel/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c, tasks.c, queue.c, timers.c, heap_4.c; 'FreeRTOS %s(build:%s %s)'"
+ },
+ "em_registry_corrections": {
+  "correction": "FP6-era census.py EM_NAMES errors fixed",
+  "details": [
+   "195: was 'TILE64' - wrong; glibc elf.h EM_TILE64=187, EM_TILEGX=191, 195 unassigned; binutils arc.h 195=EM_ARC_COMPACT2 (ARCv2)",
+   "93: was 'TI PRU' in lab census.py - wrong; EM_TI_PRU=144; binutils 93=EM_ARC_COMPACT (ARCompact)"
+  ],
+  "fixed_in": "mediatek/tools/census_mtk.py"
+ },
+ "prior_art_status": {
+  "ncc_ghidra_mtk_loader": "verified: 'Currently, only nanoMIPS-based firmware is supported'",
+  "taszk_full_chain_bb_part1": "verified: 2023-12-07, Daniel Komaromy; Helio+Dimensity; custom nanoMIPS decompiler/debugger/emulator; no per-partition census",
+  "wairz_mtk_tinysys": "verified: backend/app/services/hardware_firmware/parsers/mediatek_tinysys.py; classifier-level claims (SCP=Cortex-M4F FreeRTOS, SSPM 0x58901690, SPMFW 2MPS) all confirmed here at binary level for MT6785",
+  "zrax_socboot2": "verified: docs/socboot2.md; mtk_hdr fields empirical from 18 fw1 images, synthetic fixtures only; rosemary production images confirm byte-for-byte",
+  "0xor0ne_writeup": "verified: 2024-12-05 X post + blog, MTK 5G baseband RE",
+  "blackhat_2021_grassi": "BlackHat USA 2021 Grassi/Keen Lab MTK 5G baseband RCE; no header census",
+  "ccu_arc_prior_art": "mtk-watch/android_ccu_tool ccu_arc_binary.mk implies ARC by build flags (MT6779); no published binary-level CCU analysis"
+ }
+}
