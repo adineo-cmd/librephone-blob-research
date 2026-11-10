@@ -26,12 +26,22 @@ Verified findings (full evidence in `qualcomm-fp6/docs/`):
 Upstream contribution draft ready: `qualcomm-fp6/upstream-pr-draft.md`
 (corrects LibrePhone's AVR guess to verified RISC-V).
 
-### MediaTek (starting)
+### MediaTek — Xiaomi Redmi Note 10S (rosemary, Helio G95 / MT6785), LineageOS 24.0
 
-`mediatek/` — same methodology (architecture ID, segment maps, version
-strings, prior-art checks) applied to MediaTek firmware families
-(md1img modem, sscp/scp, mcupm, spmfw, TEE, connectivity) from public
-LineageOS builds.
+Verified findings (full evidence in `mediatek/`):
+
+| # | Finding |
+|---|---------|
+| 1 | **MTK tinysys (scp) = ARM Cortex-M4F + FreeRTOS** — instruction-level (vector table + Thumb-2 256/256 + embedded ARM_CM4F/port.c); **not** RISC-V |
+| 2 | **Camera CCU = Synopsys ARCv2 (2× ARC EM4-FPU, e_machine=195)** — first binary-level identification on a production device (vendor GCC ident + FPUDA extensions + dual-sensor entries) |
+| 3 | **MTK ships zero ELFs in firmware partitions** — the mtk_hdr record chain (0x58881688, dual X.509 per-payload signing) replaces Qualcomm's MDT/PIL entirely; first vendor-image confirmation of zrax's socboot2 model |
+| 4 | Full ISA map: ARM32 lk/preloader, HiFi3 (Xtensa) audio DSP, spmfw = PCM microcode (not a CPU), sspm/gz encrypted, cam_vpu = ARM32 Thumb-2, 21 ARCv2 files in userspace |
+| 5 | Registry correction: e_machine 195 = ARCv2 (EM_ARC_COMPACT2), not TILE64; TILE64=187, TILEGx=191, TI_PRU=144 |
+| 6 | md1rom (modem) = raw image, nanoMIPS per prior art — unverified from bytes (no decoder available, stated honestly) |
+
+The cross-vendor comparison is itself a finding: the same-generation
+"unusual core for 3A" story repeats — Qualcomm puts RISC-V in the camera
+ICP, MediaTek puts ARCv2 in the camera CCU.
 
 ## Principles
 
