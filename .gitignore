@@ -1,0 +1,16 @@
+# Never commit proprietary binary content
+*.zip
+*.img
+*.mbn
+*.mdt
+*.b[0-9][0-9]
+*.elf
+*.so
+*.bin
+downloads/
+blobs/
+vendor/
+
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
