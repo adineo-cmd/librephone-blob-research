@@ -1,0 +1,89 @@
+{
+  "id": "F-31",
+  "claim": "MT6785 md1rom ISA is byte-verifiable; nanoMIPS hypothesis from prior art is testable in Ghidra",
+  "verdict": "nanoMIPS OVERTURNED for MT6785 md1rom: MIPS32 LE entry code + MIPS16e-compressed code islands (hybrid); microMIPS and nanoMIPS both ruled out at decode level",
+  "date": "2026-11-12",
+  "input": {
+    "file": "md1img -> 00_md1rom.bin",
+    "length_bytes": 26682512,
+    "extraction": "mtk_hdr chain, no ELF header (census F-16)",
+    "version_strings": [
+      "MOLY.LR13.R1.MP.V89.6.P79",
+      "XIAOMI_S0MP1_K6785V1_64_MDBIN_PCB01_MT6785_S00.MOLY_LR13_R1_MP_V89_6_P79.bin",
+      "mtk_rel/XIAOMI_S0MP1_K6785V1_64/LWCTG_CUSTOM/L4/csm/ss/applib2_asn_common.c"
+    ]
+  },
+  "method": {
+    "tool": "Ghidra 12.2 PUBLIC headless (no auto-analysis, cold-start forced disassembly)",
+    "base_addr": "0x0 (flat raw binary import)",
+    "languages_tested": [
+      "MIPS:LE:32:default",
+      "MIPS:LE:32:16e",
+      "MIPS:LE:32:micro",
+      "nanomips:LE:32:default (nccgroup/ghidra-nanomips, built for Ghidra 12.2)"
+    ],
+    "metric": "per 256-byte window: clearListing + forced disassembly from window start; coverage = valid instruction bytes / 256 (F-20/F-28 decode-density methodology)",
+    "window_sets": ["entry/jr-target set", "1 MiB-step sweep 0x0-0x1900000 (31 windows)"]
+  },
+  "entry_point": {
+    "address": "0x0",
+    "decoded": ["lui a2,0x174", "addiu a2,a2,0x2ed0", "jr a2 (-> 0x176ed0)", "_mtc0 zero,Count"],
+    "followed_by": "00 65 filler pattern to 0x30 (explains census 'no dominant ISA' at auto-analysis)"
+  },
+  "windows_compare": [
+    {"offset": "0x0", "mips32": 6.25, "mips16e": 0.78, "micromips": 6.25, "nanomips": 1.56, "note": "4 real MIPS32 instructions at entry"},
+    {"offset": "0x176ed0", "mips32": 1.56, "mips16e": 25.0, "micromips": 1.56, "nanomips": 0.0, "note": "jr target"},
+    {"offset": "0x174100", "mips32": 12.5, "mips16e": 50.0, "micromips": 12.5, "nanomips": 0.78},
+    {"offset": "0x174400", "mips32": 0.0, "mips16e": 50.78, "micromips": 0.0, "nanomips": 0.78},
+    {"offset": "0x175000", "mips32": 0.0, "mips16e": 3.91, "micromips": 0.0, "nanomips": 2.34},
+    {"offset": "0x80000", "mips32": 100.78, "mips16e": 100.78, "micromips": 0.0, "nanomips": 1.56, "note": "dense; mips32/16e share mips16.sinc - ISA-mode context"},
+    {"offset": "0x100000", "mips32": null, "mips16e": 55.47, "micromips": 3.13, "nanomips": 0.78},
+    {"offset": "0x200000", "mips32": 0.0, "mips16e": 88.28, "micromips": 0.0, "nanomips": 0.0},
+    {"offset": "0x300000", "mips32": null, "mips16e": 50.78, "micromips": 0.0, "nanomips": 0.0},
+    {"offset": "0x400000", "mips32": 10.94, "mips16e": 0.0, "micromips": 10.94, "nanomips": 0.0},
+    {"offset": "0x700000", "mips32": 92.97, "mips16e": 92.97, "micromips": 1.56, "nanomips": 0.0},
+    {"offset": "0xe00000", "mips32": 84.38, "mips16e": 84.38, "micromips": 0.0, "nanomips": 3.91},
+    {"offset": "0x1200000", "mips32": 1.56, "mips16e": 100.78, "micromips": 1.56, "nanomips": 0.78},
+    {"offset": "0x1300000", "mips32": 1.56, "mips16e": 100.0, "micromips": 1.56, "nanomips": 2.34},
+    {"offset": "0x1400000", "mips32": 1.56, "mips16e": 91.41, "micromips": 1.56, "nanomips": 1.56},
+    {"offset": "0x1500000", "mips32": null, "mips16e": 0.0, "micromips": 0.0, "nanomips": 25.0, "note": "tail data region - partial decode in all 32-bit ISAs incl nanomips"},
+    {"offset": "0x1600000", "mips32": null, "mips16e": 14.06, "micromips": 0.0, "nanomips": 31.25, "note": "tail data region"},
+    {"offset": "0x1700000", "mips32": null, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "note": "tail data region"},
+    {"offset": "0x1800000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "note": "tail data region"},
+    {"offset": "0x1960000", "mips32": 5.47, "mips16e": 100.0, "micromips": 0.0, "nanomips": 0.0, "note": "mips16-dense tail"}
+  ],
+  "nanomips_sweep_stats": {
+    "windows": 31,
+    "median_coverage_pct": 0.78,
+    "max_in_code_regions": 3.91,
+    "tail_data_windows_over_20pct": 3,
+    "conclusion": "nanoMIPS decoder produces near-zero valid-code coverage on every MIPS16e-dense code island; only tail data windows (which decode partially in all 32-bit ISAs) exceed 20%"
+  },
+  "mips16e_evidence": {
+    "dense_windows": ["0x80000", "0x100000", "0x200000", "0x300000", "0x700000", "0xe00000", "0x1000000", "0x1100000", "0x1200000", "0x1300000", "0x1400000", "0x1960000"],
+    "sample_listing_0x1200000": ["jal 0x011c5004", "_nop", "li a2,0x32db", "lw a1,0x504(pc)", "jal 0x011c5064", "_addiu a0,sp,0x44", "lw a2,0x4f8(pc)", "li a3,0x32de", "li a0,0x26c", "jal 0x0134ee04", "_li a1,0x1", "sw v0,0x18(sp)", "lw v0,0x44(sp)", "lw s0,0x4e8(pc)", "lbu a2,0x0(v0)", "cmpi a2,0x2"]
+  },
+  "auto_analysis_pass": {
+    "language": "MIPS:LE:32:default",
+    "instruction_count": 1322630,
+    "function_count": 16297,
+    "note": "whole-image pass incl. data regions; strings harvested from defined data"
+  },
+  "prior_art_resolution": {
+    "ncc_ghidra_mtk_loader": "README: 'Currently, only nanoMIPS-based firmware is supported' - loader docs reference MT6879/NR16 build dated 2023 (Dimensity-era)",
+    "taszk_2023_12_07": "nanoMIPS decompiler/debugger/emulator for MediaTek basebands - Dimensity-generation work",
+    "resolution": "nanoMIPS attribution is generation-specific (MT6873+/5G-era); MT6785 is MOLY LR13-era (2020, Helio G95 4G) and uses the classic MIPS32+MIPS16e baseband architecture"
+  },
+  "install_notes": [
+    "Ghidra 12.2 buildExtension.gradle requires Gradle >= 9.1; repo wrapper pinned 8.10.2 - bumped to gradle-9.9.1",
+    "Gradle <= 8.x cannot evaluate build scripts under JDK 25 ('Unsupported class file major version 69')",
+    "nanomips module is pure SLEIGH data: registered by copying repo layout to <ghidra>/Ghidra/Processors/nanomips/ (Module.manifest + data/languages + lib jar) - headless picks it up without GUI install",
+    "ghidra-mtk-loader container loader NOT built/used this pass (release zip targets Ghidra 12.1; same Gradle path applies) - INT_InitRegions_C segment expansion unexercised"
+  ],
+  "negatives": [
+    "Segment boundaries are coverage-derived only; no container-level segment map (loader not built)",
+    "0x80000/0x700000/0xe00000 decode densely under both MIPS32-default and 16e (shared mips16.sinc + ISA-mode context); per-instruction ISA-mode attribution not done",
+    "md1dsp (DSP! magic, Coresonic-class) remains not byte-verified (F-17)",
+    "Window step is 1 MiB - island boundaries coarse"
+  ]
+}
