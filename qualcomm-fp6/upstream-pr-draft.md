@@ -1,5 +1,22 @@
 # Upstream contribution draft — LibrePhone (codeberg.org/rsavoye/librephone)
 
+> **Status update (2026-11-12):** superseded by the full upstream
+> contribution package in [`upstream-contribution/`](../../upstream-contribution/README.md)
+> (PR-1 = this draft's `docs/wireless.md` fix, carried forward; PR-2 = new
+> `docs/wmi-dispatch.md`; PR-3 = per-segment `wpss.bXX.md` corrections;
+> PR-4 = `docs/files.md` BT + boot-chain pointers). **All claims below
+> remain valid.** New since this draft, from the decoded dispatch
+> analysis: the WMI *event-routing* code is **Hexagon** (`wpss.b06`,
+> e_machine 164 per the mdt), not RISC-V — the RISC-V core runs the QURT
+> application firmware (`wpss.b07`); the message-ID registry is in
+> `wpss.b09` (149 distinct IDs, anchor `0xc0691080`). Full research note:
+> [`papers/wmi-dispatch-architecture.md`](https://github.com/adineo-cmd/librephone-blob-research/blob/main/papers/wmi-dispatch-architecture.md).
+> The `docs/fp6-riscv-cores.md` suggestion below is folded into the
+> package: the ICP/VPU e_machine=94 finding stays in
+> `qualcomm-fp6/docs/fp6-architecture-census.md` and is referenced from
+> the PR-1/PR-4 descriptions rather than shipped as a separate upstream
+> doc.
+
 Status: **ready to submit** (needs a Codeberg account login; this lab has no
 Codeberg credentials). Submit as a documentation PR against `main`, file
 `docs/wireless.md`, replacing the unverified processor guess in the
