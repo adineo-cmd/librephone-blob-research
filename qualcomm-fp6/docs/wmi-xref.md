@@ -1,5 +1,24 @@
 # WMI constant cross-reference: ath11k ↔ WCN6750 wpss firmware
 
+> **Correction (2026-11-12):** The conclusion below — "the firmware
+> evidently constructs IDs arithmetically (`grp << 12 | 1` at runtime)" —
+> was falsified by follow-up findings (F-19, F-20, F-22). The negative
+> control (adsp.b36 + ten modem segments) reproduces the profile-family
+> values in unrelated firmware at equal or higher counts, so
+> value-presence attributes nothing (F-19); a 100%-coverage linear-sweep
+> disassembly of wpss.b07 found no ID-construction sites (F-20); and the
+> wpss.mdt program headers show b07/b08 are RW data, not code, so the
+> original scan never had the right instrument (F-22). The actual answer:
+> WMI dispatch is **table-driven** — the message-ID registry lives in
+> `wpss.b09` (`[handler-ptr, grp<<12|cmdID, 0]` records, 12-byte stride,
+> main run at vaddr `0xc0691080`–`0xc06913b0`, 149 distinct IDs) and the
+> dispatchers are **Hexagon** code in `wpss.b06` (e_machine 164 per the
+> mdt; PDEV dispatcher `0xc02cd9cc` decoded end-to-end). Full chain:
+> `papers/wmi-dispatch-architecture.md` (F-9 → F-29 synthesis). The
+> profile-cluster reading in the table below is likewise deflated (a
+> strict 2 KB window on wpss.b08 yields 4/5, not 5/5 — F-19 correction).
+> The original text is kept as-is below for the record.
+
 **Claim:** First systematic cross-reference of ath11k's WMI command/event IDs
 (605 values, evaluated from `wmi.h` enums with a C-style evaluator) against
 the WCN6750 wpss firmware segments. Result: the **WLAN-profile command
