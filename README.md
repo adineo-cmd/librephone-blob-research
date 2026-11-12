@@ -19,7 +19,7 @@ Verified findings (full evidence in `qualcomm-fp6/docs/`):
 | 3 | Qualcomm .bXX segment headers carry junk e_machine values (methodology finding) |
 | 4 | **wpss runs Qualcomm's QURT RTOS on RISC-V**; leaked source names incl. `dog_hal_moselle_riscv.c` |
 | 5 | First ath11k↔firmware WMI constant cross-reference; IDs constructed at runtime |
-| 6 | **First public BT firmware census**: dedicated FAT16 partition, Moselle 1.1.2/1.2.0 + an EVROS family upstream Linux cannot name; rampatches = ARM32 Thumb |
+| 6 | **First public BT firmware census**: dedicated FAT16 partition, Moselle 1.1.2/1.2.0 + an EVROS family (later identified as WCN6450 per F-32) upstream Linux cannot name; rampatches = ARM32 Thumb |
 | 7 | **First public TrustZone census**: QTEE/QHEE = monolithic AArch64 ELFs (no .mdt split); build TZ.XF.5.28.0-00021-LANAIAAAAANAZT-1 |
 | 8 | **First public boot-chain census**: shrm/aop/cpucp are RISC-V (5th–6th RISC-V families on the SoC); xbl.img = 3-ELF container; full SoC ISA map: Hexagon modem / RV32 housekeeping / ARM32 BT / AArch64 UEFI |
 | 9 | **First formal research note published** — [papers/wmi-dispatch-architecture.md](papers/wmi-dispatch-architecture.md): the WCN6750 wpss WMI dispatch architecture decoded at instruction level — b09 registry (group routing) → b06 Hexagon dispatcher 0xc02cd9cc with computed jump tables (event routing); 61 events mapped; full falsification chain preserved |
@@ -46,6 +46,13 @@ The cross-vendor comparison is itself a finding: the same-generation
 ICP, MediaTek puts ARCv2 in the camera CCU. And the modem story: two
 different core families inside one MOLY build (MIPS32+MIPS16e application
 baseband + MD32 L1/PHY DSP).
+
+## Research notes (papers/)
+
+| Note | Claim |
+|------|-------|
+| [papers/wmi-dispatch-architecture.md](papers/wmi-dispatch-architecture.md) (2026-11-12) | WCN6750 wpss WMI dispatch decoded at instruction level — b09 registry → b06 Hexagon dispatcher with computed jump tables; 61 events mapped; falsification chain preserved |
+| [papers/format-re-campaign.md](papers/format-re-campaign.md) (2026-11-13) | Format-RE campaign (Open Discovery Lab F-34→F-39): ProLine PVD first public decoder+spec, IGS first structural write-up (Atari ST 640×200), Professional Draw clip container resolved 8/8, Clarion .DAT corpus validation + 4 spec corrections + complete 6/6 encryption crack (2-byte periodic XOR, arithmetic-identity brute force, 1991 content recovered) |
 
 ## Principles
 
