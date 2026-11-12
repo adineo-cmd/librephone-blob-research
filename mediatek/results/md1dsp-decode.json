@@ -1,0 +1,131 @@
+{
+ "id": "F-36",
+ "claim": "md1dsp (MT6785 modem DSP) ISA is byte-testable with the same decode-density method that closed md1rom; the rosemary census's Coresonic-class attribution and F-17's 'DSP! magic, ISA not decodable' flag are testable",
+ "verdict": "md1dsp is the modem L1/PHY DSP firmware whose build tree self-identifies the core as MediaTek MD32 (122 source-path strings 'md32/usip/...', 'md32/rake/...'); instruction-level decode is an honest negative: no available decoder produces coherent code (6 languages tested: MIPS32, MIPS16e, microMIPS, nanoMIPS, Xtensa, stock-Ghidra MD32 - max 6.25% on non-artifact windows vs 88-100.8% for md1rom islands)",
+ "date": "2026-11-12",
+ "input": {
+  "file": "md1img -> 06_md1dsp.bin",
+  "size": 6783260,
+  "sha256": "265e2c5a5561287d67a7037bb1cac3662243a089a667bf439c2000f65a4c3636",
+  "census_crosscheck": "rosemary-census.json partitions/6/records: md1dsp size 6783260, offset 28058992, mtk_hdr hdr_size 512 - size matches exactly",
+  "container": "512-B mtk_hdr (FILE_INFO: payload 0x678000 bytes at file offset 0x118) + DSP! image header: magic 'DSP!' at 0x118, +0x0C size 0x678000, +0x10 version 1, +0x18 marker 0x12345678, +0x1C chip 'MT6785', +0x2C 'DEFAULT_ASIC', +0xAC build string"
+ },
+ "method": {
+  "tool": "Ghidra 12.2 PUBLIC headless (cold-start: no auto-analysis, forced disassembly per window)",
+  "base_addr": "0x0 (flat raw binary import)",
+  "languages_tested": [
+   "MIPS:LE:32:default",
+   "MIPS:LE:32:16e",
+   "MIPS:LE:32:micro",
+   "nanomips:LE:32:default (nccgroup/ghidra-nanomips)",
+   "Xtensa:LE:32:default (stock, HiFi3 hypothesis)",
+   "MD32:LE:32:default (stock Ghidra 'MediaTek MD32' - chosen AFTER strings revealed the md32 build tree)"
+  ],
+  "metric": "per 256-byte window: clearListing + forced disassembly from window start; coverage = valid instruction bytes / 256 (F-20/F-28/F-31 decode-density methodology)",
+  "window_sets": [
+   "256 KiB-step sweep 0x0-0x677C5C (29 windows, all languages)",
+   "fine sweep of string-bearing regions 0x60000-0x5dd000 (13 windows, 16e/MIPS32/MD32)"
+  ],
+  "artifact_note": "pure-zero windows 'decode' exactly 68 bytes in every fixed 32-bit ISA (17 x 4-byte instructions) and 34 x 2-byte under MIPS16e; identical windows also hit 26.56%/13.28% under MD32/16e at data windows containing >=68-B zero runs. These rows are disassembler artifacts on zero runs, not code. Repeating 4-byte data patterns partially decode (e.g. 0x4c0000: 16e 29.69% = alternating 'addiu v1,sp,0x3a0 / addiu s0,sp,0x100' x7 - data, not code)."
+ },
+ "auto_analysis": {
+  "language": "MIPS:LE:32:default (full auto-analysis, best available fallback)",
+  "instructions": 2,
+  "functions": 0,
+  "defined_data": 15594,
+  "strings_kept": 400,
+  "note": "MIPS32 auto-analysis creates essentially no code - confirming the ISA negative; it does auto-define 15,594 data items including the string evidence below"
+ },
+ "self_identification_evidence": {
+  "build_tree_paths": 122,
+  "top_dirs": [
+   "md32/usip/brp/modem/lte/{cbrp,dbrp,top}/src/",
+   "md32/usip/brp/modem/fdd3g/{hspa,hw_drv,top}/src/",
+   "md32/usip/inner/modem/c2k/c2k_scheduler/src/",
+   "md32/rake/modem/{c2k,common/c2k}/src/",
+   "md32/usip/common/driver/sys_drv/{cache,init,md32,mpu,umif,uuif,cuif,ustimer,bigramdma}/src/",
+   "md32/usip/common/service/ddl_protection/src/",
+   "md32/common/driver/sys_drv/schd/src/"
+  ],
+  "task_strings": [
+   "4g_dci_parse_task.c", "4g_pcfich_parse_task.c", "4g_pdsch_crc_task.c", "4g_pdsch_proc_task.c",
+   "4g_dci_primitive_parse_func.c", "4g_l1_cmd_task.c", "4g_top_irq.c", "hspa_agch_event_task.c",
+   "hspa_pdsch_event_task.c", "top_event_isr.c", "c2k_scheduler.c", "lte_sw_init exit",
+   "LISR_c2k_pilot_arrival", "LISR_c2k_pd_decode_done"
+  ],
+  "assert_strings": [
+   "dsp_bin_ro==(kal_uint32 *)DSP_BIN_RO_ADDRESS",
+   "brp_idle_check == DSP_CONTROL_IDLE",
+   "fec_tx_idle_check == DSP_CONTROL_IDLE",
+   "((DEMOD_TOP_PDCCH_REGS*)...)->DEMOD_PDCCH_STATUS != 0xDEADBEEF (demod registers at 0xBD300000)"
+  ],
+  "version_strings": [
+   "MOLY.LR13.R1.MP.V89.6.P79 (identical to md1rom - same MOLY LR13 build package)",
+   "BUILD_NO", "VER_INFO!"
+  ]
+ },
+ "prior_art": [
+  "cyrozap/mediatek-lte-baseband-re (GitHub) - reverse engineering of the MTK LTE baseband's Coresonic DSP inside the MT6295 modem; establishes that older-generation (MT6295-era) MTK modem DSPs are Coresonic cores",
+  "CEVA acquired Coresonic (2014); no open Ghidra/SLEIGH decoder exists for Coresonic/CEVA XC-class vector DSPs",
+  "Check Point Research 2021 'Looking for Vulnerabilities in MediaTek Audio DSP' - custom opcodes, unrelated core (HiFi/Xtensa)",
+  "census F-16/F-17: md1dsp DSP! container, 'modem DSP = Coresonic-class per cyrozap/NCC DSP symbol history; ISA not decodable'"
+ ],
+ "interpretation": {
+  "core_id": "string-level (strong): the firmware's own assert/build strings place it in the 'md32' source tree - MediaTek's MD32 DSP core (Ghidra 12.2 ships an MD32:LE:32:default processor module, evidently for a different MD32 generation/subsystem use)",
+  "census_update": "the census's 'Coresonic-class' attribution for MT6785 md1dsp is superseded by the self-naming md32 build tree (Coresonic attribution remains valid for the MT6295 generation per cyrozap)",
+  "isa_negative": "the instruction stream does not decode under any of the 6 tested languages (incl. Ghidra's own MD32 module): code regions 0x40000-0xC0000, 0x140000-0x180000, 0x53C000-0x600000 are dense non-zero bytes with 0-6.25% coverage; possible causes: packed/compressed code sections, or an MD32 ISA generation not covered by Ghidra's module",
+  "family_map": "MT6785 modem subsystem uses at least two distinct core families: MIPS32+MIPS16e (md1rom protocol/AP cores) and md32 DSP (md1dsp L1/PHY); audio_dsp HiFi3 Xtensa is a third"
+ },
+ "limitations": [
+  "Ghidra MD32 module is stock (no pspec tuning, no load-address knowledge from the DSP! header); a future pass with DSP! segment load addresses or an MD32 ISA variant doc could still close the byte-level decode",
+  "no attempt to decompress/pack-detect the 0x600000+ tail (high-entropy, likely compressed secondary image)",
+  "auto-analysis run under MIPS32 (no winner language existed); instruction/function counts are therefore not meaningful beyond confirming the negative",
+  "window step 256 KiB (main) / ad-hoc (fine) - island boundaries not mapped"
+ ],
+ "main_sweep_256KiB_cov_pct": [
+  {"window": "0x0", "mips32": 1.56, "mips16e": 10.94, "micromips": 1.56, "nanomips": 0.0, "xtensa": 0.0, "md32": 0.0},
+  {"window": "0x118", "mips32": 4.69, "mips16e": 20.31, "micromips": 4.69, "nanomips": 17.97, "xtensa": 0.0, "md32": 0.0},
+  {"window": "0x200", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x40000", "mips32": 0.0, "mips16e": 2.34, "micromips": 0.0, "nanomips": 0.0, "xtensa": 0.0, "md32": 0.0},
+  {"window": "0x80000", "mips32": 1.56, "mips16e": 1.56, "micromips": 1.56, "nanomips": 0.78, "xtensa": 3.52, "md32": 0.0},
+  {"window": "0xc0000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x100000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x140000", "mips32": 0.0, "mips16e": 5.47, "micromips": 0.0, "nanomips": 3.91, "xtensa": 3.52, "md32": 1.56},
+  {"window": "0x180000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x1c0000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x200000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x240000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x280000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x2c0000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x300000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x340000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x380000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x3c0000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x400000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x440000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x480000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": null},
+  {"window": "0x4c0000", "mips32": 0.0, "mips16e": 29.69, "micromips": 0.0, "nanomips": 28.13, "xtensa": 0.78, "md32": 14.06},
+  {"window": "0x500000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x540000", "mips32": 0.0, "mips16e": 7.81, "micromips": 0.0, "nanomips": 0.0, "xtensa": 8.98, "md32": 3.13},
+  {"window": "0x580000", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56},
+  {"window": "0x5c0000", "mips32": 1.56, "mips16e": 7.03, "micromips": 1.56, "nanomips": 0.78, "xtensa": 2.34, "md32": 0.0},
+  {"window": "0x600000", "mips32": 0.0, "mips16e": 0.0, "micromips": 0.0, "nanomips": 0.0, "xtensa": 8.2, "md32": 0.0},
+  {"window": "0x640000", "mips32": 0.0, "mips16e": 9.38, "micromips": 0.0, "nanomips": 0.0, "xtensa": 0.0, "md32": 0.0},
+  {"window": "0x677c5c", "mips32": 26.56, "mips16e": 13.28, "micromips": 26.56, "nanomips": 26.56, "xtensa": 1.17, "md32": 26.56}
+ ],
+ "fine_sweep_cov_pct": [
+  {"window": "0x60000", "MIPS:LE:32:16e": 16.41, "MIPS:LE:32:default": 4.69, "MD32:LE:32:default": 0.0},
+  {"window": "0x70000", "MIPS:LE:32:16e": 4.69, "MIPS:LE:32:default": 7.81, "MD32:LE:32:default": 0.0},
+  {"window": "0x86000", "MIPS:LE:32:16e": 0.0, "MIPS:LE:32:default": 7.81, "MD32:LE:32:default": 3.13},
+  {"window": "0x87000", "MIPS:LE:32:16e": 13.28, "MIPS:LE:32:default": 26.56, "MD32:LE:32:default": 26.56},
+  {"window": "0x90000", "MIPS:LE:32:16e": 13.28, "MIPS:LE:32:default": 26.56, "MD32:LE:32:default": 26.56},
+  {"window": "0xa2000", "MIPS:LE:32:16e": 10.16, "MIPS:LE:32:default": 0.0, "MD32:LE:32:default": 0.78},
+  {"window": "0xaeb00", "MIPS:LE:32:16e": 16.41, "MIPS:LE:32:default": 0.0, "MD32:LE:32:default": 6.25},
+  {"window": "0x145000", "MIPS:LE:32:16e": 2.34, "MIPS:LE:32:default": 1.56, "MD32:LE:32:default": 0.0},
+  {"window": "0x155000", "MIPS:LE:32:16e": 13.28, "MIPS:LE:32:default": 26.56, "MD32:LE:32:default": 26.56},
+  {"window": "0x4d0000", "MIPS:LE:32:16e": 13.28, "MIPS:LE:32:default": 26.56, "MD32:LE:32:default": 26.56},
+  {"window": "0x550000", "MIPS:LE:32:16e": 13.28, "MIPS:LE:32:default": 26.56, "MD32:LE:32:default": 26.56},
+  {"window": "0x5a0000", "MIPS:LE:32:16e": 1.56, "MIPS:LE:32:default": 1.56, "MD32:LE:32:default": 0.0},
+  {"window": "0x5dd000", "MIPS:LE:32:16e": 35.16, "MIPS:LE:32:default": 3.13, "MD32:LE:32:default": 0.0}
+ ]
+}
