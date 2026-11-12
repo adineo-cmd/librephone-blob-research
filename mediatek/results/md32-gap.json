@@ -1,0 +1,143 @@
+{
+ "finding": "F-45: md1dsp MD32 decode gap diagnosis (F-36 follow-up)",
+ "date": "2026-11-13",
+ "file": "mediatek/extract/trees/md1img/06_md1dsp.bin",
+ "size_bytes": 6783260,
+ "header": {
+  "dsp_magic_offset": "0x118",
+  "payload_size": "0x678000",
+  "version": 1,
+  "marker": "0x12345678",
+  "chip": "MT6785",
+  "build": "MOLY.LR13.R1.MP.V89.6.P79",
+  "descriptor_table_0x248": [
+   {"off": "0x15c", "len": "0x58b814", "rsv": 0, "tag": 1},
+   {"off": "0x39c", "len": "0x73d4", "rsv": 0, "tag": 2},
+   {"off": "0x56c", "len": "0x49a58", "rsv": 0, "tag": "USIP"}
+  ],
+  "named_sections": {
+   "USIP": {"tag_offset": "0x274", "body": "0x278", "records_partially_parsed": true,
+    "sample_records": [[1, "0x100000", "0xaee80", "0x3de5fc84"], [0, "0x101000", "0x48b814", "0x30f210d6"]]},
+   "RAKE": {"tag_offset": "0x4b4",
+    "records": [
+     ["?", "0x58c814", "0x4d0c", "0x9c681227"],
+     ["?", "0x591520", "0x26c8", "0x8e4abfdc"],
+     ["?", "0x5d6540", "0x12484", "0xdaf6ce8d"],
+     ["?", "0x5efac4", "0x54a8", "0x04a1a1c8"],
+     ["?", "0x5f4f6c", "0x10c68", "0x0d410876"],
+     ["?", "0x605bd4", "0x4dfc", "0x1fbf2927"]
+    ],
+    "chains_offset_len": "0x58c814 -> 0x60a9d0, tiles the md32/rake+scq16 string zone"
+   }
+  }
+ },
+ "entropy_zones": {
+  "rodata_strings": ["0x020000-0x070000", "0x060000-0x0b0000 (md32/usip,brp,inner)", "0x100000-0x170000 (incl dense zone 0x120000-0x160000)", "0x4b0000-0x530000", "0x590000-0x5e0000 (md32/rake, scq16, common)"],
+  "all_zero": "0xb0000-0x100000",
+  "le_data_tables": ["0x4c0000 (u32 LE tables)", "0xa0000 (monotonic u16 table)"],
+  "dense_unknown_0x120000_0x160000": {"H_bits_per_byte": "6.85-6.95", "ascii_pct": "34-37", "long_strings": 0, "interpretation": "unknown-encoding code or LZ-compressed data; undetermined"},
+  "tail_0x600000_plus": {"H_max": 7.9, "interpretation": "compressed secondary image"}
+ },
+ "string_stats": {"total_ascii_runs_ge6": 9796, "md32_hits": 145,
+  "md32_64KB_blocks": {"0x80000": 32, "0xa0000": 20, "0x4b0000": 6, "0x4c0000": 4, "0x4d0000": 13, "0x530000": 29, "0x590000": 31, "0x5c0000": 2, "0x5d0000": 8}},
+ "ghidra_runs": {
+  "windows": ["0x0", "0x40000", "0x60000", "0x80000", "0x84000", "0x86000", "0xa0000", "0x120000", "0x140000", "0x180000", "0x4b0000", "0x4d0000", "0x530000", "0x540000", "0x580000", "0x590000", "0x591520", "0x5a0000", "0x5c0000", "0x5dd000", "0x600000"],
+  "MD32_native": {"lang": "MD32:LE:32:default", "file": "06_md1dsp.bin", "max_real_coverage_pct": 3.13, "note": "26.56% cells = 68-byte zero-run artifact",
+   "windows": [
+    {"offset": "0x0", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x40000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x60000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x80000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x84000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x86000", "cov_pct": 3.13, "insns": 2, "bytes": 8},
+    {"offset": "0xa0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x120000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x140000", "cov_pct": 1.56, "insns": 1, "bytes": 4},
+    {"offset": "0x180000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x4b0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x4d0000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x530000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x540000", "cov_pct": 3.13, "insns": 2, "bytes": 8},
+    {"offset": "0x580000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x590000", "cov_pct": 0.78, "insns": 1, "bytes": 2},
+    {"offset": "0x591520", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x5a0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x5c0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x5dd000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x600000", "cov_pct": 0.0, "insns": 0, "bytes": 0}
+   ]},
+  "MD32_swapped16": {"lang": "MD32:LE:32:default", "file": "md1dsp_swap16.bin (16-bit byte-swapped image)", "max_coverage_pct": 100.78, "verdict": "artifact", "evidence": "dump_win.java at 0xa0000/0x540000: 40/40 insns are 'mv rX,#imm' with monotonically increasing immediates and cycling registers; zero control-flow mnemonics",
+   "windows": [
+    {"offset": "0x0", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x40000", "cov_pct": 2.34, "insns": 2, "bytes": 6},
+    {"offset": "0x60000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x80000", "cov_pct": 2.34, "insns": 3, "bytes": 6},
+    {"offset": "0x84000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x86000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0xa0000", "cov_pct": 100.0, "insns": 64, "bytes": 256},
+    {"offset": "0x120000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x140000", "cov_pct": 3.13, "insns": 3, "bytes": 8},
+    {"offset": "0x180000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x4b0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x4d0000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x530000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x540000", "cov_pct": 100.78, "insns": 65, "bytes": 258},
+    {"offset": "0x580000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x590000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x591520", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x5a0000", "cov_pct": 1.56, "insns": 2, "bytes": 4},
+    {"offset": "0x5c0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x5dd000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x600000", "cov_pct": 0.78, "insns": 1, "bytes": 2}
+   ]},
+  "MIPS_BE": {"lang": "MIPS:BE:32:default", "file": "06_md1dsp.bin", "max_real_coverage_pct": 6.25, "note": "6.25% cells at 0x591520/0x5dd000 decode string bytes",
+   "windows": [
+    {"offset": "0x0", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x40000", "cov_pct": 1.56, "insns": 1, "bytes": 4},
+    {"offset": "0x60000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x80000", "cov_pct": 1.56, "insns": 1, "bytes": 4},
+    {"offset": "0x84000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x86000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0xa0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x120000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x140000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x180000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x4b0000", "cov_pct": 4.69, "insns": 3, "bytes": 12},
+    {"offset": "0x4d0000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x530000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x540000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x580000", "cov_pct": 26.56, "insns": 17, "bytes": 68},
+    {"offset": "0x590000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x591520", "cov_pct": 6.25, "insns": 4, "bytes": 16},
+    {"offset": "0x5a0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x5c0000", "cov_pct": 0.0, "insns": 0, "bytes": 0},
+    {"offset": "0x5dd000", "cov_pct": 6.25, "insns": 4, "bytes": 16},
+    {"offset": "0x600000", "cov_pct": 1.56, "insns": 1, "bytes": 4}
+   ]}
+ },
+ "web_research": {
+  "ghidra_md32_provenance": {
+   "repo": "https://github.com/cyrozap/ghidra-md32",
+   "author": "cyrozap",
+   "license": "Apache-2.0",
+   "status": "WIP, stalled (Ghidra issues #3942 delay slots, #4390, #4581 bundles)",
+   "derived_from": "older MediaTek modem DSP (mediatek-lte-baseband-re target, MT6295-era)",
+   "ADI_heritage": "cycle_count_md32.h carries Analog Devices 2004-2008 copyright; MTK acquired ADI cellular ops 2007",
+   "elf_machine": "0x2454 (= MTK TWSE ticker 2454)",
+   "spec_shape": "ldefs instructionEndian=big, alignment=2; sinc: r0-r15, ls/le/lc loop regs x3, accumulator a0, bundle/phase context"
+  },
+  "check_point_2021": {"url": "https://research.checkpoint.com/2021/looking-for-vulnerabilities-in-mediatek-audio-dsp", "scope": "audio DSP (different subsystem), custom proprietary opcodes, methodology prior art"}
+ },
+ "hypotheses": {
+  "a_generation_mismatch": "leading (unfalsified)",
+  "b_packing": "partial: tail compressed; 0x120000 zone undetermined; strings plaintext",
+  "c_wrong_region": "refuted for tested windows (rodata/data zones; no control flow under any language)",
+  "d_instruction_endianness": "refuted (swapped-image 100% cells are mv-only data artifacts)"
+ },
+ "next_levers": [
+  "obtain MD32 ELF machine 0x2454 or newer cyrozap spec to pin the generation",
+  "fully parse DSP! USIP/RAKE descriptors + crc32 verification to find packed sections",
+  "hand-build SLEIGH from 0x120000-0x160000 dense zone (Check Point methodology)"
+ ],
+ "scripts": ["mediatek/tools/window_stats.java", "mediatek/tools/dump_win.java"]
+}
