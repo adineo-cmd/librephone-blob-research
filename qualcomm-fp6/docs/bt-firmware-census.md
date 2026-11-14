@@ -70,7 +70,7 @@ three program headers and a single RWX `LOAD`:
 | msbtfw12.mbn | 0x23dc5 | 0x23dc4 | 0x18894 (100,500 B) |
 
 Entry = LOAD vaddr **| 1** → **ARM Thumb entry point**. Unlike the modem's
-`.bXX` segment files (see [[fp6-architecture-census]] F-7), these are
+`.bXX` segment files (see the architecture census, F-7), these are
 complete, self-consistent ELF files (sane e_type/e_machine/entry), so the
 ARM identification is trustworthy without .mdt cross-checks. Contrast: the
 WCN6750 **wpss on the same chip is 32-bit RISC-V** (F-5) — Qualcomm's BT and
@@ -100,9 +100,9 @@ WCN6750 BT firmware executes on; this is the first published identification.
   reproduces all three filenames from the shipped binaries.** First time
   this correspondence is shown against real firmware headers (upstream
   documents the formula but no public source ties it to the files).
-- The on-device patch header is 32 bytes before data (entry at offset 0x20),
-  i.e. the vendor containers carry 8 more reserved bytes than the upstream
-  24-byte `struct tlv_type_patch`; decode accordingly.
+- The on-device patch header is 32 bytes before data (entry at offset 0x24),
+  i.e. the vendor containers carry 12 more bytes (reserved fields) than the
+  upstream 24-byte `struct tlv_type_patch`; decode accordingly.
 - EVROS entry **0x20027fc8** sits in the classic Cortex-M SRAM window
   (0x2000_0000+) and appears with companion pointers 0x200117b7/0x20017xxx —
   a different load layout than Moselle's 0x24c50 region.

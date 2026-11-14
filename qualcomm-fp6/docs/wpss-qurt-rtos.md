@@ -26,7 +26,7 @@ EXCEPTION:tid=0x%x:PC=0x%x:mcause:0x%x
   API family as the Hexagon DSPs' QuRT). First public identification of
   QURT on the wpss.
 - `mcause` is a RISC-V CSR name — the exception path is RISC-V, again
-  confirming [[fp6-architecture-census]] F-5 at the RTOS layer.
+  confirming the architecture census (F-5) at the RTOS layer.
 
 ### Leaked source filenames (Qualcomm build artifacts)
 

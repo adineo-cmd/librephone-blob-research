@@ -41,10 +41,10 @@ in the paper's Appendix A).
   6,074,641 B (`0x5CB111`) = **end-exclusive `0xc05bd111`**; the Ghidra
   flat-block end `0xc05cd110` is the *inclusive last-byte* address and is
   consistent with filesz (not an error). The transcription variants
-  `0xc05cb111` and `0xc05bdb31` appear only in open-discovery-lab finding
-  docs (`wmi-dispatcher-b09-b10-b12.md`, `wmi-registry-consumers.md`,
-  `hexagon-decode.md`) — a different repo, outside this package's write
-  scope; flagged for the owner to patch there. All upstream-facing text
+  `0xc05cb111` and `0xc05bdb31` formerly appeared in open-discovery-lab
+  finding docs (`wmi-dispatcher-b09-b10-b12.md`, `wmi-registry-consumers.md`,
+  `hexagon-decode.md`); those docs have since been patched to the canonical
+  value. All upstream-facing text
   below uses the canonical value (recorded in the paper, Appendix B
   item 2).
 - **`qualcomm-fp6/docs/wmi-xref.md`** carried the falsified

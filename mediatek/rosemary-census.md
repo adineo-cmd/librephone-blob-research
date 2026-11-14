@@ -23,7 +23,8 @@ Xtensa backend). `spmfw` is **not CPU code at all**: SPM/PCM microcode
 modem (`md1rom`) is a **raw concatenated image with no ELF header**;
 nanoMIPS per public prior art (NCC Group, taszk), unverifiable with capstone
 (no nanoMIPS decoder — decode rates 0–45/48 across six supported ISAs at 12+
-probed offsets, no dominant ISA). **Zero ELF files exist in the firmware
+probed offsets, no dominant ISA) *(overturned 2026-11-12 by F-31 — see the
+corrections banner below)*. **Zero ELF files exist in the firmware
 partition set** — but the userspace partitions do contain ELFs, and exactly
 one non-ARM family: the ARCv2 CCU fleet. Every firmware code payload ships
 in the MediaTek `mtk_hdr` record chain (magic `0x58881688`, 512-byte
@@ -33,6 +34,16 @@ signed with a **pair of DER X.509 certificates (cert1 = 1,709 B, cert2 = 957
 B)** — 34 payloads, 19 signed pairs; the modem's 13 data payloads
 (`md1_filter*`, `md1_mddb*`, `md1_mdmlayout`, `md1_file_map`), gz's `unmap2`
 and lk's `kaeru` carry no signature records.
+
+> **Corrections (2026-11-12, superseding the nanoMIPS/Coresonic readings in
+> this census):** F-31 decode-verified `md1rom` as **MIPS32 LE + MIPS16e**
+> (4-language decode-density on identical windows; 1,322,630 instructions,
+> 16,297 functions — the NCC/taszk nanoMIPS attribution is Dimensity-era
+> MT6873+ 2023, and this MT6785/MOLY-LR13 chip predates it). F-36
+> byte-verified the `md1dsp` container and identified the core as **MTK
+> MD32-class** (the Coresonic reading is superseded); F-45 diagnoses the
+> remaining instruction-level decode gap. See `docs/md1rom-decode.md`,
+> `docs/md1dsp-decode.md`, `docs/md32-gap.md`.
 
 This is the MTK mirror of the FP6 methodology finding: **MTK does not use
 ELF/MDT containers for subsystem firmware on this SoC** — there is no
@@ -127,9 +138,9 @@ MT6785 firmware set is exactly the 12 firmware partitions above.
 
 | partition / payload | container | architecture evidence | verdict |
 |---|---|---|---|
-| `md1img` → `md1rom` (26,682,512 B) | mtk_hdr | raw image, no ELF, no arch strings; all-ISA decode sanity fails (see negatives) | **nanoMIPS per prior art (NCC/taszk), unverified from bytes** |
+| `md1img` → `md1rom` (26,682,512 B) | mtk_hdr | raw image, no ELF, no arch strings; all-ISA decode sanity fails (see negatives) | **nanoMIPS per prior art (NCC/taszk), unverified from bytes** *(overturned 2026-11-12 by F-31: decode-verified MIPS32+MIPS16e)* |
 | `md1img` → `md1drdi` (1,368,064 B) | mtk_hdr | avg entropy 0.8–1.5 (mostly zero-padded), no header, no code signature | data/debug image; no ISA claim |
-| `md1img` → `md1dsp` (6,783,260 B) | GFH MMM-chain (sig_type=0, load_addr=0xFFFFFFFF) | GFH records ver=1; record type **260 (0x104)** — beyond U-Boot's enum {0,1,2,3,7,8}; code region begins with ASCII magic **`DSP!`** | DSP bootloader image (modem DSP = Coresonic-class per cyrozap/NCC DSP symbol history); ISA not decodable |
+| `md1img` → `md1dsp` (6,783,260 B) | GFH MMM-chain (sig_type=0, load_addr=0xFFFFFFFF) | GFH records ver=1; record type **260 (0x104)** — beyond U-Boot's enum {0,1,2,3,7,8}; code region begins with ASCII magic **`DSP!`** | DSP bootloader image (modem DSP = Coresonic-class per cyrozap/NCC DSP symbol history); ISA not decodable *(superseded 2026-11-12 by F-36: MD32-class, container byte-verified; decode gap diagnosed in F-45)* |
 | `md1img` → `md1_filter*` ×8, `md1_emfilter`, `md1_mddbmeta`, `md1_mddbmetaodb` (gzip XML, 2.9 MB decoded), `md1_mddb`, `md1_mdmlayout`, `md1_file_map` | mtk_hdr, unsigned | modem catcher-filter/DB payloads; `md1_mddbmetaodb` = gzipped modem-DB XML (`kal_uint32` type tables); `md1_file_map` = plain-text name map | data; no ISA |
 | `scp` → `tinysys-loader-CM4_A` (1,080 B) | mtk_hdr | Cortex-M vector table: SP=0x538, reset=0x1e1 (odd = Thumb), 6× handler 0x26d | **ARM Cortex-M4 (Thumb)** |
 | `scp` → `tinysys-scp-CM4_A` (1,824,584 B) | mtk_hdr | header = u32 table (0xb8180, 0x387d9, 0x392f9, …) — section table; strings `SCP_VOW_TASK_VER`, `VER_18041204`, version `2.4.4-9d0f65f` | tinysys multibin; ISA via its dram image below |
@@ -274,6 +285,8 @@ ELFs across vendor/system).
   decoder, and 12+ probed md1rom windows give no dominant supported ISA
   (arm32 0–32/48, thumb2 0–45/48, mips32 0–26/48) — consistent with an
   unknown encoding plus data regions. Claim stands on prior art only.
+  *(Overturned 2026-11-12 by F-31: 4-language decode-density pins MIPS32
+  entry + MIPS16e islands — see `docs/md1rom-decode.md`.)*
 - **HiFi3 (Xtensa) not byte-verified** — no capstone backend; name-level
   identification only.
 - **ARCv2 decode not byte-verified** — capstone has no ARC backend either;

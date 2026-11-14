@@ -173,6 +173,10 @@ and F-18 should be corrected accordingly.
 - Coverage windows are 256 B and step 1 MiB — island boundaries are coarse.
 - md1dsp (Coresonic-class DSP, `DSP!` magic) remains not byte-verified (F-17);
   no DSP ISA decoder available this pass.
+  *(Superseded later the same day by F-36: the md1dsp container is
+  byte-verified and the core is MTK MD32-class — the Coresonic attribution
+  is superseded; the instruction-level decode gap remains, diagnosed in
+  `md32-gap.md` (F-45).)*
 
 ## Reproduce
 

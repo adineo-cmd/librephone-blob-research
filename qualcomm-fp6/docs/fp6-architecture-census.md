@@ -20,7 +20,7 @@ Source: `lineage-23.2-20261109-nightly-FP6-signed.zip` (public mirror).
 Extraction: `payload_dumper` → partitions; `tools/extract_vfat.py` (modem.img,
 vfat) and `tools/extract_ext4.py` (vendor.img/dsp.img, ext4); census via
 `tools/census.py` (stdlib ELF parser; hashes + program headers, no binary
-content). All scripts in `tools/`, census in `results/census.json`/`census.md`.
+content). All scripts in `tools/`, census in `results/census.md`.
 
 ## Results
 
