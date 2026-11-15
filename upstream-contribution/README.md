@@ -643,3 +643,35 @@ Under `## Top Level`, add:
 | PR-2 | `papers/wmi-dispatch-architecture.md` (F-9→F-29 synthesis; results JSONs in open-discovery-lab) |
 | PR-3 | same as PR-2 + `fp6-architecture-census.md`, `wpss-b07-disasm-head.md`, census notes on b10/b12 |
 | PR-4 | `qualcomm-fp6/docs/bt-firmware-census.md`, `bootchain-census.md` |
+
+---
+
+## 2026-11-15 additions (wants-vs-done audit)
+
+A full audit of what LibrePhone asks for (all 28 open issues, upstream
+docs re-fetched, FSF campaign + librephone.fsf.org pages, open PRs
+incl. #58) cross-checked against lab coverage lives in
+[librephone-wants.md](librephone-wants.md) — the master matrix
+(want, source, status, lab evidence, others' evidence, next action).
+Headline: all four PR target texts above re-verified unchanged on
+2026-11-15; all four still needed.
+
+An **additional** filing package came out of the audit —
+[pr5-corrections-package.md](pr5-corrections-package.md), holding:
+
+- **PR-5** — `docs/other.md`: CAMERA_ICP and vpu20_2v are labeled
+  "Tensilica Xtensa" upstream; the lab's verified census (F-6) shows
+  the historic RISC-V identification (e_machine=94). Not corrected by
+  anyone upstream as of 2026-11-15.
+- **PR-6** — `docs/wpss.b01.md` ("ATmega8 embedded") + the wireless.md
+  WPSS-section AVR instance: contradicted by the wpss.mdt program
+  headers (b01/b02/b03/b05/b06 executable, e_machine=164 EM_HEXAGON).
+  File after PR-1 (same file).
+- **C-1..C-3** — paste-ready comments for issues #38 (QURT, not L4),
+  #43/#41 (secure-element service TAs identified), #42 (honest
+  negative), #33 (8 of 16 libraries identified) — the lab already
+  holds verified answers from committed censuses.
+
+Filing order overall: PR-1 → PR-2 → PR-3 → PR-4 → PR-5 → PR-6, then
+the issue comments (C-1..C-3 are independent of the PRs). All owner-gated
+(Codeberg login), per the checklist.
