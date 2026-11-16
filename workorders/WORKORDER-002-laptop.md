@@ -26,9 +26,16 @@ material; every implementation file carries the clean-room statement header.
 
 ## PHASE 1 — DEEP RE (metadata-first, per device in rows 223–444)
 
-Identical to the desktop's Phase 1 (WORKORDER-001-desktop.md — read it for the full spec):
-public facts only per device (upstream rows, vendor/SoC, mainline status, public trees),
-per-family census where obtainable, honest failure marks.
+Identical to the desktop's Phase 1 (WORKORDER-001-desktop.md — read it for the full spec).
+**UPDATED 2026-11-16 (F-71):** the coverage matrix already exists —
+`upstream-contribution/blob-database/coverage-matrix.csv` (33,917 blob rows × 123
+blob-populated devices; the published upstream "database" is metadata-only, payloads are not
+published anywhere — see `blob-database/recon.md`). Your job: map your half (rows 223-444)
+against the matrix, LEVERAGE-FIRST (the top-20 list in recon.md — the bm2nXX.bin ADSP fleet
+and image-level sharing like abl.img ×75 / devcfg.img ×76 fall where they fall; whichever of
+the QCA BT fleet / ADSP fleet sits in your half is your Phase 2/3 headline), attempt
+population of your half's not-populated devices from public LineageOS packages per-device as
+needed, and extend the matrix rows for your half.
 Output: `blob-matrix/laptop/devices-223-444.csv` + `blob-matrix/laptop/deep-re-notes.md`.
 
 ## PHASE 2 — BLOB FAMILIES DOCUMENTED (per device/family in rows 223–444)
