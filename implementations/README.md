@@ -13,6 +13,10 @@ component carries a clean-room statement header and a self-test.
 | [htc/frame-layer](htc/frame-layer/) | public ath11k htc.h (GPL) frame/service facts | self-test passing (23 checks) |
 | [htt](htt/) | none committed — open item | documented gap |
 | [lpec/frame-parser](lpec/frame-parser/) | open-discovery-lab track-c lpec spec docs (F-47/F-48/F-49 + pass3) | packaged, byte-exact per pass3 validation |
+| [mediatek/container](mediatek/container/) | rosemary census "Container formats" + U-Boot tools/mtk_image.h (GPL) | self-test passing (57 checks incl. md32-interface) |
+| [mediatek/md1rom-taskmap](mediatek/md1rom-taskmap/) | rosemary census md1rom regions (F-31) | self-test passing; 6 explicit stubs |
+| [mediatek/md32-interface](mediatek/md32-interface/) | F-45 MD32 interface lever-2 facts | self-test passing |
+| [qca-bt](qca-bt/) | public btqca.h/btqca.c (GPL, torvalds/linux master, fetched 2026-11-16) — TLV patch/NVRAM container families (crbtfw/apbtfw/crnv/apnv …) | unittest suite passing (30 tests) |
 
 Build: `gcc -std=c99 -Wall -Wextra -O2 -o test <comp>/test_*.c <comp>/*.c` (each
 test binary self-validates and exits non-zero on any failure).
