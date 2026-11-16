@@ -1,0 +1,907 @@
+{
+ "half": "laptop rows 119-236 (codepoint sort)",
+ "devices": 118,
+ "extracts_flag_true": 46,
+ "semantics": {
+  "extracts_and_blobs": 31,
+  "extracts_only_no_blobs": 15,
+  "blobs_only_no_extracts_flag": 31,
+  "neither": 41,
+  "note": "the upstream `extracts` column does NOT track blob presence: 15 devices are flagged extracts-true with zero blob rows and 31 carry blob rows flagged extracts-false"
+ },
+ "blob_rows": 16883,
+ "total_bytes": 31918357652,
+ "distinct_md5": 7042,
+ "shared_md5": 2684,
+ "singleton_md5": 4358,
+ "shared_instances": 10510,
+ "shared_instance_share_pct": 62.3,
+ "real_shared_md5": 2062,
+ "real_shared_instances": 8033,
+ "hist_all": {
+  "2-4": 2017,
+  "5-9": 630,
+  "10-19": 36,
+  "20+": 1
+ },
+ "hist_real": {
+  "2-4": 1542,
+  "5-9": 506,
+  "10-19": 14
+ },
+ "empty_md5_cluster": {
+  "devices": 21,
+  "files": {
+   "oem_hw.txt": 8,
+   "eye_retouch_chinese.bin": 1,
+   "oem_hw_null.txt": 12,
+   "oem_sw_null.txt": 12
+  }
+ },
+ "soc_strings": [
+  [
+   "Qualcomm SDM636 Snapdragon 636",
+   1
+  ],
+  [
+   "Qualcomm SDM845 Snapdragon 845",
+   9
+  ],
+  [
+   "Qualcomm SM6375 Snapdragon 695",
+   8
+  ],
+  [
+   "Qualcomm SM8150-AC Snapdragon 855",
+   1
+  ],
+  [
+   "Qualcomm SM8250 Snapdragon 865",
+   6
+  ],
+  [
+   "Qualcomm SM8350 Snapdragon 888",
+   2
+  ],
+  [
+   "Qualcomm SM8475 Snapdragon 8+ Gen1",
+   1
+  ],
+  [
+   "UNSPECIFIED",
+   90
+  ]
+ ],
+ "mtk_devices_with_blank_soc": [
+  "earth",
+  "rosemary"
+ ],
+ "families": {
+  "boot": {
+   "rows": 487,
+   "bytes": 13660507500,
+   "devices": 62
+  },
+  "modem": {
+   "rows": 814,
+   "bytes": 8683591993,
+   "devices": 50
+  },
+  "other": {
+   "rows": 8574,
+   "bytes": 6460998806,
+   "devices": 59
+  },
+  "adsp": {
+   "rows": 1435,
+   "bytes": 2309789044,
+   "devices": 29
+  },
+  "wifi": {
+   "rows": 2731,
+   "bytes": 392652165,
+   "devices": 50
+  },
+  "tz": {
+   "rows": 2115,
+   "bytes": 223121774,
+   "devices": 31
+  },
+  "cdsp": {
+   "rows": 402,
+   "bytes": 139192350,
+   "devices": 23
+  },
+  "bt": {
+   "rows": 84,
+   "bytes": 42060176,
+   "devices": 31
+  },
+  "gpu": {
+   "rows": 241,
+   "bytes": 6443844,
+   "devices": 47
+  }
+ },
+ "top15": [
+  {
+   "md5": "2a47164eed5282f27ad503a28c7b71a0",
+   "file": "hrtf5c.bin",
+   "family": "adsp",
+   "bytes": 164480,
+   "device_count": 12,
+   "devices": [
+    "cupid",
+    "diting",
+    "fuxi",
+    "marble",
+    "mayfly",
+    "mondrian",
+    "nuwa",
+    "socrates",
+    "thor",
+    "unicorn",
+    "vermeer",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "30c22653187904f76d4c591fbdb4ca7e",
+   "file": "modem.b16",
+   "family": "modem",
+   "bytes": 473648,
+   "device_count": 11,
+   "devices": [
+    "cupid",
+    "diting",
+    "fuxi",
+    "marble",
+    "mayfly",
+    "mondrian",
+    "nuwa",
+    "socrates",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "922473448ce287c8bb5e849998b9ffb7",
+   "file": "hpbtfw20.tlv",
+   "family": "other",
+   "bytes": 201560,
+   "device_count": 11,
+   "devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "a2b9504e3d1cb8686ae7fcca21a11e1a",
+   "file": "a650_gmu.bin",
+   "family": "gpu",
+   "bytes": 41548,
+   "device_count": 11,
+   "devices": [
+    "gta4l",
+    "gta4lwifi",
+    "gts7l",
+    "gts7lwifi",
+    "instantnoodle",
+    "instantnoodlep",
+    "kebab",
+    "lemonades",
+    "pdx206",
+    "pdx215",
+    "r8q"
+   ]
+  },
+  {
+   "md5": "70727b648c00a14bad7ede05ba9b4bd3",
+   "file": "dax_param.bin",
+   "family": "other",
+   "bytes": 34736,
+   "device_count": 11,
+   "devices": [
+    "a21s",
+    "a71",
+    "beyond0lte",
+    "beyond1lte",
+    "beyond2lte",
+    "beyondx",
+    "f62",
+    "gta4l",
+    "gta4lwifi",
+    "gta4xl",
+    "gta4xlwifi"
+   ]
+  },
+  {
+   "md5": "353e247b2c4ea8c16c49cb31b574edc1",
+   "file": "a650_sqe.fw",
+   "family": "gpu",
+   "bytes": 31632,
+   "device_count": 11,
+   "devices": [
+    "gta4l",
+    "gta4lwifi",
+    "gts7l",
+    "gts7lwifi",
+    "instantnoodle",
+    "instantnoodlep",
+    "kebab",
+    "lemonades",
+    "pdx206",
+    "pdx215",
+    "r8q"
+   ]
+  },
+  {
+   "md5": "5de36001f431a4d60c641d494a75bb60",
+   "file": "hpnv20.bin",
+   "family": "other",
+   "bytes": 6319,
+   "device_count": 11,
+   "devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "eacfc5111f4f7edd5fa53057b22f62dc",
+   "file": "hpnv20.b2f",
+   "family": "other",
+   "bytes": 6319,
+   "device_count": 11,
+   "devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "6fc40ed9aa3b89306f003b8f6317b402",
+   "file": "hpnv20.b3b",
+   "family": "other",
+   "bytes": 6319,
+   "device_count": 11,
+   "devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "8cb11c0f17dfd819cf202966418ee038",
+   "file": "hpnv20.b4b",
+   "family": "other",
+   "bytes": 6319,
+   "device_count": 11,
+   "devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "a9c3c234c938867c762bfbe9a70d6240",
+   "file": "hpnv20.b8b",
+   "family": "other",
+   "bytes": 6319,
+   "device_count": 11,
+   "devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "9df3aeb9b0dcb474afc38155a5ab1973",
+   "file": "plmn_delta.bin",
+   "family": "other",
+   "bytes": 11458,
+   "device_count": 10,
+   "devices": [
+    "a21s",
+    "beyond0lte",
+    "beyond1lte",
+    "beyond2lte",
+    "beyondx",
+    "d1",
+    "d1x",
+    "d2s",
+    "f62",
+    "gta4l"
+   ]
+  },
+  {
+   "md5": "620f0b67a91f7f74151bc5be745b7110",
+   "file": "cpusys_vm.b03",
+   "family": "tz",
+   "bytes": 4096,
+   "device_count": 10,
+   "devices": [
+    "cupid",
+    "diting",
+    "instantnoodle",
+    "instantnoodlep",
+    "marble",
+    "mayfly",
+    "mondrian",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  {
+   "md5": "99593358b2191db96a1bb63dcbe97b54",
+   "file": "CFR_OPlus_EF017_UW_snapshot.bin",
+   "family": "other",
+   "bytes": 2126,
+   "device_count": 10,
+   "devices": [
+    "erhai",
+    "instantnoodle",
+    "instantnoodlep",
+    "kebab",
+    "lemonade",
+    "lemonadep",
+    "lemonades",
+    "luigi",
+    "martini",
+    "oscar"
+   ]
+  },
+  {
+   "md5": "e0f9a9be1543beabbbae26c89fd26740",
+   "file": "sh.bin",
+   "family": "other",
+   "bytes": 788436,
+   "device_count": 9,
+   "devices": [
+    "diting",
+    "fuxi",
+    "marble",
+    "mayfly",
+    "mondrian",
+    "nuwa",
+    "thor",
+    "unicorn",
+    "vermeer"
+   ]
+  }
+ ],
+ "leverage_top10": [
+  {
+   "md5": "db7c51a3ae0d3f096a7e4ebcf605c5a2",
+   "file": "vm-bootsys.img",
+   "bytes": 269996032,
+   "device_count": 5,
+   "freed_bytes": 1349980160
+  },
+  {
+   "md5": "d6d6d0309f47c17509e504b3b8ea07d2",
+   "file": "modem.img",
+   "bytes": 219983872,
+   "device_count": 2,
+   "freed_bytes": 439967744
+  },
+  {
+   "md5": "87ff6c2f30f5ed4667d790fd819fe31d",
+   "file": "modem.img",
+   "bytes": 187011072,
+   "device_count": 2,
+   "freed_bytes": 374022144
+  },
+  {
+   "md5": "0d231a3860ec94d0711d719d2bdb4037",
+   "file": "boot.img",
+   "bytes": 167772160,
+   "device_count": 2,
+   "freed_bytes": 335544320
+  },
+  {
+   "md5": "a6334ef3df24069beb3919bf716e34cb",
+   "file": "dsp.img",
+   "bytes": 67108864,
+   "device_count": 5,
+   "freed_bytes": 335544320
+  },
+  {
+   "md5": "bcab9cc0b85265d38e95a7be26b96c61",
+   "file": "core_nhlos.img",
+   "bytes": 153731072,
+   "device_count": 2,
+   "freed_bytes": 307462144
+  },
+  {
+   "md5": "6823cf7ffe2e23a0a6d206f66519de5d",
+   "file": "night_align_lsc_tbl_40963072.bin",
+   "bytes": 50331648,
+   "device_count": 6,
+   "freed_bytes": 301989888
+  },
+  {
+   "md5": "d02b2bbbec28e9b1a126ac229293ecab",
+   "file": "night_align_lsc_tbl_40962304.bin",
+   "bytes": 37748736,
+   "device_count": 6,
+   "freed_bytes": 226492416
+  },
+  {
+   "md5": "7cd1e09fd8b840406321e4d6cdb75b4d",
+   "file": "dsp.img",
+   "bytes": 67108864,
+   "device_count": 3,
+   "freed_bytes": 201326592
+  },
+  {
+   "md5": "fa65d18fbd8ddc81357a493d9f3bbc48",
+   "file": "seccammi.b01",
+   "bytes": 34827936,
+   "device_count": 4,
+   "freed_bytes": 139311744
+  }
+ ],
+ "recon_crossref": {
+  "crbtfw20.tlv": {
+   "global_devices": 29,
+   "global_bytes": 56180,
+   "recon_family": "bt",
+   "half_file_devices": 4,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 4,
+   "half_devices": [
+    "hotdog",
+    "laurel_sprout",
+    "luigi",
+    "oscar"
+   ]
+  },
+  "apbtfw10.tlv": {
+   "global_devices": 29,
+   "global_bytes": 56052,
+   "recon_family": "bt",
+   "half_file_devices": 4,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 4,
+   "half_devices": [
+    "hotdog",
+    "laurel_sprout",
+    "luigi",
+    "oscar"
+   ]
+  },
+  "crbtfw11.tlv": {
+   "global_devices": 29,
+   "global_bytes": 29368,
+   "recon_family": "bt",
+   "half_file_devices": 4,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 4,
+   "half_devices": [
+    "hotdog",
+    "laurel_sprout",
+    "luigi",
+    "oscar"
+   ]
+  },
+  "crnv20.bin": {
+   "global_devices": 29,
+   "global_bytes": 3936,
+   "recon_family": "bt",
+   "half_file_devices": 4,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 4,
+   "half_devices": [
+    "hotdog",
+    "laurel_sprout",
+    "luigi",
+    "oscar"
+   ]
+  },
+  "crnv11.bin": {
+   "global_devices": 29,
+   "global_bytes": 2798,
+   "recon_family": "bt",
+   "half_file_devices": 4,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 4,
+   "half_devices": [
+    "hotdog",
+    "laurel_sprout",
+    "luigi",
+    "oscar"
+   ]
+  },
+  "apnv10.bin": {
+   "global_devices": 29,
+   "global_bytes": 1243,
+   "recon_family": "bt",
+   "half_file_devices": 4,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 4,
+   "half_devices": [
+    "hotdog",
+    "laurel_sprout",
+    "luigi",
+    "oscar"
+   ]
+  },
+  "bm2n12.bin": {
+   "global_devices": 26,
+   "global_bytes": 2623528,
+   "recon_family": "adsp",
+   "half_file_devices": 14,
+   "half_md5_clusters": 2,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx235",
+    "thor",
+    "unicorn"
+   ]
+  },
+  "bm2n15.bin": {
+   "global_devices": 26,
+   "global_bytes": 1082856,
+   "recon_family": "adsp",
+   "half_file_devices": 14,
+   "half_md5_clusters": 2,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx235",
+    "thor",
+    "unicorn"
+   ]
+  },
+  "bm2n14.bin": {
+   "global_devices": 26,
+   "global_bytes": 103168,
+   "recon_family": "adsp",
+   "half_file_devices": 14,
+   "half_md5_clusters": 2,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx235",
+    "thor",
+    "unicorn"
+   ]
+  },
+  "a619_gmu.bin": {
+   "global_devices": 26,
+   "global_bytes": 32768,
+   "recon_family": "gpu",
+   "half_file_devices": 5,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 7,
+   "half_devices": [
+    "luigi",
+    "oscar",
+    "pdx206",
+    "pdx214",
+    "pdx215"
+   ]
+  },
+  "bm2n08.bin": {
+   "global_devices": 25,
+   "global_bytes": 3091896,
+   "recon_family": "adsp",
+   "half_file_devices": 16,
+   "half_md5_clusters": 3,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx235",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  "bm2n13.bin": {
+   "global_devices": 25,
+   "global_bytes": 1106944,
+   "recon_family": "adsp",
+   "half_file_devices": 14,
+   "half_md5_clusters": 2,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx235",
+    "thor",
+    "unicorn"
+   ]
+  },
+  "bm2n06.bin": {
+   "global_devices": 25,
+   "global_bytes": 864824,
+   "recon_family": "adsp",
+   "half_file_devices": 16,
+   "half_md5_clusters": 2,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx235",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  "unified_ksqs.bin": {
+   "global_devices": 25,
+   "global_bytes": 796357,
+   "recon_family": "other",
+   "half_file_devices": 24,
+   "half_md5_clusters": 5,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "caihong",
+    "cupid",
+    "diting",
+    "erhai",
+    "fuxi",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "nuwa",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx234",
+    "pdx235",
+    "pdx237",
+    "socrates",
+    "thor",
+    "unicorn",
+    "vermeer",
+    "zeus"
+   ]
+  },
+  "sequence_manifest.bin": {
+   "global_devices": 25,
+   "global_bytes": 5704,
+   "recon_family": "gpu",
+   "half_file_devices": 24,
+   "half_md5_clusters": 5,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "caihong",
+    "cupid",
+    "diting",
+    "erhai",
+    "fuxi",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "nuwa",
+    "oscar",
+    "pdx214",
+    "pdx225",
+    "pdx234",
+    "pdx235",
+    "pdx237",
+    "socrates",
+    "thor",
+    "unicorn",
+    "vermeer",
+    "zeus"
+   ]
+  },
+  "a660_sqe.fw": {
+   "global_devices": 21,
+   "global_bytes": 40496,
+   "recon_family": "gpu",
+   "half_file_devices": 14,
+   "half_md5_clusters": 2,
+   "half_largest_same_md5": 8,
+   "half_devices": [
+    "cupid",
+    "diting",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "marble",
+    "martini",
+    "mayfly",
+    "mondrian",
+    "oscar",
+    "pdx214",
+    "thor",
+    "unicorn",
+    "zeus"
+   ]
+  },
+  "a660_gmu.bin": {
+   "global_devices": 19,
+   "global_bytes": 55256,
+   "recon_family": "gpu",
+   "half_file_devices": 6,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 6,
+   "half_devices": [
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "martini",
+    "oscar",
+    "pdx214"
+   ]
+  },
+  "a630_sqe.fw": {
+   "global_devices": 19,
+   "global_bytes": 32456,
+   "recon_family": "gpu",
+   "half_file_devices": 14,
+   "half_md5_clusters": 4,
+   "half_largest_same_md5": 5,
+   "half_devices": [
+    "a71",
+    "ginkgo",
+    "gta4l",
+    "gta4lwifi",
+    "hotdog",
+    "laurel_sprout",
+    "luigi",
+    "oscar",
+    "pdx206",
+    "pdx214",
+    "pdx215",
+    "pdx225",
+    "pdx235",
+    "violet"
+   ]
+  },
+  "CFR_OPlus_EF017_UW_snapshot.bin": {
+   "global_devices": 19,
+   "global_bytes": 2126,
+   "recon_family": "other",
+   "half_file_devices": 6,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 10,
+   "half_devices": [
+    "erhai",
+    "lemonade",
+    "lemonadep",
+    "luigi",
+    "martini",
+    "oscar"
+   ]
+  },
+  "aoa_cldb_falcon.bin": {
+   "global_devices": 17,
+   "global_bytes": 839856,
+   "recon_family": "wifi",
+   "half_file_devices": 2,
+   "half_md5_clusters": 1,
+   "half_largest_same_md5": 2,
+   "half_devices": [
+    "laurel_sprout",
+    "pdx214"
+   ]
+  }
+ },
+ "unmatched_family_rows": {},
+ "inventory_mismatches": []
+}
