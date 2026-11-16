@@ -7,14 +7,17 @@
 - `open-research-lab` — mathematics and other fields. PRIORITY 2.
 - `open-discovery-lab` — the NOTEBOOK (findings from any repo; lead-merged).
 
-**THE DEVICE SPLIT (owner directive: divide the 444 listed devices evenly):**
-Fetch `https://codeberg.org/rsavoye/librephone/raw/branch/main/data/devices.csv`, sort by
-device name (plain codepoint sort — BOTH machines use the same sort so halves never overlap),
-then:
-- **DESKTOP owns rows 1–222.**
-- **LAPTOP owns rows 223–444** (see WORKORDER-002-laptop.md).
+**THE DEVICE SPLIT (authoritative 236-device list — F-71 corrected; the "444" was the audit's miscount of the file-centric CSV):**
+Fetch `https://codeberg.org/rsavoye/librephone/raw/branch/main/data/devices.sql.bz2` (pg_dump,
+fetched byte-exact 2026-11-16), parse the devices COPY block, sort by lower(vendor), lower(model),
+lower(build) — codepoint, both machines identical. Script-verified split:
+- **DESKTOP owns rows 1–118.**
+- **LAPTOP owns rows 119–236** (see WORKORDER-002-laptop.md) — 118 devices, 46 extracted,
+  holding the ADSP bm2nXX leverage fleet (bm2n12/14/15.bin ×14 devices each) plus 6 QCA BT
+  files (×4 devices) and a619_gmu.bin (×5). Pre-built inventory:
+  `blob-matrix/laptop/devices-half.csv`.
 Each machine runs the SAME four-phase program on its half. The lead merges the two halves into
-the full 444-device picture.
+the full 236-device picture.
 
 **THE FOUR WORK TYPES (owner directive — every phase runs on your device half):**
 deep RE · blob families documented · clean-room implementation · device fragmentation.
