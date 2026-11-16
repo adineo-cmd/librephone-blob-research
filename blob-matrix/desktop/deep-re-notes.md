@@ -197,8 +197,7 @@ exact-closing tag set + one unknown type-3 set each; btqca.c reads only
 the first), and the first public
 enumeration of the NVM tag surface (9→45 tags; the 3 kernel-handled tags
 BD_ADDR/HCI/deep-sleep present 6/6). Spec + results + tools:
-`fleet-re/qca-bt-format.md`, `fleet-re/qca-bt-tlv.json` (regenerable via
-`tools/qca_bulleted.py` equivalent — see `tools/qca_tlv_parse.py`), `tools/`.
+`fleet-re/qca-bt-format.md`, `fleet-re/qca-bt-tlv.json`, `tools/`.
 
 This upgrades the §3 headline from "prioritized" to "container-format
 decoded, fleet-identity proven, patch-stream interior open". The 29
