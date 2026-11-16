@@ -1,0 +1,119 @@
+vendor,model,build,soc,extracted,blob_count,leverage_blobs_present,row_range
+oneplus,OnePlus_7T_Pro,hotdog,Qualcomm SM8150-AC Snapdragon 855,n,436,a630_sqe.fw;apbtfw10.tlv;apnv10.bin;crbtfw11.tlv;crbtfw20.tlv;crnv11.bin;crnv20.bin,119-236: #119
+oneplus,OnePlus_8,instantnoodle,Qualcomm SM8250 Snapdragon 865,y,504,,119-236: #120
+oneplus,OnePlus_8_Pro,instantnoodlep,Qualcomm SM8250 Snapdragon 865,y,506,,119-236: #121
+oneplus,OnePlus_8T,kebab,Qualcomm SM8250 Snapdragon 865,y,106,,119-236: #122
+oneplus,OnePlus_9,lemonade,\N,n,651,a660_gmu.bin;a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #123
+oneplus,OnePlus_9_Pro,lemonadep,Qualcomm SM8350 Snapdragon 888,y,650,a660_gmu.bin;a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #124
+oneplus,OnePlus_9R,lemonades,Qualcomm SM8250 Snapdragon 865,y,106,,119-236: #125
+oneplus,OnePlus_9RT,martini,Qualcomm SM8250 Snapdragon 865,y,652,a660_gmu.bin;a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #126
+oneplus,Pad_2_Pro,erhai,\N,n,670,sequence_manifest.bin;unified_ksqs.bin,119-236: #127
+oneplus,Pad_Pro,caihong,\N,n,462,sequence_manifest.bin;unified_ksqs.bin,119-236: #128
+radxa,Zero_2_Tablet,radxa02_tab,\N,n,0,,119-236: #129
+radxa,Zero_2_TV,radxa02,\N,n,0,,119-236: #130
+radxa,Zero_Tablet,radxa0_tab,\N,n,0,,119-236: #131
+radxa,Zero_TV,radxa0,\N,n,0,,119-236: #132
+razer,Phone,cheryl,Qualcomm SM6375 Snapdragon 695,y,0,,119-236: #133
+razer,Phone2,aura,Qualcomm SDM845 Snapdragon 845,y,0,,119-236: #134
+realme,Realme_10_Pro,luigi,Qualcomm SM6375 Snapdragon 695,y,490,a619_gmu.bin;a630_sqe.fw;a660_gmu.bin;a660_sqe.fw;apbtfw10.tlv;apnv10.bin;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;crbtfw11.tlv;crbtfw20.tlv;crnv11.bin;crnv20.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #135
+realme,Realme_9_Pro,oscar,Qualcomm SM6375 Snapdragon 695,y,490,a619_gmu.bin;a630_sqe.fw;a660_gmu.bin;a660_sqe.fw;apbtfw10.tlv;apnv10.bin;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;crbtfw11.tlv;crbtfw20.tlv;crnv11.bin;crnv20.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #136
+samsung,Galaxy,d2x,\N,n,0,,119-236: #137
+samsung,Galaxy_A21S,a21s,\N,n,82,,119-236: #138
+samsung,Galaxy_A52_4G,a52q,\N,n,0,,119-236: #139
+samsung,Galaxy_A52s_5G,a52sxq,\N,n,0,,119-236: #140
+samsung,Galaxy_A71,a71,\N,n,22,a630_sqe.fw,119-236: #141
+samsung,Galaxy_A72,a72q,\N,n,0,,119-236: #142
+samsung,Galaxy_A73_5G,a73xq,\N,n,0,,119-236: #143
+samsung,Galaxy_F62,f62,\N,n,65,,119-236: #144
+samsung,Galaxy_M52_5G,m52xq,\N,n,0,,119-236: #145
+samsung,Galaxy_Note_10,d1,\N,n,67,,119-236: #146
+samsung,Galaxy_Note_10_5G,d1x,\N,n,69,,119-236: #147
+samsung,Galaxy_Note_10_Plus,d2s,\N,n,67,,119-236: #148
+samsung,Galaxy_S10,beyond1lte,\N,n,69,,119-236: #149
+samsung,Galaxy_S10_5G,beyondx,\N,n,73,,119-236: #150
+samsung,Galaxy_S10_Plus,beyond2lte,\N,n,69,,119-236: #151
+samsung,Galaxy_S10e,beyond0lte,\N,n,69,,119-236: #152
+samsung,Galaxy_S20,x1s,\N,n,0,,119-236: #153
+samsung,Galaxy_S20_FE,r8q,\N,n,38,,119-236: #154
+samsung,Galaxy_S20_Plus,y2s,\N,n,0,,119-236: #155
+samsung,Galaxy_S20_Ultra,z3s,\N,n,0,,119-236: #156
+samsung,Galaxy_Tab_A7_LTE,gta4l,\N,n,47,a630_sqe.fw,119-236: #157
+samsung,Galaxy_Tab_A7_Wifi,gta4lwifi,\N,n,38,a630_sqe.fw,119-236: #158
+samsung,Galaxy_Tab_S5e_LTE,gts4lv,\N,n,0,,119-236: #159
+samsung,Galaxy_Tab_S5e_Wifi,gts4lvwifi,\N,n,0,,119-236: #160
+samsung,Galaxy_Tab_S6_LTE,gta4xl,\N,n,49,,119-236: #161
+samsung,Galaxy_Tab_S6_Wifi,gta4xlwifi,\N,n,38,,119-236: #162
+samsung,Galaxy_Tab_S7_LTE,gts7l,\N,n,26,,119-236: #163
+samsung,Galaxy_Tab_S7_Wifi,gts7lwifi,\N,n,26,,119-236: #164
+samsung,Galaxy_TabA_8.0,gtowifi,\N,n,0,,119-236: #165
+shift,Shift_6MQ,axolotl,Qualcomm SDM845 Snapdragon 845,y,0,,119-236: #166
+solana,Saga,ingot,Qualcomm SM8475 Snapdragon 8+ Gen1,y,0,,119-236: #167
+sony,Xperia_10,kirin,\N,n,28,,119-236: #168
+sony,Xperia_10_IV,pdx225,Qualcomm SM6375 Snapdragon 695,y,23,a630_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #169
+sony,Xperia_10_Plus,mermaid,Qualcomm SDM636 Snapdragon 636,y,29,,119-236: #170
+sony,Xperia_10_V,pdx235,Qualcomm SM6375 Snapdragon 695,y,20,a630_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #171
+sony,Xperia_1_II,pdx215,\N,n,26,a619_gmu.bin;a630_sqe.fw,119-236: #172
+sony,Xperia_1_V,pdx234,Qualcomm SM6375 Snapdragon 695,y,69,sequence_manifest.bin;unified_ksqs.bin,119-236: #173
+sony,Xperia_5_II,pdx206,Qualcomm SM8250 Snapdragon 865,y,26,a619_gmu.bin;a630_sqe.fw,119-236: #174
+sony,Xperia_5_III,pdx214,Qualcomm SM8350 Snapdragon 888,y,43,a619_gmu.bin;a630_sqe.fw;a660_gmu.bin;a660_sqe.fw;aoa_cldb_falcon.bin;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #175
+sony,Xperia_5_V,pdx237,Qualcomm SM6375 Snapdragon 695,y,69,sequence_manifest.bin;unified_ksqs.bin,119-236: #176
+sony,Xperia_XA2,pioneer,Qualcomm SDM845 Snapdragon 845,y,27,,119-236: #177
+sony,Xperia_XA2_Plus,voyager,Qualcomm SDM845 Snapdragon 845,y,27,,119-236: #178
+sony,Xperia_XA2_Ultra,discovery,Qualcomm SDM845 Snapdragon 845,y,29,,119-236: #179
+sony,Xperia_XZ2,akari,Qualcomm SDM845 Snapdragon 845,y,0,,119-236: #180
+sony,Xperia_XZ2_Compact,xz2c,Qualcomm SDM845 Snapdragon 845,y,0,,119-236: #181
+sony,Xperia_XZ2_Premium,aurora,Qualcomm SDM845 Snapdragon 845,y,0,,119-236: #182
+sony,Xperia_XZ3,akatsuki,Qualcomm SDM845 Snapdragon 845,y,0,,119-236: #183
+xiaomi,Black_Shark,shark,\N,n,0,,119-236: #184
+xiaomi,Mi_10,umi,\N,n,0,,119-236: #185
+xiaomi,Mi_10_Pro,cmi,\N,n,0,,119-236: #186
+xiaomi,Mi_10S,thyme,\N,y,0,,119-236: #187
+xiaomi,Mi_10T,apollon,\N,n,0,,119-236: #188
+xiaomi,Mi_10T_5G,gauguin,\N,n,9,,119-236: #189
+xiaomi,Mi_11,lisa,\N,y,0,,119-236: #190
+xiaomi,Mi_11_5G,renoir,\N,y,0,,119-236: #191
+xiaomi,Mi_11I,haydn,\N,y,0,,119-236: #192
+xiaomi,Mi_12,cupid,\N,n,783,a660_sqe.fw;bm2n06.bin;bm2n08.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #193
+xiaomi,Mi_12_Pro,zeus,\N,y,802,a660_sqe.fw;bm2n06.bin;bm2n08.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #194
+xiaomi,Mi_12S,mayfly,\N,y,823,a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #195
+xiaomi,Mi_12S_Pro,unicorn,\N,y,840,a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #196
+xiaomi,Mi_12S_Ultra,thor,\N,y,841,a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #197
+xiaomi,Mi_12T_Pro,diting,\N,y,819,a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #198
+xiaomi,Mi_13,fuxi,\N,y,700,sequence_manifest.bin;unified_ksqs.bin,119-236: #199
+xiaomi,Mi_13_Pro,nuwa,\N,y,706,sequence_manifest.bin;unified_ksqs.bin,119-236: #200
+xiaomi,Mi_5,gemini,\N,n,0,,119-236: #201
+xiaomi,Mi_5S_Plus,natrium,\N,n,0,,119-236: #202
+xiaomi,Mi_6,sagit,\N,n,0,,119-236: #203
+xiaomi,Mi_8,dipper,\N,n,0,,119-236: #204
+xiaomi,Mi_8_Explorer,ursa,\N,n,0,,119-236: #205
+xiaomi,Mi_8_Pro,equuleus,\N,n,0,,119-236: #206
+xiaomi,Mi_9SE,grus,\N,n,0,,119-236: #207
+xiaomi,Mi_A3,laurel_sprout,\N,n,326,a630_sqe.fw;aoa_cldb_falcon.bin;apbtfw10.tlv;apnv10.bin;crbtfw11.tlv;crbtfw20.tlv;crnv11.bin;crnv20.bin,119-236: #208
+xiaomi,Mi_CC9,pyxis,\N,n,0,,119-236: #209
+xiaomi,Mi_CC9_Meitu,vela,\N,n,0,,119-236: #210
+xiaomi,Mi_Fold_2,zizhan,\N,y,0,,119-236: #211
+xiaomi,Mi_Mix_2,chiron,\N,n,0,,119-236: #212
+xiaomi,Mi_Mix_2S,polaris,\N,n,0,,119-236: #213
+xiaomi,Mi_Mix_3,perseus,\N,n,0,,119-236: #214
+xiaomi,Poco_12C,earth,\N,y,18,,119-236: #215
+xiaomi,Poco_3S,Mi8937,\N,n,19,,119-236: #216
+xiaomi,Poco_F1,beryllium,\N,n,0,,119-236: #217
+xiaomi,Poco_F2_Pro,lmi,\N,n,0,,119-236: #218
+xiaomi,Poco_F3,alioth,\N,y,0,,119-236: #219
+xiaomi,Poco_F4,munch,\N,y,0,,119-236: #220
+xiaomi,Poco_F5,marble,\N,y,819,a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #221
+xiaomi,Poco_F5_Pro,mondrian,\N,y,821,a660_sqe.fw;bm2n06.bin;bm2n08.bin;bm2n12.bin;bm2n13.bin;bm2n14.bin;bm2n15.bin;sequence_manifest.bin;unified_ksqs.bin,119-236: #222
+xiaomi,Poco_F6_PRo,vermeer,\N,n,720,sequence_manifest.bin;unified_ksqs.bin,119-236: #223
+xiaomi,Poco_X3_NFC,surya,\N,n,0,,119-236: #224
+xiaomi,Poco_X3_Pro,vayu,\N,n,0,,119-236: #225
+xiaomi,Redmi_10S,rosemary,\N,y,89,,119-236: #226
+xiaomi,Redmi_4A,Mi8917,\N,n,17,,119-236: #227
+xiaomi,Redmi_8,Mi439,\N,y,10,,119-236: #228
+xiaomi,Redmi_K20,davinci,\N,n,0,,119-236: #229
+xiaomi,Redmi_K60_Pro,socrates,\N,y,630,sequence_manifest.bin;unified_ksqs.bin,119-236: #230
+xiaomi,Redmi_Note_10_Pro,sweet,\N,n,0,,119-236: #231
+xiaomi,Redmi_Note_10_Pro,tucana,\N,n,0,,119-236: #232
+xiaomi,Redmi_Note_7_Pro,violet,\N,n,10,a630_sqe.fw,119-236: #233
+xiaomi,Redmi_Note_8,ginkgo,\N,n,28,a630_sqe.fw,119-236: #234
+xiaomi,Redmi_Note_9_Pro,miatoll,\N,n,0,,119-236: #235
+zte,Axon_9_Pro,akershus,Qualcomm SM6375 Snapdragon 695,n,0,,119-236: #236
