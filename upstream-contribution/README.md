@@ -675,3 +675,46 @@ An **additional** filing package came out of the audit —
 Filing order overall: PR-1 → PR-2 → PR-3 → PR-4 → PR-5 → PR-6, then
 the issue comments (C-1..C-3 are independent of the PRs). All owner-gated
 (Codeberg login), per the checklist.
+
+---
+
+## 2026-11-16 addition — PR-10 (remaining open issues)
+
+[pr10-remaining-issues-package.md](pr10-remaining-issues-package.md)
+is the **fourth** filing package (after PR-5/PR-6 + C-1..C-3 in
+pr5-corrections-package.md, and the interface-doc comments in the
+pr8-issue-answers-package.md file). It completes the coverage of the
+28 open issues: the 14 already packaged (pr5/pr8) are untouched — a
+fresh API check (2026-11-16) confirmed none closed and no new
+upstream comments since the 2026-11-15 audit — and the remainder is
+handled:
+
+- **R-1 (#15, High)** — BT driver↔blob interface, API-doc style +
+  test-suite hooks; companion doc
+  `qualcomm-fp6/docs/interface-bt.md` (mainline btqca.c/hci_qca.c
+  verified this session against the committed BT census).
+- **R-2 (#19, High)** — user space vs loaded firmware split table;
+  companion doc
+  `qualcomm-fp6/docs/userspace-firmware-split.md` (answers the
+  issue's "AARCH64 executable in modem.img" assumption: those are
+  QSEE TAs, not user space).
+- **R-3 (#36)** — radio-directory blobs: upstream's own track.md
+  enumerates 46 images; the bootchain/trustzone censuses identify the
+  FP6 subset's ISA and containers.
+- **R-4 (#35)** — signed-blob loading chain per loader (PIL/PAS,
+  qseecom, BT EDL, AVB), with the lab's no-bypass policy boundary
+  stated in the comment itself.
+- **R-5 (#56)** — firmware-side WMI-dispatch companion to the
+  thread's host-side IPCI/ICNSS2 confirmation.
+- Honest classification (no faked answers) for #34 (owner-excluded),
+  #50, #59, #62, #63, #2, #23, #25; #61 is in progress upstream
+  (claimed by bobov 2026-11-07); #5 verified closed.
+
+Also new this session: `blob-matrix/per-soc-method-plans.md` — the
+per-SoC census method plans (top-8 device clusters of the 236-device
+split, computed from the 236-device split data) with an
+upstream-facing section per cluster.
+
+Filing order: PR-1 → … → PR-6, then C-1..C-3, Q-1..Q-8, then R-1..R-5
+(R-1..R-5 are independent of each other and of the earlier comments).
+All owner-gated (Codeberg login).

@@ -291,6 +291,10 @@ different scope; both recorded.
 
 **Flag: dedicated documentation session required; nothing below is a
 conclusion — these are the enumerated dimensions to fill.**
+(FILLED 2026-11-16: the full document now lives at
+[../radio-regulatory-hurdles.md](../radio-regulatory-hurdles.md) — primary
+texts fetched verbatim, precedents surveyed, RULE-0 query log included.
+The stub below is retained as the original dimension list.)
 
 1. **Type-approval per radio (modem/WiFi/BT/GNSS/NFC are certified as a
    unit per device):** FCC (US; Part 15 + Part 22/24/27 for cellular,
