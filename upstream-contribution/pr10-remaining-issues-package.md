@@ -1,4 +1,4 @@
-# PR-10 filing package — the remaining open issues (#15, #19, #35, #36, #56 + honest classification of the rest) (2026-11-16)
+# PR-10 filing package — the remaining open issues (#15, #19, #35, #36, #56 + honest classification of the rest) (2026-11-17 re-verification)
 
 Fourth package. The 2026-11-15 wants audit
 ([librephone-wants.md](librephone-wants.md), Group A) enumerated the 28
@@ -13,47 +13,54 @@ stated), a **#56 firmware-side companion** comment, and the honest
 classification of everything that is code-contribution, blocked, noise
 or owner-excluded.
 
-Companion docs (both new, in `qualcomm-fp6/docs/`):
+Companion docs (new, in `qualcomm-fp6/docs/`):
 
 | doc | issue(s) | file |
 |---|---|---|
-| BT driver ↔ blob interface, API-doc style | #15 | [interface-bt.md](../qualcomm-fp6/docs/interface-bt.md) |
-| User space vs loaded firmware split table | #19 | [userspace-firmware-split.md](../qualcomm-fp6/docs/userspace-firmware-split.md) |
+| BT driver ↔ blob interface, API-doc style | #15 | [interface-bt-driver.md](../qualcomm-fp6/docs/interface-bt-driver.md) |
+| User space vs loaded firmware split table | #19 | [userspace-vs-firmware-split.md](../qualcomm-fp6/docs/userspace-vs-firmware-split.md) |
 
-Fresh-state check (RULE 1, done 2026-11-16, API
-`https://codeberg.org/api/v1/repos/rsavoye/librephone/issues?state=open&limit=50&type=issues`,
-plus per-issue fetches and the comment endpoints of #2/#33/#46/#56/#61):
+Fresh-state check (RULE 1, re-swept 2026-11-17, API
+`https://codeberg.org/api/v1/repos/rsavoye/librephone/issues?state=open&limit=50&page=1..3`
+— 2 curl retries hit; all pages fetched within 3 retries, failures
+logged):
 
-- **The open set is unchanged since the audit**: same 28 issues, none
-  closed, newest `updated_at` = #63 on 2026-11-13 — nothing has been
-  answered or closed upstream since 2026-11-15, so none of the
-  packaged answers (pr5/pr8) needs rework. Issue #5 from the earlier
-  task framing is **not** in the open set (closed upstream; its
-  completion is already cited in the audit's Group A tail).
-- #61 is **claimed upstream** (bobov, 2026-11-07, maintainer
-  approved) — excluded here as in-progress.
-- #56 gained a substantive host-side confirmation thread on
-  2026-11-01 (FrossGus: WCN6750 is a real PCIe endpoint via
-  IPCI/ICNSS2; upstream's own transport docs corrected by b75b158f).
-  The lab's remaining delta for #56 is the firmware-side dispatch
-  spec — R-5 below.
-- #46: the maintainer's own 2026-09-18 comment names **QCSuper** as
-  the DIAG host implementation — Rule 1 improvement for the packaged
-  Q-8 answer at the bottom of this file.
-- No `implementations/qca-bt/` exists yet at packaging time (the
-  lab's QCA-BT clean-room stream is a separate concurrent session);
-  interface-bt.md and R-1 therefore cite only committed lab docs +
-  mainline. No fake citations.
+- **The open set is unchanged since the audit.** The API returns 31
+  open entries = **the same 28 issues + the 3 open PRs** (#58, #14,
+  #10) that the audit counted separately in Group D (`type=issues` was
+  not set on this sweep's first pass; the reconciliation is exact —
+  no issue closed, none opened, none renamed since 2026-11-15). Max
+  issue `updated_at` is still #63 on 2026-11-13; nothing upstream has
+  moved since the audit, so none of the packaged answers (pr5/pr8)
+  needs rework.
+- Comment-endpoint re-verification this date: #61 = bobov claimed it
+  2026-11-07 and the maintainer approved ("Go or it") — excluded here
+  as in-progress; #56 = FrossGus + L123123 host-side confirmations
+  (2026-11-01); #46 = the maintainer's QCSuper pointer (2026-09-18);
+  #33 = hmltn's 14-of-16-encrypted observation + the maintainer's
+  reply ("I instrumented the mdt_loader.c file in the kernel, and none
+  of these files ever gets loaded at boot time", 2026-07-22). All
+  match the audit's recorded state.
+- #56's remaining lab delta is the firmware-side dispatch spec — R-5
+  below.
+- No `implementations/qca-bt/` existed at the earlier packaging time;
+  it now does (the lab's QCA-BT clean-room stream, all
+  mainline-downloaded families). The BT comment below cites only
+  committed lab docs + mainline sources, not the implementation, so
+  the comment stays true regardless of merge order.
+- Issue #5 from an earlier task framing is **not** in the open set
+  (closed upstream; completion already cited in the audit's Group A
+  tail) — see the #5 note at the bottom.
 
-Prior-art check (RULE 0, 2026-11-16): issues #15/#19/#35/#36/#34/#50/
-#59/#62/#63/#23/#25 have **zero comments** each (fetched individually);
-no upstream doc covers the BT rampatch header structure (prior-art
-section of bt-firmware-census.md, checked 2026-11-10), no upstream
-answer states the user-space/firmware split (fresh re-check of the
-28 issue bodies this date), and the radio-directory question is
-answered nowhere upstream except the raw per-device file lists in
-`docs/track.md` (fetched 2026-11-16, 101,712 B — 46 distinct
-radio-directory images enumerated).
+Prior-art check (RULE 0): issues #15/#19/#35/#36/#34/#50/#59/#62/#63/
+#23/#25 have **zero comments** each (listing + individual fetches
+2026-11-16 and re-checked 2026-11-17); no upstream doc covers the BT
+rampatch header structure (prior-art section of bt-firmware-census.md,
+checked 2026-11-10); no upstream answer states the user-space/
+firmware split; the radio-directory question is answered nowhere
+upstream except the raw per-device file lists in `docs/track.md`
+(re-fetched 2026-11-17, 101,712 B — byte-count matches the 2026-11-16
+fetch; **45 distinct radio image names**, re-counted this date).
 
 ---
 
@@ -85,7 +92,8 @@ Interface note from the FP6 census + mainline kernel sources
   with synthetic command-complete) with .tlv fallback whose 32-byte
   header's download_mode field decides ack behavior; segments are
   243-byte chunks of command 0x1E, last segment always acked;
-  WCN6750 gets a pre-download patch-config command (EDL opcode 0xFC00 + sub-command 0x28).
+  WCN6750 gets a pre-download patch-config command (EDL opcode
+  0xFC00 + sub-command 0x28).
 - NVM (msnv%02x.bin): TLV tag set — the kernel rewrites tag 2
   (BD address), tag 17 (in-band-sleep bit 0x80 + baud byte), tag 27
   (deep sleep) in flight; multi-set NVMs carry an enclosing type-4
@@ -102,7 +110,7 @@ Interface note from the FP6 census + mainline kernel sources
   doc below lists all six.
 
 Interface doc (full table + header decode + test hooks):
-https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/interface-bt.md
+https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/interface-bt-driver.md
 Blob census (sizes, hashes, first public ISA identification of this family):
 https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/bt-firmware-census.md
 ```
@@ -137,9 +145,12 @@ The split, per family (user space / kernel / loaded firmware):
   GLINK + QRTR + QMI + rmnet (all mainline) | modem.mdt+b00-b30
   (Hexagon) + qdsp6m.qdb + mcfg payloads | PAS auth via SCM,
   GLINK→QRTR→QMI.
-- TrustZone: TEE client libs only | drivers/tee/qcom/qseecom |
-  tz.img (QTEE OS), hyp.img (QHEE), keymaster/devcfg/uefisecapp/... 
-  (AArch64 PIE) + the modem/image TAs | SCM via qseecom ioctl.
+- TrustZone: TEE client libs only | mainline QSEECOM is the
+  client-registration layer (drivers/firmware/qcom/qcom_qseecom.c +
+  qcom_scm.c SCM ABI; the Android-style TA-image loader is not in
+  torvalds master) | tz.img (QTEE OS), hyp.img (QHEE),
+  keymaster/devcfg/uefisecapp/... (AArch64 PIE) + the modem/image TAs
+  | SCM via the qseecom client path.
 - DSPs: FastRPC user libs | fastrpc + qcom_q6v5_pas (mainline) |
   adsp.img/cdsp.img (Hexagon) | FastRPC ioctls.
 - Boot chain: no user space at all | — | xbl (3-ELF container: RV32 +
@@ -161,7 +172,7 @@ One honest open point: the modem blob's internal process structure
 disassembly capacity and is stated as open rather than guessed.
 
 Split-table doc:
-https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/userspace-firmware-split.md
+https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/userspace-vs-firmware-split.md
 ISA map:
 https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/fp6-architecture-census.md
 Boot-chain census:
@@ -179,14 +190,20 @@ census:
 1. What it is: the radio directory is the extracted firmware-update
    partition set (the per-partition images, not files inside a
    partition image). Your own docs/track.md enumerates it across the
-   database: 46 distinct images — the boot chain (xbl, xbl_config,
+   database: 45 distinct images — the boot chain (xbl, xbl_config,
    xbl_ramdump, shrm, aop, aop_config, cpucp, qupfw, uefi, abl,
    imagefv, devcfg, hyp, storsec, tzsw, pbl, bl1/bl2/bl31,
    multiimgoem), the modem set (modem, fsg, ldfw, prov, esim-full),
    the TrustZone set (tz, cmnlib, cmnlib64, keymaster, uefisecapp,
    gsa, featenabler), the WLAN/BT image (bluetooth), plus the OS-side
    images that ride along in firmware packages (boot, recovery,
-   init_boot, dtbo, dtb, vbmeta, splash, logo, pvmfw, rpm, dsp).
+   init_boot, dtbo, dtb, vbmeta, splash, logo, pvmfw, rpm, dsp). A
+   cross-device metadata census on our side (444-device matrix keyed
+   by the same radio/ paths) shows 1,847 radio-directory rows over 72
+   distinct filenames — the same core set plus vendor extras
+   (oplus_sec, oplusstanvbk, engineering_cdt, gcf, qweslicstore, and
+   MediaTek-language images md1img/lk/preloader_raw/scp on MTK
+   devices).
 2. Which parts of your "mostly secure boot / firmware signing" guess
    verify (FP6, from the boot-chain census): the signing infrastructure
    is not a separate blob — each image carries its own MBNv7
@@ -205,7 +222,7 @@ census:
    TZ.XF.5.28.0-00021-LANAIAAAAANAZT-1; keymaster/cmnlib/uefisecapp/
    featenabler are AArch64 PIE images — modern QSEE images here are
    plain ELF64 files, not .mdt+.bXX splits.
-4. What stays open: the ISA/structure of the other 45 devices' radio
+4. What stays open: the ISA/structure of the other devices' radio
    images (track.md lists them per device; nothing public identifies
    them beyond filenames — same gap your track.md already flags).
 
@@ -309,43 +326,53 @@ https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/do
 | #34 "Figure out TrustZone exploit" | **OOS — owner exclusion** | The lab's owner directive (2026-11-09) excludes CVE-hunting and exploit research; trustzone-census.md's policy note states the boundary ("no TrustZone code analysis, no keys, no bypass guidance"). The issue's own premise (PAS rejects replaced segments; keys in hardware fuses) is already documented factually in R-4 above — but the exploit half is not lab work and no comment should be filed by the lab. |
 | #50 "Debugging kernel module" (Bazel external modules) | OPEN-B (outside lab charter) | Build-infrastructure/code work, needs the upstream build environment. The lab contributes the public half only: the Qualcomm test-API surface the module would exercise is already covered by interface-ftm-diag.md (pr8 Q-7). |
 | #59 "Figure out updating the SSL certs" (mdttool cert replacement) | OPEN-B (code contribution + no Codeberg account), **blocked-with-plan** | The lab's cert-chain censuses (bootchain-census.md: MBNv7 chain, X.509 validity, OEM key chain; bt-firmware-census.md: TLV signature fields) are the reference material a cert-replacement feature needs; the write path itself is upstream code. The R-4 comment documents the chain facts publicly. |
-| #61 pytest fixture lookup | **In progress upstream** — claimed by bobov 2026-11-07, maintainer approved. Excluded (do not double-work). |
+| #61 pytest fixture lookup | **In progress upstream** — claimed by bobov 2026-11-07, maintainer approved (re-verified against the comment endpoint 2026-11-17). Excluded (do not double-work). |
 | #62 test_split_blob refusal returns empty list | OPEN-B (code contribution) | Upstream-owned bug with a full diagnosis already in the issue body; any answer would repeat it. The return-vs-raise question is a design call for the maintainer, not for a census lab. |
 | #63 Fix Lineage-24.0 FP6 build | OPEN-B | Needs a build farm + device validation (same class as #23); the lab has no build environment. Note: the lab's census is against 23.2 (2026-11-09 nightly) — still-building per the issue body. |
 | #2 Create UI for database | OPEN-B (code charter) | Active thread (7 comments; PR #14 flask webui open since 2025-11-07); design questions (read-only vs write-back, hosting) pending in-thread. The lab's device-inventory.csv/coverage-matrix.csv (blob-database/) are upstream-consumable data views, not UI code. |
 | #23 Add support for OnePlus 15 | OPEN-B | Needs the device + build farm; no lab lever. |
 | #25 "Clean Slate — Let's consider -1..." | Noise | One-line non-sequitur from a non-participant (2026-01-22); recommend upstream close (same as audit row A-7). |
 
-**#5 note:** the earlier framing listed #5 among open issues — it is
-**closed** upstream (initial 215-device blob database, cited in
-librephone-wants.md's closed-issue tail); verified against the fresh
-open-issues fetch (2026-11-16).
+**#5 note:** an earlier framing listed #5 among open issues ("donations") —
+it is **closed** upstream (initial 215-device blob database, cited in
+librephone-wants.md's closed-issue tail), verified against the fresh
+open-issues fetches (2026-11-16 and 2026-11-17). The *donations want*
+itself is audit row C-5 (OPEN-B, not lab-actionable), not an issue.
 
-## Rule 1 improvement found this session (for the already-packaged Q-8, issue #46)
+## Rule 1 improvements recorded this session (for already-packaged answers)
 
-The maintainer's own 2026-09-18 comment on #46 names **QCSuper**
-(his comment states it "implements the Diag protocol for a host Linux
-host") before the pr8 package was written; Q-8's DIAG bullet lists
-community tools generically. One-line addition to the Q-8 comment
-(paste after the "community tools implement it" sentence):
+1. **For the packaged Q-8 (issue #46):** the maintainer's own
+   2026-09-18 comment names **QCSuper** ("implements the Diag protocol
+   for a host Linux host") before the pr8 package was written; Q-8's
+   DIAG bullet lists community tools generically. One-line addition
+   (paste after the "community tools implement it" sentence):
 
-> The maintainer already pointed at QCSuper (comment here 2026-09-18)
-> — that is the right base: it implements the 0x4B log/packet framing
-> host-side and can record a DIAG capture to bootstrap any
-> test-suite work.
+   > The maintainer already pointed at QCSuper (comment here
+   > 2026-09-18) — that is the right base: it implements the 0x4B
+   > log/packet framing host-side and can record a DIAG capture to
+   > bootstrap any test-suite work.
 
-(pr8 is a shared file under the lead's merge control, so the edit is
-recorded here rather than applied in place.)
+   (pr8 is a shared file under the lead's merge control, so the edit
+   is recorded here rather than applied in place.)
+
+2. **For #19's kernel-layer claim (and the 2026-11-16 split doc):**
+   mainline's QSEECOM driver is `drivers/firmware/qcom/qcom_qseecom.c`
+   (client-registration layer) + `qcom_scm.c` SCM ABI — NOT
+   `drivers/tee/qcom/qseecom.c` (404 in torvalds/master, checked
+   twice 2026-11-17); the Android-style TA-image loader is not
+   mainlined. The new [userspace-vs-firmware-split.md](../qualcomm-fp6/docs/userspace-vs-firmware-split.md)
+   states the corrected paths; R-2 above carries the corrected
+   TrustZone kernel row.
 
 ---
 
 ## Source map (what each item draws on)
 
-| Item | Lab sources | Public sources (all fetched 2026-11-16, status logged in the companion docs) |
+| Item | Lab sources | Public sources (access dates logged in the companion docs; 2026-11-17 re-verification fetches: btqca.c, hci_qca.c, btqca.h, qcom_q6v5_pas.c, qcom_qseecom.c + Kconfig + qcom_scm.c, qcom-cpucp-mbox.c, gunyah_wdt.c, ath11k core.c) |
 |---|---|---|
-| R-1 (#15) | `qualcomm-fp6/docs/bt-firmware-census.md`, `results/bt-tz-census.json` | mainline `drivers/bluetooth/btqca.c` (1,032 lines), `hci_qca.c` (2,855 lines), `btqca.h` |
-| R-2 (#19) | `docs/userspace-firmware-split.md` + censuses (bt/bootchain/trustzone/architecture) | `drivers/remoteproc/qcom_q6v5_pas.c`, `drivers/tee/qcom/qseecom.c` (existence per census cross-ref), issue #33 thread |
-| R-3 (#36) | `docs/bootchain-census.md`, `docs/trustzone-census.md` | upstream `docs/track.md` (46 radio-dir images), `docs/files.md` |
-| R-4 (#35) | `docs/bootchain-census.md` (cert chain, AVB), `docs/interface-mdtloader-vs-readelf.md` | mainline `drivers/soc/qcom/mdt_loader.c`, PAS path in `qcom_q6v5_pas.c`; PR #58 thread (2026-11-15 fetch, unchanged) |
-| R-5 (#56) | `papers/wmi-dispatch-architecture.md`, `docs/wmi-dispatcher-b09-b10-b12.md`, `docs/interface-pcie-bridge.md`, `docs/interface-copyengine.md` | #56 thread (FrossGus 2026-11-01), mainline ath11k `wmi.h` IDs (per the paper's xref) |
-| Classifications | `librephone-wants.md` Group A rows A-5/A-6/A-7/A-10/A-23/A-25/A-26/A-27/A-28 | fresh per-issue API fetches incl. comment endpoints (this session) |
+| R-1 (#15) | `qualcomm-fp6/docs/bt-firmware-census.md`, `results/bt-tz-census.json` | mainline `drivers/bluetooth/btqca.c` (1,032 lines), `hci_qca.c` (2,855 lines), `btqca.h` (205 lines) — all fetched 2026-11-16 and 2026-11-17 |
+| R-2 (#19) | `docs/userspace-vs-firmware-split.md` + censuses (bt/bootchain/trustzone/architecture) | `drivers/remoteproc/qcom_q6v5_pas.c` (PAS compatibles incl. `qcom,milos-*`), `drivers/firmware/qcom/qcom_qseecom.c` + `Kconfig` + `qcom_scm.c`; issue #33 thread (2026-11-17 re-fetch) |
+| R-3 (#36) | `docs/bootchain-census.md`, `docs/trustzone-census.md`, `blob-database/coverage-matrix.csv` (1,847 radio/ rows, 72 distinct filenames) | upstream `docs/track.md` (45 radio-dir images, re-fetched 2026-11-17), `docs/files.md` |
+| R-4 (#35) | `docs/bootchain-census.md` (cert chain, AVB), `docs/interface-mdtloader-vs-readelf.md` | mainline `drivers/soc/qcom/mdt_loader.c`, PAS path in `qcom_q6v5_pas.c`; PR #58 thread |
+| R-5 (#56) | `papers/wmi-dispatch-architecture.md`, `docs/wmi-dispatcher-b09-b10-b12.md`, `docs/interface-pcie-bridge.md`, `docs/interface-copyengine.md` | #56 thread (FrossGus + L123123, 2026-11-01, re-fetched 2026-11-17), mainline ath11k `wmi.h` IDs (per the paper's xref) |
+| Classifications | `librephone-wants.md` Group A rows A-5/A-6/A-7/A-10/A-23/A-25/A-26/A-27/A-28 | fresh per-issue API fetches incl. comment endpoints #33/#46/#56/#61 (2026-11-17; #61 fetch needed 3 attempts — network flaky, failures logged) |
