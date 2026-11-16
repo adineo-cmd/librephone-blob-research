@@ -104,8 +104,8 @@ census CSV is kept alongside locally.)
 ## Honest negatives / open items
 
 - 100 listed-not-populated + 12 builds-csv-only devices remain
-  metadata-only (OnePlus 6 is the proof-of-population; ~1.07 GB per
-  device — bulk decision is the lead's).
+  metadata-only (OnePlus 6 + larry are the two populated proofs;
+  ~1.07-1.6 GB per device — bulk decision is the lead's).
 - P2 "mainline basis" strings not verified against postmarketOS wiki.
 - cmnlib/cmnlib64/keymaster/boot-chain partitions one payload_dump away
   from being censused (hashing not run this session).
@@ -122,9 +122,7 @@ container format is decoded from public GPL btqca structs and verified
 10/10 against real bytes (patch headers with per-generation entry
 addresses 0x1b0e0/0x1b15c/0x209e4, one exact-closing NVM tag set + one
 unknown type-3 set each, first public NVM tag enumeration 9→45 tags).
-Patch-stream diff across families: no record framing — a flat code image
-with scattered instruction-level deltas; the 256-byte tails are
-per-family content. Deliverables: `blob-matrix/desktop/fleet-re/qca-bt-format.md`,
+Deliverables: `blob-matrix/desktop/fleet-re/qca-bt-format.md`,
 `tools/qca_tlv_parse.py`, `tools/fat_extract.py`; the 53 KB results JSON
 stays local with reproducibility provenance (regenerable byte-identically
 via the committed tool from any official LineageOS nightly of a
@@ -136,19 +134,67 @@ ap*/cr* family attribution, 256-byte tails, NVM tag names ≥ 0x0020.
 ## Partition-map addendum 2 (2026-11-17, continued session)
 
 Fleet deep-RE pass 2, still payload-only OnePlus 6: `modem.img` (119.8 MB)
-is a **FAT16 volume** carrying **403 named firmware files / 113.5 MB** —
+is a **FAT16 volume** carrying **404 named firmware files / 113.5 MB** —
 the full OP6 firmware set (`image_modem.b16-b24` mpss segments up to
 26.3 MB, adsp/cdsp/slpi MDT sets, **`image_wlanmdsp.mbn` = the WCN3990
-WiFi firmware** resolving the wifi census-negative finding, 37 ×
-`image_bdwlan.*` board-data variants, gfp9508, qdsp6m.qdb, manifests).
-`tz.img` is ELF64 AArch64 (e_machine 183, 17 phdrs); `dsp.img` is raw
-with 60 Hexagon ELF32 blobs from 0x48f000. **201 of the 403 files md5-join
-to multi-device fleet blobs in the committed matrix** — the sha256↔md5
-fleet join is delivered at scale from this one device. The devices CSV
-grows to 34,052 rows (v2, local, regenerable; +403 modem-FAT census rows —
-regen path: `tools/fat_extract.py` on modem.img → append census rows →
-`tools/phase1_build.py`). Deliverables:
-`fleet-re/oneplus6-partition-map.md`, updated
-`docs/devices/oneplus6/{modem,wifi}.md`. Open: the 60 dsp.img ELF
-identifications, tz QSEE segment map, `bdwlan.*` board-data format
-(19,152 B fixed records; 37-variant diff is the natural probe).
+WiFi firmware** resolving the wifi census-negative finding, `image_bdwlan.*`
+board-data variants, gfp9508, qdsp6m.qdb, manifests). `tz.img` is ELF64
+AArch64 (e_machine 183, 17 phdrs); `dsp.img` was probed raw. **201 of the
+extracted files md5-join to multi-device fleet blobs in the committed
+matrix** — the sha256↔md5 fleet join is delivered at scale from this one
+device. The devices CSV grows to 34,052 rows (v2, local, regenerable).
+Deliverables: `fleet-re/oneplus6-partition-map.md`, updated
+`docs/devices/oneplus6/{modem,wifi}.md`.
+
+## Subagent deep-pass addendum 3 (2026-11-17, four parallel analysis streams)
+
+Four subagent streams (facts-only, repo untouched by them) closed four
+open items:
+
+1. **bdwlan board-data format RESOLVED** (`fleet-re/bdwlan-format.md`):
+   flat TLV chain `{u16 tag, u16 len, payload}` to EOF, no outer magic,
+   34 files carry 17 strictly-sequential IEs (b38 re-chunks the tail to
+   18), chain sums to exactly 19,152 on every file; 35 files / 29 md5
+   clusters (count corrected from 37); stride-40 and stride-4 record
+   tables identified; per-board ID fields at abs [10,12) (28 values) and
+   [408,410) (3 values); minimal-diff cluster pairs (2 bytes). Honest
+   negatives: no checksum, no ASCII metadata, no nested TLVs. Counts
+   corrected: 404 FAT entries (403 was stale), 35 bdwlan files.
+2. **dsp.img + tz.img mapped** (`fleet-re/dsp-tz-map.md`): dsp.img is
+   **ext4** (volume "dsp", 8,192 × 4,096 B blocks, clean journal) holding
+   62 files — 57 Hexagon ELF32 fastrpc user-PD modules (/adsp /cdsp
+   /sdsp; audio codecs, vpp, chre, libc++, fastrpc shells), 0/17 identity
+   with the modem-FAT `IMAGE_ADSP.*` PIL set (disjoint by design — boot
+   PIL vs runtime fastrpc, proven at whole-file/raw/segment levels);
+   tz.img QSEE ELF64 fully segmented (17 phdrs, two vaddr regions,
+   QSEE metadata seg with X.509 chain, version strings
+   `TZ.XF.5.0.1.C5-00083.1` / `WAXAANAAA` / `CRM`), per-segment
+   sha256 + entropy in the JSON.
+3. **BT patch-stream + 256-byte tails resolved**
+   (`fleet-re/patch-stream-structure.md`): tails are per-file-unique
+   high-entropy signature/attestation-class blocks (table and padded
+   header refuted; not sha256/md5/sha1 of the stream; 0 shared words
+   across all 10 pairs); patch streams are flat dense images (zero-run
+   framing refuted); the ap/cr 128-byte delta accumulates in ONE
+   localized region (a-side ≈ 23.7-24.7K), not an insertion block —
+   one firmware built twice with a ~128-B larger section; each stream
+   contains exactly one literal u32 equal to its own entry value at a
+   per-generation offset (472/636/428). Rule-1 correction recorded: the
+   stale local `qca-bt-tlv.json` carried an entry misread (0x80000002);
+   committed parser is correct.
+4. **Second device populated** (`fleet-re/second-device-larry.md`):
+   `larry` (OnePlus Nord CE 3 Lite / N30 5G, SM6375) from the official
+   LineageOS **24.0** nightly (sha256-verified 1,601,993,721 B): **bm2n
+   fleet 6/6 byte-exact** (first SM6375-generation fleet proof; aliases
+   bm2n12≡bm2n37, bm2n14≡bm2n55, bm2n15≡bm2n31), apnv11_eu/in/na 3/3;
+   299 files / 74.5 MB censused. Honest negatives: VOOC pair absent
+   (SM8250-only per the matrix — the #1 leverage entry needs
+   instantnoodle/kebab); no modem/bt/radio partitions in the 24.0
+   payload; **vendor/odm are EROFS, not ext4** (`fsck.erofs --extract`
+   used — method note for all future 24.0-era payloads). The session
+   brief's VOOC md5s were corrupted (suffix collision with crnv20.bin's
+   md5); matrix md5s were used correctly.
+
+Open after addendum 3: tz QSEE metadata layout + fastrpc embedded ELFs;
+bdwlan tag semantics; tail construction; VOOC proof via an SM8250
+payload; the 403-vs-404 FAT-entry delta (one unresolved entry).
