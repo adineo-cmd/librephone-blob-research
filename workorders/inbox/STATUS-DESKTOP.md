@@ -97,14 +97,15 @@ byte-reproducible from committed inputs: run
 `blob-matrix/desktop/tools/phase1_build.py` against the committed
 `coverage-matrix.csv` + `device-inventory.csv` + `enchilada-census.csv`
 (all pushed) — or push it from any environment with the adineo-cmd git
-alias.
+alias. (v2 of the CSV, 34,052 rows, additionally carries the 403
+modem-FAT census rows — see partition-map addendum 2; the extended
+census CSV is kept alongside locally.)
 
 ## Honest negatives / open items
 
 - 100 listed-not-populated + 12 builds-csv-only devices remain
   metadata-only (OnePlus 6 is the proof-of-population; ~1.07 GB per
   device — bulk decision is the lead's).
-- sha256↔md5 fleet join needs per-device payloads.
 - P2 "mainline basis" strings not verified against postmarketOS wiki.
 - cmnlib/cmnlib64/keymaster/boot-chain partitions one payload_dump away
   from being censused (hashing not run this session).
@@ -121,11 +122,33 @@ container format is decoded from public GPL btqca structs and verified
 10/10 against real bytes (patch headers with per-generation entry
 addresses 0x1b0e0/0x1b15c/0x209e4, one exact-closing NVM tag set + one
 unknown type-3 set each, first public NVM tag enumeration 9→45 tags).
-Deliverables: `blob-matrix/desktop/fleet-re/qca-bt-format.md`,
+Patch-stream diff across families: no record framing — a flat code image
+with scattered instruction-level deltas; the 256-byte tails are
+per-family content. Deliverables: `blob-matrix/desktop/fleet-re/qca-bt-format.md`,
 `tools/qca_tlv_parse.py`, `tools/fat_extract.py`; the 53 KB results JSON
 stays local with reproducibility provenance (regenerable byte-identically
 via the committed tool from any official LineageOS nightly of a
 fleet-carrying device — same push-path class as the devices CSV);
 `docs/devices/oneplus6/bt.md` upgraded to format-spec class. Open:
-patch-stream entry structure, ap*/cr* family attribution, 256-byte
-tails, NVM tag names ≥ 0x0020.
+patch-stream entry structure (no record framing found — flat image),
+ap*/cr* family attribution, 256-byte tails, NVM tag names ≥ 0x0020.
+
+## Partition-map addendum 2 (2026-11-17, continued session)
+
+Fleet deep-RE pass 2, still payload-only OnePlus 6: `modem.img` (119.8 MB)
+is a **FAT16 volume** carrying **403 named firmware files / 113.5 MB** —
+the full OP6 firmware set (`image_modem.b16-b24` mpss segments up to
+26.3 MB, adsp/cdsp/slpi MDT sets, **`image_wlanmdsp.mbn` = the WCN3990
+WiFi firmware** resolving the wifi census-negative finding, 37 ×
+`image_bdwlan.*` board-data variants, gfp9508, qdsp6m.qdb, manifests).
+`tz.img` is ELF64 AArch64 (e_machine 183, 17 phdrs); `dsp.img` is raw
+with 60 Hexagon ELF32 blobs from 0x48f000. **201 of the 403 files md5-join
+to multi-device fleet blobs in the committed matrix** — the sha256↔md5
+fleet join is delivered at scale from this one device. The devices CSV
+grows to 34,052 rows (v2, local, regenerable; +403 modem-FAT census rows —
+regen path: `tools/fat_extract.py` on modem.img → append census rows →
+`tools/phase1_build.py`). Deliverables:
+`fleet-re/oneplus6-partition-map.md`, updated
+`docs/devices/oneplus6/{modem,wifi}.md`. Open: the 60 dsp.img ELF
+identifications, tz QSEE segment map, `bdwlan.*` board-data format
+(19,152 B fixed records; 37-variant diff is the natural probe).
