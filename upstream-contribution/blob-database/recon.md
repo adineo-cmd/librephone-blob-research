@@ -332,3 +332,13 @@ conclusion — these are the enumerated dimensions to fill.**
   generator; family/ISA/interface rules embedded and commented).
 
 No git commit, no push (per instructions).
+
+## Workorder impact (lead note, 2026-11-16)
+
+The finding above CORRECTS workorder W1 (desktop): no payload corpus is
+published, so there is nothing to bulk-download. Desktop payloads come
+**per-device from the public LineageOS install packages** (~1-1.3 GB each,
+fetched only when a device in its half reaches a payload-needing phase).
+The published metadata needs no download — it is already distilled into
+`coverage-matrix.csv` (33,917 rows) and `device-inventory.csv` (249
+devices), which the two-machine 222/222 program consumes directly.
