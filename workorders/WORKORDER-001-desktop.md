@@ -29,6 +29,23 @@ clean-room statement header (spec-only derivation, no proprietary access).
 
 ## PHASE 1 — DEEP RE (metadata-first, per device in rows 1–222)
 
+**UPDATED 2026-11-16 (F-71): the coverage matrix already EXISTS.**
+`upstream-contribution/blob-database/coverage-matrix.csv` holds 33,917 blob rows × 123
+blob-populated devices (distilled from the upstream PostgreSQL/CSV metadata — the published
+"database" is metadata-only; the payload corpus lives on the maintainer's machine at
+/work/Lineage-images/ and is published nowhere; full findings in
+`blob-database/recon.md`). Your Phase 1 therefore starts from that matrix:
+
+(a) map your half (rows 1–222) against it — which of your devices are among the 123
+extracted, which fall in the 113 listed-not-populated;
+(b) LEVERAGE-FIRST ordering: check your half against the top-20 leverage list in recon.md
+(the QCA BT patch fleet covers 29 devices per file — whichever top-20 entries sit in your
+half are your Phase 2/3 headline);
+(c) for your half's not-populated devices, attempt population from the **public LineageOS
+install packages** (per-device ~1–1.3 GB fetches, only as needed — no bulk download exists
+anywhere);
+(d) extend the matrix rows for your half (`blob-matrix/desktop/` outputs below).
+
 1. For each device: gather every public fact obtainable without the payload — upstream data
    repo rows, vendor/SoC identification, public mainline kernel support status, public vendor
    trees, published teardown/firmware listings. Network is flaky: retries, and mark failures
