@@ -1,144 +1,72 @@
-# WORKORDER-001 — DESKTOP machine work order (LibrePhone 100 GB program)
+# WORKORDER-001 — DESKTOP agent program (LibrePhone corpus + upstream)
 
-**Issued by:** Open Discovery Lab (agent session, 2026-11-16)
-**For:** the owner's DESKTOP PC (this machine has the disk space, RAM,
-bandwidth, and desktop OS that the lab box lacks)
-**Status channel:** when a task below is finished, put your result files
-in `workorders/inbox/` (see the naming convention at the bottom) and tick
-the checkbox. The lab agents poll this directory through the repo.
+**Machine:** DESKTOP · **Agent budget:** ~300M tokens · **Repo:** `librephone-blob-research` (this clone)
+**Issued:** 2026-11-16 by the Open Discovery Lab lead · **Duration:** one full agent session
+**Rule:** you have the repo to yourself — no other agent works in it. Commit locally per
+deliverable; push at the end of each domain; write `workorders/inbox/STATUS-DESKTOP.md` when done
+(and after any halt).
 
----
+You are an AI coding agent running on the owner's desktop. Work through the program below IN
+ORDER. First read this repo's `AGENTS.md` (RULE 0 uniqueness + prior-art search, RULE 1 improve
+previous work, RULE 2 cross-vendor, RULE 3 clean-room spec producer — you document; you do not
+write firmware) and `upstream-contribution/librephone-wants.md` (the F-69 47-row audit — rows
+marked OPEN-E are your source list).
 
-## Ground rules (read once, apply always)
+## DOMAIN 1 — The 444-device blob coverage matrix (the biggest open item)
 
-1. **FACTS, NOT BLOBS.** Nothing proprietary is ever committed to the
-   repository: no .bin/.mbn/.dll/.so payloads, no decompiled code dumps.
-   What you commit or drop in `inbox/` is: inventories (name, size,
-   sha256), extracted tables/constants, call graphs, your notes. When in
-   doubt: hashes and listings are always fine; payload bytes never are.
-2. **Work locally, report hashes.** Keep all extracted payloads in a
-   local workspace (e.g. `D:\lpwork\` or `~/lpwork/`), never inside the
-   repo clone.
-3. **One work unit at a time**, in the order below. W1 unblocks
-   everything else.
-4. If a step fails, write what happened into
-   `workorders/inbox/STATUS-<WO>.md` (commands + exact errors) — honest
-   failures are deliverables; the lab adapts the plan around them.
+1. Fetch the upstream data: `https://codeberg.org/rsavoye/librephone/raw/branch/main/data/devices.csv`
+   (444 devices) and `data/sizes.csv` (format reference — the lab's pr7 package added 702 FP6
+   rows: `upstream-contribution/pr7-sizes-fp6.md`). Enumerate the repo tree via the codeberg API
+   (`/api/v1/repos/rsavoye/librephone/git/trees/{sha}?recursive=true`) for any other data files.
+2. Build `blob-matrix/devices.csv-analysis.md`: vendor × SoC × generation breakdown of all 444
+   devices. The fragmentation picture IS the deliverable: how many distinct SoC generations, how
+   many device families share the same firmware families, where the leverage points are (one RE
+   result that covers N devices).
+3. Build `blob-matrix/coverage-matrix.csv` scaffold: one row per device — columns:
+   `device,vendor,soc,families_present,rows_in_sizes_csv,lab_coverage(none/fp6/mt6785-method-applicable),priority(P1|P2|P3)`.
+   P1 = Fairphone FP6 (the FSF flagship, fully covered by the lab already), P2 = devices whose
+   SoC family the lab has method coverage for, P3 = the rest. Mark honestly — no coverage
+   claims without a committed doc behind them.
+4. If the upstream repo (or librephone.fsf.org) hosts per-device firmware listings/blobs for any
+   devices beyond FP6: extend the matrix with their file inventories (names+sizes+hashes only —
+   metadata is fine; payload bytes stay out of the repo).
 
----
+## DOMAIN 2 — The 28 open Codeberg issues: finish every answerable one
 
-## W1 — Download the LibrePhone firmware database (~100 GB)
+The F-69 audit classified them; Agent L already produced interface docs for #17/#18/#26/#37/
+#39/#40/#44/#45/#46 (`qualcomm-fp6/docs/interface-*.md`) and answer packages pr5/pr8. Your job is
+the remainder:
 
-- [ ] **W1.1** Locate the database manifest. The lab's recon
-      (`upstream-contribution/blob-database/recon.md` — pull latest from
-      this repo) records where the ~100 GB corpus lives. Known candidate
-      endpoints to check first:
-      - https://codeberg.org/rsavoye/librephone (data/ tree — look for
-        .torrent/.magnet/meta4 files or per-device archives)
-      - https://librephone.fsf.org (follow every download link)
-      - archive.org advanced search: `q=librephone`, and any items linked
-        from the FSF pages.
-- [ ] **W1.2** Download the full payload. Torrent preferred (resumable,
-      verifiable); otherwise `curl -C - -o out.bin <url>` in a retry
-      loop, or `aria2c -x8 -s8 <url>` if you have it. Verify every file
-      against the manifest hashes (or compute them if the manifest lacks
-      them — that computation is itself part of the deliverable).
-- [ ] **W1.3** Write `workorders/inbox/W1-manifest.csv`:
-      `device,path_in_archive,bytes,sha256` — one row per file. This is
-      the file that unblocks W2 and the lab's coverage matrix.
+1. Fetch all 28 open issues fresh (API: `/api/v1/repos/rsavoye/librephone/issues?state=open`) —
+   re-check status (some may have been answered upstream since the audit; RULE 1: don't redo
+   done work — cite what's already there).
+2. For each still-open issue without a packaged answer: write the doc or the paste-ready answer
+   into `upstream-contribution/pr9-remaining-issues-package.md`, same style as pr5/pr8 (read
+   those for format). The lab's committed docs + public kernel sources are your evidence base;
+   mark [PUBLIC]/[LAB]/[OPEN] per claim, URL + access date every time.
+3. High-priority items specifically: #15 (BT driver↔blob interface — the lab's bt-firmware-census
+   is the base), #19 (user-space-vs-firmware split — the bootchain + per-family censuses answer
+   this), #36 (radio-directory blobs), #34 (TrustZone exploit — OUT OF SCOPE per owner exclusion,
+   say so in the package if it comes up).
+4. Update `upstream-contribution/README.md` with the new package pointer (append; don't rewrite
+   existing sections).
 
-## W2 — Per-device firmware extraction
+## DOMAIN 3 — Provenance + hygiene sweep (RULE 1)
 
-- [ ] **W2.1** For each device package in the W1 payload: unpack the
-      update/ROM containers (usual Android chain: `payload.bin` →
-      `payload-dumper-go`; raw .img → `simg2img` then standard
-      partitions; .ozip → ozip-decrypt; Spreadtrum .pac → SPD Research
-      Tool dump; MTK scatter → `mtk_extract`/pgpt). Tools the lab
-      verified: python `payload_dumper`, `simg2img`, `7z` for most
-      archives.
-- [ ] **W2.2** Produce per-device blob trees, grouped by family:
-      `modem/ wifi/ bt/ tz/ boot/ adsp/ cdsp/ camera/ gpu/ other/`
-      (map by path + partition name; when ambiguous, put under `other/`
-      with a note).
-- [ ] **W2.3** Write `workorders/inbox/W2-blobs.csv`:
-      `device,family,filename,bytes,sha256` — one row per blob. THIS IS
-      THE MASTER INPUT for the lab's coverage matrix. Size expectation:
-      ~444 devices × ~10-60 blobs each.
-- [ ] **W2.4** Flag every device whose extraction fails in
-      `workorders/inbox/W2-failures.md`.
+1. Verify every hash recorded in the docs against your fresh re-fetches where the payload is
+   public (e.g. sizes.csv rows, the DVE ISO md5).
+2. Fix any dangling reference, stale count, or wrong F-number in this repo's docs (the lab's
+   rule: leave the repo better than you found it; list before/after in your status file).
+3. Re-verify the paste-ready packages' target texts are still unchanged upstream (the pr5/pr8
+   blocks quote exact upstream lines — re-fetch each and confirm).
 
-## W3 — Ghidra headless bulk analysis (P1 blobs only)
+## Deliverables + push discipline
 
-- [ ] **W3.1** Install Ghidra (latest release, needs Java 21+) and
-      confirm `analyzeHeadless` runs.
-- [ ] **W3.2** Run headless analysis on the **P1 blobs only** (the lab's
-      priority list: FP6 families — wpss b01/b02/b03/b04/b06/b07/b08,
-      modem, adsp, cdsp, camera icp, bt, trustzone — and MT6785: md1rom,
-      md1dsp, ccu, tinysys; the full per-file list is in
-      `qualcomm-fp6/docs/*.md` + `mediatek/docs/*.md` in this repo).
-      Command shape:
-      `analyzeHeadless <proj> <proj> -import <blob> -analysisTimeoutPerFile 3600`
-- [ ] **W3.3** Export per-blob ANALYSIS FACTS ONLY (script Ghidra's
-      post-analysis): function list with addresses/sizes, discovered
-      strings tables, per-function call targets, and section tables.
-      Write `workorders/inbox/W3-ghidra/<device>_<family>.facts.json`.
-- [ ] **W3.4** Do NOT export decompiled C or binaries into the repo.
-      The lab agents reason over your facts files and request targeted
-      follow-ups (specific functions) in the next workorder.
-
-## W4 — Wine reference runs (LPEC/PCM — ROADMAP Q-2)
-
-- [ ] **W4.1** Install Wine (64-bit prefix). Fetch the Sony Digital
-      Voice Editor 3.3.01 installer — provenance documented in
-      `qualcomm-fp6/../track-c docs lpec-dll-analysis.md` (archive.org
-      item dve3301icdpx820; extract chain needs data1.cab AND data2.cab
-      side by side — see F-68's correction in the lab journal).
-- [ ] **W4.2** Run the DVE application under Wine; play/convert the two
-      reference samples (budgtele.dvf, 07011600.MSV — from
-      sembiance.com/fileFormatSamples/, hashes recorded in the F-68
-      journal) to WAV via the app itself. Record the exact app actions.
-- [ ] **W4.3** Drop the produced WAVs + a run log into
-      `workorders/inbox/W4-wine/` (WAVs are DERIVED PCM from samples the
-      lab already uses — they are analysis artifacts, allowed in inbox;
-      if unsure, submit hashes + sizes and ask).
-- The lab diffs this reference PCM against its LPEC decoder output —
-  this closes ROADMAP Q-2 (reference-quality validation).
-
-## W5 — Re-fetch trees that unblock the open library census (issue #33)
-
-- [ ] **W5.1** Re-fetch the FP6 LineageOS build tree and the MT6785
-      firmware tree (same sources as the lab's original sessions —
-      LineageOS device trees + vendor dumps; see the provenance sections
-      in `qualcomm-fp6/docs/fp6-architecture-census.md` and
-      `mediatek/docs/`).
-- [ ] **W5.2** Extract the 16 shared libraries named in issue #33
-      (https://codeberg.org/rsavoye/librephone/issues/33) with
-      sha256 + sizes.
-- [ ] **W5.3** Run `strings -n 8` + `file` on the 7 unidentified ones
-      (focal64, ic5, loadalgota64, ops, sp_license, winsecap, evautil64)
-      and drop the outputs in `workorders/inbox/W5-libs/`. The lab's
-      F-32 method then identifies them from your strings files.
-
----
-
-## Inbox naming convention (how results come back)
-
-```
-workorders/inbox/
-  W1-manifest.csv            W2-blobs.csv            W2-failures.md
-  W3-ghidra/<facts>.json     W4-wine/<wavs+log>      W5-libs/<strings+hashes>
-  STATUS-<WO>.md             (any failure/halt notes)
-```
-
-The lab processes inbox files, merges facts into the coverage matrix and
-docs, and issues WORKORDER-002 for the next round. Nothing in inbox/ is
-ever committed raw — the lab distills it to facts first.
-
----
-
-## Why this split
-
-| work | machine | reason |
-|---|---|---|
-| 100 GB download, extraction, Ghidra, Wine | **DESKTOP** | bandwidth, disk, RAM, desktop OS |
-| coverage matrix, RE analysis, spec docs, solvers, upstream packaging, verification | **LAB BOX + AGENTS** | reasoning + compute + clean-room discipline |
+- Commit locally per deliverable. Push after Domain 1, after Domain 2, and after Domain 3.
+- `workorders/inbox/STATUS-DESKTOP.md`: the full report (domains done, counts, findings, honest
+  negatives, anything you could NOT do and why).
+- Sizing note: this program is sized for ~300M tokens. If you finish early, the stretch goal is
+  Domain 4: draft the P2-device census plans (per-SoC method adaptations of the lab's FP6/MT6785
+  pipeline) as doc stubs in `blob-matrix/`.
+- Do NOT touch: `open-research-lab` (the laptop's domain), other repos, anything in
+  `workorders/WORKORDER-002-laptop.md`.
