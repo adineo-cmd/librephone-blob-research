@@ -163,7 +163,8 @@ open LPEC decoder; no firmware-side clean-room WMI dispatcher reference.
   agent-knowledge flagged for verification against the postmarketOS
   wiki — not verified this session.
 - `bt.img`/`dsp.img`/`modem.img` container parsing, MDT segment maps:
-  open (method exists, budget pending).
+  bt.img done (fleet-re §8); dsp.img/modem.img open (method exists,
+  budget pending).
 - cmnlib/cmnlib64/keymaster/boot-chain partitions are one payload_dump
   call each from being censused (hashing not run this session).
 
@@ -180,3 +181,25 @@ open LPEC decoder; no firmware-side clean-room WMI dispatcher reference.
 - `docs/devices/oneplus6/` — 7 family docs (Phase 2)
 - `implementations/` — 5 components + open-item marker (Phase 3)
 - `workorders/inbox/STATUS-DESKTOP.md` — session status
+
+## 8. Fleet deep-RE, pass 1: the QCA BT patch/NVM fleet (2026-11-16, same session)
+
+The leverage-first plan got its first execution pass. The OnePlus 6
+`bt.img` partition turned out to be a **FAT16 volume** whose `IMAGE`
+directory carries the complete QCA BT patch/NVM fleet — all six top-20
+md5s extract byte-exactly from this one device payload (two of them
+double-verified against public linux-firmware), plus four sibling
+variants. Container format fully decoded from public GPL btqca.h/btqca.c
+structs and verified 10/10 against real bytes: patch headers
+(`total_size == data_length + 24` 5/5; `rom_build` == filename suffix;
+`download_mode` splits Rome 1.1 vs 2.x), NVM enclosing-header sets (one
+exact-closing tag set + one unknown type-3 set each; btqca.c reads only
+the first), and the first public
+enumeration of the NVM tag surface (9→45 tags; the 3 kernel-handled tags
+BD_ADDR/HCI/deep-sleep present 6/6). Spec + results + tools:
+`fleet-re/qca-bt-format.md`, `fleet-re/qca-bt-tlv.json` (regenerable via
+`tools/qca_bulleted.py` equivalent — see `tools/qca_tlv_parse.py`), `tools/`.
+
+This upgrades the §3 headline from "prioritized" to "container-format
+decoded, fleet-identity proven, patch-stream interior open". The 29
+devices per fleet file are covered by this one spec.
