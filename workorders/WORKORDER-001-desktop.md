@@ -1,81 +1,86 @@
-# WORKORDER-001 — DESKTOP agent program
+# WORKORDER-001 — DESKTOP agent program (v3)
 
 **Machine:** DESKTOP · **Agent budget:** ~300M tokens · **Repo:** `librephone-blob-research` (this clone)
-**Issued:** 2026-11-16 by the Open Discovery Lab lead · **Duration:** one full agent session
+**Issued:** 2026-11-16 (v3) by the Open Discovery Lab lead · **Duration:** one full agent session
 **Repo roles (standing):**
 - `librephone-blob-research` — LibrePhone work. **PRIORITY 1 on BOTH machines.**
-- `open-research-lab` — mathematics and other fields. **PRIORITY 2.**
-- `open-discovery-lab` — the NOTEBOOK: records every finding, solved problem, or improvement
-  made in either repo (or any other repo). You never work IN it — but every session's
-  discoveries belong in its FINDINGS.md ledger, which the lead merges.
+- `open-research-lab` — mathematics and other fields. PRIORITY 2.
+- `open-discovery-lab` — the NOTEBOOK (findings from any repo; lead-merged).
 
-**Work division between the two machines (LibrePhone first, split evenly):**
-- DESKTOP = the DATA+COVERAGE side (below). LAPTOP = the ISSUES+UPSTREAM side (see
-  WORKORDER-002-laptop.md). No overlap.
+**THE DEVICE SPLIT (owner directive: divide the 444 listed devices evenly):**
+Fetch `https://codeberg.org/rsavoye/librephone/raw/branch/main/data/devices.csv`, sort by
+device name (plain codepoint sort — BOTH machines use the same sort so halves never overlap),
+then:
+- **DESKTOP owns rows 1–222.**
+- **LAPTOP owns rows 223–444** (see WORKORDER-002-laptop.md).
+Each machine runs the SAME four-phase program on its half. The lead merges the two halves into
+the full 444-device picture.
 
-**Discipline:** commit locally per deliverable; push at the end of each domain; write
-`workorders/inbox/STATUS-DESKTOP.md` when done and after any halt. Read this repo's `AGENTS.md`
-first (RULE 0 prior-art search, RULE 1 improve previous work, RULE 3 clean-room spec producer —
-you document, you never write firmware). Facts-not-blobs: no proprietary payload is ever
-committed.
+**THE FOUR WORK TYPES (owner directive — every phase runs on your device half):**
+deep RE · blob families documented · clean-room implementation · device fragmentation.
 
-## DOMAIN 1 (LibrePhone) — the 444-device blob coverage matrix + fragmentation analysis
+**Discipline:** commit locally per phase; push at phase end; write
+`workorders/inbox/STATUS-DESKTOP.md` when done and after any halt. Read `AGENTS.md` first
+(RULE 0 prior-art search, RULE 1 improve previous work). Facts-not-blobs: no proprietary
+payload ever committed. Clean-room rule (owner directive 2026-11-16, amending RULE 3): you
+MAY write implementations, but ONLY from the lab's published spec documents — an implementer
+never reads proprietary code, headers, or strings; every implementation file carries a
+clean-room statement header (spec-only derivation, no proprietary access).
 
-The core open item: everything LibrePhone lists, measured and mapped.
+## PHASE 1 — DEEP RE (metadata-first, per device in rows 1–222)
 
-1. Fetch the upstream data: `https://codeberg.org/rsavoye/librephone/raw/branch/main/data/devices.csv`
-   (444 devices) and `data/sizes.csv` (the lab's `upstream-contribution/pr7-sizes-fp6.md` added
-   702 FP6 rows — read it for the exact format). Enumerate the repo tree via the codeberg API
-   (`/api/v1/repos/rsavoye/librephone/git/trees/{sha}?recursive=true`) for every other data file.
-2. Build `blob-matrix/devices-analysis.md`: the vendor × SoC × generation breakdown of all 444
-   devices — the fragmentation picture IS the deliverable (distinct SoC generations, device
-   families sharing firmware families, leverage points where one RE result covers N devices).
-3. Build `blob-matrix/coverage-matrix.csv`: one row per device —
-   `device,vendor,soc,families_present,in_sizes_csv,lab_coverage(none/fp6/mt6785-method),priority(P1|P2|P3)`.
-   P1 = Fairphone FP6 (FSF flagship — fully covered), P2 = SoCs the lab's method already covers,
-   P3 = the rest. Honest marks only: no coverage claim without a committed doc behind it.
-4. If upstream or librephone.fsf.org hosts per-device firmware listings/blobs for devices beyond
-   FP6: extend the matrix with their inventories (names+sizes+hashes only — metadata is fine,
-   payload bytes stay out of the repo).
-5. Fallback: the owner is NOT certain a 100 GB blob database exists. If your enumeration finds
-   no such corpus, document that finding (every probe + URL) and build the matrix from
-   devices.csv + sizes.csv alone — the 444-device metadata picture is still the deliverable.
+1. For each device: gather every public fact obtainable without the payload — upstream data
+   repo rows, vendor/SoC identification, public mainline kernel support status, public vendor
+   trees, published teardown/firmware listings. Network is flaky: retries, and mark failures
+   honestly.
+2. Per family present (modem/wifi/bt/tz/boot/adsp/cdsp/camera/gpu/other): census what is
+   obtainable (file names, sizes, hashes where public, ISA from public analyses where they
+   exist — cite them; never re-claim another project's result as lab work).
+3. Output: `blob-matrix/desktop/devices-001-222.csv` —
+   `device,vendor,soc,family,file,bytes,sha256,public_status,notes`. Plus
+   `blob-matrix/desktop/deep-re-notes.md` for per-device findings that exceed a CSV row.
 
-## DOMAIN 2 (LibrePhone) — per-SoC census method plans (P2/P3 devices)
+## PHASE 2 — BLOB FAMILIES DOCUMENTED (template-driven, per device/family in rows 1–222)
 
-1. For the top P2 device clusters from your matrix (biggest device counts sharing an SoC family
-   the lab's method covers — e.g. other Snapdragon 8-series phones, other MT6785-era devices):
-   write per-SoC census method plans into `blob-matrix/method-<soc>.md` — the FP6/MT6785
-   pipeline (container walk → ISA identification → per-family census → interface decode)
-   adapted to each SoC's known public data (mainline kernel support, public vendor trees).
-2. These plans are what turn the matrix from a picture into a queue: each plan names the
-   public sources, the extraction steps, and the expected per-family outputs.
+1. For every family where Phase 1 produced real data: write the family doc from the FP6/MT6785
+   exemplar templates (`qualcomm-fp6/docs/`, `mediatek/docs/` are the patterns): container
+   layout, ISA/proof status, interface facts, open questions — each doc marked with its
+   evidence class (census/ISA-identified/spec-complete).
+2. Output: `docs/devices/<device>/<family>.md` (stub-level is honest for metadata-only
+   devices; the FP6/MT6785 depth is the target only where payloads/analysis exist).
 
-## DOMAIN 3 (LibrePhone) — provenance + hygiene sweep (RULE 1)
+## PHASE 3 — CLEAN-ROOM IMPLEMENTATION (from published specs ONLY)
 
-1. Re-verify recorded hashes against fresh fetches where payloads are public (sizes.csv rows,
-   the DVE ISO md5); fix dangling references, stale counts, wrong F-numbers anywhere in this
-   repo (leave it better than you found it; before/after in your status file).
-2. Re-fetch the paste-ready packages' target texts (pr5/pr7/pr8/pr9 quote upstream lines
-   exactly) and confirm they are still current.
+1. Inventory the lab's completed specs (FP6 WMI dispatch architecture, LPEC codec model
+   (100%-closed), boot-chain map, TrustZone census, MT6785 ISA maps…).
+2. Write clean-room implementation components from those specs ONLY — every file headered
+   with the clean-room statement. Suggested starts (highest value first):
+   - **Qualcomm side:** the wpss WMI/HTT/CE interface components that open PR #58
+     (codeberg rsavoye/librephone) explicitly lacks — the lab's decoded dispatch spec is
+     exactly what its author asked for. Liaison note: implement against
+     `qualcomm-fp6/docs/wmi-*` + the dispatch paper, NOT against ath11k's header copies
+     unless they are clean-room-safe public code (they are GPL public code — usable).
+   - **LPEC:** the decoder exists (`track-c-discovery-engine` lpec_decoder) — package it as a
+     standalone implementation with the spec doc as its design document.
+3. Output: `implementations/<family>/<component>/` with README stating the spec-derived
+   provenance. Where a spec is incomplete, implement the spec'd subset and file the gap as an
+   open item — never guess beyond the spec.
 
-## DOMAIN 4 (Priority 2 — open-research-lab, ONLY after Domains 1-3)
+## PHASE 4 — DEVICE FRAGMENTATION (your half, merge-ready)
 
-Clone https://github.com/adineo-cmd/open-research-lab. Then, in order:
-1. OEIS A385403 proof attack — execute the named plan in
-   `math/property-b-covering/results/a385403-results.md` §"Continuation attack": FIRST the
-   structural probe "does any Fano-free non-2-colorable 3-graph with 8 edges exist (no
-   coverage)" — INFEASIBLE there proves BOTH a(13)=9 and a(14)=10-bound by counting alone;
-   then the replay-seeded lazy master (all 1716 size-55 colorings, checkpoint per iteration,
-   12 workers, 4-6 h). Solver setup workaround is documented in the results doc.
-2. Erdős #614 extension — re-run the bounded cells at 3600 s budgets, add the derived redundant
-   per-subset cut, extend the exact tables (`math/erdos614-fnk/`).
-Record what you did in `math/.../results/` docs; the lead merges the ledger rows.
+1. From Phases 1-2: the fragmentation analysis for rows 1–222 — SoC generations, family
+   sharing, leverage ranking (blobs shared across the most devices), and the split-notes the
+   lead needs to merge your half with the laptop's into the full 444-device picture.
+2. Output: `blob-matrix/desktop/fragmentation-half.md` + the merge-ready CSV.
 
-## Deliverables + push discipline
+## FALLBACK (Priority 2 — after all four phases)
 
-- Commit locally per deliverable; push after each domain.
-- `workorders/inbox/STATUS-DESKTOP.md`: full report (domains done, counts, findings, honest
-  negatives, could-not-do list).
-- Do NOT touch: `workorders/WORKORDER-002-laptop.md`, the laptop's files, or
-  open-discovery-lab (the notebook is the lead's).
+`open-research-lab`: OEIS A385403 proof attack per
+`math/property-b-covering/results/a385403-results.md` §"Continuation attack" (structural
+Fano-free-8-edge probe FIRST — it proves both brackets by counting), then EP614 extension
+(`math/erdos614-fnk/`). Only if Phases 1-4 consumed little budget.
+
+## Do NOT touch
+
+`workorders/WORKORDER-002-laptop.md`, the laptop's files (rows 223-444 outputs),
+open-discovery-lab (the notebook is the lead's).

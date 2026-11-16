@@ -1,0 +1,250 @@
+vendor,model,build_codename,soc,soc_source,released_year,in_devices_sql,blob_rows_devices_sql,total_bytes_devices_sql,in_builds_csv,extract_status_22.2,build_status_22.2,in_count_csv,count_csv_total,in_sizes_csv,sizes_rows,sizes_bytes,in_devices_csv_bloblists,priority,mainline_basis_or_note,source_artifacts
+,Phone_2,aura,Qualcomm SDM845 Snapdragon 845,builds.csv,,n,,,y,completes,,n,,n,,,y,P3,,builds.csv
+LGE,G8_ThinQ,alphaplus,Qualcomm SM8150 Snapdragon 855,builds.csv,,n,,,y,completes,completes,n,,n,,,n,P3,,builds.csv
+LGE,V50_ThinQ,flashlmdd,Qualcomm SM8150 Snapdragon 855,builds.csv,,n,,,y,completes,completes,n,,n,,,n,P3,,builds.csv
+Motorola,Moto_G7P_Plus,lake,,,,n,,,y,fails,,n,,n,,,n,P3,,builds.csv
+Motorola,Edge_,racer,Qualcomm SM7250 Snapdragon 765G,builds.csv,,n,,,y,fails,,n,,n,,,n,P3,,builds.csv
+Nokia,8,NB1,Qualcomm MSM8998 Snapdragon 835,builds.csv,,n,,,y,,,n,,n,,,n,P3,,builds.csv
+Nvidia,TX2_Tablet,quill_tag,,,,n,,,y,fails,,n,,n,,,n,P3,,builds.csv
+OnePlus,Nord_N10,billie,Qualcomm SM6350 Snapdragon 690 5G,builds.csv,,n,,,y,,,n,,n,,,n,P3,,builds.csv
+OnePlus,OnePlus_5T,dumpling,Qualcomm MSM8998 Snapdragon 835,builds.csv,,n,,,y,,,n,,n,,,n,P3,,builds.csv
+Sony,Xperia_1_II,pdx203,Qualcomm SM8250 Snapdragon 865,builds.csv,,n,,,y,completes,,y,14,n,,,y,P3,,builds.csv|count.csv
+Xiaomi,Mi_11_Pro,mars,,,,n,,,y,,fails,n,,n,,,n,P3,,builds.csv
+Xiaomi,Mi_10_5G,monet,,,,n,,,y,,,n,,n,,,n,P3,,builds.csv
+Xiaomi,Redmi_7,quill,,,,n,,,y,completes,fails,n,,n,,,n,P3,,builds.csv
+asus,ZenPhone_5Z,Z01R,,,,y,,,y,fails,,y,19,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+asus,ZenPhone_8,sake,,,,y,,,n,,,y,3,n,,,n,P3,,count.csv|devices.sql.bz2
+bananaPI,M5_TV,m5,Amlogic S905X3,builds.csv,,y,,,y,fails,,n,,n,,,n,P3,,builds.csv|devices.sql.bz2
+bananaPI,M5_Tablet,m5_tab,Amlogic S905X3,builds.csv,,y,,,y,fails,,n,,n,,,n,P3,,builds.csv|devices.sql.bz2
+essential,PH_1,mata,Qualcomm MSM8998 Snapdragon 835,builds.csv,,y,,,y,completes,,y,13,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+fxtec,Pro_1,pro1,,,,y,,,y,fails,,y,30,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+fxtec,Pro_1X,pro1x,Qualcomm SM6115 Snapdragon 662,builds.csv,,y,287,450884676,y,completes,,y,36,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+google,Pixel_8A,akita,Google Tensor G3,builds.csv,,y,54,371286246,y,completes,completes,y,52,y,54,371286246,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_5A,barbet,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,91,387020494,y,completes,,y,41,y,91,387020494,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_4A_5G,bramble,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,105,387070176,y,completes,,y,55,y,105,387070176,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_9_Pro,caiman,Google Tensor G3,builds.csv,,y,59,528012773,y,completes,completes,y,58,y,59,528012773,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_7_Pro,cheetah,Google Tensor GS201,builds.csv,,y,45,219054998,y,completes,,y,45,y,45,219054998,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_9_Pro_Fold,comet,Google Tensor G3,builds.csv,,y,64,526839752,y,completes,,y,63,y,64,526839752,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,ADT_3,deadpool,Amlogic S905Y2,builds.csv,,y,,,y,completes,,y,8,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+google,Pixel_Fold,felix,Google Tensor GS201,builds.csv,,y,41,217670341,y,completes,,y,41,y,41,217670341,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_8_Pro,husky,Google Tensor G3,builds.csv,,y,52,364778289,y,completes,,y,51,y,52,364778289,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_9_Pro_XL,komodo,,,,y,59,528012563,n,,,n,,n,,,y,P3,,devices.sql.bz2
+google,Pixel_7a,lynx,Google Tensor GS201,builds.csv,,y,49,222815520,y,fails,,y,50,y,49,222815520,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_XL,marlin,Qualcomm MSM8996 Pro Snapdragon 821,builds.csv,,y,,,y,completes,,y,38,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+google,Pixel_5,redfin,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,103,387213136,y,completes,,y,53,y,103,387213136,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel,sailfish,Qualcomm MSM8996 Pro Snapdragon 821,builds.csv,,y,,,y,fails,,y,37,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+google,Pixel_8,shiba,Google Tensor G3,builds.csv,,y,52,364308501,y,completes,,y,16,y,52,364308501,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_2XL,taimen,Qualcomm SDM835 Snapdragon 835,builds.csv,,y,,,y,fails,,y,28,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+google,Pixel_Tablet,tangorpro,Google Tensor GS201,builds.csv,,y,46,136697788,y,completes,,y,46,y,46,136697788,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_9A,tegu,,,,y,54,356676420,n,,,n,,n,,,y,P3,,devices.sql.bz2
+google,Pixel_9,tokay,Google Tensor G4,builds.csv,,y,59,527523396,y,completes,completes,y,58,y,59,527523396,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_2,walleye,Qualcomm SDM835 Snapdragon 835,builds.csv,,y,,,y,fails,,y,30,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+lenovo,Z5_Pro_GT,heart,,,,y,20,327457184,y,fails,,y,17,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+lenovo,Z6_Pro,zippo,,,,y,,,y,fails,,y,11,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+lge,Velvet,caymanslm,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,,,y,20,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+lge,V30,joan,Qualcomm MSM8998 Snapdragon 835,builds.csv,,y,,,y,fails,,y,46,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+lge,G7_ThinQ,judyln,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,completes,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+lge,V35,judyp,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+lge,V40,judypn,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,21,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G84_5G,bangkk,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,345,764235773,y,fails,,n,,n,,,y,P3,,builds.csv|devices.sql.bz2
+motorola,Defy_2021,bathena,Qualcomm SM6115 Snapdragon 662,builds.csv,,y,226,562085430,y,fails,,y,33,y,226,562085430,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,Edge_20,berlin,Qualcomm SM7325 Snapdragon 778G 5G,builds.csv,,y,31,139626681,y,completes,,y,71,y,31,139626681,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,Edge_2021,berlna,Qualcomm SM7325 Snapdragon 778G 5G,builds.csv,,y,36,207166791,y,fails,,y,74,y,36,207166791,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_G_Power,borneo,Qualcomm SM6115 Snapdragon 662,builds.csv,,y,222,560367829,y,completes,,y,30,y,222,560367829,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,ThinkPhone,bronco,Qualcomm SM8475 Snapdragon 8 Gen1,builds.csv,,y,,,y,completes,,y,40,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G10,capri,Qualcomm SM4250 Snapdragon 460,builds.csv,,y,211,457473736,y,fails,,y,34,y,211,457473736,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_G30,caprip,Qualcomm SM6115 Snapdragon 662,builds.csv,,y,232,457752331,y,fails,,y,33,y,232,457752331,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_G9_Power,cebu,,,,y,222,524628698,y,fails,,y,30,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G7_Play,channel,,,,y,,,n,,,y,2,n,,,n,P3,,count.csv|devices.sql.bz2
+motorola,Moto_G_Stylus_5G,denver,,,,y,353,758872095,n,,,n,,n,,,y,P3,,devices.sql.bz2
+motorola,Moto_G32,devon,Qualcomm SM6225 Snapdragon 680 4G,builds.csv,,y,232,473578241,y,fails,,n,,y,232,473578241,y,P3,,builds.csv|devices.sql.bz2|sizes.csv
+motorola,Edge_30,dubai,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,338,805161240,y,fails,,n,,y,338,805161240,y,P3,,builds.csv|devices.sql.bz2|sizes.csv
+motorola,Edge_30_Ultra,eqs,Qualcomm SM8475 Snapdragon 8+ Gen1,builds.csv,,y,,,y,fails,,n,,n,,,n,P3,,builds.csv|devices.sql.bz2
+motorola,Moto_G6_Plus,evert,Qualcomm SDM630 Snapdragon 630,builds.csv,,y,,,y,fails,,y,29,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G_5G_2024,fogo,Qualcomm SM4375 Snapdragon 4 Gen 1,builds.csv,,y,364,784040172,y,completes,,n,,y,364,784040172,y,P3,,builds.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_G34_5G,fogos,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,358,781578598,y,fails,,y,37,y,358,781578598,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_E7_Plus,guam,Qualcomm SM4250 Snapdragon 460,builds.csv,,y,210,557144929,y,fails,,y,33,y,210,557144929,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_G9,guamp,,,,y,224,561128588,y,fails,,y,32,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G42,hawao,Qualcomm SM6225 Snapdragon 680 4G,builds.csv,,y,235,462141241,y,fails,,n,,y,235,462141241,y,P3,,builds.csv|devices.sql.bz2|sizes.csv
+motorola,One_Vision,kane,,,,y,,,y,completes,,y,71,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G_5G,kiev,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,,,y,completes,completes,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_Z3,messi,Qualcomm SDM636 Snapdragon 636,builds.csv,,y,,,y,fails,,y,33,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Edge_30_Neo,miami,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,353,754141054,y,fails,,n,,y,353,754141054,y,P3,,builds.csv|devices.sql.bz2|sizes.csv
+motorola,G_Stylus_5G-2-2022,milanf,,,,y,360,760043006,n,,,n,,n,,,y,P3,,devices.sql.bz2
+motorola,Moto_G_5G_Plus,nairo,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,,,y,fails,,y,24,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Edge_S,nio,Qualcomm SM8250-AC Snapdragon 870,builds.csv,,y,,,y,completes,,y,18,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G7_Power,ocean,,,,y,,,y,completes,,y,33,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_X4,payton,,,,y,,,y,fails,,y,33,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Edge_20_Pro,pstar,Qualcomm SM8250-AC Snapdragon 870,builds.csv,,y,,,y,completes,,y,17,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Moto_G52,rhode,Qualcomm SM6225 Snapdragon 680 4G,builds.csv,,y,237,466319439,y,fails,,n,,y,237,466319439,y,P3,,builds.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_G82_5G,rhodep,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,350,765880034,y,fails,,n,,n,,,y,P3,,builds.csv|devices.sql.bz2
+motorola,Moto_G7,river,Qualcomm SDM632 Snapdragon 632,builds.csv,,y,,,y,fails,,y,89,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Edge_40_Pro,rtwo,Qualcomm SM8550 Snapdragon 8 Gen2,builds.csv,,y,612,1299268531,y,completes,,y,88,y,612,1299268531,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+motorola,One_Action,troika,,,,y,,,y,completes,,y,69,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+motorola,Edge_30_Fusion,tundra,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,639,843007454,y,fails,,n,,y,639,843007454,y,P3,,builds.csv|devices.sql.bz2|sizes.csv
+motorola,Moto_G200,xpeng,Qualcomm SM8350-AC Snapdragon 888+,builds.csv,,y,651,833798522,y,fails,,y,42,y,651,833798522,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+nokia,7_Plus,B2N,Qualcomm SDM660 Snapdragon 660,builds.csv,,y,,,y,fails,,y,54,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nokia,6.1_2018,PL2,Qualcomm SDM630 Snapdragon 630,builds.csv,,y,,,y,fails,,y,48,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nothing,Phone_2,Pong,Qualcomm SM8475 Snapdragon 8+ Gen1,builds.csv,,y,654,809627901,y,completes,,y,55,y,654,809627901,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+nothing,Phone_1,Spacewar,Qualcomm SM7325-AE Snapdragon 778G+ 5G,builds.csv,,y,475,657099453,y,completes,,y,27,y,475,657099453,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+nubia,Mini_5G,TP1803,Qualcomm SM8150 Snapdragon 855,builds.csv,,y,,,y,fails,,y,28,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nubia,Z17,nx563j,,,,y,,,y,fails,,y,21,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nubia,Z18,nx606j,Qualcomm SDM660 Snapdragon 660,builds.csv,,y,,,y,fails,,y,13,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nubia,Red_Magic_Mars,nx619j,,,,y,,,y,fails,,y,11,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nubia,Red_Magic_5G,nx659j,Qualcomm MSM8998 Snapdragon 835,builds.csv,,y,,,y,fails,,y,45,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nvidia,TX1_TV,foster,,,,y,,,y,fails,,y,33,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nvidia,TX1_Tablet,foster_tab,,,,y,,,y,fails,,y,33,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nvidia,Jetson_TV,porg,,,,y,,,y,fails,,y,35,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nvidia,Jetson_Tablet,porg_tab,,,,y,,,y,fails,,y,35,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nvidia,TX2_TV,quill,,,,y,,,y,fails,,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+nvidia,TX2_Tablet,quill_tab,,,,y,,,n,,,y,22,n,,,n,P3,,count.csv|devices.sql.bz2
+nvidia,Shield_TV_2019,sif,,,,y,,,n,,,y,33,n,,,n,P3,,count.csv|devices.sql.bz2
+oneplus,OnePlus_12R,aston,,,,y,187,1103661805,n,,,n,,n,,,y,P3,,devices.sql.bz2
+oneplus,Nord_4,avalon,,,,y,672,1940664881,n,,,n,,n,,,y,P3,,devices.sql.bz2
+oneplus,Nord_CE4,benz,,,,y,584,1400035095,n,,,n,,n,,,y,P3,,devices.sql.bz2
+oneplus,Pad_Pro,caihong,,,,y,462,718912724,n,,,n,,n,,,y,P3,,devices.sql.bz2
+oneplus,OnePlus_5,cheeseburger,Qualcomm MSM8998 Snapdragon 835,builds.csv,,y,,,y,fails,,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+oneplus,OnePlus_13,dodge,,,,y,857,1233076892,n,,,n,,n,,,y,P3,,devices.sql.bz2
+oneplus,Nord_200,dre,Qualcomm SM4350 Snapdragon 480,builds.csv,,y,44,146412066,y,completes,,y,35,y,44,146412066,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,Pad_2_Pro,erhai,,,,y,670,709417133,n,,,n,,n,,,y,P3,,devices.sql.bz2
+oneplus,OnePlus_7_Pro,guacamole,Qualcomm SM8150 Snapdragon 855,builds.csv,,y,435,499345117,y,fails,fails,y,83,y,435,499345117,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,Nord_N20_5G,gunnar,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,,,y,fails,,y,200,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+oneplus,OnePlus_7T_Pro,hotdog,Qualcomm SM8150-AC Snapdragon 855,builds.csv,,y,436,601743141,y,fails,fails,y,89,y,436,601743141,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_7T,hotdogb,Qualcomm MSM8998 Snapdragon 835,builds.csv,,y,438,585064437,y,fails,,y,89,y,438,585064437,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_8,instantnoodle,Qualcomm SM8250 Snapdragon 865,builds.csv,,y,504,590857486,y,completes,completes,y,135,y,504,590857486,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_8_Pro,instantnoodlep,Qualcomm SM8250 Snapdragon 865,builds.csv,,y,506,591327658,y,completes,completes,y,140,y,506,591327658,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_8T,kebab,Qualcomm SM8250 Snapdragon 865,builds.csv,,y,106,252290143,y,completes,fails,y,115,y,106,252290143,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,Nord_CE3,larry,Qualcomm SM6375 Snapdragon 695 5G,builds.csv,,y,506,732004792,y,completes,,y,203,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+oneplus,OnePlus_9,lemonade,,,,y,651,746439440,n,,,n,,n,,,y,P3,,devices.sql.bz2
+oneplus,OnePlus_9_Pro,lemonadep,Qualcomm SM8350 Snapdragon 888,builds.csv,,y,650,748523070,y,completes,fails,y,139,y,650,748523070,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_9R,lemonades,Qualcomm SM8250 Snapdragon 865,builds.csv,,y,106,252290143,y,completes,,y,115,y,106,252290143,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_9RT,martini,Qualcomm SM8250 Snapdragon 865,builds.csv,,y,652,734658038,y,completes,,y,26,y,652,734658038,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,Nord_CE2,oscaro,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,489,752234976,y,completes,,y,187,y,489,752234976,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_11_5G,salami,Qualcomm SM8550 Snapdragon 8 Gen2,builds.csv,,y,646,1603429711,y,completes,,y,185,y,646,1603429711,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_12,waffle,,,,y,738,1874474311,n,,,n,,n,,,y,P3,,devices.sql.bz2
+radxa,Zero_TV,radxa0,,,,y,,,y,,,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+radxa,Zero_2_TV,radxa02,,,,y,,,y,fails,,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+radxa,Zero_2_Tablet,radxa02_tab,,,,y,,,y,fails,,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+radxa,Zero_Tablet,radxa0_tab,,,,y,,,y,fails,,y,22,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+razer,Phone2,aura,,devices.sql.bz2,,y,,,n,,,y,23,n,,,y,P3,,count.csv|devices.sql.bz2
+razer,Phone,cheryl,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,,,y,completes,,y,27,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+realme,Realme_10_Pro,luigi,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,490,761027712,y,completes,,y,187,y,490,761027712,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+realme,Realme_9_Pro,oscar,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,490,761027712,y,completes,,y,189,y,490,761027712,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+samsung,Galaxy_A21S,a21s,,,,y,82,395669880,y,fails,,y,41,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_A52_4G,a52q,,,,y,,,y,fails,,y,29,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_A52s_5G,a52sxq,,,,y,,,y,fails,,y,31,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_A71,a71,,,,y,22,212057122,y,fails,,y,22,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_A72,a72q,,,,y,,,y,fails,,y,29,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_A73_5G,a73xq,,,,y,,,y,fails,,y,35,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_S10e,beyond0lte,,,,y,69,379639343,y,fails,,y,72,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_S10,beyond1lte,,,,y,69,382281531,y,fails,,y,72,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_S10_Plus,beyond2lte,,,,y,69,382817647,y,fails,,y,72,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_S10_5G,beyondx,,,,y,73,423025895,y,fails,,y,76,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Note_10,d1,,,,y,67,314540968,y,fails,,y,70,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Note_10_5G,d1x,,,,y,69,335370158,y,fails,,y,72,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Note_10_Plus,d2s,,,,y,67,315951452,y,fails,,y,70,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy,d2x,,,,y,,,n,,,n,,n,,,n,P3,,devices.sql.bz2
+samsung,Galaxy_F62,f62,,,,y,65,384339292,y,fails,,y,68,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_A7_LTE,gta4l,,,,y,47,336045815,y,fails,,y,42,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_A7_Wifi,gta4lwifi,,,,y,38,336002819,y,fails,,y,33,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_S6_LTE,gta4xl,,,,y,49,292501472,y,fails,,y,49,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_S6_Wifi,gta4xlwifi,,,,y,38,243369538,y,fails,,y,38,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_TabA_8.0,gtowifi,,,,y,,,y,fails,,y,44,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_S5e_LTE,gts4lv,,,,y,,,y,fails,,y,25,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_S5e_Wifi,gts4lvwifi,,,,y,,,y,fails,,y,16,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_S7_LTE,gts7l,,,,y,26,260387951,y,fails,,y,25,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_Tab_S7_Wifi,gts7lwifi,,,,y,26,260387951,y,fails,,y,25,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_M52_5G,m52xq,,,,y,,,y,fails,,y,31,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_S20_FE,r8q,,,,y,38,246012751,y,fails,,y,37,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+samsung,Galaxy_S20,x1s,,,,y,,,n,,,n,,n,,,n,P3,,devices.sql.bz2
+samsung,Galaxy_S20_Plus,y2s,,,,y,,,n,,,n,,n,,,n,P3,,devices.sql.bz2
+samsung,Galaxy_S20_Ultra,z3s,,,,y,,,n,,,n,,n,,,n,P3,,devices.sql.bz2
+solana,Saga,ingot,Qualcomm SM8475 Snapdragon 8+ Gen1,builds.csv,,y,,,y,completes,,y,28,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+sony,Xperia_XZ2,akari,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,13,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+sony,Xperia_XZ3,akatsuki,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,12,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+sony,Xperia_XZ2_Premium,aurora,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,30,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+sony,Xperia_XA2_Ultra,discovery,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,29,36245796,y,completes,,y,23,y,29,36245796,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_10,kirin,,,,y,28,35956348,n,,,n,,n,,,y,P3,,devices.sql.bz2
+sony,Xperia_10_Plus,mermaid,Qualcomm SDM636 Snapdragon 636,builds.csv,,y,29,36307096,y,completes,,y,22,y,29,36307096,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_5_II,pdx206,Qualcomm SM8250 Snapdragon 865,builds.csv,,y,26,226947936,y,completes,,y,14,y,26,226947936,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_5_III,pdx214,Qualcomm SM8350 Snapdragon 888,builds.csv,,y,43,137685863,y,completes,,y,25,y,43,137685863,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_1_II,pdx215,,,,y,26,226929812,n,,,n,,n,,,y,P3,,devices.sql.bz2
+sony,Xperia_10_IV,pdx225,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,23,135973079,y,completes,,y,19,y,23,135973079,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_1_V,pdx234,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,69,470583271,y,completes,,y,68,y,69,470583271,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_10_V,pdx235,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,20,135826337,y,completes,,y,15,y,20,135826337,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_5_V,pdx237,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,69,470583279,y,completes,,y,68,y,69,470583279,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_XA2_Plus,voyager,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,27,36232108,y,completes,,y,21,y,27,36232108,y,P3,,builds.csv|count.csv|devices.sql.bz2|sizes.csv
+sony,Xperia_XZ2_Compact,xz2c,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,13,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_8,Mi439,,,,y,10,285238600,y,fails,fails,y,76,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_4A,Mi8917,,,,y,17,54237676,y,fails,,y,18,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_3S,Mi8937,,,,y,19,55451188,y,fails,,y,18,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_F3,alioth,,,,y,,,y,completes,,y,24,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_10T,apollon,,,,y,,,y,fails,fails,y,35,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_Mix_2,chiron,,,,y,,,y,fails,,y,9,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_10_Pro,cmi,,,,y,,,y,fails,,y,26,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_12,cupid,,,,y,783,967886162,y,completes,,y,77,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_K20,davinci,,,,y,,,y,fails,,y,34,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_12T_Pro,diting,,,,y,819,1295868507,y,completes,,y,99,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_12C,earth,,,,y,18,149326319,y,completes,,y,19,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_8_Pro,equuleus,,,,y,,,y,fails,,y,11,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_13,fuxi,,,,y,700,1459042077,y,completes,,y,149,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_10T_5G,gauguin,,,,y,9,302116860,y,fails,,y,29,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_5,gemini,,,,y,,,y,fails,,y,12,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_Note_8,ginkgo,,,,y,28,143544144,y,fails,,y,36,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_9SE,grus,,,,y,,,y,fails,,y,16,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_11I,haydn,,,,y,,,y,completes,,y,62,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_A3,laurel_sprout,,,,y,326,331543576,y,completes,,y,46,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_11,lisa,,,,y,,,y,completes,,y,54,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_F2_Pro,lmi,,,,y,,,y,fails,,y,20,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_F5,marble,,,,y,819,1077771666,y,completes,,y,88,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_12S,mayfly,,,,y,823,1388874906,y,completes,,y,25,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_Note_9_Pro,miatoll,,,,y,,,y,fails,,y,50,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_F5_Pro,mondrian,,,,y,821,1309085295,y,completes,,y,91,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_F4,munch,,,,y,,,y,completes,,y,13,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_5S_Plus,natrium,,,,y,,,y,fails,,y,12,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_13_Pro,nuwa,,,,y,706,1484043637,y,completes,,y,156,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_Mix_3,perseus,,,,y,,,y,fails,,y,13,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_Mix_2S,polaris,,,,y,,,y,fails,,y,11,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_CC9,pyxis,,,,y,,,y,fails,,y,14,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_11_5G,renoir,,,,y,,,y,completes,,y,48,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_10S,rosemary,,,,y,89,163136897,y,completes,,y,89,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_6,sagit,,,,y,,,y,fails,,y,7,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Black_Shark,shark,,,,y,,,y,fails,,y,10,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_K60_Pro,socrates,,,,y,630,1137639734,y,completes,,y,59,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_X3_NFC,surya,,,,y,,,y,fails,,y,35,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_Note_10_Pro,sweet,,,,y,,,y,fails,,y,29,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_12S_Ultra,thor,,,,y,841,1389760340,y,completes,,y,96,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_10S,thyme,,,,y,,,y,completes,,y,24,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Redmi_Note_10_Pro,tucana,,,,y,,,n,,,n,,n,,,n,P3,,devices.sql.bz2
+xiaomi,Mi_10,umi,,,,y,,,y,fails,fails,y,27,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_12S_Pro,unicorn,,,,y,840,1411166715,y,completes,,y,94,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_8_Explorer,ursa,,,,y,,,y,fails,,y,13,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_X3_Pro,vayu,,,,y,,,y,fails,,y,25,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_CC9_Meitu,vela,,,,y,,,y,fails,,y,120,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Poco_F6_PRo,vermeer,,,,y,720,1416159695,n,,,n,,n,,,y,P3,,devices.sql.bz2
+xiaomi,Redmi_Note_7_Pro,violet,,,,y,10,142697259,y,fails,,y,11,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_12_Pro,zeus,,,,y,802,999339189,y,completes,,y,85,n,,,y,P3,,builds.csv|count.csv|devices.sql.bz2
+xiaomi,Mi_Fold_2,zizhan,,,,y,,,y,completes,,y,95,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+zte,Axon_9_Pro,akershus,Qualcomm SM6375 Snapdragon 695,builds.csv,,y,,,y,fails,,y,11,n,,,n,P3,,builds.csv|count.csv|devices.sql.bz2
+fairphone,FP6,FP6,,,,y,447,703921964,n,,,n,,n,,,y,P1,FSF flagship device per F-69 audit (librephone.fsf.org lists exactly one device: Fairphone 6),devices.sql.bz2
+fairphone,FP3,FP3,Qualcomm SDM632 Snapdragon 632,builds.csv,,y,,,y,fails,,y,42,n,,,n,P2,"Fairphone 3 (sdm632): pmOS community port - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+fairphone,FP4,FP4,Qualcomm SM7225 Snapdragon 750G,builds.csv,,y,286,689737383,y,completes,fails,y,35,y,286,689737383,y,P2,"Fairphone 4 (sm7225): vendor-backed mainline effort + pmOS port - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+fairphone,FP5,FP5,Qualcomm QCM6490,builds.csv,,y,706,588299075,y,completes,completes,y,47,y,706,588299075,y,P2,"Fairphone 5 (sm7325): pmOS community port - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+oneplus,OnePlus_6,enchilada,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,24,n,,,n,P2,"pmOS community mainline port (OnePlus 6, sdm845) - agent knowledge 2026-11, verify vs pmOS wiki",builds.csv|count.csv|devices.sql.bz2
+oneplus,OnePlus_6T,fajita,Qualcomm SM8150 Snapdragon 855,builds.csv,,y,,,y,completes,,y,24,n,,,n,P2,"pmOS community mainline port (OnePlus 6T, sdm845) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+oneplus,OnePlus_7,guacamoleb,Qualcomm MSM8998 Snapdragon 835,builds.csv,,y,433,494092577,y,fails,,y,83,y,433,494092577,y,P2,"pmOS community mainline port (OnePlus 7 Pro, sm8150) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+xiaomi,Poco_F1,beryllium,,,,y,,,y,fails,,y,9,n,,,n,P2,"pmOS community mainline port (POCO F1, sdm845) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_3XL,crosshatch,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,37,n,,,n,P2,"pmOS community mainline port (Pixel 3 XL, sdm845) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_3,blueline,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,37,n,,,n,P2,"pmOS community mainline port (Pixel 3, sdm845) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_3A_XL,bonito,Qualcomm SDM670 Snapdragon 670,builds.csv,,y,,,y,completes,,y,48,n,,,n,P2,"pmOS community mainline port (Pixel 3a XL, sdm670) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_3A,sargo,Qualcomm SDM670 Snapdragon 670,builds.csv,,y,,,y,,,y,15,n,,,n,P2,"pmOS community mainline port (Pixel 3a, sdm670) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_4,flame,Qualcomm SM8150 Snapdragon 855,builds.csv,,y,,,y,completes,,y,57,n,,,n,P2,"pmOS community mainline port (Pixel 4 XL, sm8150) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_4XL,coral,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,,,y,completes,,y,57,n,,,n,P2,"pmOS community mainline port (Pixel 4, sm8150) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_4A,sunfish,Qualcomm SM7250 Snapdragon 765G,builds.csv,,y,,,y,completes,,y,43,n,,,n,P2,"pmOS community mainline port (Pixel 4a, sm7150) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+google,Pixel_6,oriole,Google Tensor GS101,builds.csv,,y,37,321519223,y,completes,,y,38,y,37,321519223,y,P2,"pmOS community mainline port (Pixel 6, gs101) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_6A,bluejay,Google Tensor GS101,builds.csv,,y,37,321235073,y,completes,completes,y,35,y,37,321235073,y,P2,"pmOS community mainline port (Pixel 6a, gs101) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_6_Pro,raven,Google Tensor GS101,builds.csv,,y,38,321738119,y,completes,,y,39,y,38,321738119,y,P2,"pmOS community mainline port (Pixel 7 Pro, gs201) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+google,Pixel_7,panther,Google Tensor GS201,builds.csv,,y,44,218744333,y,completes,,y,44,y,44,218744333,y,P2,"pmOS community mainline port (Pixel 7, gs201) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+shift,Shift_6MQ,axolotl,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,,,y,completes,,y,22,n,,,n,P2,"pmOS community mainline port (Shift 6MQ, sdm845) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
+sony,Xperia_XA2,pioneer,Qualcomm SDM845 Snapdragon 845,builds.csv,,y,27,36240300,y,completes,,y,21,y,27,36240300,y,P2,"pmOS community mainline port (Sony Xperia XA2, sdm660) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2|sizes.csv
+xiaomi,Mi_8,dipper,,,,y,,,y,fails,,y,12,n,,,n,P2,"pmOS community mainline port (Xiaomi Mi 8, sdm845) - agent knowledge 2026-11, verify",builds.csv|count.csv|devices.sql.bz2
