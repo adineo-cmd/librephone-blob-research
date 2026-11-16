@@ -63,6 +63,16 @@ Family breakdown of the half (matrix rows): modem 2,533 rows /
 3.49 GB · wifi 5,568 / 0.71 GB · tz 4,256 / 0.67 GB · cdsp 940 /
 0.28 GB · bt 445 / 0.12 GB · gpu 696 / 0.09 GB.
 
+SoC spread (222 devices): Qualcomm 29 chip generations dominate (SM6375
+×12 incl. one stray `\u00ff` byte on one SOC cell — upstream data-quality
+flag already logged in recon.md; inventory duplicates it), Google Tensor
+GS101/GS201/G3/G4 ×14, 56 devices carry a blank SOC upstream.
+
+Inventory data-quality flags found this session (lead, shared files —
+not edited): duplicate model name `Xperia_1_II` (two codenames, breaks
+the "one row per distinct identity" model name join), probable typo
+`Poco_F6_PRo`.
+
 Upstream duplicate-row finding (lead, shared files — not edited): the
 committed coverage matrix itself contains **586 true duplicate
 (device, filename, md5) triples** (341 inside the half) — same blob
