@@ -61,9 +61,11 @@ Segment geometry is identical across all three families:
 
 - 55,256 B, entropy 6.46, **common prefix with a630/a619 = 0 bytes**; ~0% words equal.
 - Head (8 u32-LE pairs): `(0,0), (1,0x1dc), (0x4000,0), (1,0xd4cc), (0x200,0),
-  (1,0x3a64), (0x100000,0), (1,0x85b4)` — a zero block, then a table-like pattern of
-  alternating small/power-of-two words and size-or-offset words (476, 54476, 14948,
-  34228, all < 55256) `[F]`. Interpretation as a section table: `[I]`.
+  (1,0x3a64), (0x100000,0), (1,0x85b4)` — a zero block, then a table-like pattern.
+  **Update 2026-11-19: this leading table is DECODED as the mainline
+  `struct block_header` prealloc-request TOC** (11 zero-size requests fitting
+  mainline's hardcoded a660 allocations + 4 DEADBEEF-tagged data blocks routed
+  ITCM/icache/DTCM) — full decode in [qsee-crossgen.md](qsee-crossgen.md) §5 `[F]`.
 - Non-zero density ≈0.87–0.92 through offset 49152, then 0.161 / 0.019 — trailing
   padding region `[F]`. 170 alphabetic strings (vs 26) — denser code, RS64-era build `[I]`.
 - No ASCII banner/version string identified in any gmu file beyond the RTOS crash
@@ -89,11 +91,10 @@ Segment geometry is identical across all three families:
 ### 2.4 Cross-generation header signature `[N]`
 
 There is **no common gmu header magic across generations**: a630/a619 begin with
-instruction words; a660 begins with a zero block and a table. The only u32 word
-identical in all three gmu files across the first 32 KiB is word 7196 = 0x0 (a
-trivial zero; surrounding-region entropy differs per file) — no meaningful shared
-version/count word found `[N]`. Generation identity is carried by the filename, not
-an in-file version field (probed: first 64 B words, string table, fleet md5 set).
+instruction words; a660 begins with a zero block and the (now-decoded) prealloc TOC.
+No meaningful shared version/count word found `[N]`. Generation identity is carried
+by the filename, not an in-file version field (probed: first 64 B words, string
+table, fleet md5 set).
 
 ## 3. Fleet identity (md5 cross-check vs coverage-matrix.csv) `[F]`
 
@@ -162,11 +163,11 @@ sequential tags 1..19**, `Σ(4+len) = 26328` exactly.
 | 16 | 516 | OP6 common: 2052 — but **exactly the OP6 `b38` outlier's re-chunk** |
 | 17 | 1532 | OP6 common: 68 — `b38` uses 1532 |
 | 18 | 68 | absent in 34/35 OP6 files; `b38` has it |
-| 19 | 7172 | **new IE, absent from the entire OP6 fleet**; payload 100% non-zero, entropy 3.50 |
+| 19 | 7172 | **new IE, absent from the entire OP6 fleet**; payload nonzero fraction 0.4099 with six all-zero 256-B blocks, entropy 3.50. **Update 2026-11-19: tag 19 content is DECODED as a stride-14 regdb-class country table** (199 records × 14 B, 0xA028 marker, 147/199 records byte-identical to larry's regdb.bin, CC set adds CW / drops AO+IR) — full analysis in [bm2n-isa-bt.md](bm2n-isa-bt.md) §3 `[F]` (this doc's earlier "100% non-zero" claim corrected per that measurement) |
 
 So the tail re-partition first seen in OP6's one-off `b38` (16/17/18 = 516/1532/68)
 became the standard tail layout on this generation, extended by a large new
-calibration IE (tag 19) `[I]`.
+regdb-class IE (tag 19) `[I]`.
 
 ### 5.3 Per-tag variability vs OP6 consensus (file `102`) `[F]`
 
@@ -198,7 +199,6 @@ only the container grammar and the fixed-config IEs are shared across generation
 
 - **Not the bdwlan TLV grammar**: the LE {u16,u16} walk from offset 0 produces
   nonsense IEs and degenerates into a (0,0) chain after 17152 (558 nominal IEs) `[F]`.
-  A BE variant also "reaches EOF" (787 IEs) but only via degenerate zero chains `[N]`.
 - Actual structure (measured): 6-byte head, then a **fixed-stride 14-byte record
   table from offset 6**. A recurring u32 LE marker `28 a0 00 00` occurs 189 times at
   record offset +6 with dominant stride 14 (179 of 188 consecutive gaps) `[F]`.
@@ -211,7 +211,8 @@ only the container grammar and the fixed-config IEs are shared across generation
   unanalyzed), tail [17152, 19348) all-zero `[F]`.
 - Classification: regulatory database (country → rules), structurally unrelated to
   the bdwlan container `[I]`; semantics of the two u16 fields and the 0xA028
-  constant unknown `[open]`.
+  constant unknown `[open]`. **Note 2026-11-19: the same record shape is embedded
+  as bdwlan tag 19 in the SM6375 generation — see bm2n-isa-bt.md §3.**
 
 ## 7. Honest negatives
 
@@ -227,15 +228,10 @@ only the container grammar and the fixed-config IEs are shared across generation
 
 ## 8. Open items
 
-- Identify what a630_zap.mdt's 100-byte common prefix divergence at phdr-level means
-  (a630 vs a615 vs a660 shader payload versions).
-- Decode a660_gmu's leading table (pairs pattern §2.2) against the msm driver's GMU
-  fw loader; confirm the 4-word values are section offsets/sizes.
+- Decode the a630 vs a615/a660 zap payload differences (100-byte mdt prefix).
 - Confirm the `[10,12)` discriminator semantics (board ID namespace) for larry's
   three values; link to QMI/board-id selection.
-- Decode tag 19 (7,172 B, dense) — likely the SM6375-generation's added calibration
-  table; align with tag 8 record geometry (stride-40 tables) to test.
-- regdb.bin: decode the post-table sparse region and the u16 fields; find the public
+- Decode the regdb.bin post-table sparse region and the u16 fields; find the public
   qcacld/qcacmn parser for confirmation.
 
 ## 9. Reproduction
