@@ -83,8 +83,8 @@ coverage, byte-weighted top-15, and merge notes for the lead.
 5. Inventory: duplicate display names `Phone_2` (aura/Pong) and
    `Xperia_1_II` (two codenames); typo `Poco_F6_PRo`; stray `\ufffd` SOC
    byte (already flagged in recon).
-6. NEW (addendum 5): matrix coverage gap — `libsns_low_lat_stream_skel.so`
-   and `libsns_device_mode_skel.so` are real fleet blobs (byte-identical
+6. Addendum 5: matrix coverage gap — `libsns_low_lat_stream_skel.so` and
+   `libsns_device_mode_skel.so` are real fleet blobs (byte-identical
    across SM845/SM6375/SM8250) with **zero matrix rows**; same for
    `libcamera_nn_skel.so` (809,688 B, SM6375+SM8250 shared).
 
@@ -101,10 +101,10 @@ byte-reproducible from committed inputs: run
 `blob-matrix/desktop/tools/phase1_build.py` against the committed
 `coverage-matrix.csv` + `device-inventory.csv` + `enchilada-census.csv`
 (all pushed) — or push it from any environment with the adineo-cmd git
-alias. (v2 of the CSV, 34,052 rows, additionally carries the 403
-modem-FAT census rows — see partition-map addendum 2; the extended
-census CSV is kept alongside locally. Addendum-5 correction: the census
-should carry 404 modem-FAT rows — see addendum 5 §5.)
+alias. (v3 of the CSV, 34,054 rows, additionally carries the 404 modem-FAT
+census rows with the addendum-5/6 corrections — VERINFO/VER_INFO.TXT row
+added, MBN_HW.TXT corrected to its FAT-declared size 0; the extended
+census CSV is kept alongside locally.)
 
 ## Honest negatives / open items
 
@@ -132,160 +132,131 @@ Deliverables: `blob-matrix/desktop/fleet-re/qca-bt-format.md`,
 stays local with reproducibility provenance (regenerable byte-identically
 via the committed tool from any official LineageOS nightly of a
 fleet-carrying device — same push-path class as the devices CSV);
-`docs/devices/oneplus6/bt.md` upgraded to format-spec class. Open:
-patch-stream entry structure (no record framing found — flat image),
-ap*/cr* family attribution, 256-byte tails, NVM tag names ≥ 0x0020.
+`docs/devices/oneplus6/bt.md` upgraded to format-spec class.
 
 ## Partition-map addendum 2 (2026-11-17, continued session)
 
-Fleet deep-RE pass 2, still payload-only OnePlus 6: `modem.img` (119.8 MB)
-is a **FAT16 volume** carrying **404 named firmware files / 113.5 MB** —
-the full OP6 firmware set (`image_modem.b16-b24` mpss segments up to
-26.3 MB, adsp/cdsp/slpi MDT sets, **`image_wlanmdsp.mbn` = the WCN3990
-WiFi firmware** resolving the wifi census-negative finding, `image_bdwlan.*`
-board-data variants, gfp9508, qdsp6m.qdb, manifests). `tz.img` is ELF64
-AArch64 (e_machine 183, 17 phdrs); `dsp.img` was probed raw. **201 of the
-extracted files md5-join to multi-device fleet blobs in the committed
-matrix** — the sha256↔md5 fleet join is delivered at scale from this one
-device. The devices CSV grows to 34,052 rows (v2, local, regenerable).
-Deliverables: `fleet-re/oneplus6-partition-map.md`, updated
+Fleet deep-RE pass 2: `modem.img` (119.8 MB) is a **FAT16 volume**
+carrying **404 named firmware files / 113.4 MB** — the full OP6 firmware
+set (`image_modem.b16-b24` mpss segments up to 26.3 MB, adsp/cdsp/slpi
+MDT sets, **`image_wlanmdsp.mbn` = the WCN3990 WiFi firmware** resolving
+the wifi census-negative finding, `image_bdwlan.*` board-data variants,
+gfp9508, qdsp6m.qdb, manifests). `tz.img` is ELF64 AArch64 (17 phdrs);
+`dsp.img` was probed raw (later corrected to ext4, addendum 3). **201
+files md5-join to fleet blobs**. Deliverables:
+`fleet-re/oneplus6-partition-map.md`, updated
 `docs/devices/oneplus6/{modem,wifi}.md`.
 
 ## Subagent deep-pass addendum 3 (2026-11-17, four parallel analysis streams)
 
-Four subagent streams (facts-only, repo untouched by them) closed four
-open items:
-
 1. **bdwlan board-data format RESOLVED** (`fleet-re/bdwlan-format.md`):
-   flat TLV chain `{u16 tag, u16 len, payload}` to EOF, no outer magic,
-   34 files carry 17 strictly-sequential IEs (b38 re-chunks the tail to
-   18), chain sums to exactly 19,152 on every file; 35 files / 29 md5
-   clusters (count corrected from 37); stride-40 and stride-4 record
-   tables identified; per-board ID fields at abs [10,12) (28 values) and
-   [408,410) (3 values); minimal-diff cluster pairs (2 bytes). Honest
-   negatives: no checksum, no ASCII metadata, no nested TLVs. Counts
-   corrected: 404 FAT entries (403 was stale), 35 bdwlan files.
+   flat TLV chain `{u16 tag, u16 len, payload}` to EOF, 17 strictly-
+   sequential IEs (b38 re-chunks to 18), sums exactly 19,152 on every
+   file; 35 files / 29 md5 clusters; stride-40 and stride-4 record
+   tables; per-board ID fields at abs [10,12) and [408,410).
 2. **dsp.img + tz.img mapped** (`fleet-re/dsp-tz-map.md`): dsp.img is
-   **ext4** (volume "dsp", 8,192 × 4,096 B blocks, clean journal) holding
-   62 files — 57 Hexagon ELF32 fastrpc user-PD modules (/adsp /cdsp
-   /sdsp; audio codecs, vpp, chre, libc++, fastrpc shells), 0/17 identity
-   with the modem-FAT `IMAGE_ADSP.*` PIL set (disjoint by design — boot
-   PIL vs runtime fastrpc, proven at whole-file/raw/segment levels);
-   tz.img QSEE ELF64 fully segmented (17 phdrs, two vaddr regions,
-   QSEE metadata seg with X.509 chain, version strings
-   `TZ.XF.5.0.1.C5-00083.1` / `WAXAANAAA` / `CRM`), per-segment
-   sha256 + entropy in the JSON.
-3. **BT patch-stream + 256-byte tails resolved**
-   (`fleet-re/patch-stream-structure.md`): tails are per-file-unique
-   high-entropy signature/attestation-class blocks (table and padded
-   header refuted; not sha256/md5/sha1 of the stream; 0 shared words
-   across all 10 pairs); patch streams are flat dense images (zero-run
-   framing refuted); the ap/cr 128-byte delta accumulates in ONE
-   localized region (a-side ≈ 23.7-24.7K), not an insertion block —
-   one firmware built twice with a ~128-B larger section; each stream
-   contains exactly one literal u32 equal to its own entry value at a
-   per-generation offset (472/636/428). Rule-1 correction recorded: the
-   stale local `qca-bt-tlv.json` carried an entry misread (0x80000002);
-   committed parser is correct.
+   **ext4** holding 62 files — 57 Hexagon ELF32 fastrpc user-PD modules
+   (/adsp /cdsp /sdsp), 0/17 identity with the modem-FAT PIL set (disjoint
+   by design); tz.img QSEE ELF64 segmented, version strings
+   `TZ.XF.5.0.1.C5-00083.1` / `WAXAANAAA` / `CRM`.
+3. **BT patch-stream + tails resolved** (`fleet-re/patch-stream-structure.md`):
+   tails are per-file-unique signature/attestation-class blocks (not any
+   digest of the stream); streams are flat dense images; the ap/cr 128-B
+   delta accumulates in ONE localized region (a-side ≈ 23.7-24.7K);
+   each stream contains exactly one literal u32 equal to its own entry
+   value at a per-generation offset (472/636/428).
 4. **Second device populated** (`fleet-re/second-device-larry.md`):
-   `larry` (OnePlus Nord CE 3 Lite / N30 5G, SM6375) from the official
-   LineageOS **24.0** nightly (sha256-verified 1,601,993,721 B): **bm2n
-   fleet 6/6 byte-exact** (first SM6375-generation fleet proof; aliases
-   bm2n12≡bm2n37, bm2n14≡bm2n55, bm2n15≡bm2n31), apnv11_eu/in/na 3/3;
-   299 files / 74.5 MB censused. Honest negatives: VOOC pair absent
-   (SM8250-only per the matrix — the #1 leverage entry needs
-   instantnoodle/kebab); no modem/bt/radio partitions in the 24.0
-   payload; **vendor/odm are EROFS, not ext4** (`fsck.erofs --extract`
-   used — method note for all future 24.0-era payloads). The session
-   brief's VOOC md5s were corrupted (suffix collision with crnv20.bin's
-   md5); matrix md5s were used correctly.
+   `larry` (Nord CE 3 Lite, SM6375, LineageOS 24.0): **bm2n fleet 6/6
+   byte-exact** (aliases bm2n12≡bm2n37, bm2n14≡bm2n55, bm2n15≡bm2n31),
+   apnv11_eu/in/na 3/3; 299 files / 74.5 MB censused; vendor/odm are
+   **EROFS** (`fsck.erofs --extract` method note).
 
-Open after addendum 3: tz QSEE metadata layout + fastrpc embedded ELFs;
-bdwlan tag semantics; tail construction; VOOC proof via an SM8250
-payload; the 403-vs-404 FAT-entry delta (one unresolved entry).
+## Addendum 4 (2026-11-18, GPU/bdwlan + VOOC proof)
 
-## Addendum 4 (2026-11-18, two parallel subagent streams — GPU/bdwlan + VOOC proof)
-
-1. **GPU/bdwlan stream** (`fleet-re/gpu-bdwlan.md`): ZAP shader
-   containers fully resolved (ELF32 EM_QDSP6 ET_EXEC, e_entry 0x5000,
-   mdt = b00+b01 concat, .elf = page-aligned variant, geometry identical
-   across a630/a615/a660); **6/6 GMU/SQE fleet identities proven** (OP6
-   a630_gmu = 8-device blob; larry a619_gmu = 24-device top-20 blob,
-   a630_sqe = 19, a660_gmu = 19, a660_sqe = 21; zap absent from the
-   matrix entirely); a630/a619 share one container generation (1,076-B
-   common prefix, second 16 KiB byte-identical), a660 is a different
-   generation (table-style head); gfp9508/gfp5288 = **signed ARM
-   TrustZone QSEE apps** (EM_ARM, X.509 chain, fingerprint-sensor [H]) —
-   not Hexagon; cross-device bdwlan: larry's files parse under the same
-   TLV grammar (19 IEs, tags 1-15 lens byte-identical to OP6, tail =
-   b38-style re-chunk + NEW dense tag 19 of 7,172 B), tags 3/5/6/10
-   byte-identical across generations, 0 md5 matches (board data is
-   generation-specific); regdb.bin decoded as an ISO 3166-1 record
-   table (stride 14, ~198 records) — a different container.
+1. **GPU/bdwlan stream** (`fleet-re/gpu-bdwlan.md`): ZAP containers
+   resolved; **6/6 GMU/SQE fleet identities proven** (a619_gmu = 24-device
+   top-20 blob); cross-device bdwlan same grammar (19 IEs); regdb.bin
+   decoded as ISO 3166-1 record table; gfp9508 = signed ARM QSEE apps.
 2. **VOOC leverage entry PROVEN** (`fleet-re/third-device-instantnoodle.md`):
-   `instantnoodle` (OnePlus 8, SM8250) from the official LineageOS
-   24.0 nightly (sha256-verified 1,385,279,498 B; one stall at 588 MB
-   recovered via `curl -C -`): **both VOOC blobs byte-exact (18/18
-   matrix rows = 100% of instantnoodle fastchg coverage)**, plus 25
-   newer/older fastchg variants the matrix lacks (free fleet-delta).
-   Census: **2,107 rows** across 30 partitions (bluetooth/modem FAT16 —
-   the OnePlus 6 pattern confirmed on SM8250; odm/vendor EROFS; dsp
-   EXT4 with 75 modules; 16 single-ELF firmware partitions); **492
-   fleet md5 joins** (454 distinct matrix md5s) and the inverse join
-   covers **98% of instantnoodle's own matrix rows**. Honest negatives:
-   0/84 adsp rows matched (SM8250 ships no bm2n fleet), 11/504 matrix
-   md5s unmatched (build drift).
+   `instantnoodle` (OnePlus 8, SM8250, LineageOS 24.0 sha256-verified):
+   **both VOOC blobs byte-exact (18/18 matrix rows = 100% fastchg
+   coverage)**, 2,107-row census, **492 fleet md5 joins**, 98% inverse
+   join, FAT16 bluetooth/modem pattern confirmed on SM8250.
 
-Open after addendum 4: tz QSEE metadata layout, bdwlan tag semantics,
-tail construction, three-device sharing quantification.
-
-## Addendum 5 (2026-11-18, two parallel subagent streams — sharing matrix + QSEE decode)
+## Addendum 5 (2026-11-18, sharing matrix + QSEE decode)
 
 1. **Three-device sharing matrix** (`fleet-re/three-device-sharing.md`):
-   first cross-SoC-generation identity analysis (SM845 × SM6375 ×
-   SM8250): of 2,509 distinct md5s across the three censuses, only **4
-   blobs are carried by all three devices** (2 of them — `libsns_*_skel.so`
-   — absent from the 123-device matrix: a coverage gap), 17 on exactly
-   two, 2,488 device-unique; unique-content share 98.7-99.98% by bytes —
-   fragmentation dominates, leverage concentrates in tiny shared files.
-   Fleet coverage: the three devices cover **574 of the 15,091 upstream
-   fleet md5s (3.80%)**. **FAT-entry delta RESOLVED**: the OP6 modem.img
-   404th entry is a root-level **`VERINFO` subdirectory** whose child
-   `VER_INFO.TXT` (1,201 B) is the 404th named file (0 deleted entries,
-   0 volume labels); the 113,460,308 B prior total over-counted
-   `MBN_HW.TXT` (FAT-declared size 0) by one 16,384 B cluster chain.
-   Census actions for the owner: append the 404th row, correct
-   MBN_HW.TXT.
+   of 2,509 distinct md5s across the three censuses, only **4 blobs on
+   all 3 devices**, 17 on exactly two, 2,488 device-unique; unique
+   share 98.7-99.98% by bytes; fleet coverage **574/15,091 (3.80%)**;
+   **FAT-entry delta RESOLVED** (404th entry = VERINFO subdirectory);
+   matrix coverage gap flagged (libsns_* skel fleet blobs absent).
 2. **QSEE cross-generation decode** (`fleet-re/qsee-crossgen.md`):
-   instantnoodle tz.img fully mapped (ELF64, 23 phdrs, e_entry
-   0x14680000 **identical to OP6**, version triple
-   **TZ.XF.5.8-00274 / DARAANAAA / CRM**); **QSEE metadata hash-slot
-   layout decoded — first public**: seg[1] = header + per-phdr digest
-   table + two RSA-2048 signature blocks + two 3-cert X.509 chains;
-   slot count == phdr count, slot[i] = digest of phdr[i] file content,
-   width 32 B (SHA-256, SDM845) → 48 B (SHA-384, SM8250), header word[5]
-   records the table length exactly; empty segments stored as zero
-   slots; signatures bind to the paired chain's leaf keys (RSASSA-PSS
-   EM tail 0xBC, 4/4, with 4/4 cross-key negative controls); root CAs:
-   Qualcomm-owned on SDM845 vs an OEM-owned test root on SM8250.
-   fastrpc embedded-ELF magics: **false positive** (0/3 — the loader's
-   magic constant + error-string rodata); a660_gmu.bin leading table
-   **confirmed against mainline** (`struct block_header` chain, 15
-   blocks, 11 zero-size prealloc-request TOC entries fitting mainline's
-   hardcoded a660 allocations, 4 DEADBEEF-tagged data blocks routed
-   ITCM/icache/DTCM; a619_gmu is the raw legacy format).
+   instantnoodle tz mapped (23 phdrs, e_entry 0x14680000 identical to
+   OP6, **TZ.XF.5.8-00274 / DARAANAAA / CRM**); **metadata hash-slot
+   layout decoded — first public** (seg[1] = header + per-phdr digest
+   table + 2 RSA-2048 PSS sig blocks bound to leaf cert keys + two
+   3-cert X.509 chains); fastrpc embedded-ELF magics = false positive
+   (loader magic constant + error string); a660_gmu leading table
+   confirmed against mainline `struct block_header`.
 
-Open after addendum 5: metadata header word semantics (word[0]/[1],
-word[4] constant 19,200); SIG byte-range (PSS salt); bdwlan tag
-semantics; SHA-384 metadata: TZ-specific or SM8250-wide (re-run on
-cmnlib/keymaster); VERINFO census-row append (census owner).
+## Addendum 6 (2026-11-19, two parallel subagent streams — PIL sweep + bm2n/BT/tag-19)
 
-Session totals after addendum 5: **three devices populated** (SM845,
+1. **PIL metadata sweep** (`fleet-re/pil-metadata-sweep.md`): all 28
+   signed PIL images across both devices (tz, hyp, xbl, xbl_config, abl,
+   aop, cmnlib, cmnlib64, keymaster, devcfg, uefisecapp, imagefv, qupfw,
+   storsec, multiimgoem, featenabler) match the decoded hash-slot layout
+   — **zero exceptions; the container is universal across the entire
+   secboot chain**. **SHA-384 is SM8250-wide, not TZ-specific** (16/16
+   SM8250 = 48-B slots; 12/12 SDM845 = 32-B; 220 slots verified, 178
+   digest hits). Header geometry refined (Rule-1 corrections to
+   qsee-crossgen.md): SM8250 header = 168 B base + 120 B per extra
+   chain (288 B = the 2-chain case); w[9] = 6144 × chain_count;
+   w[4]−w[5] = 6400 + 12800 × (chains−1); w[2]/w[3] zero unless second
+   chain — all 28/28. Signing facts: 35 chains / 105 certs, only 7
+   production chains (28 test-only, build-time re-signing with the OEM
+   test root); xbl carries embedded sub-image version triples on both
+   devices.
+2. **bm2n + BT + tag-19 stream** (`fleet-re/bm2n-isa-bt.md`):
+   - **bm2n fleet**: raw loader-header images, not ELF (header:
+     0xFA0000FA marker, size-class 0x200000, 7-hex build id at [12,19);
+     bm2n13≡bm2n15 same build 5371806); **ISA verdicts: Hexagon-
+     consistent [I] on all 6** — the strongest signal is 30-52 shared
+     Itanium RTTI type names with verified-Hexagon
+     `libbitml_nsp_v2_skel.so` (bm2n = **BitML/NSP DSP-side payload
+     images**, a Qualcomm internal ML stack); bm2n08 carries 56 packed
+     islands ≥7.5 bits/B (ISA of islands unknown).
+   - **OnePlus 8 BT fleet**: WCN3998 ships a **third QCA prefix family
+     `ht*`** (htbtfw10/20.tlv + htnv10/20.bin; LFNs recovered from the
+     FAT), each md5 = OnePlus_8+8_Pro only; **zero overlap with the OP6
+     ap*/cr* fleet**; ht* patch envelope changed (36-B header, 32-B
+     tail, product_id 16, entry 0); NVM = direct type-2 tag sets with
+     38/52 tag-ID overlap and 14 new tag IDs.
+   - **larry bdwlan tag 19**: **stride-14 regdb-class country table**
+     (199 records × 14 B, 0xA028 marker, 147/199 records byte-identical
+     to larry's regdb.bin; CC set adds CW / drops AO+IR) — NOT an
+     extended tag-8; payload byte-identical across bin/in/us; tail
+     [2794,7172) unresolved. Rule-1 correction applied to gpu-bdwlan.md
+     §5.2 ("100% non-zero" was wrong: nonzero 0.4099).
+
+Census corrections applied (addendum 5+6): 404th modem-FAT row
+(VERINFO/VER_INFO.TXT 1,201 B) appended; MBN_HW.TXT corrected to its
+FAT-declared size 0 (was recorded at the 16,384 B cluster-chain size);
+devices CSV v3 = **34,054 rows** (local, sha256 recorded in git log).
+
+Session totals after addendum 6: **three devices populated** (SM845,
 SM6375, SM8250), ~2,850 censused blob files with hashes, every
-leverage-family identity proven (QCA BT fleet, bm2n fleet, VOOC pair,
-GMU/SQE blobs), **7 container formats decoded** (QCA BT TLV, bdwlan TLV,
-BT patch stream + tails, QSEE metadata, GMU block chain, regdb
-ISO-3166 table, FAT16 firmware volumes ×2), clean-room WMI/CE/HTC/TLV
+leverage-family identity proven (QCA BT fleet, bm2n fleet = BitML/NSP,
+VOOC pair, GMU/SQE blobs), **8 container formats decoded** (QCA BT TLV,
+bdwlan TLV, BT patch stream + tails, QSEE metadata hash-slot layout
+[universal, 28/28], GMU block chain, regdb ISO-3166 table, ht* envelope,
+FAT16 firmware volumes ×3 devices), clean-room WMI/CE/HTC/TLV
 components + LPEC packaging shipped, three-device sharing matrix
-quantified, and the QSEE metadata layout published as a first-public
-decode.
+quantified, two first-public decodes published (QSEE metadata
+hash-slot layout; NVM tag enumeration).
+
+Open after addendum 6: bm2n loader header decode + Hexagon byte-level
+verification (needs a Hexagon disassembler); ht* 36-B header interior;
+tag-19 tail [2794,7172); QSEE header word[0]/w[1] semantics; SIG byte
+range; remaining ~100 unpopulated devices (bulk decision with the
+lead).
