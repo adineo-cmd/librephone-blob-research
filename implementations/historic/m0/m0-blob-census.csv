@@ -1,0 +1,6 @@
+filename,size_bytes,md5,source
+brcmfmac4330-sdio.bin,223581,c6908817b83724800bb76b0114eec7a5,"linux-firmware brcm/ (kernel.org cgit @main, 2026-11-18) — 4330 comparison file"
+brcmfmac4334-sdio.bin,451566,0e5d2b9bfaaf3b6c43077405cfe92632,linux-firmware @id=dc9576448222cc1922462d58796ab1c62b523ada (pmOS-pinned)
+"brcmfmac4334-sdio.samsung,i9300.txt",2406,7953e13434db75e62020874f85b36d26,"armbian/firmware@5ff122ef brcm/brcmfmac4334-sdio.rockchip,rk3318-box.txt (pmOS-pinned rename)"
+bcm4334.hcd,53957,f5814186cd58c8006a2a1ff489660a93,TheMuppets/proprietary_vendor_samsung@fdd8c445 smdk4412-common/proprietary/bin (pmOS-pinned)
+p4412_s_fwbl1.bin,8192,195db23622b0b741e03786525a2db1c0,dmarszk/exynos4_uboot@24609192 sd_fuse (pmOS-pinned)
