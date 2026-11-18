@@ -104,13 +104,13 @@ census CSV is kept alongside locally.)
 ## Honest negatives / open items
 
 - 100 listed-not-populated + 12 builds-csv-only devices remain
-  metadata-only (OnePlus 6 + larry are the two populated proofs;
-  ~1.07-1.6 GB per device — bulk decision is the lead's).
+  metadata-only (enchilada + larry + instantnoodle are the three
+  populated proofs; ~1.1-1.6 GB per device — bulk decision is the
+  lead's).
 - P2 "mainline basis" strings not verified against postmarketOS wiki.
-- cmnlib/cmnlib64/keymaster/boot-chain partitions one payload_dump away
-  from being censused (hashing not run this session).
-- LineageOS mirrorbits dropped one transfer (0-byte, empty sha256)
-  before the successful `curl -L` re-download — logged, recovered.
+- LineageOS mirrorbits dropped two transfers across the session
+  (one 0-byte, one stall at 588 MB) — both recovered with `curl -L`
+  / `curl -C -`; logged.
 
 ## Fleet deep-RE addendum (2026-11-16, same session, post-Phase-4)
 
@@ -198,3 +198,44 @@ open items:
 Open after addendum 3: tz QSEE metadata layout + fastrpc embedded ELFs;
 bdwlan tag semantics; tail construction; VOOC proof via an SM8250
 payload; the 403-vs-404 FAT-entry delta (one unresolved entry).
+
+## Addendum 4 (2026-11-18, two parallel subagent streams — GPU/bdwlan + VOOC proof)
+
+1. **GPU/bdwlan stream** (`fleet-re/gpu-bdwlan.md`): ZAP shader
+   containers fully resolved (ELF32 EM_QDSP6 ET_EXEC, e_entry 0x5000,
+   mdt = b00+b01 concat, .elf = page-aligned variant, geometry identical
+   across a630/a615/a660); **6/6 GMU/SQE fleet identities proven** (OP6
+   a630_gmu = 8-device blob; larry a619_gmu = 24-device top-20 blob,
+   a630_sqe = 19, a660_gmu = 19, a660_sqe = 21; zap absent from the
+   matrix entirely); a630/a619 share one container generation (1,076-B
+   common prefix, second 16 KiB byte-identical), a660 is a different
+   generation (table-style head); gfp9508/gfp5288 = **signed ARM
+   TrustZone QSEE apps** (EM_ARM, X.509 chain, fingerprint-sensor [H]) —
+   not Hexagon; cross-device bdwlan: larry's files parse under the same
+   TLV grammar (19 IEs, tags 1-15 lens byte-identical to OP6, tail =
+   b38-style re-chunk + NEW dense tag 19 of 7,172 B), tags 3/5/6/10
+   byte-identical across generations, 0 md5 matches (board data is
+   generation-specific); regdb.bin decoded as an ISO 3166-1 record
+   table (stride 14, ~198 records) — a different container.
+2. **VOOC leverage entry PROVEN** (`fleet-re/third-device-instantnoodle.md`):
+   `instantnoodle` (OnePlus 8, SM8250) from the official LineageOS
+   24.0 nightly (sha256-verified 1,385,279,498 B; one stall at 588 MB
+   recovered via `curl -C -`): **both VOOC blobs byte-exact (18/18
+   matrix rows = 100% of instantnoodle fastchg coverage)**, plus 25
+   newer/older fastchg variants the matrix lacks (free fleet-delta).
+   Census: **2,107 rows** across 30 partitions (bluetooth/modem FAT16 —
+   the OnePlus 6 pattern confirmed on SM8250; odm/vendor EROFS; dsp
+   EXT4 with 75 modules; 16 single-ELF firmware partitions); **492
+   fleet md5 joins** (454 distinct matrix md5s) and the inverse join
+   covers **98% of instantnoodle's own matrix rows**. Honest negatives:
+   0/84 adsp rows matched (SM8250 ships no bm2n fleet), 11/504 matrix
+   md5s unmatched (build drift).
+
+Session totals after addendum 4: **three devices populated** (SM845,
+SM6375, SM8250), ~2,800 censused blob files with hashes, every
+leverage-family identity proven (QCA BT fleet, bm2n fleet, VOOC pair,
+6 GMU/SQE blobs), 4 new container formats decoded (bdwlan TLV,
+regdb ISO-3166 table, BT patch structure, QSEE segment map), clean-room
+WMI/CE/HTC/TLV components + LPEC packaging shipped. Open items: tz QSEE
+metadata layout, bdwlan tag semantics, tail construction, remaining
+~100 not-populated devices (bulk decision with the lead).
