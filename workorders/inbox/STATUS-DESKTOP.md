@@ -83,6 +83,10 @@ coverage, byte-weighted top-15, and merge notes for the lead.
 5. Inventory: duplicate display names `Phone_2` (aura/Pong) and
    `Xperia_1_II` (two codenames); typo `Poco_F6_PRo`; stray `\ufffd` SOC
    byte (already flagged in recon).
+6. NEW (addendum 5): matrix coverage gap — `libsns_low_lat_stream_skel.so`
+   and `libsns_device_mode_skel.so` are real fleet blobs (byte-identical
+   across SM845/SM6375/SM8250) with **zero matrix rows**; same for
+   `libcamera_nn_skel.so` (809,688 B, SM6375+SM8250 shared).
 
 ## Push mechanics (honest note)
 
@@ -99,7 +103,8 @@ byte-reproducible from committed inputs: run
 (all pushed) — or push it from any environment with the adineo-cmd git
 alias. (v2 of the CSV, 34,052 rows, additionally carries the 403
 modem-FAT census rows — see partition-map addendum 2; the extended
-census CSV is kept alongside locally.)
+census CSV is kept alongside locally. Addendum-5 correction: the census
+should carry 404 modem-FAT rows — see addendum 5 §5.)
 
 ## Honest negatives / open items
 
@@ -108,9 +113,9 @@ census CSV is kept alongside locally.)
   populated proofs; ~1.1-1.6 GB per device — bulk decision is the
   lead's).
 - P2 "mainline basis" strings not verified against postmarketOS wiki.
-- LineageOS mirrorbits dropped two transfers across the session
-  (one 0-byte, one stall at 588 MB) — both recovered with `curl -L`
-  / `curl -C -`; logged.
+- LineageOS mirrorbits dropped transfers twice across the session
+  (0-byte and a 588 MB stall) — both recovered (`curl -L` / `curl -C -`);
+  logged.
 
 ## Fleet deep-RE addendum (2026-11-16, same session, post-Phase-4)
 
@@ -231,11 +236,56 @@ payload; the 403-vs-404 FAT-entry delta (one unresolved entry).
    0/84 adsp rows matched (SM8250 ships no bm2n fleet), 11/504 matrix
    md5s unmatched (build drift).
 
-Session totals after addendum 4: **three devices populated** (SM845,
-SM6375, SM8250), ~2,800 censused blob files with hashes, every
+Open after addendum 4: tz QSEE metadata layout, bdwlan tag semantics,
+tail construction, three-device sharing quantification.
+
+## Addendum 5 (2026-11-18, two parallel subagent streams — sharing matrix + QSEE decode)
+
+1. **Three-device sharing matrix** (`fleet-re/three-device-sharing.md`):
+   first cross-SoC-generation identity analysis (SM845 × SM6375 ×
+   SM8250): of 2,509 distinct md5s across the three censuses, only **4
+   blobs are carried by all three devices** (2 of them — `libsns_*_skel.so`
+   — absent from the 123-device matrix: a coverage gap), 17 on exactly
+   two, 2,488 device-unique; unique-content share 98.7-99.98% by bytes —
+   fragmentation dominates, leverage concentrates in tiny shared files.
+   Fleet coverage: the three devices cover **574 of the 15,091 upstream
+   fleet md5s (3.80%)**. **FAT-entry delta RESOLVED**: the OP6 modem.img
+   404th entry is a root-level **`VERINFO` subdirectory** whose child
+   `VER_INFO.TXT` (1,201 B) is the 404th named file (0 deleted entries,
+   0 volume labels); the 113,460,308 B prior total over-counted
+   `MBN_HW.TXT` (FAT-declared size 0) by one 16,384 B cluster chain.
+   Census actions for the owner: append the 404th row, correct
+   MBN_HW.TXT.
+2. **QSEE cross-generation decode** (`fleet-re/qsee-crossgen.md`):
+   instantnoodle tz.img fully mapped (ELF64, 23 phdrs, e_entry
+   0x14680000 **identical to OP6**, version triple
+   **TZ.XF.5.8-00274 / DARAANAAA / CRM**); **QSEE metadata hash-slot
+   layout decoded — first public**: seg[1] = header + per-phdr digest
+   table + two RSA-2048 signature blocks + two 3-cert X.509 chains;
+   slot count == phdr count, slot[i] = digest of phdr[i] file content,
+   width 32 B (SHA-256, SDM845) → 48 B (SHA-384, SM8250), header word[5]
+   records the table length exactly; empty segments stored as zero
+   slots; signatures bind to the paired chain's leaf keys (RSASSA-PSS
+   EM tail 0xBC, 4/4, with 4/4 cross-key negative controls); root CAs:
+   Qualcomm-owned on SDM845 vs an OEM-owned test root on SM8250.
+   fastrpc embedded-ELF magics: **false positive** (0/3 — the loader's
+   magic constant + error-string rodata); a660_gmu.bin leading table
+   **confirmed against mainline** (`struct block_header` chain, 15
+   blocks, 11 zero-size prealloc-request TOC entries fitting mainline's
+   hardcoded a660 allocations, 4 DEADBEEF-tagged data blocks routed
+   ITCM/icache/DTCM; a619_gmu is the raw legacy format).
+
+Open after addendum 5: metadata header word semantics (word[0]/[1],
+word[4] constant 19,200); SIG byte-range (PSS salt); bdwlan tag
+semantics; SHA-384 metadata: TZ-specific or SM8250-wide (re-run on
+cmnlib/keymaster); VERINFO census-row append (census owner).
+
+Session totals after addendum 5: **three devices populated** (SM845,
+SM6375, SM8250), ~2,850 censused blob files with hashes, every
 leverage-family identity proven (QCA BT fleet, bm2n fleet, VOOC pair,
-6 GMU/SQE blobs), 4 new container formats decoded (bdwlan TLV,
-regdb ISO-3166 table, BT patch structure, QSEE segment map), clean-room
-WMI/CE/HTC/TLV components + LPEC packaging shipped. Open items: tz QSEE
-metadata layout, bdwlan tag semantics, tail construction, remaining
-~100 not-populated devices (bulk decision with the lead).
+GMU/SQE blobs), **7 container formats decoded** (QCA BT TLV, bdwlan TLV,
+BT patch stream + tails, QSEE metadata, GMU block chain, regdb
+ISO-3166 table, FAT16 firmware volumes ×2), clean-room WMI/CE/HTC/TLV
+components + LPEC packaging shipped, three-device sharing matrix
+quantified, and the QSEE metadata layout published as a first-public
+decode.
