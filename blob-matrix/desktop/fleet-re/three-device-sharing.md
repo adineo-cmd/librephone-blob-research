@@ -62,11 +62,18 @@ Top content-alias groups (same md5, different names across devices):
 | `ce338fe6899778aacfc28414f2d9498b` | 16,384 | 2 | OnePlus_6+OnePlus_8 | OnePlus_6: <modem-fat:IMAGE/modem_pr_mcfg_configs_mcfg_hw_mbn_hw.txt>; OnePlus_8: <modem-fat:PCAFUI~2/WMLSPW~2/CCASGL~2/YI7XVO~2/KBNBN6~2/PJYYG4~2.TXT> | 0 rows / 0 devices |
 | `620f0b67a91f7f74151bc5be745b7110` | 4,096 | 2 | Nord_CE3+OnePlus_8 | Nord_CE3: firmware/evass.b19; OnePlus_8: <modem-fat:PCAFUI~2/UVYW7S~2.B19> | 15 rows / 15 devices |
 | `d0bd5030a03f631c9af5060a5645d02e` | 555 | 2 | OnePlus_6+OnePlus_8 | OnePlus_6: <modem-fat:IMAGE/adspua.jsn>; OnePlus_8: <modem-fat:PCAFUI~2/4K5XTO~2.JSN> | 30 rows / 30 devices |
+| `0039483ebd20685728df72c12d13fee4` | 405 | 2 | OnePlus_6+OnePlus_8 | OnePlus_6: <modem-fat:IMAGE/slpius.jsn>; OnePlus_8: <modem-fat:PCAFUI~2/H54GTB~2.JSN> | 6 rows / 6 devices |
 | `40d6edf129dec063ca3fe6cb6837488f` | 403 | 2 | OnePlus_6+OnePlus_8 | OnePlus_6: <modem-fat:IMAGE/adspr.jsn>; OnePlus_8: <modem-fat:PCAFUI~2/WNORW3~2.JSN> | 30 rows / 30 devices |
 | `f2bd80d5f0b19b5b0d36d28383948149` | 403 | 2 | OnePlus_6+OnePlus_8 | OnePlus_6: <modem-fat:IMAGE/cdspr.jsn>; OnePlus_8: <modem-fat:PCAFUI~2/AV7H26~2.JSN> | 30 rows / 30 devices |
-| `0d68af0904dd698b16ffc9cd28b9b0c8` | 32 | 5 | Nord_CE3+OnePlus_6+OnePlus_8 | Nord_CE3: firmware/vpu20_1v.b19, vpu20_2v.b19, vpu20_4v.b19; OnePlus_6: <modem-fat:IMAGE/venus.b04>; OnePlus_8: <modem-fat:PCAFUI~2/OQYQXB~2.B19> | 34 rows / 34 devices |
-| `eb667b725e1602ba8b9300293a4a2272` | 24 | 6 | Nord_CE3+OnePlus_8 | Nord_CE3: firmware/evass.b07 + vpu20*.b07 (3); OnePlus_8: 2 modem-FAT copies | 35 rows / 30 devices |
-| `d41d8cd98f00b204e9800998ecf8427e` | 0 | 34 | Nord_CE3+OnePlus_6 | zero-byte degenerate group | 57 rows / 34 devices |
+| `2439d6872b39e9c1282c572b266665f0` | 403 | 2 | OnePlus_6+OnePlus_8 | OnePlus_6: <modem-fat:IMAGE/slpir.jsn>; OnePlus_8: <modem-fat:PCAFUI~2/S4RWSX~2.JSN> | 6 rows / 6 devices |
+| `0d68af0904dd698b16ffc9cd28b9b0c8` | 32 | 5 | Nord_CE3+OnePlus_6+OnePlus_8 | Nord_CE3: firmware/vpu20_1v.b19, firmware/vpu20_2v.b19, firmware/vpu20_4v.b19; OnePlus_6: <modem-fat:IMAGE/venus.b04>; OnePlus_8: <modem-fat:PCAFUI~2/OQYQXB~2.B19> | 34 rows / 34 devices |
+| `5dd97594c3def03756451e6408954491` | 32 | 2 | OnePlus_6+OnePlus_8 | OnePlus_6: <modem-fat:IMAGE/modem_pr_mcfg_configs_mcfg_hw_mbn_hw.dig>; OnePlus_8: <modem-fat:PCAFUI~2/WMLSPW~2/CCASGL~2/YI7XVO~2/KBNBN6~2/VLDE6D~2.DIG> | 7 rows / 7 devices |
+| `eb667b725e1602ba8b9300293a4a2272` | 24 | 6 | Nord_CE3+OnePlus_8 | Nord_CE3: firmware/evass.b07, firmware/vpu20_1v.b07, firmware/vpu20_2v.b07, firmware/vpu20_4v.b07; OnePlus_8: <modem-fat:PCAFUI~2/6NAYYT~2.B07>, <modem-fat:PCAFUI~2/WHKSWD~2.B07> | 35 rows / 30 devices |
+| `d81a5c71adbe6aae61e4b4a8e121e446` | 20 | 5 | Nord_CE3+OnePlus_8 | Nord_CE3: firmware/vpu20_1v.b06, firmware/vpu20_2v.b06, firmware/vpu20_4v.b06; OnePlus_8: <modem-fat:PCAFUI~2/HQKKA5~2.B06>, <modem-fat:PCAFUI~2/VSDWCB~2.B06> | 34 rows / 30 devices |
+| `cb24261b83d97279f0dbfa45c42c01c2` | 20 | 4 | Nord_CE3+OnePlus_8 | Nord_CE3: firmware/vpu20_1v.b03, firmware/vpu20_2v.b03, firmware/vpu20_4v.b03; OnePlus_8: <modem-fat:PCAFUI~2/VA37H6~2.B03> | 7 rows / 7 devices |
+| `f05c4f03a9283589091c31be065c6fed` | 20 | 4 | Nord_CE3+OnePlus_8 | Nord_CE3: firmware/vpu20_1v.b05, firmware/vpu20_2v.b05, firmware/vpu20_4v.b05; OnePlus_8: <modem-fat:PCAFUI~2/KK77H3~2.B05> | 30 rows / 30 devices |
+| `ec2d6ced2030acafa2b680b83eb3ab63` | 16 | 6 | Nord_CE3+OnePlus_8 | Nord_CE3: firmware/vpu20_1v.b08, firmware/vpu20_2v.b08, firmware/vpu20_4v.b08; OnePlus_8: <modem-fat:PCAFUI~2/6QLSMJ~2.B08>, <modem-fat:PCAFUI~2/TTU5RS~2.B04>, <modem-fat:PCAFUI~2/XT2HFG~2.B08> | 38 rows / 30 devices |
+| `d41d8cd98f00b204e9800998ecf8427e` | 0 | 34 | Nord_CE3+OnePlus_6 | Nord_CE3: firmware/evass.b11..b18, firmware/vpu20_1v.b11..b18, vpu20_2v.b11..b18, vpu20_4v.b11..b18 (32 rows); OnePlus_6: firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini, firmware/wlan/qca_cld/wlan_mac.bin (2 rows) | 57 rows / 34 devices |
 
 ## 4. Fleet coverage — the "three devices vs the 15,091" number `[F]`
 
@@ -93,26 +100,35 @@ Raw FAT16 walk of `data-fetch/enchilada/modem.img` (119,820,288 bytes), re-deriv
 | lfn | 0 |
 | end_markers | 119 |
 
-**Resolution:** the 403-row census covers exactly the 403 allocated files under `IMAGE/`; the walk finds **404 allocated files / 113,443,924 bytes**. The extra named file is **`VERINFO/VER_INFO.TXT`** (1,201 bytes, md5 `624973d80f73a1c0a6670ee87afdd08c`, first_cluster 7311) — the 404th file lives under a root-level **`VERINFO` subdirectory**, which the extraction tool's flat walk did not descend into. All 402 comparable walked md5s match the prior census exactly. Reconciliation of the byte totals: the previously-published 113,460,308 B figure = 113,443,924 (true total) + 16,384 — i.e. it also charged `MBN_HW.TXT` (FAT-declared size 0, true content empty) at its full 16,384 B cluster-chain size instead of its declared size `[F]`.
+**Resolution:** volume labels: (none); deleted entries: 0. Subdirectory entries: 118 total — at root level: `IMAGE`, `VERINFO` (full tree in JSON `fat_walk.subdirs`). The 403-row census and `analysis/out/modem-fat-census.json` cover exactly the 403 allocated files under `IMAGE/`; the walk finds **404 allocated files / 113,443,924 bytes**. File(s) walked but absent from the census: `IMAGE/MODEM_PR/MCFG/CONFIGS/MCFG_HW/MBN_HW.TXT` (0 bytes declared, md5 `d41d8cd98f00b204e9800998ecf8427e`, first_cluster 6363); `VERINFO/VER_INFO.TXT` (1,201 bytes, md5 `624973d80f73a1c0a6670ee87afdd08c`, first_cluster 7311). All 402 walked file md5s that exist in `modem-fat-census.json` match it exactly; the remaining walked file (`IMAGE/.../MBN_HW.TXT`) is present in the census but with the chain-hash md5 documented in caveats (`[F]`).
 
-Consequence for the census: add `VERINFO/VER_INFO.TXT` as the 404th modem-FAT row (one-line append, census owner); correct the `MBN_HW.TXT` row (declared size 0).
+Consequence: the OP6 census is missing one 8.3-named file (`VERINFO/VER_INFO.TXT`, 1,201 B); the modem.img directory-entry-true content total is **113,443,924 bytes across 404 files**, not 403 / 113,460,308 B. Reconciliation: the previously-published 113,460,308 B figure = this total + 16,384 — i.e. it counted VER_INFO.TXT and also charged MBN_HW.TXT at its 16,384 B chain size instead of its declared size 0 `[F]`.
 
 ## 6. Method / provenance
 
-- Censuses deduped on `(device,file)` keep-last: raw rows OnePlus_6 462, Nord_CE3 299, OnePlus_8 2107; the 2 OP6 dedupe events are the 0-byte `firmware/wlan/qca_cld/` duplicate rows (content-identical re-walk).
-- OnePlus_6 md5 provenance: 403 modem-FAT rows from `analysis/out/modem-fat-census.json` (cross-checked, 0 mismatches); 59 vendor rows recomputed from local files, accepted only when local sha256 equals the census sha256 `[F]`.
-- Matrix join key `md5_db`, 33,917 rows × 123 devices, 15,091 distinct values, 0 empty `[F]`.
-- 11 md5s carry different family labels on different devices — normalization pass needed before fleet-wide roll-up `[F]`.
+- Censuses deduped on `(device,file)` keep-last: raw rows OnePlus_6 462, Nord_CE3 299, OnePlus_8 2107. Dedupe events: OnePlus_6 2 (the 0-byte `firmware/wlan/qca_cld/` duplicate rows, content-identical re-walk); Nord_CE3 0; OnePlus_8 0 (`[F]`).
+- OnePlus_6 md5 provenance: 403 modem-FAT rows from `analysis/out/modem-fat-census.json` (bytes + notes cross-checked, 0 mismatches); 59 vendor rows recomputed from local files, accepted only when local sha256 equals the census sha256 (`[F]`).
+- Nord_CE3 and OnePlus_8 md5s from their census `md5` columns (sha256-verified at population time) `[F]`.
+- Matrix join key `md5_db`, 33,917 rows × 123 devices, 15,091 distinct values, 0 empty `[F]`. 11 md5s carry different family labels across devices — normalization needed `[F]`.
 
 ## 7. Honest negatives `[N]`
 
 - No deleted FAT16 entries, no volume labels, no LFN entries in modem.img (0/0/0) — the delta is not a deleted-entry artifact.
 - No md5 with conflicting byte sizes across devices.
-- The task brief's example alias pair (OP6 `image_wlanmdsp.mbn` vs larry `wlanmdsp.otaupdate`) does not exist in these censuses — Nord_CE3 has no wlanmdsp row; OP6's `wlanmdsp.mbn` (3,035,876 B) matches no md5 on either other device.
-- Census scope limits cross-device conclusions: the OP6 census has no odm/ tree, so the VOOC pair (proven on Nord_CE3 and OnePlus_8 odm partitions) cannot appear for OnePlus_6 — a scope fact, not a content fact.
+- No md5-based cross-device identity for OnePlus_6 vendor rows beyond local recomputation (the enchilada census carries no `md5` column).
+- Entries after the first end-of-dir marker: 0.
+- The brief's example alias pair (OP6 `image_wlanmdsp.mbn` vs larry `wlanmdsp.otaupdate`) does not exist: Nord_CE3 has no wlanmdsp row; OP6's `wlanmdsp.mbn` (3,035,876 B) matches no md5 on either other device.
+- No zero-byte rows on OnePlus_8; the degenerate zero-byte group exists only between OP6 (2 rows) and Nord_CE3 (32 rows).
 
-## 8. Open items
+## 8. Caveats
 
-- Append `VERINFO/VER_INFO.TXT` as the 404th modem-FAT row; correct the `MBN_HW.TXT` row (census owner).
-- Family-label normalization for identical content across devices (11 md5s).
+- OP6 modem-FAT row MBN_HW.TXT: FAT directory entry declares size 0 (true content = empty) but the census recorded 16,384 bytes with md5 ce338fe6… (full cluster-chain hash) — the recorded OP6+OP8 pairing on that md5 reflects chain bytes, not declared content.
+- The zero-byte md5 groups 34 census rows and is itself carried by 57 matrix rows — all zero-byte 'shared' counts are degenerate, split out separately.
+- Census scope limits cross-device conclusions: the OP6 census has no odm/ tree, so the VOOC pair (proven on Nord_CE3 and OnePlus_8) cannot appear for OnePlus_6 — a scope fact, not a content fact.
+
+## 9. Open items
+
+- Append `VERINFO/VER_INFO.TXT` as the 404th modem-FAT row (one-line append; census owner per write discipline).
+- Correct the `MBN_HW.TXT` row (declared size 0).
+- Family-label normalization for identical content across devices (11 md5s) before fleet-wide roll-up.
 - Extend the identity matrix to more of the 123 matrix devices to turn the 3-device leverage numbers into a fleet curve.
