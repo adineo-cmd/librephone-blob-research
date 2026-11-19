@@ -27,6 +27,28 @@ repeated everywhere it matters.
 Labels used in the documents: **[S]** quoted from public source (file, symbol) ·
 **[M]** own measurement of payload bytes · **[OPEN]** not established, gap named.
 
+### RULE 0 prior-art record (searches 2026-11-19)
+
+The `websearch` tool returned HTTP 402, so the prose leg was run through a
+real browser (DuckDuckGo) rather than skipped. Exact queries and outcomes:
+
+| query | outcome |
+|---|---|
+| `cpp_firmware_v1_12_0.fw MSM camera CPP post-processing microcode` | 10 hits. The only relevant ones are **mirrors of the file itself** (`firmware-xiaomi-rosy`, `proprietary_vendor_xiaomi_msm8998-common`). Everything else is a name collision with unrelated products: Bosch "CPP4" CCTV camera firmware, Canon Production Printing (`cpp.canon`). Nobody has written up the format. |
+| `"cpp_firmware" qualcomm camera CPP firmware load` | **"No results"** |
+
+The **"CPP" name is a genuine search hazard** and is recorded here as a
+finding in its own right: it collides with Canon Production Printing and with
+Bosch's CPP-series camera firmware, so a careless search produces confident
+false positives. In this family `cpp` means the MSM **Camera
+Post-Processor**, and the disambiguating terms are `msm_cpp.c` and
+`MSM_CPP_CMD_FW_LOAD`, not the token `cpp`.
+
+Conclusion: no public reverse-engineering writeup of these image contents
+exists. The consumer-side specification below is therefore the *only* public
+account of this family, which is what makes the `wifi` -> camera correction
+worth contributing upstream.
+
 ## Clean-room statement
 
 Written 2026-11-19 from public sources only:
