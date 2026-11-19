@@ -1,12 +1,14 @@
 <div align="center">
 
-# LibrePhone Blob Research
+# Open Device
 
-**Clean-room documentation of the Android blobs nobody specified.**
+**Firmware blob research across every device class.**
 
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white) ![Bash](https://img.shields.io/badge/Bash-4EAA25?logo=gnubash&logoColor=white)
+This project began as the FSF LibrePhone blob research effort and retains that
+work as its provenance. It now covers firmware and blobs for phones, tablets,
+TVs, single-board computers and developer boards.
 
-[![Stars](https://img.shields.io/github/stars/adineo-cmd/librephone-blob-research?style=flat&logo=github&label=stars)](https://github.com/adineo-cmd/librephone-blob-research/stargazers) [![Last commit](https://img.shields.io/github/last-commit/adineo-cmd/librephone-blob-research?style=flat)](https://github.com/adineo-cmd/librephone-blob-research/commits)
+[Stars](https://github.com/adineo-cmd/open-device/stargazers) · [Last commit](https://github.com/adineo-cmd/open-device/commits)
 
 [Quick start](#quick-start) · [How it works](#how-it-works) · [Features](#features)
 
