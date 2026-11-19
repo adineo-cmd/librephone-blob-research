@@ -5,8 +5,11 @@
 **Firmware blob research across every device class.**
 
 This project began as the FSF LibrePhone blob research effort and retains that
-work as its provenance. It now covers firmware and blobs for phones, tablets,
-TVs, single-board computers and developer boards.
+work as its provenance. Its scope is every device class; current coverage
+concentrates on Android phones — Qualcomm (SDM845, SM6375, SM8250, QCM6490/FP6)
+and MediaTek — with per-file blob data: 33,917 rows across 123 devices. A
+further 122 devices of the 245 inventoried have no blob rows: tablets, TV boxes,
+single-board computers and developer boards are not yet catalogued per file.
 
 [Stars](https://github.com/adineo-cmd/open-device/stargazers) · [Last commit](https://github.com/adineo-cmd/open-device/commits)
 
