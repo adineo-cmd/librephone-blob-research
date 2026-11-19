@@ -1,0 +1,5 @@
+# Synthetic fixtures only -- regenerable, never proprietary vendor bytes.
+# The repo root ignores *.bin but not *.fw (this family's extension), and the
+# root .gitignore is outside this work's write scope, so exclude them here.
+*
+!.gitignore
