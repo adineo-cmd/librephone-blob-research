@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import { buildDevices } from '../../lib/data';
+const devices = buildDevices();
+---
+<Base title="Devices">
+  <h2>All devices</h2>
+  <p>{devices.length} devices across every device class. Coverage states:
+  catalogued (per-file rows), count-known (upstream count only), inventory-only.</p>
+  <table>
+    <tr><th>Device</th><th>Type</th><th>Vendor</th><th>State</th><th>Blobs</th></tr>
+    {devices.map((d) => <tr><td><a href={`devices/${d.slug}.html`}>{d.model}</a></td><td>{d.type}</td><td>{d.vendor_display}</td><td>{d.state}</td><td>{d.blob_count}</td></tr>)}
+  </table>
+</Base>

@@ -14,5 +14,8 @@ vendor/
 *.pyc
 __pycache__/
 .ipynb_checkpoints/
-__pycache__/
-*.pyc
+
+# Astro build output and dependencies
+dist/
+node_modules/
+.astro/

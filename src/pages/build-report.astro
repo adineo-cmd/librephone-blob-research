@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { buildDevices, buildDocs, dedupe, loadInventory } from '../lib/data';
+const devices = buildDevices();
+const docs = buildDocs();
+const { dropped } = dedupe(loadInventory());
+const unclassified = devices.filter((d) => d.type === 'other').map((d) => d.model);
+const countKnown = devices.filter((d) => d.state === 'count_known').map((d) => d.model);
+const inventoryOnly = devices.filter((d) => d.state === 'inventory_only').map((d) => d.model);
+const pages = 1 + 1 + 1 + 1 + 1 + 1 + devices.length + new Set(devices.map((d) => d.type)).size + new Set(devices.flatMap((d) => Object.keys(d.families))).size + docs.length;
+function block(title: string, items: string[]) {
+  return `<h3>${title}</h3>` + (items.length ? `<ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul>` : '<p>none</p>');
+}
+const body = [
+  `<p>${pages} pages generated from ${docs.length} documents and ${devices.length} devices.</p>`,
+  block('Unclassified devices', unclassified),
+  block('Duplicate inventory rows', dropped.map((r) => r.model)),
+  block('Count-known devices', countKnown),
+  block('Inventory-only devices', inventoryOnly),
+].join('\n');
+---
+<Base title="Build report">
+  <h2>Build report</h2>
+  <div set:html={body} />
+</Base>

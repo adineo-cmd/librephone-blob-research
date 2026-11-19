@@ -1,0 +1,38 @@
+---
+import Base from '../../layouts/Base.astro';
+import { buildDevices } from '../../lib/data';
+
+export function getStaticPaths() {
+  return buildDevices().map((device) => ({ params: { slug: device.slug }, props: { device } }));
+}
+const { device } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const families = Object.entries(device.families).sort(([a], [b]) => a.localeCompare(b));
+let leverage: { name: string; family: string; bytes: number }[] = [];
+for (const [family, rows] of families) {
+  for (const r of rows) leverage.push({ name: r.filename, family, bytes: /^\d+$/.test(r.size_bytes) ? parseInt(r.size_bytes, 10) : 0 });
+}
+leverage = leverage.sort((a, b) => b.bytes - a.bytes).slice(0, 3);
+---
+<Base title={device.model}>
+  <h2>{device.model}</h2>
+  <ul>
+    <li>Vendor: {device.vendor_display}</li>
+    <li>Type: {device.type}</li>
+    <li>Build variant: {device.build_variant}</li>
+    <li>SoC: {device.soc || 'not recorded'}</li>
+  </ul>
+
+  {device.state === 'count_known' && <div class="gap"><h3>Coverage gap</h3><p>{device.upstream_count} blobs are known to exist upstream for this device; 0 are catalogued with filenames and hashes. Source: {device.count_source}.</p></div>}
+  {device.state === 'inventory_only' && <div class="gap"><h3>Coverage gap</h3><p>This device is listed in the upstream inventory, but no blob count and no blob rows are recorded for it.</p></div>}
+
+  <h3>Families</h3>
+  <p>Counts below are matrix rows, not distinct blobs.</p>
+  <table>
+    <tr><th>Family</th><th>Matrix rows</th><th>Distinct md5</th><th>Bytes</th></tr>
+    {families.map(([family, rows]) => <tr class="blob-row"><td><a href={base + `families/${family}.html`}>{family}</a></td><td>{rows.length}</td><td>{new Set(rows.map((r) => r.md5_db)).size}</td><td>{rows.reduce((a, r) => a + (/^\d+$/.test(r.size_bytes) ? parseInt(r.size_bytes, 10) : 0), 0)}</td></tr>)}
+  </table>
+
+  <h3>Leverage</h3>
+  <ul>{leverage.map((b) => <li><a href={base + `families/${b.family}.html`}>{b.name}</a> ({b.bytes} bytes)</li>)}</ul>
+</Base>

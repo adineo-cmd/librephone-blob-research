@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import { buildDevices, buildFamilies, buildDocs } from '../lib/data';
+const devices = buildDevices();
+const families = buildFamilies(devices);
+const docs = buildDocs();
+const states = { catalogued: 0, count_known: 0, inventory_only: 0 };
+for (const d of devices) states[d.state]++;
+const types: Record<string, number> = {};
+for (const d of devices) types[d.type] = (types[d.type] || 0) + 1;
+---
+<Base title="Home">
+  <h2>Open Device</h2>
+  <p>Open-source firmware and blobs for every device class — phones, tablets,
+  TV boxes, single-board computers and developer boards.</p>
+  <p><strong>Website:</strong> <a href="https://adineo-cmd.github.io/open-device/">https://adineo-cmd.github.io/open-device/</a></p>
+
+  <h3>Coverage</h3>
+  <ul>
+    <li>{states.catalogued} catalogued</li>
+    <li>{states.count_known} count-known</li>
+    <li>{states.inventory_only} inventory-only</li>
+  </ul>
+
+  <h3>Device types</h3>
+  <ul>{Object.entries(types).sort().map(([k, v]) => <li><a href={`devices-by-type/${k}.html`}>{k}</a>: {v}</li>)}</ul>
+
+  <h3>Firmware families</h3>
+  <ul>{families.map((f) => <li><a href={`families/${f.family}.html`}>{f.family}</a>: {f.device_count} devices, {f.blob_count} rows</li>)}</ul>
+
+  <h3>Research documents</h3>
+  <p>{docs.length} evidence-classed documents. <a href="research.html">Browse them</a>.</p>
+  <p><a href="links.html">External firmware and code hosts</a> ·
+     <a href="methodology.html">Methodology</a> ·
+     <a href="build-report.html">Build report</a></p>
+</Base>

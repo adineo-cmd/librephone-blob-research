@@ -1,0 +1,31 @@
+---
+interface Props { title: string; }
+const { title } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const nav = [
+  [base + 'index.html', 'Home'],
+  [base + 'devices.html', 'Devices'],
+  [base + 'families.html', 'Families'],
+  [base + 'research.html', 'Research'],
+  [base + 'links.html', 'External code'],
+  [base + 'methodology.html', 'Methodology'],
+  [base + 'build-report.html', 'Build report'],
+];
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title} — Open Device</title>
+  <link rel="stylesheet" href={base + 'assets/site.css'} />
+</head>
+<body>
+  <header>
+    <h1><a href={base + 'index.html'}>Open Device</a></h1>
+    <nav>{nav.map(([href, label]) => <a href={href}>{label}</a>)}</nav>
+  </header>
+  <main><slot /></main>
+  <footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

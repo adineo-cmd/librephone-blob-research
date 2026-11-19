@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import { buildDevices, buildFamilies } from '../../lib/data';
+const families = buildFamilies(buildDevices());
+---
+<Base title="Families">
+  <h2>Firmware families</h2>
+  <p>Ranked by device reach, not row count — the lab's leverage metric.</p>
+  <ul>{families.map((f) => <li><a href={`families/${f.family}.html`}>{f.family}</a>: {f.device_count} devices, {f.blob_count} rows</li>)}</ul>
+</Base>

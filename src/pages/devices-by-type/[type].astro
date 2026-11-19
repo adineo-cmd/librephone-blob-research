@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import { buildDevices } from '../../lib/data';
+
+export function getStaticPaths() {
+  const devices = buildDevices();
+  const types = [...new Set(devices.map((d) => d.type))];
+  return types.map((type) => ({ params: { type }, props: { type, devices: devices.filter((d) => d.type === type) } }));
+}
+const { type, devices } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<Base title={`${type} devices`}>
+  <h2>{type} devices</h2>
+  <p>{devices.length} devices.</p>
+  <table>
+    <tr><th>Device</th><th>State</th><th>Vendor</th></tr>
+    {devices.map((d) => <tr><td><a href={base + `devices/${d.slug}.html`}>{d.model}</a></td><td>{d.state}</td><td>{d.vendor_display}</td></tr>)}
+  </table>
+</Base>

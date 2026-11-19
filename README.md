@@ -4,6 +4,8 @@
 
 **Firmware blob research across every device class.**
 
+**[🌐 Website: https://adineo-cmd.github.io/open-device/](https://adineo-cmd.github.io/open-device/)**
+
 This project began as the FSF LibrePhone blob research effort and retains that
 work as its provenance. Its scope is every device class; current coverage
 concentrates on Android phones — Qualcomm (SDM845, SM6375, SM8250, QCM6490/FP6)
@@ -92,15 +94,23 @@ data/             derived CSV/JSON data; the frozen matrix and inventory stay
 implementations/  clean-room, spec-derived components
 docs/devices/     per-device family notes
 upstream/         paste-ready upstream PRs and issue filings
-site/             the Open Device static-site generator
+src/              the Astro website (npm run build -> dist/)
+site/             the original Python generator, kept as provenance (not deployed)
 AGENTS.md         standing rules, including the issue-claim protocol (Rule 2)
 SCOPE.md          legal and ethical boundary
 ```
 
-Work is decomposed into 2,836 atomic GitHub issues. Read
-`docs/ISSUE-WORKFLOW.md` for the claim protocol and harness partition, then claim
-one with a `CLAIM` comment before touching its files. The machine-readable
-catalog is `docs/issue-catalog/issues.jsonl`; Rule 2 in `AGENTS.md` is binding.
+## Website
+
+Built with Astro. Run locally with `npm install && npm run dev`; build the static
+site with `npm run build` (output in `dist/`). It is published by GitHub Actions
+to [https://adineo-cmd.github.io/open-device/](https://adineo-cmd.github.io/open-device/).
+
+Work is decomposed into GitHub device work packages (one sustained package per
+device, plus firmware-fleet and deep-RE packages). Read `docs/ISSUE-WORKFLOW.md`
+for the claim protocol and harness partition, then claim one with a `CLAIM`
+comment before touching its files. The catalog is
+`docs/issue-catalog/device-packages.jsonl`; Rules 2 and 3 in `AGENTS.md` are binding.
 
 ## Two findings worth the trip
 

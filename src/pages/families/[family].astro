@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import { buildDevices, buildFamilies } from '../../lib/data';
+
+export function getStaticPaths() {
+  const devices = buildDevices();
+  return buildFamilies(devices).map((family) => ({ params: { family: family.family }, props: { family, devices } }));
+}
+const { family, devices } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<Base title={`${family.family} family`}>
+  <h2>{family.family} family</h2>
+  <p>{family.device_count} devices, {family.blob_count} matrix rows.</p>
+  <h3>Top blobs by device reach</h3>
+  <ul>{family.top_blobs.map((b) => <li>{b.filename} — {b.reach} devices</li>)}</ul>
+  <h3>Devices</h3>
+  <table>
+    <tr><th>Device</th><th>Rows</th></tr>
+    {devices.filter((d) => d.families[family.family]).map((d) => <tr><td><a href={base + `devices/${d.slug}.html`}>{d.model}</a></td><td>{d.families[family.family].length}</td></tr>)}
+  </table>
+</Base>

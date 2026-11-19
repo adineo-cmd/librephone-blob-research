@@ -1,0 +1,28 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../../layouts/Base.astro';
+import { ROOT, buildDocs } from '../../lib/data';
+import { render } from '../../lib/markdown';
+
+export function getStaticPaths() {
+  return buildDocs().map((doc) => ({ params: { slug: doc.path.replace(/\.md$/, '') }, props: { doc } }));
+}
+const { doc } = Astro.props;
+const base = import.meta.env.BASE_URL;
+let html = render(fs.readFileSync(path.join(ROOT, doc.path), 'utf8'));
+const docDir = path.dirname(doc.path);
+html = html.replace(/href="([^"]+)"/g, (m, href) => {
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(href) || href.startsWith('#') || !href.endsWith('.html')) return m;
+  const targetMd = path.normalize(path.join(docDir, href.replace(/\.html$/, '.md'))).split(path.sep).join('/');
+  if (!fs.existsSync(path.join(ROOT, targetMd))) return m;
+  return `href="${base}research/${targetMd.replace(/\.md$/, '.html')}"`;
+});
+const ev = doc.evidence_classes.map((c) => `<span class="evidence" data-evidence="${c.toLowerCase()}">${c}</span>`).join(' ');
+---
+<Base title={doc.title || doc.path}>
+  <h2>{doc.title || doc.path}</h2>
+  {doc.summary && <p>{doc.summary}</p>}
+  {doc.evidence_classes.length > 0 && <p>Evidence: <span set:html={ev} /></p>}
+  <div set:html={html} />
+</Base>
