@@ -175,6 +175,11 @@ hr {
   white-space: nowrap;
 }
 
+.evidence[data-evidence="f"] { color: #1b6b3a; border-color: #1b6b3a; }
+.evidence[data-evidence="i"] { color: #1a4f9c; border-color: #1a4f9c; }
+.evidence[data-evidence="h"] { color: #8a5a00; border-color: #8a5a00; }
+.evidence[data-evidence="n"] { color: #8a1f1f; border-color: #8a1f1f; }
+
 .evidence-block {
   font-family: var(--mono);
   font-size: 0.8125rem;
