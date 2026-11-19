@@ -1,17 +1,23 @@
 url,title,organisation,device_types,families,what_it_hosts,licence,verified_date
+https://barebox.org,barebox,barebox,"sbc,devkit",boot,Free bootloader and bring-up toolkit for embedded systems with Linux-compatible driver frameworks,,2026-11-20
 https://codeberg.org/rsavoye/librephone,FSF LibrePhone repository,FSF,all,other,The FSF LibrePhone project's own repository: blob research notes and tooling,,2026-11-19
+https://en.wikipedia.org/wiki/List_of_router_firmware_projects,Router firmware list,Wikipedia,"router,sbc","wifi,other",Index of third-party router firmware projects,,2026-11-20
 https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git,linux-firmware,Linux Foundation,all,"wifi,bt,gpu,adsp,modem,tz",Upstream linux-firmware tree: the vendor blob payloads themselves,,2026-11-19
 https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/ath10k,ath10k board data in linux-firmware,Linux Foundation,"phone,tablet,sbc",wifi,ath10k board data and firmware blobs in linux-firmware,,2026-11-19
 https://git.kernel.org/pub/scm/linux/kernel/git/johannes/linux-wireless.git,linux-wireless integration tree,Linux Foundation,"phone,tablet,tv_box,sbc","wifi,bt","linux-wireless integration tree, where WiFi and BT driver changes land before mainline",GPL-2.0-only,2026-11-19
-https://github.com/LibreELEC/LibreELEC.tv,LibreELEC,LibreELEC,"tv_box,sbc,devkit",other,LibreELEC: minimal OS images for TV boxes and single-board computers,,2026-11-19
-https://github.com/ReFirmLabs/binwalk,binwalk,ReFirmLabs,all,other,binwalk: firmware image extraction and entropy analysis,MIT,2026-11-19
+https://gitea.osmocom.org/phone-side/osmocom-bb,OsmocomBB,Osmocom,phone,modem,Free software GSM baseband firmware and L1/L2/L3 protocol stack,,2026-11-20
 https://github.com/coreboot/coreboot,coreboot,coreboot,"sbc,devkit,tv_box",boot,coreboot: open firmware for booting devices with blob-free or reduced-blob paths,GPL-2.0-only,2026-11-19
 https://github.com/cyrozap/mediatek-lte-baseband-re,MediaTek LTE baseband reverse engineering,cyrozap,phone,modem,MediaTek LTE baseband reverse-engineering notes and tools,GPL-3.0-only,2026-11-19
+https://github.com/firmwire/firmwire,FirmWire,FirmWire,phone,modem,Full-system baseband firmware emulation platform for fuzzing and debugging,,2026-11-20
+https://github.com/LibreELEC/LibreELEC.tv,LibreELEC,LibreELEC,"tv_box,sbc,devkit",other,LibreELEC: minimal OS images for TV boxes and single-board computers,,2026-11-19
 https://github.com/nccgroup/ghidra-mtk-loader,Ghidra MediaTek firmware loader,NCC Group,phone,"adsp,modem",Ghidra loader for MediaTek firmware images,GPL-3.0-only,2026-11-19
 https://github.com/nccgroup/ghidra-nanomips,Ghidra NanoMIPS module,NCC Group,"phone,tablet,tv_box",other,Ghidra processor module for the MIPS NanoMIPS instruction set,GPL-3.0-only,2026-11-19
+https://github.com/open-source-firmware/awesome-firmware,awesome-firmware,Open Source Firmware Foundation,all,other,Curated list of open-source firmware projects and their use cases,CC-BY-SA-4.0,2026-11-20
 https://github.com/openwrt/openwrt,OpenWrt,OpenWrt,"tv_box,sbc",wifi,OpenWrt: router and embedded Linux distribution with extensive WiFi support,,2026-11-19
 https://github.com/postmarketOS,postmarketOS,postmarketOS,"phone,tablet",other,postmarketOS: mainline-Linux mobile distributions and device ports,,2026-11-19
 https://github.com/qca/qca-swiss-army-knife,QCA Swiss Army Knife,Qualcomm,"phone,tablet,sbc",wifi,Qualcomm Atheros WiFi board-data and calibration tooling,,2026-11-19
+https://github.com/ReFirmLabs/binwalk,binwalk,ReFirmLabs,all,other,binwalk: firmware image extraction and entropy analysis,MIT,2026-11-19
+https://github.com/replicant-archive,Replicant archive,Replicant,"phone,tablet",other,Archived Replicant source repositories on GitHub,,2026-11-20
 https://github.com/torvalds/linux/blob/master/drivers/bluetooth/btqca.c,btqca Bluetooth firmware loader,Linux Foundation,"phone,tablet,sbc",bt,"Qualcomm Bluetooth firmware loading and patch download, mainline",GPL-2.0-only,2026-11-19
 https://github.com/torvalds/linux/blob/master/drivers/bluetooth/hci_qca.c,hci_qca HCI transport driver,Linux Foundation,"phone,tablet,sbc",bt,"Qualcomm HCI transport driver, mainline",GPL-2.0-only,2026-11-19
 https://github.com/torvalds/linux/blob/master/drivers/net/wireless/ath/ath10k/,ath10k WiFi driver,Linux Foundation,"phone,tablet,sbc",wifi,"Qualcomm Atheros ath10k WiFi driver, mainline",GPL-2.0-only,2026-11-19
@@ -19,6 +25,16 @@ https://github.com/torvalds/linux/blob/master/drivers/net/wireless/mediatek/mt76
 https://github.com/torvalds/linux/blob/master/drivers/net/wireless/realtek/rtw88/,rtw88 WiFi driver,Linux Foundation,"phone,tablet,sbc",wifi,"Realtek rtw88 WiFi driver, mainline",GPL-2.0-only,2026-11-19
 https://github.com/torvalds/linux/blob/master/drivers/remoteproc/qcom_q6v5_pas.c,qcom_q6v5_pas remoteproc loader,Linux Foundation,"phone,tablet","adsp,cdsp",Qualcomm remote processor loader for ADSP and CDSP,GPL-2.0-only,2026-11-19
 https://github.com/u-boot/u-boot,U-Boot,U-Boot project,"sbc,devkit,tv_box",boot,U-Boot: the bootloader most ARM boards and TV boxes use,,2026-11-19
+https://gitlab.postmarketos.org/postmarketOS/pmaports,pmaports,postmarketOS,"phone,tablet",other,Device packages that define postmarketOS port coverage,,2026-11-20
+https://libreboot.org,Libreboot,Libreboot,"phone,tablet,tv_box,sbc,devkit",boot,"Free/open boot firmware based on coreboot, with binary-blob removal on supported hardware",,2026-11-20
+https://librecellular.org,LibreCellular,LibreCellular,"phone,sbc",modem,Open-source 4G cellular networks using software-defined radio and validated open software,,2026-11-20
 https://librephone.fsf.org/hardware,LibrePhone hardware index,FSF,"phone,tablet",other,LibrePhone hardware compatibility index and project status,,2026-11-19
+https://opensourcefirmware.foundation/projects,OSFF projects list,Open Source Firmware Foundation,all,other,Non-profit foundation listing open-source firmware projects,,2026-11-20
+https://openwrt.org,OpenWrt project site,OpenWrt,"router,sbc,tv_box","wifi,other","Router and embedded-device Linux distribution; docs, package sources and device support lists",,2026-11-20
+https://redmine.replicant.us/projects/replicant/wiki/SourceCodeRepositories,Replicant source repositories,Replicant,"phone,tablet",other,Where the fully free Android distribution keeps its source repositories,,2026-11-20
 https://research.checkpoint.com/2021/looking-for-vulnerabilities-in-mediatek-audio-dsp,MediaTek audio DSP vulnerability research,Check Point Research,phone,adsp,Public vulnerability research on the MediaTek audio DSP firmware format,,2026-11-19
+https://srlabs.de/blog/hexagon-fuzz-full-system-emulated-fuzzing-of-qualcomm-basebands,SRLabs Hexagon fuzzing,SRLabs,phone,modem,Open-source toolchain for full-system emulated fuzzing of Hexagon firmware,,2026-11-20
+https://wiki.debian.org/Firmware/Open,Debian Open Firmware wiki,Debian,all,other,"Wiki list of open firmware projects, licences and status",,2026-11-20
 https://wireless.wiki.kernel.org/,Linux wireless wiki,Linux Foundation,"phone,tablet,tv_box,sbc,devkit",wifi,Linux wireless subsystem documentation and driver status,,2026-11-19
+https://www.coreboot.org,coreboot project,coreboot,"tv_box,sbc,devkit",boot,Open-source boot firmware replacing proprietary BIOS/UEFI on computers and embedded devices,,2026-11-20
+https://www.osmocom.org/projects,Osmocom projects,Osmocom,phone,"modem,other",Free/open-source GSM/3G core network and phone-side protocol implementations,,2026-11-20
