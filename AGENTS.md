@@ -52,6 +52,19 @@ No agent may work an issue claimed by another agent, on any provider or in any
 harness. A commit made without a winning claim is a protocol violation. The
 lead verifies by reading issue comments and may reassign violating commits.
 
+Claims have a race window, so work is also partitioned by label. An agent may
+only start issues whose `area:` label is assigned to its harness:
+
+| harness | owns `area:` labels |
+|---|---|
+| opencode key 1 (`100milionseek`) | `firmware`, `historic` |
+| opencode key 2 (`100milionseek-2`) | `soc`, `upstream` |
+| zcode | `docs`, `site`, `blobs`, `repo`, `tools` |
+
+The partition is the primary guard; the `CLAIM` comment is the secondary one.
+If a partition owner is idle, it may take from another partition only after
+claiming that issue and confirming no competing claim exists.
+
 ## Fleet rules
 
 - Two agents run concurrently (account cap = 2; a third launch is
