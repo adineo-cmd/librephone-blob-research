@@ -33,11 +33,11 @@ class DeviceTypesTest(unittest.TestCase):
             self.assertIn(r["type"], TYPES, r["model"])
             self.assertIn(r["build_variant"], VARIANTS, r["model"])
 
-    def test_atv_set_is_exactly_seven(self):
+    def test_atv_set_is_exactly_eight(self):
         atv = {r["model"] for r in self.rows() if r["build_variant"] == "atv"}
         self.assertEqual(atv, {
             "Shield_TV_2019", "M5_TV", "TX1_TV", "TX2_TV",
-            "Jetson_TV", "Zero_TV", "Zero_2_TV",
+            "Jetson_TV", "Zero_TV", "Zero_2_TV", "ADT_3",
         })
 
     def test_non_phone_types(self):
