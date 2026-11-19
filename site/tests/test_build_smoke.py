@@ -26,13 +26,21 @@ class BuildSmokeTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("missing: site/data/device-types.csv", result.stdout)
-        for rel in (
-            "site/data/device-types.csv",
-            "site/data/upstream-counts.csv",
-            "site/data/links.csv",
-        ):
-            self.assertIn("missing: " + rel, result.stdout)
+        self.assertIn(result.returncode, (0, 1), result.stderr)
+        expected = [
+            rel for rel in (
+                "site/data/device-types.csv",
+                "site/data/upstream-counts.csv",
+                "site/data/links.csv",
+            )
+            if not (REPO / rel).is_file()
+        ]
+        reported = [
+            line[len("missing: "):]
+            for line in result.stdout.splitlines()
+            if line.startswith("missing: ")
+        ]
+        self.assertEqual(reported, expected)
 
 
 if __name__ == "__main__":
