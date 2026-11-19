@@ -6,7 +6,7 @@ Generated deterministically from the committed CSVs and Markdown corpus.
 | area | issues |
 |---|---|
 | area:blobs | 4 |
-| area:docs | 120 |
+| area:docs | 122 |
 | area:firmware | 2328 |
 | area:historic | 61 |
 | area:repo | 2 |
@@ -21,9 +21,9 @@ Generated deterministically from the committed CSVs and Markdown corpus.
 | type:fix | 11 |
 | type:impl | 37 |
 | type:re | 184 |
-| type:verify | 1734 |
+| type:verify | 1736 |
 
-Total: 2834 atomic issues.
+Total: 2836 atomic issues.
 
 Each issue body carries the claim protocol from `docs/ISSUE-WORKFLOW.md`.
 Published to `adineo-cmd/librephone-blob-research` with label routing.
