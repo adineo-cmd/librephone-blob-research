@@ -1,0 +1,24 @@
+url,title,organisation,device_types,families,what_it_hosts,licence,verified_date
+https://codeberg.org/rsavoye/librephone,FSF LibrePhone repository,FSF,all,other,The FSF LibrePhone project's own repository: blob research notes and tooling,,2026-11-19
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git,linux-firmware,Linux Foundation,all,"wifi,bt,gpu,adsp,modem,tz",Upstream linux-firmware tree: the vendor blob payloads themselves,,2026-11-19
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/ath10k,ath10k board data in linux-firmware,Linux Foundation,"phone,tablet,sbc",wifi,ath10k board data and firmware blobs in linux-firmware,,2026-11-19
+https://git.kernel.org/pub/scm/linux/kernel/git/johannes/linux-wireless.git,linux-wireless integration tree,Linux Foundation,"phone,tablet,tv_box,sbc","wifi,bt","linux-wireless integration tree, where WiFi and BT driver changes land before mainline",GPL-2.0-only,2026-11-19
+https://github.com/LibreELEC/LibreELEC.tv,LibreELEC,LibreELEC,"tv_box,sbc,devkit",other,LibreELEC: minimal OS images for TV boxes and single-board computers,,2026-11-19
+https://github.com/ReFirmLabs/binwalk,binwalk,ReFirmLabs,all,other,binwalk: firmware image extraction and entropy analysis,MIT,2026-11-19
+https://github.com/coreboot/coreboot,coreboot,coreboot,"sbc,devkit,tv_box",boot,coreboot: open firmware for booting devices with blob-free or reduced-blob paths,GPL-2.0-only,2026-11-19
+https://github.com/cyrozap/mediatek-lte-baseband-re,MediaTek LTE baseband reverse engineering,cyrozap,phone,modem,MediaTek LTE baseband reverse-engineering notes and tools,GPL-3.0-only,2026-11-19
+https://github.com/nccgroup/ghidra-mtk-loader,Ghidra MediaTek firmware loader,NCC Group,phone,"adsp,modem",Ghidra loader for MediaTek firmware images,GPL-3.0-only,2026-11-19
+https://github.com/nccgroup/ghidra-nanomips,Ghidra NanoMIPS module,NCC Group,"phone,tablet,tv_box",other,Ghidra processor module for the MIPS NanoMIPS instruction set,GPL-3.0-only,2026-11-19
+https://github.com/openwrt/openwrt,OpenWrt,OpenWrt,"tv_box,sbc",wifi,OpenWrt: router and embedded Linux distribution with extensive WiFi support,,2026-11-19
+https://github.com/postmarketOS,postmarketOS,postmarketOS,"phone,tablet",other,postmarketOS: mainline-Linux mobile distributions and device ports,,2026-11-19
+https://github.com/qca/qca-swiss-army-knife,QCA Swiss Army Knife,Qualcomm,"phone,tablet,sbc",wifi,Qualcomm Atheros WiFi board-data and calibration tooling,,2026-11-19
+https://github.com/torvalds/linux/blob/master/drivers/bluetooth/btqca.c,btqca Bluetooth firmware loader,Linux Foundation,"phone,tablet,sbc",bt,"Qualcomm Bluetooth firmware loading and patch download, mainline",GPL-2.0-only,2026-11-19
+https://github.com/torvalds/linux/blob/master/drivers/bluetooth/hci_qca.c,hci_qca HCI transport driver,Linux Foundation,"phone,tablet,sbc",bt,"Qualcomm HCI transport driver, mainline",GPL-2.0-only,2026-11-19
+https://github.com/torvalds/linux/blob/master/drivers/net/wireless/ath/ath10k/,ath10k WiFi driver,Linux Foundation,"phone,tablet,sbc",wifi,"Qualcomm Atheros ath10k WiFi driver, mainline",GPL-2.0-only,2026-11-19
+https://github.com/torvalds/linux/blob/master/drivers/net/wireless/mediatek/mt76/,mt76 WiFi driver family,Linux Foundation,"phone,tablet,sbc",wifi,"MediaTek mt76 WiFi driver family, mainline",GPL-2.0-only,2026-11-19
+https://github.com/torvalds/linux/blob/master/drivers/net/wireless/realtek/rtw88/,rtw88 WiFi driver,Linux Foundation,"phone,tablet,sbc",wifi,"Realtek rtw88 WiFi driver, mainline",GPL-2.0-only,2026-11-19
+https://github.com/torvalds/linux/blob/master/drivers/remoteproc/qcom_q6v5_pas.c,qcom_q6v5_pas remoteproc loader,Linux Foundation,"phone,tablet","adsp,cdsp",Qualcomm remote processor loader for ADSP and CDSP,GPL-2.0-only,2026-11-19
+https://github.com/u-boot/u-boot,U-Boot,U-Boot project,"sbc,devkit,tv_box",boot,U-Boot: the bootloader most ARM boards and TV boxes use,,2026-11-19
+https://librephone.fsf.org/hardware,LibrePhone hardware index,FSF,"phone,tablet",other,LibrePhone hardware compatibility index and project status,,2026-11-19
+https://research.checkpoint.com/2021/looking-for-vulnerabilities-in-mediatek-audio-dsp,MediaTek audio DSP vulnerability research,Check Point Research,phone,adsp,Public vulnerability research on the MediaTek audio DSP firmware format,,2026-11-19
+https://wireless.wiki.kernel.org/,Linux wireless wiki,Linux Foundation,"phone,tablet,tv_box,sbc,devkit",wifi,Linux wireless subsystem documentation and driver status,,2026-11-19
