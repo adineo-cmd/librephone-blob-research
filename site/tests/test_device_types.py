@@ -45,13 +45,29 @@ class DeviceTypesTest(unittest.TestCase):
         for r in self.rows():
             by_type.setdefault(r["type"], set()).add(r["model"])
         self.assertEqual(by_type.get("tv_box"), {"Shield_TV_2019"})
-        self.assertEqual(by_type.get("sbc", set()), {"M5_TV", "Zero_TV", "Zero_2_TV"})
-        self.assertEqual(by_type.get("devkit", set()),
-                         {"TX1_TV", "TX2_TV", "Jetson_TV", "ADT_3"})
-        self.assertEqual(len(by_type.get("tablet", set())), 21)
-        self.assertEqual(len(by_type.get("phone", set())), 216)
-        total = sum(len(v) for v in by_type.values())
-        self.assertEqual(total, 245)
+        self.assertEqual(by_type.get("sbc", set()), {
+            "M5_TV", "Zero_TV", "Zero_2_TV",
+            "M5_Tablet", "Zero_Tablet", "Zero_2_Tablet",
+        })
+        self.assertEqual(by_type.get("devkit", set()), {
+            "TX1_TV", "TX2_TV", "Jetson_TV", "ADT_3",
+            "TX1_Tablet", "TX2_Tablet", "Jetson_Tablet",
+        })
+        self.assertEqual(by_type.get("tablet", set()), {
+            "Pixel_Tablet", "Galaxy_TabA_8.0",
+            "Galaxy_Tab_A7_LTE", "Galaxy_Tab_A7_Wifi",
+            "Galaxy_Tab_S5e_LTE", "Galaxy_Tab_S5e_Wifi",
+            "Galaxy_Tab_S6_LTE", "Galaxy_Tab_S6_Wifi",
+            "Galaxy_Tab_S7_LTE", "Galaxy_Tab_S7_Wifi",
+            "Pad_Pro", "Pad_2_Pro",
+        })
+        phones = by_type.get("phone", set())
+        self.assertEqual(len(phones), 219)
+        self.assertIn("Pixel_Fold", phones)
+        self.assertIn("Pixel_9_Pro_Fold", phones)
+        self.assertIn("Mi_Fold_2", phones)
+        self.assertNotIn("Pixel_Tablet", phones)
+        self.assertEqual(sum(len(v) for v in by_type.values()), 245)
 
 
 if __name__ == "__main__":
