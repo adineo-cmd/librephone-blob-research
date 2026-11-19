@@ -61,13 +61,35 @@ only start issues whose `area:` label is assigned to its harness:
 
 | harness | owns `area:` labels |
 |---|---|
-| opencode key 1 (`100milionseek`) | `firmware`, `historic` |
-| opencode key 2 (`100milionseek-2`) | `soc`, `upstream` |
+| opencode key 1 (`100milionseek`) | `firmware`, `historic`, `blobs` |
+| opencode key 2 (`100milionseek-2`) | `soc`, `upstream`, `cpu`, `gpu`, `drivers` |
 | zcode | `docs`, `site`, `blobs`, `repo`, `tools` |
 
 The partition is the primary guard; the `CLAIM` comment is the secondary one.
 If a partition owner is idle, it may take from another partition only after
 claiming that issue and confirming no competing claim exists.
+
+## Rule 2b — PRIOR-ART GATE BEFORE ANY WORK (owner directive, 2026-11-20)
+
+Immediately after claiming an issue, and before touching any repository file,
+the agent MUST search the whole internet for prior art and record the exact
+query strings and access date as a comment on the issue:
+
+1. GitHub code search, excluding `adineo-cmd/*`.
+2. Web search: XDA, LWN, HN, Reddit, arXiv/Scholar, project and vendor docs.
+3. Kernel source, linux-firmware, and the relevant upstream code trees.
+
+Then post exactly one of:
+
+- `PRIOR-ART <urls>` and **close the issue as a duplicate** if someone has
+  already done the work. Do not rebuild it. Record what the prior art covers.
+- `DELTA <one-line>` if only partial overlap exists — state the precise new
+  contribution before starting.
+- `NO-PRIOR-ART <queries + date>` if nothing was found, then proceed.
+
+No work or commit may begin before one of these three comments exists. An
+agent that finds existing prior art and keeps the issue open is in violation.
+This gate is the cheapest way to spend the free tokens on genuinely new work.
 
 ## Rule 3 — PUSH EVERYTHING WHEN DONE (owner directive, 2026-11-19)
 
