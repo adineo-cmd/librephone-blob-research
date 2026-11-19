@@ -65,6 +65,23 @@ The partition is the primary guard; the `CLAIM` comment is the secondary one.
 If a partition owner is idle, it may take from another partition only after
 claiming that issue and confirming no competing claim exists.
 
+## Rule 3 — PUSH EVERYTHING WHEN DONE (owner directive, 2026-11-19)
+
+Once an issue is verified and the `DONE` comment is posted, push the work.
+Do not leave completed work sitting only in a local commit.
+
+- Fetch and rebase onto the current remote tip before pushing. Never force-push.
+- Push every local commit that belongs to the claimed issue. Do not push commits
+  claimed by another agent or work from an unclaimed issue.
+- The `feat/open-device-site` branch is the integration branch. Push there;
+  never push directly to `main`.
+- If a push is rejected, fetch, rebase, re-run the verification commands, and
+  push again. Report the final remote SHA in the `DONE` comment.
+- A completed issue with no corresponding remote commit is not done.
+
+This supersedes the earlier "commit locally, the lead pushes" rule. That rule is
+retained only for the merge tracked by issue #143, which the owner paused.
+
 ## Fleet rules
 
 - Two agents run concurrently (account cap = 2; a third launch is

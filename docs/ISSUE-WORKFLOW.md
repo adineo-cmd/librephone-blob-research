@@ -43,16 +43,23 @@ Then pick another issue. One agent holds one issue at a time in this repo.
 - Python is standard library only, run with `python3 -I`, no comments in code.
 - Every number is verified by command output before it is written.
 - Honest negatives are deliverables. Report them, do not omit them.
-- Do not push. Commit locally; the lead pushes after review.
+- Push everything when done (Rule 3). Fetch and rebase first, never force-push,
+  push the `feat/open-device-site` branch rather than `main`, and report the
+  final remote SHA in the `DONE` comment. A finished issue with no remote commit
+  is not done. Exception: issue #143 (the owner-paused merge) stays local.
 
-## 4. Finish
+## 4. Finish and push
+
+Verify, commit, fetch, rebase, push every commit that belongs to this issue to
+`feat/open-device-site`, then post:
 
 ```
-DONE <commit-sha> <one-line result>
+DONE <remote-sha> <one-line result>
 ```
 
-Reference the issue number in the commit message. A claim older than 24 hours
-with no `DONE` comment is stale; the first `STALE` comment releases it.
+Reference the issue number in the commit message. A completed issue with no
+matching remote commit is not done. A claim older than 24 hours with no `DONE`
+comment is stale; the first `STALE` comment releases it.
 
 ## 5. Lead verification
 
