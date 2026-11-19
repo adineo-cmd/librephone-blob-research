@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>adreno650 — the Adreno 650 GMU/SQE GPU firmware, parsed — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>adreno650 — the Adreno 650 GMU/SQE GPU firmware, parsed</h1><p>`a650_gmu.bin` + `a650_sqe.fw` (8 laptop-half devices, one md5 each),</p><p>Evidence: none</p>
+<h1>adreno650 — the Adreno 650 GMU/SQE GPU firmware, parsed</h1>
+<p><code>a650_gmu.bin</code> + <code>a650_sqe.fw</code> (8 laptop-half devices, one md5 each),</p>
+<p>parsed per the mainline-documented structures only</p>
+<p>(<code>drivers/gpu/drm/msm/adreno/a6xx_gmu.c</code> block_header chain,</p>
+<p><code>adreno_gpu.c</code> 4-byte SQE strip, <code>a6xx_gpu.c</code> version check), md5-verified</p>
+<p>against the upstream database, with the a619 one-generation-back delta.</p>
+<h2>Contents</h2>
+<ul>
+<li><code>a650-gmu-analysis.md</code> — the analysis: block table (9 manifest + 7</li>
+</ul>
+<p>  DEADBEEF-tagged payload blocks), region map vs the kernel's BO bases,</p>
+<p>  SQE version-dword findings (device fleet build v0.93 FAILS mainline's</p>
+<p>  ≥0.95 floor; linux-firmware v1.12 passes), a619 raw-0x8000-format delta,</p>
+<p>  md5 table, route log.</p>
+<ul>
+<li><code>a650_fw.py</code> — clean-room structural parser (GMU block chain incl.</li>
+</ul>
+<p>  manifest/payload classes + region classification; SQE version</p>
+<p>  semantics). Inspector only — no disassembly.</p>
+<ul>
+<li><code>make_fixture.py</code> + <code>test_a650_fw.py</code> — synthetic fixtures from the</li>
+</ul>
+<p>  documented structures; run <code>python3 -I test_a650_fw.py</code>.</p>
+<h2>md5 status (2026-11-18)</h2>
+<p>a650_gmu.bin (<code>a2b9504e…</code>) <strong>MATCH from two independent sources</strong></p>
+<p>(linux-firmware <code>qcom/</code> AND the Sony sm8250-common device tree — the</p>
+<p>device copy and the linux-firmware copy are byte-identical).</p>
+<p>a650_sqe.fw device build (<code>353e247b…</code>) <strong>MATCH</strong> (Sony tree); the</p>
+<p>linux-firmware copy is a different build (<code>dc02e77a…</code>, v1.12) — labeled</p>
+<p>NOT-database-identical in the analysis. a619_gmu.bin (<code>9e23c520…</code>, FP4</p>
+<p>copy) <strong>MATCH</strong> for the 7-device a619 laptop-half fleet.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

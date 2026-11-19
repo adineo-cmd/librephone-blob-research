@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AGENTS.md — standing rules for every agent working in this repo — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>AGENTS.md — standing rules for every agent working in this repo</h1><p>## ⚠️ RULE 0 — PARAMOUNT: ABSOLUTE UNIQUENESS (owner directive, never override)</p><p>Evidence: none</p>
+<h1>AGENTS.md — standing rules for every agent working in this repo</h1>
+<h2>⚠️ RULE 0 — PARAMOUNT: ABSOLUTE UNIQUENESS (owner directive, never override)</h2>
+<p>**Everything produced here must be unique — no one may have done it before.</p>
+<p>Never build anything that has already been built. Research it beforehand:</p>
+<p>search the whole internet FIRST.**</p>
+<p>Mandatory sequence for every task and finding:</p>
+<ol>
+<li><strong>Search before building</strong> — GitHub code search (excluding</li>
+</ol>
+<p>   adineo-cmd/*), the wider web (XDA, Reddit, LWN, HN), arXiv/Scholar,</p>
+<p>   linux-firmware/kernel trees (firmware coverage). Record exact query</p>
+<p>   strings and dates in the deliverable.</p>
+<ol>
+<li><strong>Prior art found → do not rebuild.</strong> Find the genuinely new delta or</li>
+</ol>
+<p>   pick a different target. Partial overlap is still overlap.</p>
+<ol>
+<li><strong>Adversarial audit after</strong> — a dedicated prior-art audit agent</li>
+</ol>
+<p>   re-attacks every claim (run every ~10 findings or per session). A</p>
+<p>   finding survives only if the auditor genuinely tried to break it.</p>
+<ol>
+<li><strong>Corrections in place</strong> — any finding that fails the audit is</li>
+</ol>
+<p>   corrected where the original claim lives.</p>
+<h2>Rule 1 — IMPROVE PREVIOUS WORK WHEN YOU FIND THE OPPORTUNITY (owner directive)</h2>
+<p>If during any task you notice something in the lab's prior work that can be</p>
+<p>improved — a dangling reference, a stale number, a missing citation, an</p>
+<p>uncorrected claim, a missing artifact, a broken link — **fix it in the same</p>
+<p>session** (respecting file-walls: only files no other running agent owns).</p>
+<p>Improvements are first-class deliverables: list them in your report with</p>
+<p>before/after. The lab compounds: every session must leave the repos better</p>
+<p>than it found them.</p>
+<h2>Rule 2 — ISSUE CLAIMS ARE EXCLUSIVE (owner directive, 2026-11-19)</h2>
+<p>The repo's work is decomposed into atomic GitHub issues in</p>
+<p><code>adineo-cmd/librephone-blob-research</code>. Every agent — opencode on key 1 or key 2,</p>
+<p>or zcode on any model — MUST claim an issue before touching files for it.</p>
+<p>Before any file work, post the first comment on the issue:</p>
+<pre><code>
+CLAIM &lt;agent-id&gt; &lt;provider&gt; &lt;UTC ISO-8601 timestamp&gt;
+</code></pre>
+<p>Then re-read the comments. The FIRST valid claim wins. If yours is not first,</p>
+<p>comment <code>RELEASE &lt;agent-id&gt; conflict</code> and pick another issue. One agent holds</p>
+<p>one issue at a time in this repository. A claim older than 24 h with no <code>DONE</code></p>
+<p>comment is stale; the first <code>STALE</code> comment releases it. Finish with</p>
+<p><code>DONE &lt;commit-sha&gt; &lt;one-line result&gt;</code>.</p>
+<p>No agent may work an issue claimed by another agent, on any provider or in any</p>
+<p>harness. A commit made without a winning claim is a protocol violation. The</p>
+<p>lead verifies by reading issue comments and may reassign violating commits.</p>
+<p>Claims have a race window, so work is also partitioned by label. An agent may</p>
+<p>only start issues whose <code>area:</code> label is assigned to its harness:</p>
+<table>
+<tr>
+<th>harness</th>
+<th>owns <code>area:</code> labels</th>
+</tr>
+<tr>
+<td>opencode key 1 (<code>100milionseek</code>)</td>
+<td><code>firmware</code>, <code>historic</code></td>
+</tr>
+<tr>
+<td>opencode key 2 (<code>100milionseek-2</code>)</td>
+<td><code>soc</code>, <code>upstream</code></td>
+</tr>
+<tr>
+<td>zcode</td>
+<td><code>docs</code>, <code>site</code>, <code>blobs</code>, <code>repo</code>, <code>tools</code></td>
+</tr>
+</table>
+<p>The partition is the primary guard; the <code>CLAIM</code> comment is the secondary one.</p>
+<p>If a partition owner is idle, it may take from another partition only after</p>
+<p>claiming that issue and confirming no competing claim exists.</p>
+<h2>Rule 3 — PUSH EVERYTHING WHEN DONE (owner directive, 2026-11-19)</h2>
+<p>Once an issue is verified and the <code>DONE</code> comment is posted, push the work.</p>
+<p>Do not leave completed work sitting only in a local commit.</p>
+<ul>
+<li>Fetch and rebase onto the current remote tip before pushing. Never force-push.</li>
+<li>Push every local commit that belongs to the claimed issue. Do not push commits</li>
+</ul>
+<p>  claimed by another agent or work from an unclaimed issue.</p>
+<ul>
+<li>The <code>feat/open-device-site</code> branch is the integration branch. Push there;</li>
+</ul>
+<p>  never push directly to <code>main</code>.</p>
+<ul>
+<li>If a push is rejected, fetch, rebase, re-run the verification commands, and</li>
+</ul>
+<p>  push again. Report the final remote SHA in the <code>DONE</code> comment.</p>
+<ul>
+<li>A completed issue with no corresponding remote commit is not done.</li>
+</ul>
+<p>This supersedes the earlier "commit locally, the lead pushes" rule. That rule is</p>
+<p>retained only for the merge tracked by issue #143, which the owner paused.</p>
+<h2>Fleet rules</h2>
+<ul>
+<li>Two agents run concurrently (account cap = 2; a third launch is</li>
+</ul>
+<p>  rejected — queue and resume via SendMessage when a slot frees).</p>
+<ul>
+<li>File-wall isolation: agents push ONLY their own directories; shared</li>
+</ul>
+<p>  files are edited by the lead when merging agent reports.</p>
+<ul>
+<li>Pushes go through the GitHub MCP (push_files); verify large files</li>
+</ul>
+<p>  byte-for-byte after push.</p>
+<ul>
+<li>The account cap is per harness. The issue-claim rule (Rule 2) is what</li>
+</ul>
+<p>  prevents two harnesses from colliding; file walls alone do not.</p>
+<h2>Repo principles (unchanged — see README.md)</h2>
+<p>Facts, not blobs · clean-room discipline · negative results are results ·</p>
+<p>everything reproducible · contribute upstream · MediaTek + Qualcomm fronts.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

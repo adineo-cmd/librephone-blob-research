@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boot-chain firmware census — Fairphone FP6 (QCM6490 &quot;Lanai&quot;/&quot;Milos&quot;) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Boot-chain firmware census — Fairphone FP6 (QCM6490 &quot;Lanai&quot;/&quot;Milos&quot;)</h1><p>**Claim:** First public structural census (versions, ELF/container layout, ISA</p><p>Evidence: none</p>
+<h1>Boot-chain firmware census — Fairphone FP6 (QCM6490 "Lanai"/"Milos")</h1>
+<p><strong>Claim:</strong> First public structural census (versions, ELF/container layout, ISA</p>
+<p>identification, hashes, string inventory) of the FP6's boot-chain partitions:</p>
+<p><code>xbl</code>, <code>xbl_config</code>, <code>xbl_ramdump</code>, <code>uefi</code>, <code>abl</code>, <code>imagefv</code>, <code>shrm</code>, <code>aop</code>,</p>
+<p><code>aop_config</code>, <code>cpucp</code>, <code>cpucp_dtb</code>, <code>qupfw</code>, plus the Android boot images</p>
+<p><code>boot</code>, <code>vendor_boot</code>, <code>dtbo</code>, <code>pvmfw</code> and the AVB metadata <code>vbmeta</code>,</p>
+<p><code>vbmeta_system</code> from a public LineageOS OTA. Headline results: **the</p>
+<p>housekeeping firmware on this SoC is 32-bit RISC-V** — <code>shrm</code> (Shared Resource</p>
+<p>Manager), <code>aop</code> (Always On Processor), <code>cpucp</code> (CPUSS Control Processor) and</p>
+<p><code>aop_config</code> all carry <code>e_machine = 243 (EM_RISCV)</code> with the RVC ABI flag, and</p>
+<p><code>shrm</code>'s entry decodes as a textbook RV32 machine-mode startup (<code>auipc</code>/<code>addi</code></p>
+<p>gp-setup + <code>csrw mtvec</code>) — while <code>qupfw</code> alone claims <code>EM_QDSP6</code> (164,</p>
+<p>Hexagon). <strong><code>xbl.img</code> is a multi-ELF container</strong> (3 concatenated ELFs: outer</p>
+<p>junk-header wrapper + an ELF32 RISC-V image + an ELF64 AArch64 image), matching</p>
+<p>its stock name <code>xbl_s.melf</code> ("melf" = multi-ELF). The GKI <code>boot</code> kernel is a</p>
+<p><strong>PE32+ EFI-stub AArch64 image</strong>, and the whole family is one signed build</p>
+<p>generation: <code>BOOT.MXF.2.1-02027-LANAI-1</code> (xbl/uefi/xbl_ramdump), signed with a</p>
+<p>Qualcomm SRoT MBNv7 chain down to <strong>Fairphone BV's own OEM attestation key</strong></p>
+<p>("T2MO OEM Key", Amsterdam).</p>
+<p><strong>Prior art checked (2026-11-10):</strong> GitHub code search `BOOT.MXF.2.1-02027 OR</p>
+<p>AOP.HO.5.0-00813 OR xbl_s.melf` — exactly <strong>1 hit</strong>, the</p>
+<p><a href="https://github.com/DiamaneOS/diamaneos-tools">DiamaneOS/diamaneos-tools</a></p>
+<p>FP6 firmware inventory JSON (sizes/hashes/flash-order for delivery — no</p>
+<p>structural analysis); its <a href="https://github.com/DiamaneOS/diamaneos-tools/blob/main/docs/FIRMWARE.md">FIRMWARE.md</a></p>
+<p>documents partition <em>logistics</em> (flash order, A/B, rollback rules) but zero</p>
+<p>image structure. <code>BOOT.MXF</code> (303 hits) = Project Mu UEFI platform ports</p>
+<p>(WOA-Project/mu_andromeda_platforms SM8350, Project-Aloha Kodiak) —</p>
+<p>reimplementation targets, not image analysis. <code>AOP.HO.</code> (167 hits) = firmware</p>
+<p>dumps; one is a <strong>source-tree dump</strong> of the SDM710-era AOP</p>
+<p>(<a href="https://github.com/Rivko/android-firmware-qti-sdm670">Rivko/android-firmware-qti-sdm670</a>,</p>
+<p><code>AOP.HO.1.1.C1-00025</code>, 2020) whose build tree proves the AOP product line was</p>
+<p>built with the <strong>Hexagon/QDSP6 toolchain then</strong> (scons <code>hexagon.py</code>,</p>
+<p><code>QDSP6BIN</code>, <code>HEXAGON_IMAGE_ENTRY</code>) — no public source states the ISA of the</p>
+<p>QCM6490 generation. Kernel-side: mainline</p>
+<p><code>drivers/mailbox/qcom-cpucp-mbox.c</code> documents the AP↔CPUCP mailbox ("CPUSS</p>
+<p>Control Processor") for sc7280/sm8450; <code>shrm</code> appears in vendor dtsi trees only</p>
+<p>as a coresight trace probe (<code>tpdm_shrm</code>) — no firmware structure anywhere;</p>
+<p>Qualcomm's own Linux boot docs list SHRM/AOP only as XBL log lines ("Image</p>
+<p>Load, Start … Segments"). No public segment table, entry point, ISA statement,</p>
+<p>or AVB descriptor inventory of any FP6/Lanai boot-chain image exists.</p>
+<h2>Policy boundary (hard rule for this doc)</h2>
+<p>Census-only: file identity, versions, container/ELF/segment tables, ISA</p>
+<p>identification at the entry-point level, hashes, and AVB <strong>metadata facts</strong></p>
+<p>(algorithm IDs, flags, rollback indices, descriptor partition names, key</p>
+<p>presence + hash — <strong>no key material is extracted or committed</strong>). No</p>
+<p>disassembly beyond entry sanity, no bypass content, no signature/ROM</p>
+<p>vulnerability discussion.</p>
+<h2>Method</h2>
+<ol>
+<li><code>tools/payload_manifest.py</code> lists 37 OTA partitions (same tooling as</li>
+</ol>
+<p>   [[bt-firmware-census]] / [[trustzone-census]]); <code>tools/payload_dump.py</code></p>
+<p>   dumped 18 partitions (15 firmware/AVB + <code>boot</code>/<code>vendor_boot</code>/<code>dtbo</code>)</p>
+<p>   into <code>downloads/lineage-fp6/extracted/partitions-bootchain/</code> — beyond the</p>
+<p>   task list, the manifest revealed <code>abl</code>, <code>xbl_ramdump</code>, <code>aop_config</code>,</p>
+<p>   <code>cpucp_dtb</code>, <code>vbmeta_system</code>, all small and all included.</p>
+<ol>
+<li>Header/container census + strings via a session parser (ELF32/64 headers +</li>
+</ol>
+<p>   program headers; Android boot-image v3/v4; vendor-boot v4; dt-table;</p>
+<p>   AVB0 headers/footers/descriptors). Full derived data in</p>
+<p>   <code>results/bootchain-census.json</code>.</p>
+<ol>
+<li>ISA sanity per the F-7 junk-header rule: <code>e_machine</code> claims cross-checked</li>
+</ol>
+<p>   against entry-in-LOAD, <code>e_flags</code>, and RV32 opcode enrichment (fraction of</p>
+<p>   words with valid RV32 opcodes vs the ~12.5 % random baseline), using the</p>
+<p>   lab's two validated references: <code>wpss.b07</code> (RV32+C, F-5) and <code>modem.bXX</code></p>
+<p>   (Hexagon). No Hexagon/RISC-V disassembler is installed on the lab box</p>
+<p>   (checked <code>objdump --info</code>, r2 — negative), so Hexagon-side identification</p>
+<p>   rests on the registered <code>EM_QDSP6</code> value plus below-baseline RV32 density.</p>
+<h2>Results</h2>
+<h3>Inventory</h3>
+<table>
+<tr>
+<th>partition</th>
+<th>bytes</th>
+<th>container</th>
+<th>ISA claim (e_machine)</th>
+<th>entry</th>
+<th>QC version</th>
+</tr>
+<tr>
+<td>xbl</td>
+<td>1,196,032</td>
+<td><strong>3 concatenated ELFs</strong></td>
+<td>outer ELF32 mach=1 (junk, F-7); inner ELF32 <strong>RISCV 243</strong>; inner ELF64 <strong>AArch64 183</strong></td>
+<td>0x22126000 / 0x20412d00 / 0x14825fa8</td>
+<td>BOOT.MXF.2.1-02027-LANAI-1</td>
+</tr>
+<tr>
+<td>xbl_config</td>
+<td>311,296</td>
+<td>ELF64, mach=1 (junk)</td>
+<td>— (10 phdrs, 4×51,204-B LOADs)</td>
+<td>0x1494e000</td>
+<td>(none; name strings <code>pre/post-ddr-milos-1.0.dtb</code>)</td>
+</tr>
+<tr>
+<td>xbl_ramdump</td>
+<td>860,160</td>
+<td>ELF64 AArch64 (sane)</td>
+<td><strong>AArch64 183</strong></td>
+<td>0x81a40000 (= LOAD)</td>
+<td>BOOT.MXF.2.1-02027-LANAI-1</td>
+</tr>
+<tr>
+<td>uefi</td>
+<td>2,904,064</td>
+<td>ELF64 mach=40 (junk: ELF64+ARM is an invalid combo)</td>
+<td>AArch64 (EFI FV inside: <code>_FVH</code>, <code>DxeCore</code>)</td>
+<td>0xa7000000 (= LOAD)</td>
+<td>BOOT.MXF.2.1-02027-LANAI-1</td>
+</tr>
+<tr>
+<td>abl</td>
+<td>245,760</td>
+<td>ELF32 mach=40 (EM_ARM)</td>
+<td>ARM32 (self-consistent: entry = LOAD vaddr; instr-level unverified)</td>
+<td>0x9fa00000</td>
+<td>(payload opaque)</td>
+</tr>
+<tr>
+<td>imagefv</td>
+<td>53,248</td>
+<td>ELF32 mach=40, entry 0</td>
+<td>payload wrapper (LOAD@0, 45,056 B, <code>_FVH</code> inside)</td>
+<td>0x0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>shrm</td>
+<td>53,248</td>
+<td>ELF32 <strong>RISCV 243</strong>, RVC flag</td>
+<td><strong>RV32</strong> (entry decodes: auipc/addi gp setup + <code>csrw mtvec</code> = csr 0x305)</td>
+<td>0x200000 (= LOAD)</td>
+<td>contains "DDR_FW version : 19.12.0"</td>
+</tr>
+<tr>
+<td>aop</td>
+<td>319,488</td>
+<td>ELF32 <strong>RISCV 243</strong>, RVC flag</td>
+<td><strong>RV32</strong> (AUIPC/ADDI pattern; opcode enrichment 26 %)</td>
+<td>0x13200000 (<strong>outside all LOADs — flagged</strong>)</td>
+<td>AOP.HO.5.0-00813-LANAI_E-1</td>
+</tr>
+<tr>
+<td>aop_config</td>
+<td>20,480</td>
+<td>ELF32 <strong>RISCV 243</strong>, RVC flag</td>
+<td>RV32 (entry in LOAD)</td>
+<td>0x81c82014</td>
+<td>—</td>
+</tr>
+<tr>
+<td>cpucp</td>
+<td>204,800</td>
+<td>ELF32 <strong>RISCV 243</strong>, RVC flag</td>
+<td><strong>RV32</strong> (SYSTEM/JALR/AUIPC at entry; enrichment 38 %)</td>
+<td>0x17d0036c (in LOAD)</td>
+<td>— (role strings: SCMI/RPMH/CPRh/Memlat/DTB parsing)</td>
+</tr>
+<tr>
+<td>cpucp_dtb</td>
+<td>12,288</td>
+<td>ELF64 mach=1 (junk)</td>
+<td>— (contains an embedded FDT: "cpucp_cfg.dtb")</td>
+<td>0x819f0000 (= LOAD)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>qupfw</td>
+<td>61,440</td>
+<td>ELF32 <strong>EM_QDSP6 164</strong></td>
+<td>Hexagon per registered e_machine; RV32 density 5 % (below chance); instr-level unverified</td>
+<td>0x0 (junk or real)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>boot</td>
+<td>100,663,296</td>
+<td>Android boot image <strong>v4</strong></td>
+<td>kernel = <strong>PE32+ (0x20b), machine 0xAA64</strong> EFI-stub, 35,711,488 B</td>
+<td>—</td>
+<td>os_version raw 0x200001aa; cmdline empty</td>
+</tr>
+<tr>
+<td>vendor_boot</td>
+<td>100,663,296</td>
+<td>vendor boot <strong>v4</strong></td>
+<td>vendor_ramdisk 10,091,577 B; DTB region 3,641,222 B (8 FDTs found), dtb_addr 0x08500000</td>
+<td>—</td>
+<td>cmdline <code>nosoftlockup sysctl.kernel.firmware_config.force_sysfs_fallback=1 bootconfig</code></td>
+</tr>
+<tr>
+<td>dtbo</td>
+<td>31,457,280</td>
+<td>dt_table (mkdtimg, <strong>big-endian</strong>)</td>
+<td>14 device-tree entries</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>pvmfw</td>
+<td>1,048,576</td>
+<td>Android boot image <strong>v3</strong></td>
+<td>payload = <strong>raw AArch64 machine code</strong> (ADR/MOVZ/SYSTEM encodings), no ELF wrapper, 768,576 B</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>vbmeta</td>
+<td>12,288</td>
+<td>AVB0 v1.0</td>
+<td>SHA256_RSA4096; <strong>flags=3</strong> (hashtree + verification disabled); one chain descriptor → <code>boot</code></td>
+<td>—</td>
+<td>avbtool 1.3.0</td>
+</tr>
+<tr>
+<td>vbmeta_system</td>
+<td>4,096</td>
+<td>AVB0 v1.0</td>
+<td>SHA256_RSA4096; rollback_index = 1,788,566,400 = <strong>Unix epoch of 2026-09-05</strong>; descriptors for pvmfw/product/system/system_ext</td>
+<td>—</td>
+<td>avbtool 1.3.0</td>
+</tr>
+</table>
+<p>Full hashes, program-header tables, descriptor contents and signing metadata in</p>
+<p><code>results/bootchain-census.json</code>.</p>
+<h3>Build identity</h3>
+<ul>
+<li><strong>One XBL build ships xbl + uefi + xbl_ramdump</strong>:</li>
+</ul>
+<p>  <code>QC_IMAGE_VERSION_STRING=BOOT.MXF.2.1-02027-LANAI-1</code> in all three; OEM build</p>
+<p>  hosts leak (<code>ip-10-195-202-206</code>, <code>T2M-NB-BY151</code>); `IMAGE_VARIANT_STRING=</p>
+<p>  SocMilosLAA` — the SoC family name <strong>"Milos"</strong> is confirmed by xbl_config's</p>
+<p>  own DTBs (<code>pre-ddr-milos-1.0.dtb</code>, <code>post-ddr-milos-1.0.dtb</code>) while build IDs</p>
+<p>  use the target name <strong>LANAI</strong>.</p>
+<ul>
+<li><strong>AOP</strong>: <code>AOP.HO.5.0-00813-LANAI_E-1</code> + `OEM_IMAGE_UUID_STRING=</li>
+</ul>
+<p>  Q_SENTINEL_{...}_20250430_1132<code>. The </code>AOP.HO` product line existed in the</p>
+<p>  Hexagon era (SDM710, 2020, <code>AOP.HO.1.1.C1-00025</code>) — the QCM6490 generation</p>
+<p>  carries the same prefix but ships RISC-V-marked ELFs (see below).</p>
+<ul>
+<li><strong>Signing</strong>: every image carries MBNv7 signature blocks with visible cert</li>
+</ul>
+<p>  subjects — Qualcomm <code>SRoT MBNv7 Image Signing Root CA 6 (SubCA 10)</code>,</p>
+<p>  <code>CASS - SBL40v0</code>, then an OEM chain: <code>Generated OEM Root CA</code> /</p>
+<p>  <code>Generated OEM Attestation CA</code> → **<code>Fairphone BV</code>, <code>T2MO OEM Key</code>,</p>
+<p>  Amsterdam** (validity 2025-03-05 → 2045-02-28). Per-image cert <code>notBefore</code></p>
+<p>  values range 2024-03-14 (qupfw) to 2026-08-31 (uefi/xbl_config/xbl_ramdump/</p>
+<p>  imagefv/aop_config/cpucp_dtb) — the boot chain was refreshed in slices.</p>
+<h3>The housekeeping cores are RISC-V (evidence quality per image)</h3>
+<p><code>shrm</code>, <code>aop</code>, <code>aop_config</code>, <code>cpucp</code> all: ELF32, <code>e_machine = 243 (EM_RISCV)</code>,</p>
+<p><code>e_flags = 0x1</code> (RVC ABI flag), and RV32-opcode-enriched code. Strongest:</p>
+<p><strong>shrm</strong> — entry <code>0x200000</code> equals its RX LOAD and decodes as</p>
+<p><code>auipc gp …; addi gp; auipc …; addi …; csrw mtvec (csr 0x305)</code> — the same</p>
+<p>machine-mode startup pattern F-5 validated on wpss. <strong>cpucp</strong> entry decodes</p>
+<p>SYSTEM/JALR/AUIPC ops. <strong>aop</strong> shows the <code>auipc+addi</code> gp pattern in its code</p>
+<p>LOAD but its <code>e_entry</code> (0x13200000) lies <strong>outside all program headers</strong> — the</p>
+<p>header-level claim is strong, the entry field itself is not sane (flagged).</p>
+<p>This is the <strong>first public ISA identification</strong> for any of these images on</p>
+<p>this SoC; nothing public states what physical core runs them (the vendor docs</p>
+<p>name SHRM/AOP only as boot-log lines; the kernel tree knows only the cpucp</p>
+<p>mailbox and a tpdm_shrm trace probe). Contrast with F-5/F-6: wpss, camera ICP</p>
+<p>and VPU on the same chip are also RISC-V — on QCM6490 the entire non-ARM</p>
+<p>"small core" fleet we have now identified (wpss, aop, shrm, cpucp,</p>
+<p>aop_config, xbl-embedded ELF) is RV32, and the only Hexagon claim left is</p>
+<p>qupfw. The modem (Hexagon) and the BT rampatches (ARM32 Thumb) complete the</p>
+<p>ISA map.</p>
+<ul>
+<li><strong>xbl's inner ELF32</strong> (offset 0x1300 in the container): machine 243, entry</li>
+</ul>
+<p>  0x20412d00 inside its own LOAD, LOAD start decodes <code>auipc/addi/auipc/jalr</code></p>
+<p>  — a RISC-V component embedded inside XBL itself. The inner ELF64</p>
+<p>  (offset 0x2ef70, AArch64, 9 phdrs, RX LOAD 0xa3000 bytes at 0x14825000,</p>
+<p>  entry in LOAD) is the classic XBL core. The outer wrapper (machine=1,</p>
+<p>  2 phdrs covering only 4,748 B of a 1.2 MB file) is the F-7 junk-header</p>
+<p>  pattern applied to a whole outer ELF.</p>
+<ul>
+<li><strong>qupfw</strong>: <code>e_machine = 164</code> is the registered <code>EM_QDSP6</code> value (not a</li>
+</ul>
+<p>  plausible filler like the 0/1/3 junk seen in F-7), its RV32 density is</p>
+<p>  below the random baseline, and 11 RWX LOADs sit at low addresses</p>
+<p>  (0x1000–0xb288) — consistent with a Hexagon serial-engine firmware, stated</p>
+<p>  as "per header" because no Hexagon tooling is installed to verify</p>
+<p>  instruction-level (tooling negative).</p>
+<h3>AVB metadata (facts only)</h3>
+<ul>
+<li><code>vbmeta.img</code>: AVB0 v1.0, SHA256_RSA4096, <code>flags = 3</code> — both</li>
+</ul>
+<p>  <code>AVB_VBMETA_IMAGE_FLAGS_HASHTREE_DISABLED</code> (1) and</p>
+<p>  <code>AVB_VBMETA_IMAGE_FLAGS_VERIFICATION_DISABLED</code> (2) — the unlocked/userdebug</p>
+<p>  LineageOS configuration; rollback_index = 0. Public key present, 1,032 B</p>
+<p>  (RSA4096), sha256-16 <code>7728e30f50bfa5ce</code>. One chain descriptor (avb 3.4)</p>
+<p>  naming <code>boot</code>.</p>
+<ul>
+<li><code>vbmeta_system.img</code>: SHA256_RSA4096, same key hash, rollback_index =</li>
+</ul>
+<p>  <strong>1,788,566,400 = Unix epoch seconds of 2026-09-05 00:00 UTC</strong> — matching</p>
+<p>  boot's <code>com.android.build.boot.security_patch = 2026-09-05</code> property, i.e.</p>
+<p>  the rollback index is the boot/GKI security-patch date as a timestamp</p>
+<p>  (independently confirmed by DiamaneOS's FIRMWARE.md: "the security patch</p>
+<p>  date as Unix time"). Carries hash/hashtree descriptors for **pvmfw, product,</p>
+<p>  system, system_ext** and property descriptors:</p>
+<p>  <code>com.android.build.{product,system,system_ext}.os_version = 16</code>,</p>
+<p>  <code>.security_patch = 2026-10-01</code>, and</p>
+<p>  `com.android.build.{system,product,system_ext,pvmfw}.fingerprint =</p>
+<p>  Fairphone/lineage_FP6/FP6:16/BP4A.251205.006/43b742158d:userdebug/release-keys`.</p>
+<ul>
+<li><code>boot.img</code>/<code>vendor_boot.img</code> carry AVB footers (<code>AVBf</code> v1.0) with embedded</li>
+</ul>
+<p>  vbmeta: boot's (2,432 B at 35,717,120) is SHA256_RSA4096-signed with hash</p>
+<p>  descriptor for <code>boot</code> (35,711,488) + properties (os_version 16, fingerprint,</p>
+<p>  security_patch 2026-09-05); vendor_boot's (640 B at 0xd1c000) stores</p>
+<p>  <code>algorithm = 0 (NONE)</code> with a hashtree descriptor for <code>vendor_boot</code></p>
+<p>  (13,746,176) — recorded as stored, interpretation out of scope.</p>
+<ul>
+<li>pvmfw is AVB-verified (descriptor in vbmeta_system) but **built from</li>
+</ul>
+<p>  source** by LineageOS (also stated by DiamaneOS), so the stock↔OS AVB</p>
+<p>  boundary is: firmware = Qualcomm/Fairphone signatures; OS partitions =</p>
+<p>  LineageOS AVB with verification disabled at the top level.</p>
+<h3>Kernel/OS-side cross-reference</h3>
+<ul>
+<li>Mainline <code>drivers/mailbox/qcom-cpucp-mbox.c</code> ("CPUSS Control Processor</li>
+</ul>
+<p>  (CPUCP) mailbox", sc7280/sm8450) is the AP side of cpucp's SCMI/RPMH</p>
+<p>  surface — the role strings we found in cpucp (<code>SCMI init Done</code>,</p>
+<p>  <code>RPMH driver init Done</code>, <code>CPRh init</code>, <code>Memlat init</code>, <code>DTB parsing Done</code>,</p>
+<p>  <code>Boot Core-1 Done</code>) match the driver's purpose (cpufreq/cpuidle channel).</p>
+<ul>
+<li><code>shrm</code> in vendor dtsi trees = <code>tpdm_shrm</code> coresight probe only; Qualcomm's</li>
+</ul>
+<p>  boot docs mention SHRM image load/start lines. Its actual role here is</p>
+<p>  evidenced in-image: <strong><code>DDR_FW version : 19.12.0</code></strong> — SHRM carries the DDR</p>
+<p>  initialization firmware, and xbl_config carries the DDR training DTBs/DCBs</p>
+<p>  — consistent with Qualcomm's docs statement that XBL performs DDR init.</p>
+<ul>
+<li>No upstream code parses any of these images' container formats; the</li>
+</ul>
+<p>  <code>.melf</code> multi-ELF container and the monolithic-ELF partition images are</p>
+<p>  undocumented publicly (checked negative).</p>
+<h2>Negatives / open questions</h2>
+<ul>
+<li>aop's <code>e_entry</code> (0x13200000) is outside all LOADs — junk entry field or a</li>
+</ul>
+<p>  loader-side fixup; unresolved.</p>
+<ul>
+<li>xbl_config's four identical-size LOADs (51,204 B each) and its two embedded</li>
+</ul>
+<p>  FDTs are catalogued but not decoded (multi-config layout suspected).</p>
+<ul>
+<li>vendor_boot v4 extension fields (ramdisk table offset/size, bootconfig</li>
+</ul>
+<p>  offset/size): the table was located by content (1 entry, 108 B, at</p>
+<p>  0xd1a000) but the field order of the extension was not decoded — the</p>
+<p>  partition list in the OTA shows <code>vendor_boot</code> also holds</p>
+<p>  <code>com.android.build.vendor_boot.fingerprint</code> as a property.</p>
+<ul>
+<li>dtbo's 14 entries not further decoded (board variant DTs).</li>
+<li>abl's payload region (237,568 B) yields no readable strings beyond certs —</li>
+</ul>
+<p>  compressed or packed; ARM32 claim rests on the self-consistent ELF header.</p>
+<ul>
+<li><code>storsec</code>, <code>toolsfv</code>, <code>vm-bootsys</code>, <code>vm-persist</code>, <code>logfs</code>, <code>study</code> appear in</li>
+</ul>
+<p>  Fairphone's factory package (per DiamaneOS) but not in the LineageOS OTA</p>
+<p>  payload — the OTA replaces only the OS-side images plus the firmware listed</p>
+<p>  here (inventory delta noted, not investigated further).</p>
+<ul>
+<li>Exact boot image <code>os_version</code> raw field (0x200001aa) not decoded against</li>
+</ul>
+<p>  the MAKE_OS_VERSION macro (values overflow the documented layout) — stored</p>
+<p>  raw in the JSON.</p>
+<ul>
+<li>The vbmeta descriptor walk needed content-based enumeration: our minimal</li>
+</ul>
+<p>  parser's descriptor-boundary walk mis-parses this avbtool 1.3.0 build</p>
+<p>  (offsets differ from the classic layouts); all reported descriptor content</p>
+<p>  is direct string/structure evidence, flagged in the JSON.</p>
+<h2>Reproduce</h2>
+<pre><code class="language-bash">
+python3 tools/payload_manifest.py payload.bin                 # 37 partitions
+python3 tools/payload_dump.py payload.bin xbl xbl.img         # + uefi shrm aop …
+python3 tools/payload_dump.py payload.bin boot boot.img       # + vendor_boot dtbo vbmeta*
+# session parser (ELF/bootimg/AVB) — see results/bootchain-census.json for
+# the full derived tables; ISA sanity = RV32 opcode enrichment vs the
+# wpss.b07 (RV32) / modem.bXX (Hexagon) references per F-5/F-7
+</code></pre>
+<p>(Paths per lab layout: <code>downloads/lineage-fp6/extracted/partitions-bootchain/</code>.)</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

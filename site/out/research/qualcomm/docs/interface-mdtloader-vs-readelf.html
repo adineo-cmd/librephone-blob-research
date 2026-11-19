@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why readelf and mdt_loader.c show different addresses — for upstream issue #40 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Why readelf and mdt_loader.c show different addresses — for upstream issue #40</h1><p>One-page answer note, from **public kernel source + lab-derived MDT</p><p>Evidence: none</p>
+<h1>Why readelf and mdt_loader.c show different addresses — for upstream issue #40</h1>
+<p>One-page answer note, from **public kernel source + lab-derived MDT</p>
+<p>facts** ([upstream issue</p>
+<p>#40](https://codeberg.org/rsavoye/librephone/issues/40): "When I run</p>
+<p><em>readelf</em>, I get different addresses than what I see after</p>
+<p>instrumenting mdt_loader.c ... why does mdt_loader show different</p>
+<p>addresses in the phdr header?"). Written 2026-11-16.</p>
+<p><strong>Legend:</strong> [PUBLIC] = mainline kernel fact; [LAB] = lab-derived fact.</p>
+<h2>1. The short answer</h2>
+<p><code>readelf</code> prints the program headers <strong>as stored in the file</strong>.</p>
+<p><code>mdt_loader.c</code> does not show stored addresses — it computes</p>
+<p><strong>post-relocation runtime addresses</strong>. If the image is relocatable,</p>
+<p>every loadable segment's runtime location differs from the stored</p>
+<p><code>p_paddr</code> by a base shift, so an instrumented loader legitimately</p>
+<p>prints different numbers than readelf. Both are "correct"; they</p>
+<p>answer different questions (file layout vs runtime layout).</p>
+<h2>2. The mechanism, step by step (all [PUBLIC], mainline</h2>
+<p><code>drivers/soc/qcom/mdt_loader.c</code>, fetched 2026-11-16, 508 lines)</p>
+<ol>
+<li><strong>Relocatable bit.</strong> Each loadable phdr carries Qualcomm flags in</li>
+</ol>
+<p>   <code>p_flags</code>' upper bits: <code>QCOM_MDT_RELOCATABLE = BIT(27)</code></p>
+<p>   (<code>include/linux/soc/qcom/mdt_loader.h</code>). If <strong>any</strong> loadable</p>
+<p>   segment has the bit set, <code>relocate = true</code> —</p>
+<p>   <code>mdt_loader.c</code> lines ~258 and ~369.</p>
+<ol>
+<li><strong>Base selection.</strong></li>
+</ol>
+<p>   - relocatable image: <code>mem_reloc = min_addr</code> (the lowest stored</p>
+<p>     <code>p_paddr</code> of all loadable segments);</p>
+<p>   - non-relocatable: <code>mem_reloc = mem_phys</code> (the physically</p>
+<p>     allocated chunk).</p>
+<ol>
+<li><strong>Per-segment rebase.</strong> The loader copies each segment to</li>
+</ol>
+<p>   <code>offset = phdr-&gt;p_paddr - mem_reloc</code> inside the allocated region</p>
+<p>   and reports <code>*reloc_base = mem_reloc</code> (<code>qcom_mdt_load_no_init</code>,</p>
+<p>   lines ~344–435). So a segment stored at paddr P appears at runtime</p>
+<p>   at <code>mem_phys + (P - min_addr)</code> for relocatable images — while the</p>
+<p>   PAS metadata path (<code>__qcom_mdt_pas_init</code> → <code>qcom_pas_init_image</code>)</p>
+<p>   hands the <strong>un-relocated</strong> metadata to TrustZone for</p>
+<p>   authentication, which is why signature checks still pass on the</p>
+<p>   stored layout.</p>
+<ol>
+<li><strong>Also filtered out before any of this</strong> (common source of</li>
+</ol>
+<p>   confusion):</p>
+<p>   - hash segments (`p_flags &amp; QCOM_MDT_TYPE_MASK ==</p>
+<p>     QCOM_MDT_TYPE_HASH<code>, i.e. type bits </code>2&lt;&lt;24`) are skipped by</p>
+<p>     <code>mdt_phdr_loadable()</code> — they exist in readelf's phdr list but</p>
+<p>     never get load addresses;</p>
+<p>   - zero-<code>memsz</code> and non-PT_LOAD phdrs are skipped;</p>
+<p>   - <code>qcom_mdt_bins_are_split()</code> decides whether payloads come from</p>
+<p>     the <code>.mdt</code> itself or from the sibling <code>.bNN</code> files (segments</p>
+<p>     whose extent falls outside <code>fw-&gt;size</code>).</p>
+<p>So the visible discrepancies an instrumented loader reports are: (a)</p>
+<p>relocated bases for relocatable images, (b) missing hash segments,</p>
+<p>(c) split-image file offsets. None of these is a readelf bug.</p>
+<h2>3. The FP6 cross-check ([LAB])</h2>
+<p>The lab's committed censuses make this concrete for this device:</p>
+<ul>
+<li><code>wpss.mdt</code> declares e_machine 164 (EM_HEXAGON) with phdrs marking</li>
+</ul>
+<p>  b01/b02/b03/b05/b06 executable — the per-segment <code>.bXX</code> files carry</p>
+<p>  <strong>junk ELF headers</strong> (zeros, even x86=3 on wpss.b08), so any tool</p>
+<p>  that reads a segment file in isolation sees noise: the <code>.mdt</code> phdr</p>
+<p>  table is the only authoritative address/permission source</p>
+<p>  (<code>qualcomm-fp6/docs/fp6-architecture-census.md</code>, F-7/F-20/F-22).</p>
+<ul>
+<li>The same junk-header rule shows up in the boot-chain family</li>
+</ul>
+<p>  (outer xbl wrapper ELF machine=1, multiimgoem e_type=0) —</p>
+<p>  <code>qualcomm-fp6/docs/bootchain-census.md</code>,</p>
+<p>  <code>qualcomm-fp6/docs/trustzone-census.md</code> (F-7).</p>
+<ul>
+<li>Practical consequence for #40's tooling: parse the <code>.mdt</code> phdrs and</li>
+</ul>
+<p>  apply the relocatable-bit math; ignore the <code>.bXX</code> headers entirely.</p>
+<h2>4. Test-suite hooks</h2>
+<ol>
+<li>Assert the rebase formula on a public FP6 relocatable MDT:</li>
+</ol>
+<p>   runtime_addr(P) = mem_phys + (P − min_addr) over all loadable</p>
+<p>   segments, and hash-type segments excluded.</p>
+<ol>
+<li>Assert <code>qcom_mdt_bins_are_split</code>'s decision against the on-disk</li>
+</ol>
+<p>   family (modem/adsp/cdsp/wpss = split; tz/hyp = monolithic ELF64).</p>
+<ol>
+<li>Round-trip: a loader that reproduces <code>qcom_mdt_load_no_init</code>'s</li>
+</ol>
+<p>   segment placement in memory must match byte-for-byte on a</p>
+<p>   re-extracted nightly.</p>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/soc/qcom/mdt_loader.c (fetched, quoted line references)</li>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/include/linux/soc/qcom/mdt_loader.h (QCOM_MDT_RELOCATABLE = BIT(27), TYPE_MASK/TYPE_HASH)</li>
+<li>Lab: <code>qualcomm-fp6/docs/fp6-architecture-census.md</code>,</li>
+</ul>
+<p>  <code>docs/bootchain-census.md</code>, <code>docs/trustzone-census.md</code> (F-7</p>
+<p>  junk-header methodology)</p>
+<p><strong>Clean-room statement:</strong> the mechanism above is upstream-kernel</p>
+<p>source reading plus lab census facts; nothing from disassembly.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hpbtfw20.tlv — the h-generation (Hastings-class) QCA BT rampatch, parsed — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>hpbtfw20.tlv — the h-generation (Hastings-class) QCA BT rampatch, parsed</h1><p>Fleet-level RE of the `hpbtfw20.tlv` rampatch carried by the laptop-half</p><p>Evidence: none</p>
+<h1>hpbtfw20.tlv — the h-generation (Hastings-class) QCA BT rampatch, parsed</h1>
+<p>Fleet-level RE of the <code>hpbtfw20.tlv</code> rampatch carried by the laptop-half</p>
+<p>devices (matrix rows for FP5 + the Xiaomi SM8450-class block + OnePlus_9RT).</p>
+<p>This is the <strong>h-prefix sibling of the F-75 cr/ap fleet analysis</strong></p>
+<p>(<code>implementations/qca-bt/fleet-analysis.md</code>): same parser</p>
+<p>(<code>implementations/qca-bt/qca_tlv.py</code>, unmodified), same per-byte-range</p>
+<p>method, same [OPEN] discipline. No payload bytes are committed — payload</p>
+<p>copies live only in <code>/tmp/astro_v/payload/</code> (regeneratable via the route</p>
+<p>log below); everything below is derived structural fact.</p>
+<h2>0. RULE 0 prior-art search (all queries 2026-11-18)</h2>
+<ol>
+<li>GitHub code search <code>q=hpbtfw20</code> (authenticated <code>gh api search/code</code>) —</li>
+</ol>
+<p>   114 hits, <strong>all text files</strong> (device extract lists, vendor .mk files,</p>
+<p>   firmware manifests, mainlining notes). No byte-level parse anywhere.</p>
+<ol>
+<li>GitHub code search <code>q=hiccup hpbtfw20</code> — 0 hits.</li>
+<li><strong>Prior art found and cited (structure-free on our targets):</strong></li>
+</ol>
+<p>   <code>corpunum/unumS22linux docs/research/BT_QCA6490_FIRMWARE_GATE_2026-09-21.md</code></p>
+<p>   — a host-only controller-identity audit for a QCA6490 device. It</p>
+<p>   establishes, and we build on: (a) the hp* family is the <strong>"Hastings"</strong></p>
+<p>   generation (QTI HAL strings <code>HASTINGS_VER_2_0</code>, controller build string</p>
+<p>   <code>BTFW.HSP.2.1-…</code>, SoCID <code>0x400C0210</code>); (b) the QTI HAL state machine</p>
+<p>   (<code>PatchDLManager::SocInit</code> → Get-App-Version → SetBaudRateReq →</p>
+<p>   <code>DownloadTlvFile</code> → <code>UpdateHastingNvm</code>); (c) the HAL's XML override files</p>
+<p>   (<code>bt_nvm_loading.xml</code>) target <code>WCN6856_2.1</code>. It contains **no TLV/tag</p>
+<p>   parse of hpbtfw20.tlv or hpnv20.bin** — the byte-level work below is the</p>
+<p>   delta.</p>
+<ol>
+<li><code>dianqk/nixos-android-devices docs/marble/firmware.md</code> — mainlining notes</li>
+</ol>
+<p>   for Poco F5 (marble, a laptop-half fleet member): documents that stock</p>
+<p>   hpbtfw/hpnv21 files differ from linux-firmware's and that btqca selects</p>
+<p>   the <code>hpnv21g</code> NVM on GlobalFoundries parts. No file parse.</p>
+<ol>
+<li>linux-firmware <code>qca/</code> directory listing (fetched 2026-11-18): contains</li>
+</ol>
+<p>   <code>hpbtfw10.tlv</code>, <code>hpbtfw21.tlv</code>, <code>hpnv10*</code>, <code>hpnv21*</code> (+<code>hpnv21g.*</code>),</p>
+<p>   <code>htbtfw20.tlv</code>, <code>htnv20.bin</code>, <code>hmtbtfw20.tlv</code>, <code>msbtfw11.*</code> — but **no</p>
+<p>   <code>hpbtfw20.tlv</code> and no <code>hpnv20.bin</code>** (the F-74-style absence, now</p>
+<p>   pinned for the h-20 generation: these ship only inside device vendor</p>
+<p>   trees).</p>
+<ol>
+<li>Web search <code>"hpbtfw20.tlv" analysis</code> — no structural analysis exists.</li>
+</ol>
+<h2>1. Chip identity: what the mainline driver says about "h"</h2>
+<p><code>drivers/bluetooth/btqca.c</code> (torvalds master, fetched 2026-11-18,</p>
+<p><code>/tmp/astro_v/btqca.c</code>):</p>
+<ul>
+<li><code>QCA_QCA2066</code> → <code>qca/hpbtfw%02x.tlv</code> (direct), NVM via</li>
+</ul>
+<p>  <code>qca_get_nvm_name_by_board(..., "hpnv", ...)</code>; the board-id naming emits</p>
+<p>  <code>hpnv20.bin</code> (no board id) or <code>hpnv20.&lt;prefix&gt;&lt;bid&gt;</code> per board, with a</p>
+<p>  <code>g</code> variant for GlobalFoundries-fab chips (<code>QCA_HSP_GF_SOC_ID</code> — "HSP"</p>
+<p>  = Hastings).</p>
+<ul>
+<li><code>QCA_WCN6855</code> → <code>wcnhpbtfw*.tllv</code> with a documented historical fallback</li>
+</ul>
+<p>  to <code>hpbtfw*.tlv</code> / <code>hpnv*.bin</code> ("Due to historical reasons, WCN685x chip</p>
+<p>  has been using firmware without the 'wcn' prefix").</p>
+<ul>
+<li><code>QCA_WCN6750</code> → <code>msbtfw*.mbn</code> (ELF) then <code>msbtfw*.tlv</code> then <code>msnv*.bin</code></li>
+</ul>
+<p>  — NOT hpbtfw.</p>
+<p>So the lab's earlier prefix decode (<code>hpbtfw* → QCA2066</code>,</p>
+<p>blob-matrix/per-soc-method-plans.md) is confirmed for the <em>mainline loader</em>.</p>
+<p>The workorder brief's "WCN6750-generation" framing is right at the family</p>
+<p>level: QCA2066 and WCN6750's BT core (QCA6490) are the same Hastings</p>
+<p>silicon family (SoCID 0x400C02xx per the unumS22linux capture), one</p>
+<p>generation after the cr/ap (WCN399x/WCN3988) files, with WCN6855 sharing</p>
+<p>the same fallback names. Devices ship hpbtfw20/hpnv20 alongside msbtfw</p>
+<p>(e.g. FP5 carries both) because the Hastings BT core can enumerate under</p>
+<p>either name depending on the SoC-id/board flow.</p>
+<h2>2. Provenance and md5 verification</h2>
+<p>Upstream md5s from <code>upstream-contribution/blob-database/coverage-matrix.csv</code>.</p>
+<p>The laptop half carries <strong>two builds</strong>; a third build (Samsung) was fetched</p>
+<p>for cross-checks and is labeled NOT-DB-IDENTICAL below.</p>
+<table>
+<tr>
+<th>build</th>
+<th>bytes</th>
+<th>DB md5</th>
+<th>fetched md5</th>
+<th>status</th>
+<th>source (public, individually fetchable)</th>
+</tr>
+<tr>
+<td>common (9 devices: cupid/mayfly/unicorn/thor/diting/zeus/marble/mondrian/martini)</td>
+<td>201,560</td>
+<td><code>922473448ce287c8bb5e849998b9ffb7</code></td>
+<td>see §2.1</td>
+<td>see §2.1</td>
+<td>Xiaomi <code>bluetooth</code> partition image via XiaomiFirmwareUpdater <code>firmware_xiaomi_cupid</code> release zip (bluetooth.img)</td>
+</tr>
+<tr>
+<td>FP5 build</td>
+<td>184,740</td>
+<td><code>9430539dc8e602c5634896f218a591dd</code></td>
+<td>—</td>
+<td>[OPEN: no public source found yet]</td>
+<td>Fairphone FP5 stock vendor (<code>/vendor/bluetooth/image/</code>); LineageOS does not extract it; GitHub dumps of FP5 ship no bluetooth partition</td>
+</tr>
+<tr>
+<td>Samsung r0s build (NOT a DB device; cross-check only)</td>
+<td>163,760</td>
+<td>— (no DB row carries md5 <code>d79f9944b6b5b666ce47e50c1fb5a4b4</code>)</td>
+<td><code>d79f9944b6b5b666ce47e50c1fb5a4b4</code></td>
+<td><strong>NOT database-identical</strong> (third build; still structurally the same generation and parsed below)</td>
+<td><code>TheMuppets/proprietary_vendor_samsung_r0s</code> @ lineage-24.0, <code>proprietary/vendor/firmware/hpbtfw20.tlv</code> (raw)</td>
+</tr>
+<tr>
+<td>hpbtfw21.tlv (r0s, adjacent-ROM generation, no DB rows in laptop half)</td>
+<td>195,916</td>
+<td>—</td>
+<td><code>52c94069635d08f59f5b69441cba2436</code></td>
+<td>n/a (context)</td>
+<td>same r0s repo</td>
+</tr>
+</table>
+<h3>2.1 Common-build status [updated in session]</h3>
+<p><code>bluetooth.img</code> was extracted from</p>
+<p><code>fw_cupid_miui_CUPID_V13.0.10.0.SLCCNXM_e5b34408f8_12.0.zip</code></p>
+<p>(XiaomiFirmwareUpdaterReleases/firmware_xiaomi_cupid @ stable-31.12.2021,</p>
+<p>189 MB) — the <code>bluetooth</code> partition image that carries <code>/image/hpbtfw20.tlv</code></p>
+<ul>
+<li><code>hpnv20.bin</code>. Verification results recorded in §4 below.</li>
+</ul>
+<h2>3. The h-generation patch format (what changed vs the F-75 cr/ap fleet)</h2>
+<p>Parsed with the unmodified lab parser (<code>qca_tlv.py</code>, exit 0 on every file of</p>
+<p>this fleet — no error-class diagnostics) and `implementations/hbt-fleet/</p>
+<p>fleet_diff.py` (new, fixtures-tested). Byte-range map (hpbtfw20.tlv, both</p>
+<p>builds share the frame):</p>
+<pre><code>
+[0, 4)       tlv_type_hdr     type=1, length_field = file−4  (holds, all files)
+[4, 28)      tlv_type_patch   24 bytes, fields below
+[28, 28+data_length)          patch body (opaque ARM Thumb overlay, §3.2)
+[28+data_length, file)        44-byte footer (NOT a 256-byte tail), §3.1
+</code></pre>
+<h3>3.1 Header fields — h generation vs F-75 cr/ap generation</h3>
+<table>
+<tr>
+<th>field</th>
+<th>hpbtfw20 (r0s build)</th>
+<th>hpbtfw21 (r0s)</th>
+<th>crbtfw20 (F-75)</th>
+<th>apbtfw10 (F-75)</th>
+</tr>
+<tr>
+<td>total_size</td>
+<td>163,724</td>
+<td>195,880</td>
+<td>55,920</td>
+<td>55,792</td>
+</tr>
+<tr>
+<td>data_length</td>
+<td>163,688</td>
+<td>195,844</td>
+<td>55,896</td>
+<td>55,768</td>
+</tr>
+<tr>
+<td>format_version</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>signature_algorithm</strong></td>
+<td><strong>0</strong></td>
+<td><strong>0</strong></td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>download_mode</td>
+<td>3 SKIP_EVT_VSE_CC</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td><strong>product_id</strong></td>
+<td><strong>19</strong></td>
+<td><strong>19</strong></td>
+<td>10</td>
+<td>10</td>
+</tr>
+<tr>
+<td>rom_build</td>
+<td>0x0200</td>
+<td>0x0201</td>
+<td>0x0200</td>
+<td>0x0200</td>
+</tr>
+<tr>
+<td><strong>patch_version</strong></td>
+<td><strong>0x3d71</strong></td>
+<td><strong>0x687c</strong></td>
+<td>0x0002</td>
+<td>0x0002</td>
+</tr>
+<tr>
+<td><strong>reserved2</strong></td>
+<td><strong>0x0</strong></td>
+<td><strong>0x0</strong></td>
+<td>0x8000</td>
+<td>0x8000</td>
+</tr>
+<tr>
+<td><strong>entry</strong></td>
+<td><strong>0x00000000</strong></td>
+<td><strong>0x00000000</strong></td>
+<td>0x1b0e0</td>
+<td>0x1b0e0</td>
+</tr>
+</table>
+<p>Generational invariants (hold on every h-build parsed):</p>
+<ol>
+<li><code>total_size = data_length + 36</code> (cr/ap: <code>data_length + 24</code>) and</li>
+</ol>
+<p>   <code>file = 4 + 24 + data_length + 44</code> (cr/ap: <code>+ 256</code>).</p>
+<ol>
+<li>The <strong>256-byte signature-class tail is GONE</strong>. The h-generation ends in</li>
+</ol>
+<p>   a <strong>44-byte footer</strong>: an 8-byte build-varying prologue followed by 36</p>
+<p>   bytes of hash-class content (footer entropy 5.05 bits/byte vs 7.13 for</p>
+<p>   the cr/ap RSA-class tail; prologues observed: <code>04040202 05ca0404</code> on</p>
+<p>   both r0s builds, <code>00000000 10000000</code> on cupid hp20, <code>6d750e10 20000000</code></p>
+<p>   on cupid hp21 — see §4). With <code>signature_algorithm = 0</code> this reads as:</p>
+<p>   the h-generation drops the on-file RSA signature block and ships a</p>
+<p>   compact checksum/MAC-class footer instead. Exact verification algorithm</p>
+<p>   [OPEN] (the mainline kernel streams the footer to the chip and never</p>
+<p>   inspects it).</p>
+<ol>
+<li><code>entry = 0x00000000</code>: the h-generation patches do not declare a RAM</li>
+</ol>
+<p>   entry point (cr/ap declared 0x1b0e0/0x1b15c). Entry semantics moved</p>
+<p>   into the body [OPEN].</p>
+<ol>
+<li><code>patch_version</code> becomes a per-file build id (0x3d71 / 0x687c), not the</li>
+</ol>
+<p>   constant format revision (0x0002) of the cr/ap generation.</p>
+<ol>
+<li><code>product_id</code> 19 (cr/ap: 10) — the product_id field now separates the</li>
+</ol>
+<p>   Hastings generation.</p>
+<ol>
+<li><code>rom_build 0x0200</code> matches crbtfw20's ROM build digit — but the two</li>
+</ol>
+<p>   bodies share only <strong>2.64 %</strong> same-offset bytes (cr20 vs hp20): a wholly</p>
+<p>   different code base patching a different controller's ROM. hpbtfw20 vs</p>
+<p>   hpbtfw21 (adjacent ROM builds 0x0200/0x0201): 2.44 % — same-story</p>
+<p>   within the h generation (cf. F-75 §3.2: cr20 vs ap10 = 43.7 % shared</p>
+<p>   base; the h fleet does NOT share one overlay base between its own</p>
+<p>   ROM builds).</p>
+<h3>3.2 Patch body [28, file−44)</h3>
+<ul>
+<li>Entropy 6.94/6.98 bits/byte, 8.7 %/8.9 % zero bytes — same dense</li>
+</ul>
+<p>  machine-code profile as the F-75 bodies.</p>
+<ul>
+<li>The ARM Thumb stack-veneer idiom from F-75 is present and MORE dominant:</li>
+</ul>
+<p>  most-common little-endian words in hpbtfw20.r0s body are <code>0x4801b403</code></p>
+<p>  ×389 and <code>0xbd019001</code> ×389 (crbtfw20: ×133) — <code>push {r0,r1}</code>;</p>
+<p>  <code>ldr r0,[pc,#4]</code> / <code>str r0,[sp,#4]</code>; <code>pop {r0,r1}</code> pairs — plus</p>
+<p>  <code>0xb081b5f0</code> ×120 (<code>push {r4-r7,lr}; sub sp,#4</code>) and <code>0x46c0bdf0</code> ×116</p>
+<p>  (<code>pop {r4-r7,pc}; nop</code>). <strong>Interpretation [OPEN]</strong> (same discipline as</p>
+<p>  F-75): ARM Thumb machine code for the controller core with</p>
+<p>  patch-entry veneers; statistics only, no disassembly performed.</p>
+<h3>3.3 The 44-byte footer [file−44, file)</h3>
+<table>
+<tr>
+<th>file</th>
+<th>prologue (8 B)</th>
+<th>sha1-12 of content[8:]</th>
+</tr>
+<tr>
+<td>hpbtfw20.tlv (r0s)</td>
+<td><code>02020404 0404ca05</code></td>
+<td><code>f841c03e01c8</code></td>
+</tr>
+<tr>
+<td>hpbtfw21.tlv (r0s)</td>
+<td><code>02020404 0404ca05</code></td>
+<td><code>130f891e2046</code></td>
+</tr>
+<tr>
+<td>hpbtfw20.tlv (DB/cupid)</td>
+<td><code>00000000 10000000</code></td>
+<td><code>c2e518fae594</code></td>
+</tr>
+<tr>
+<td>hpbtfw21.tlv (cupid, 91,344 B)</td>
+<td><code>6d750e10 20000000</code></td>
+<td><code>e57ff8b5e420</code></td>
+</tr>
+</table>
+<p>The 8+36 footer structure is a NEW structural fact for this generation</p>
+<p>(no 256-byte signature block exists in these files; the "total_size ≠ file"</p>
+<p>notes the parser emits are exactly this footer, now quantified instead of</p>
+<p>unexplained). The prologue is build-varying (the r0s pair shares one</p>
+<p>because both files ship in one firmware build).</p>
+<h2>4. Common-build (DB md5) verification — MATCH</h2>
+<p>The cupid <code>bluetooth</code> partition image (FAT16, 1,470,464 B; parsed with a</p>
+<p>scratch minimal FAT16 reader, <code>/tmp/astro_v/analysis/fat16_read.py</code>)</p>
+<p>extracted 71 files under <code>/image/</code> — the exact layout the DB records under</p>
+<p><code>&lt;vendor&gt;/bluetooth/image</code>. Both common-build targets verified byte-exact:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>DB md5</th>
+<th>fetched md5</th>
+<th>status</th>
+</tr>
+<tr>
+<td>hpbtfw20.tlv (cupid bluetooth partition)</td>
+<td>201,560</td>
+<td><code>922473448ce287c8bb5e849998b9ffb7</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td>hpnv20.bin (cupid bluetooth partition)</td>
+<td>6,319</td>
+<td><code>5de36001f431a4d60c641d494a75bb60</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+</table>
+<p>The partition also carries (context, not DB targets): <code>hpbtfw21.tlv</code></p>
+<p>(**91,344 B here vs 195,916 B in the r0s Samsung tree — same filename,</p>
+<p>wholly different build**, the F-74 counterexample pattern again),</p>
+<p><code>hpbtfw20.ver</code> (33 B), <code>hpnv20.bXX</code> ×10 (exactly the 10 board-variant names</p>
+<p>the DB lists for this device block) + <code>hpnv20g.bXX</code> ×9 + <code>hpnv20g.bin</code>, and</p>
+<p>the whole <code>hpnv21</code>/<code>hpnv21g</code> family (<code>.301/.302</code> numeric board ids and</p>
+<p><code>.bXX</code> ones). qca_tlv.py on the DB build: exit 0; header</p>
+<p>product_id 19, rom_build 0x0200, <strong>patch_version 0x3ed8</strong> (r0s build:</p>
+<p>0x3d71 — per-build build-id confirmed), entry 0x00000000, 830 segments</p>
+<p>(last 113 B), <strong>44-byte footer</strong> with prologue <code>0x00000000 0x00000010</code>.</p>
+<p><strong>Footer-prologue correction (recorded):</strong> the r0s pair shared prologue</p>
+<p><code>0x04040202 0x05ca0404</code>, which initially looked constant; the cupid builds</p>
+<p>use different prologues (<code>00000000 00000000 10 00 00 00</code> for hp20,</p>
+<p><code>6d750e10 20000000</code> for its hp21). The generation invariant is the **44-byte</p>
+<p>length + 36-byte hash-class content**, not the prologue (4/4 builds differ</p>
+<p>in it; the r0s pair shared one because both files came from one Samsung</p>
+<p>firmware build). <code>fleet_diff.py</code> documents this and reports the prologue</p>
+<p>without asserting constancy.</p>
+<h2>5. What the h-generation adds (generation delta, one line each)</h2>
+<ul>
+<li>product_id 19; signature_algorithm 0; reserved2 0; entry 0.</li>
+<li>44-byte checksum-class footer with constant prologue, replacing the</li>
+</ul>
+<p>  256-byte RSA-class tail.</p>
+<ul>
+<li>No shared overlay base between ROM builds (2.4 % cross-build equality</li>
+</ul>
+<p>  vs 43.7 % in the cr/ap generation).</p>
+<ul>
+<li>Same filename, different bytes across device families: hpbtfw21.tlv is</li>
+</ul>
+<p>  195,916 B (Samsung r0s) vs 91,344 B (cupid) — vendor fleet files are</p>
+<p>  not interchangeable across the generation.</p>
+<ul>
+<li>Same TLV download protocol (243-byte segments, SKIP_EVT_VSE_CC,</li>
+</ul>
+<p>  whole-file framing) — the mainline loader needs NO changes to carry</p>
+<p>  these files (qca_tlv.py parses them error-free, unmodified).</p>
+<h2>6. Freed-device value</h2>
+<p>The laptop half carries hpbtfw20.tlv on <strong>10 devices</strong> (matrix rows 119-236</p>
+<p>exact match): FP5 (own build) + 9 devices sharing one md5 (8 Xiaomi + 1</p>
+<p>OnePlus_9RT). Whole-DB fleet: 13 devices / 2 md5s. With the common build</p>
+<p>md5-verified from a public source, 9 of the 10 laptop-half devices have a</p>
+<p>publicly fetchable, byte-identical, structurally parsed rampatch; FP5's</p>
+<p>build remains [OPEN] on provenance (no public copy found after the honest</p>
+<p>routes in §0/§2 — recorded).</p>
+<h2>7. Route log (all probes 2026-11-18)</h2>
+<ol>
+<li><code>gh api search/code q=hpbtfw20</code> → 114 hits (text only; no binaries —</li>
+</ol>
+<p>   GitHub code search does not index binary paths).</p>
+<ol>
+<li>TheMuppets repos checked for <code>bluetooth/image</code> extracts:</li>
+</ol>
+<p>   proprietary_vendor_xiaomi_mayfly (hrtf5c only), proprietary_vendor_</p>
+<p>   oneplus_martini (odm/etc/bt/hpnv10.bin only), proprietary_vendor_</p>
+<p>   samsung_r0s (<strong>has</strong> vendor/firmware/hpbtfw20.tlv + hpnv20.bin +</p>
+<p>   hpbtfw21.tlv + hpnv21.bab + hpnv21g.bab) — fetched raw.</p>
+<ol>
+<li>fairphone FP5 sources probed: TheMuppets/proprietary_vendor_fairphone</li>
+</ol>
+<p>   (branches ≤ lineage-19.1, no FP5), proprietary_vendor_fairphone_FP5</p>
+<p>   (lineage-21…24.0 — BT images not extracted), FairBlobs/FP5-firmware</p>
+<p>   (pil images only), gm-stuffs + Jiovanni-dump fp5 dumps (no bluetooth</p>
+<p>   partition), fairphone-mirror/vendor_fairphone_hiccup (overlay only,</p>
+<p>   83 KB) — FP5 build unfetchable from these routes; recorded.</p>
+<ol>
+<li>Stock dumps for the Xiaomi block: Jiovanni-dump/xiaomi_cupid_dump and</li>
+</ol>
+<p>   Klozz/xiaomi_cupid_dump — vendor/ trees carry no bluetooth partition</p>
+<p>   (it is a separate partition; also confirmed by DB db_paths</p>
+<p>   <code>&lt;vendor&gt;/bluetooth/image</code>).</p>
+<ol>
+<li>XiaomiFirmwareUpdaterReleases/firmware_xiaomi_cupid release</li>
+</ol>
+<p>   <code>fw_cupid_miui_CUPID_V13.0.10.0.SLCCNXM_e5b34408f8_12.0.zip</code> — 189 MB</p>
+<p>   zip downloaded with resumable curl (connection resets required ~14</p>
+<p>   resumes; script in scratch), contains the <code>bluetooth</code> partition image.</p>
+<ol>
+<li>kernel.org linux-firmware <code>qca/</code> listing — h-20 files absent</li>
+</ol>
+<p>   (F-74-style absence pinned for hpbtfw20.tlv/hpnv20.bin).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

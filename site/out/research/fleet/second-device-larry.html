@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Second Device Population — OnePlus Nord CE 3 Lite 5G / Nord N30 5G (`larry`, SM6375) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Second Device Population — OnePlus Nord CE 3 Lite 5G / Nord N30 5G (`larry`, SM6375)</h1><p>WORKORDER-001 desktop session, second-device population. This is the lab&#x27;s first SM6xxx-generation census. Raw artifacts stay local under `data-fetch/second-device/larry/`; census lives at `analysis/out/second-device-census.csv`. Nothing was committed to `librephone-blob-research/`.</p><p>Evidence: none</p>
+<h1>Second Device Population — OnePlus Nord CE 3 Lite 5G / Nord N30 5G (<code>larry</code>, SM6375)</h1>
+<p>WORKORDER-001 desktop session, second-device population. This is the lab's first SM6xxx-generation census. Raw artifacts stay local under <code>data-fetch/second-device/larry/</code>; census lives at <code>analysis/out/second-device-census.csv</code>. Nothing was committed to <code>librephone-blob-research/</code>.</p>
+<h2>Device chosen and why</h2>
+<ul>
+<li><strong>Device:</strong> OnePlus Nord CE 3 Lite 5G / Nord N30 5G (matrix identity <code>Nord_CE3</code>, vendor <code>oneplus</code>, LineageOS codename <code>larry</code>).</li>
+<li><strong>SoC:</strong> Qualcomm SM6375 Snapdragon 695 5G — the preferred SM6375 generation per the workorder (SM6375/SM6225/SM6115 first, then SM7250).</li>
+<li><strong>Leverage:</strong> the coverage matrix carries all six <code>bm2nXX.bin</code> fleet md5s for <code>oneplus/larry/vendor/lib/rfsa/adsp</code> (bm2n06/08/12/13/14/15), the richest SM6375 OnePlus candidate (506 matrix rows, <code>extract_status_22.2=completes</code>, 732 MB).</li>
+<li><strong>Candidate pool (method step 1):</strong> rows whose <code>md5_db</code> equals the VOOC pair md5s appear only on OnePlus_8 / OnePlus_8_Pro / OnePlus_8T / OnePlus_9R (all SM8250, SM8xxx — outside the requested generation). The bm2n fleet md5s appear on 35+ identities across SM4350/SM6375/SM7250/SM7325/SM8250(9RT)/SM8350/SM8475. No single matrix device carries both sets; per the workorder's generation preference, the SM6375 OnePlus bm2n carrier was selected. Fallbacks <code>oscaro</code> (Nord_CE2, SM6375, same six fleet md5s), <code>dre</code> (Nord_200, SM4350) and <code>instantnoodle</code> (OnePlus_8, SM8250, VOOC carrier) were all API-queried and available but not needed.</li>
+<li><strong>Desktop half:</strong> all candidates sit inside rows 1-222 of the model-name-sorted device inventory (larry at sorted position 118 of 249 identities).</li>
+</ul>
+<h2>LineageOS API URLs used</h2>
+<ul>
+<li>Device: <code>https://download.lineageos.org/api/v2/devices/larry</code> → 200, <code>"name":"Nord CE 3 Lite 5G / Nord N30 5G"</code>, <code>"versions":["23.2","24.0"]</code></li>
+<li>Builds: <code>https://download.lineageos.org/api/v2/devices/larry/builds</code> → 3 nightly builds (24.0-20261114, 24.0-20261107, 23.2-20261010)</li>
+<li>Zip: <code>https://mirrorbits.lineageos.org/full/larry/20261114/lineage-24.0-20261114-nightly-larry-signed.zip</code></li>
+</ul>
+<p>Also queried (all 200, versions 23.2/24.0): <code>.../api/v2/devices/oscaro</code>, <code>.../api/v2/devices/dre</code>, <code>.../api/v2/devices/instantnoodle</code>.</p>
+<p>Note: 22.2 has been superseded; the current channel is 23.2/24.0. The newest nightly (24.0 line) was taken, per "or similar".</p>
+<h2>Build downloaded and verified</h2>
+<table>
+<tr>
+<th>field</th>
+<th>value</th>
+</tr>
+<tr>
+<td>zip</td>
+<td><code>lineage-24.0-20261114-nightly-larry-signed.zip</code></td>
+</tr>
+<tr>
+<td>size</td>
+<td>1,601,993,721 bytes (1.49 GiB — inside the one-zip &lt;=1.5 GB cap)</td>
+</tr>
+<tr>
+<td>sha256 (API)</td>
+<td><code>c73a04e8e97ad47a0fd6e4349694a1254edc09adf03544364ecbabde730f2ddf</code></td>
+</tr>
+<tr>
+<td>sha256 (local sha256sum)</td>
+<td><code>c73a04e8e97ad47a0fd6e4349694a1254edc09adf03544364ecbabde730f2ddf</code></td>
+</tr>
+<tr>
+<td>match</td>
+<td>EXACT — sha256-verified Y</td>
+</tr>
+</table>
+<p>Download: <code>curl -L -sS --retry 8 --retry-delay 5 --retry-all-errors -o &lt;zip&gt;</code>; single attempt, no retries needed.</p>
+<h2>Payload manifest (12 partitions)</h2>
+<p>boot 167,772,160 / dtbo 25,165,824 / odm 620,982,272 / product 2,542,948,352 / system 1,179,967,488 / system_ext 598,708,224 / vbmeta 8,192 / vbmeta_system 4,096 / vbmeta_vendor 4,096 / vendor 383,954,944 / vendor_boot 167,772,160 / vendor_dlkm 10,178,560.</p>
+<p>Ops mix: REPLACE_XZ dominant, plus REPLACE_BZ and a few REPLACE (all supported by <code>payload_dump.py</code>).</p>
+<p><strong>No <code>radio</code>, <code>bluetooth</code>, <code>modem</code>, <code>dsp</code> or <code>firmware</code> partition exists in this payload</strong> — LineageOS 24.0 for <code>larry</code> flashes OS partitions only; modem/dsp/tz images stay on the stock firmware partition. This is a structural negative for the census (see below).</p>
+<h2>Extraction steps: what worked, what failed</h2>
+<table>
+<tr>
+<th>step</th>
+<th>result</th>
+</tr>
+<tr>
+<td><code>unzip -o &lt;zip&gt; payload.bin</code></td>
+<td>OK</td>
+</tr>
+<tr>
+<td><code>payload_manifest.py payload.bin</code></td>
+<td>OK — 12 partitions listed</td>
+</tr>
+<tr>
+<td><code>payload_dump.py payload.bin vendor vendor.img</code></td>
+<td>OK — 184 ops, 383,954,944 bytes</td>
+</tr>
+<tr>
+<td><code>payload_dump.py payload.bin odm odm.img</code></td>
+<td>OK — 297 ops, 620,982,272 bytes</td>
+</tr>
+<tr>
+<td>FAT16 probe (first 16 bytes, EB 3C 90)</td>
+<td>No FAT partitions exist in this payload; vendor/odm first 16 bytes are all zero (ext4 would have magic at 0x438)</td>
+</tr>
+<tr>
+<td><code>debugfs</code> / <code>extract_ext4.py</code></td>
+<td><strong>FAILED</strong> — both images are <strong>EROFS</strong>, not ext4 (<code>debugfs</code> reports "contains a erofs file system"; magic <code>E2 E1 F5 E0</code> at offset 1024)</td>
+</tr>
+<tr>
+<td><code>fat_extract.py</code></td>
+<td>Not applicable — no FAT16 partition present</td>
+</tr>
+<tr>
+<td>EROFS extraction</td>
+<td>OK — <code>fsck.erofs 1.7.1</code> (erofs-utils 1.7.1-1build2 .deb unpacked locally with <code>dpkg -x</code>, run without sudo): <code>fsck.erofs --extract=tree-vendor vendor.img</code>, <code>--extract=tree-odm odm.img</code></td>
+</tr>
+<tr>
+<td>Symlink handling</td>
+<td>296 symlinks in the trees; dangling ones (<code>wlanmdsp.otaupdate</code> → <code>/data/vendor/firmware/wlanmdsp.mbn</code>, <code>firmware/wlan/qca_cld/wlan_mac.bin</code> → <code>/mnt/vendor/persist/wlan_mac.bin</code>) are excluded from the census</td>
+</tr>
+</table>
+<p>Method note for future sessions: any LineageOS 24.0-era payload will be EROFS; the ext4/debugfs path in the workorder must be replaced by <code>fsck.erofs --extract</code>.</p>
+<h2>Fleet-identity verification</h2>
+<p>Matrix md5s are authoritative. The workorder brief's md5s (<code>76835ccc095f116ce20029238b4ca4c1</code>, <code>1ec85cbd095f116ce20029238b4ca4c1</code>) are corrupted: they share only the 8-hex prefix with the matrix values, and their identical 24-hex suffix <code>095f116ce20029238b4ca4c1</code> is exactly the tail of <code>crnv20.bin</code>'s md5 (<code>bb6ca169095f116ce20029238b4ca4c1</code>, a Nord_CE3 matrix row). Matrix values were used, as the workorder instructs.</p>
+<h3>oplus VOOC fast-charge pair — NOT PRESENT (0/2)</h3>
+<table>
+<tr>
+<th>blob</th>
+<th>matrix md5</th>
+<th>matrix size</th>
+<th>found in build</th>
+</tr>
+<tr>
+<td><code>oplus_vooc_fw.bin</code></td>
+<td><code>1ec85cbd137458de72d76822a05a7595</code></td>
+<td>6,464</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>oplus_vooc_fw_rk826.bin</code></td>
+<td><code>76835ccc9dd4ad08922e9d7616bdf4ac</code></td>
+<td>12,432</td>
+<td>no</td>
+</tr>
+</table>
+<p>VOOC pair md5 match: <strong>N</strong> for this device. The matrix confirms why: every <code>oplus_vooc_fw*.bin</code> row belongs to OnePlus 7/7 Pro/7T/7T Pro/8/8 Pro/8T/9R (MSM8998/SM8150/SM8250). No SM6xxx/SM7xxx matrix device carries the VOOC pair, and the <code>larry</code> LineageOS odm has no <code>firmware/fastchg/</code> directory (only <code>firmware/tp/</code> touch firmware). The VOOC leverage entry stays SM8250-specific; populating <code>instantnoodle</code>/<code>kebab</code> remains the only way to prove it.</p>
+<h3>bm2n ADSP-region fleet — 6/6 EXACT MATCHES</h3>
+<p>All in <code>vendor/lib/rfsa/adsp</code> (census path prefix <code>lib/rfsa/adsp</code>), md5 + size both identical to the matrix fleet values shared by <code>dre</code>/<code>oscaro</code>/<code>larry</code> and the wider SM6375 fleet:</p>
+<table>
+<tr>
+<th>blob</th>
+<th>md5 (matrix = local)</th>
+<th>bytes</th>
+<th>matrix devices sharing this md5</th>
+</tr>
+<tr>
+<td><code>bm2n06.bin</code></td>
+<td><code>9010bb1a7c08222a058aaef7edd938c6</code></td>
+<td>864,824</td>
+<td>fleet md5 (dre, oscaro, larry, pdx225, miami, ...)</td>
+</tr>
+<tr>
+<td><code>bm2n08.bin</code></td>
+<td><code>1275a2d212e5bccce734d3055ff10156</code></td>
+<td>3,091,896</td>
+<td>fleet md5 (same set)</td>
+</tr>
+<tr>
+<td><code>bm2n12.bin</code></td>
+<td><code>5c86c8fcc7451f51e11d38276253aac8</code></td>
+<td>2,623,528</td>
+<td>fleet md5; ≡ <code>bm2n37.bin</code> on other devices</td>
+</tr>
+<tr>
+<td><code>bm2n13.bin</code></td>
+<td><code>bf635d9084b54633526f9ad8a84d299b</code></td>
+<td>1,106,944</td>
+<td>fleet md5</td>
+</tr>
+<tr>
+<td><code>bm2n14.bin</code></td>
+<td><code>805176afaae27821520b79647fa5d498</code></td>
+<td>103,168</td>
+<td>fleet md5; ≡ <code>bm2n55.bin</code></td>
+</tr>
+<tr>
+<td><code>bm2n15.bin</code></td>
+<td><code>2ce8163cda60f33cbf2b50f03a3d0ea1</code></td>
+<td>1,082,856</td>
+<td>fleet md5; ≡ <code>bm2n31.bin</code></td>
+</tr>
+</table>
+<p>Fleet identity for the bm2n ADSP-region blobs is <strong>proven byte-for-byte</strong> for the SM6375 generation — first direct confirmation outside SM4350/SM8350 dumps.</p>
+<h3>Bonus QCA BT NVM matches — 3/3 EXACT</h3>
+<table>
+<tr>
+<th>blob</th>
+<th>md5 (matrix = local)</th>
+<th>bytes</th>
+</tr>
+<tr>
+<td><code>odm/etc/bt/apnv11_eu.bin</code></td>
+<td><code>6f9cf45a440a8787b19a9b5152a1823a</code></td>
+<td>4,903</td>
+</tr>
+<tr>
+<td><code>odm/etc/bt/apnv11_in.bin</code></td>
+<td><code>1f58bde391c2e2742d1919cbcddf11c4</code></td>
+<td>4,903</td>
+</tr>
+<tr>
+<td><code>odm/etc/bt/apnv11_na.bin</code></td>
+<td><code>f5a8f5543b2d06d09d18ffee2f36be01</code></td>
+<td>4,903</td>
+</tr>
+</table>
+<p><code>crbtfw*/apbtfw*/crnv*</code> (matrix paths <code>oneplus/larry/bluetooth/image</code>) are absent — they live in the stock <code>bluetooth</code>/<code>radio</code> partition, which this payload does not carry.</p>
+<h2>Census (<code>analysis/out/second-device-census.csv</code>)</h2>
+<ul>
+<li><strong>299 files, 74,530,271 bytes</strong> (71.05 MiB), 196 unique sha256, header <code>device,vendor,soc,family,file,bytes,sha256,md5,public_status</code>, <code>public_status=populated-local-session</code>.</li>
+<li>Scope: blob-bearing trees only — <code>vendor/firmware</code> (incl. <code>wlan/qca_cld</code> real files), <code>vendor/lib/rfsa/adsp</code>, <code>vendor/gpu</code>, <code>vendor/bt_firmware</code> (empty), <code>vendor/dsp</code> (empty), <code>odm/etc/bt</code>, <code>odm/etc/wifi</code>, <code>odm/vendor/firmware</code> (face-unlock), <code>odm/firmware/tp</code> (touch). Camera tuning configs and OS <code>.so</code> trees outside <code>rfsa/adsp</code> were excluded, matching the enchilada methodology.</li>
+</ul>
+<table>
+<tr>
+<th>family</th>
+<th>files</th>
+<th>bytes</th>
+</tr>
+<tr>
+<td>adsp</td>
+<td>21 (6 bm2n fleet + 15 fastrpc skel libs)</td>
+<td>21,947,448</td>
+</tr>
+<tr>
+<td>bt</td>
+<td>3 (apnv11_eu/in/na)</td>
+<td>14,709</td>
+</tr>
+<tr>
+<td>gpu</td>
+<td>15 (a615/a619/a630/a660 gmu-sqe-zap, kbc)</td>
+<td>226,008</td>
+</tr>
+<tr>
+<td>modem</td>
+<td>7 (ipa_fws)</td>
+<td>62,848</td>
+</tr>
+<tr>
+<td>wifi</td>
+<td>4 (bdwlan.bin, bdwlan_in.bin, bdwlan_us.bin, regdb.bin)</td>
+<td>98,332</td>
+</tr>
+<tr>
+<td>other</td>
+<td>249 (touch FW 131, face-unlock 27, evass/vpu20/wlanmdsp etc.)</td>
+<td>52,180,926</td>
+</tr>
+<tr>
+<td>cdsp</td>
+<td>0 — stock-partition only</td>
+<td>0</td>
+</tr>
+<tr>
+<td>tz</td>
+<td>0 — stock-partition only</td>
+<td>0</td>
+</tr>
+</table>
+<ul>
+<li>182/299 census files match a matrix row exactly on (filename, md5); 38 more match an md5 under a different filename (content aliasing).</li>
+<li>33 duplicate-content groups (136 files); largest: <code>FW_NF_ILI7807S_HUAXING.img</code> 392,133 B ×4 across touch-panel dirs.</li>
+</ul>
+<h2>Honest negatives</h2>
+<ol>
+<li><strong>VOOC pair absent (0/2).</strong> See verification above; leverage entry remains SM8250-only. The workorder's premise that one SM6xxx/SM7xxx device carries the VOOC pair is not supported by the matrix or by this build.</li>
+<li><strong>No modem-family partitions in the payload.</strong> <code>adsp.b0*/cdsp.b*/tz*/mpss*</code> images from matrix paths <code>oneplus/larry/modem/image</code> cannot be censused from an official LineageOS nightly; census shows cdsp=0, tz=0. Those rows stay desktop-dump-only.</li>
+<li><strong>EROFS, not ext4.</strong> The prescribed <code>extract_ext4.py</code>/debugfs step cannot run on LineageOS 24.0 images; <code>fsck.erofs</code> used instead.</li>
+<li><strong>No FAT16 partitions</strong> — <code>fat_extract.py</code> had nothing to run on (unlike OnePlus 6's bt.img/modem.img).</li>
+<li><strong>Brief md5 corruption</strong> documented in the verification section; matrix md5s used throughout.</li>
+<li><strong>22.2 superseded</strong> by 23.2/24.0; newest nightly used. <code>oscaro</code>/<code>dre</code>/<code>instantnoodle</code> remain unpopulated fallbacks.</li>
+</ol>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

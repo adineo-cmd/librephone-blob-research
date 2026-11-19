@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WCN3990 `bdwlan.*` board-data container — format analysis (OnePlus 6 / enchilada) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>WCN3990 `bdwlan.*` board-data container — format analysis (OnePlus 6 / enchilada)</h1><p>**Evidence classes:** `[F]` fact (directly measured on the files) · `[I]` inference</p><p>Evidence: <span class="evidence" data-evidence="f">F</span> <span class="evidence" data-evidence="h">H</span> <span class="evidence" data-evidence="i">I</span> <span class="evidence" data-evidence="n">N</span></p>
+<h1>WCN3990 <code>bdwlan.*</code> board-data container — format analysis (OnePlus 6 / enchilada)</h1>
+<p><strong>Evidence classes:</strong> <code>[F]</code> fact (directly measured on the files) · <code>[I]</code> inference</p>
+<p>(strong, derived from measurements) · <code>[H]</code> hypothesis (plausible, unverified) ·</p>
+<p><code>[N]</code> honest negative (probed, not found).</p>
+<p><strong>Source:</strong> OnePlus 6 (enchilada) <code>modem.img</code> → FAT16 volume → <code>IMAGE/BDWLAN.*</code></p>
+<p>directory entries. Extracted with</p>
+<p><code>librephone-blob-research/blob-matrix/desktop/tools/fat_extract.py</code> to</p>
+<p><code>/tmp/modem-fat3</code>. Machine-readable companion:</p>
+<p><code>analysis/out/bdwlan-variants.json</code> (md5 clusters, full RLE variability map,</p>
+<p>per-IE stats, aligned cluster/pair diffs, entropy blocks, strings).</p>
+<p><strong>Count correction (2026-11-17):</strong> the fleet contains <strong>35</strong> <code>BDWLAN.*</code> files,</p>
+<p>not 37 as stated in <code>docs/devices/oneplus6/wifi.md</code>. Verified twice:</p>
+<p>the extractor emits 35 files, and an independent raw FAT directory walk</p>
+<p>(including deleted entries — there are <strong>0</strong> deleted entries) finds exactly 35</p>
+<p><code>IMAGE/BDWLAN.*</code> entries in consecutive clusters 7240..7308. The same doc's</p>
+<p>"403 files" is also stale (raw walk: 404 entries).</p>
+<p>---</p>
+<h2>1. Fleet overview <code>[F]</code></h2>
+<table>
+<tr>
+<th>property</th>
+<th>value</th>
+</tr>
+<tr>
+<td>file count</td>
+<td>35 (<code>.102 .104 .105 .106 .107 .108 .109 .b04 .b07 .b09 .b0a .b0b .b0d .b0e .b0f .b14 .b15 .b30 .b31 .b32 .b33 .b34 .b35 .b36 .b37 .b38 .b3d .b3f .bin .cxo .qor .t0a .t0b .t1a .t1b</code>)</td>
+</tr>
+<tr>
+<td>size</td>
+<td>19,152 bytes (0x4AD0) — identical for all 35</td>
+</tr>
+<tr>
+<td>md5 clusters</td>
+<td><strong>29</strong> distinct contents; 6 duplicate pairs</td>
+</tr>
+<tr>
+<td>duplicate pairs</td>
+<td><code>b07==b30</code>, <code>b0d==b31</code>, <code>b09==b33</code>, <code>b0e==b32</code> (first-pass known) <strong>+ <code>107==109</code>, <code>b35==b37</code> (new)</strong></td>
+</tr>
+<tr>
+<td>variable bytes</td>
+<td>4,199 / 19,152 (22.0%) differ from the per-offset fleet majority</td>
+</tr>
+<tr>
+<td>max differ count</td>
+<td>31 of 34 non-majority files</td>
+</tr>
+<tr>
+<td>common prefix</td>
+<td>10 bytes</td>
+</tr>
+<tr>
+<td>common suffix</td>
+<td>last 71 bytes (≥ last 64 bytes are constant zero)</td>
+</tr>
+</table>
+<p>The files are per-board-ID variants of one template: same container, same IE</p>
+<p>skeleton, calibration payloads diverging by cluster.</p>
+<h2>2. Container format — RESOLVED <code>[F]</code></h2>
+<p>The file is a <strong>flat TLV chain with no outer header and no magic</strong>:</p>
+<pre><code>
+IE := { u16 LE tag , u16 LE len , u8 payload[len] }   repeated back-to-back to EOF
+</code></pre>
+<p>Measured properties:</p>
+<ul>
+<li>All 35 files walk header-to-EOF cleanly under this grammar (<code>[F]</code>, all 35).</li>
+<li>34 of 35 files carry exactly <strong>17 IEs with strictly sequential tags 1..17</strong>;</li>
+</ul>
+<p>  one file (<code>b38</code>) carries <strong>18 IEs</strong> (tags 1..18, see §6).</p>
+<ul>
+<li><code>Σ (4 + len)</code> over the chain = <strong>19,152</strong> exactly, on every file <code>[F]</code>.</li>
+<li>Tag values are strictly ascending with no duplicates — the tag is an</li>
+</ul>
+<p>  enumeration (section/parameter ID), not a stream type marker <code>[I]</code>.</p>
+<ul>
+<li>Inside the first IE payload, a u16 LE at absolute offset [8,10) equals</li>
+</ul>
+<p>  <strong>19152</strong> — the total file size self-reference, present in all 35 files <code>[F]</code>.</p>
+<ul>
+<li>No nested TLV evidence: the only payloads that parse as nested <code>{u16,u16}</code></li>
+</ul>
+<p>  chains are all-zero payloads (an artifact: zero-filled space parses as an</p>
+<p>  infinite <code>(0,0)</code> TLV chain). Content-bearing payloads do <strong>not</strong> parse as</p>
+<p>  nested TLVs at 4-byte granularity <code>[N]</code>.</p>
+<ul>
+<li>No ASCII magic anywhere (see §7) <code>[N]</code>.</li>
+</ul>
+<p>This is <em>not</em> the public ath10k <code>board-2.bin</code> grammar (which uses 32-bit</p>
+<p><code>{id,len}</code> IEs and an ASCII name IE) — it is a distinct, simpler container</p>
+<p><code>[F vs public]</code>. Consumer attribution: WCN3990 board data is passed to the WLAN</p>
+<p>firmware via the SNOC platform path (ath10k/cnss); the firmware, not the</p>
+<p>driver, parses this TLV stream <code>[H]</code>.</p>
+<h3>IE map (34-file common layout; ranges are IE spans, payload = span[4:])</h3>
+<table>
+<tr>
+<th>tag</th>
+<th>len</th>
+<th>abs span [header start, IE end)</th>
+<th>entropy (bits/B, <code>bin</code>)</th>
+<th>var offsets</th>
+<th>var spans</th>
+<th>classification</th>
+</tr>
+<tr>
+<td>1</td>
+<td>1028</td>
+<td>[0, 1032)</td>
+<td>0.51</td>
+<td>98</td>
+<td>42</td>
+<td>header/config; holds file-size self-ref; <strong>per-board ID fields at abs [10,12) and [408,410)</strong> (§5)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>292</td>
+<td>[1032, 1328)</td>
+<td>0.43</td>
+<td>12</td>
+<td>10</td>
+<td>sparse config</td>
+</tr>
+<tr>
+<td>3</td>
+<td>484</td>
+<td>[1328, 1816)</td>
+<td>0.00</td>
+<td>37</td>
+<td>5</td>
+<td><strong>optional</strong>: zeroed in 25/35; populated in <code>b07,b0d,b0e,b14,b15,b30,b31,b32,cxo,qor</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>1028</td>
+<td>[1816, 2848)</td>
+<td>0.00</td>
+<td>19</td>
+<td>11</td>
+<td>mostly zero; populated in 33/35</td>
+</tr>
+<tr>
+<td>5</td>
+<td>656</td>
+<td>[2848, 3508)</td>
+<td>0.12</td>
+<td>10</td>
+<td>5</td>
+<td>sparse config</td>
+</tr>
+<tr>
+<td>6</td>
+<td>636</td>
+<td>[3508, 4148)</td>
+<td>0.00</td>
+<td>0</td>
+<td>0</td>
+<td><strong>pure padding</strong> (all-zero in all 35)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>280</td>
+<td>[4148, 4432)</td>
+<td>0.86</td>
+<td>37</td>
+<td>7</td>
+<td>small config</td>
+</tr>
+<tr>
+<td>8</td>
+<td>4932</td>
+<td>[4432, 9368)</td>
+<td>1.57</td>
+<td>2648</td>
+<td>86</td>
+<td><strong>main calibration IE</strong> — 63% of all fleet variability; contains the stride-40 record tables (§4)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>920</td>
+<td>[9368, 10292)</td>
+<td>2.79</td>
+<td>238</td>
+<td>17</td>
+<td>densest IE (only region approaching 4+ bits/byte)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>928</td>
+<td>[10292, 11224)</td>
+<td>0.93</td>
+<td>0</td>
+<td>0</td>
+<td><strong>constant across all variants</strong> but non-zero content — fixed config</td>
+</tr>
+<tr>
+<td>11</td>
+<td>1028</td>
+<td>[11224, 12256)</td>
+<td>2.14</td>
+<td>446</td>
+<td>3</td>
+<td>calibration; variability concentrated in 3 spans (one 357-byte contiguous)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>3432</td>
+<td>[12256, 15692)</td>
+<td>2.22</td>
+<td>305</td>
+<td>26</td>
+<td>calibration; 9- and 14-byte record patterns (§4)</td>
+</tr>
+<tr>
+<td>13</td>
+<td>44</td>
+<td>[15692, 15740)</td>
+<td>0.90</td>
+<td>30</td>
+<td>10</td>
+<td><strong>stride-4 table</strong>: 10 records × 4 B, bytes [0,3) of each record vary (§4); populated in 21/35</td>
+</tr>
+<tr>
+<td>14</td>
+<td>260</td>
+<td>[15740, 16004)</td>
+<td>0.00</td>
+<td>181</td>
+<td>43</td>
+<td><strong>optional</strong>: zeroed in <code>bin</code> + 25 others; populated in <code>105,106,b38,cxo,qor,t0a,t0b,t1a,t1b</code></td>
+</tr>
+<tr>
+<td>15</td>
+<td>1016</td>
+<td>[16004, 17024)</td>
+<td>1.51</td>
+<td>40</td>
+<td>24</td>
+<td>sparse calibration</td>
+</tr>
+<tr>
+<td>16</td>
+<td>2052</td>
+<td>[17024, 19080)</td>
+<td>0.00</td>
+<td>96</td>
+<td>12</td>
+<td>mostly-zero tail IE with a small non-zero island ([17032,17148)) in 16/35 files</td>
+</tr>
+<tr>
+<td>17</td>
+<td>68</td>
+<td>[19080, 19152)</td>
+<td>0.00</td>
+<td>0</td>
+<td>0</td>
+<td>all-zero padding in all 34</td>
+</tr>
+<tr>
+<td>18</td>
+<td>68</td>
+<td>[19080, 19152)</td>
+<td>0.00</td>
+<td>—</td>
+<td>—</td>
+<td>exists <strong>only in b38</strong> (§6), all-zero</td>
+</tr>
+</table>
+<h2>3. Variability map <code>[F]</code></h2>
+<ul>
+<li>Raw-offset full RLE (2671 runs) and the differ-count histogram are in the</li>
+</ul>
+<p>  JSON. 14,953 offsets are invariant; of the 4,199 variable offsets, 950 differ</p>
+<p>  in 2–5 files, 645 in 6–13 files, and the bulk (2,604, 62%) in 14–31 files —</p>
+<p>  i.e. most variable bytes are fields where a majority of boards disagree, not</p>
+<p>  one-off outliers.</p>
+<ul>
+<li>Differences are <strong>not</strong> confined to one contiguous span: merging variable</li>
+</ul>
+<p>  offsets with a 64-byte gap tolerance yields <strong>28 disjoint variable regions</strong></p>
+<p>  spread over 12 different IEs:</p>
+<pre><code>
+[10,96) [352,488) [1041,1105) [1185,1249) [1444,1593) [1842,1896) [2097,2156)
+[2856,2861) [3000,3010) [4158,4226) [4441,5566) [6137,8398) [9376,9711)
+[10040,10091) [10188,10199) [11232,11351) [11488,11845) [12372,12399)
+[12540,12637) [12920,12956) [13388,13451) [13756,13848) [14180,14268)
+[14532,14596) [15700,16228) [17027,17148) [17544,17548) [19080,19081)
+</code></pre>
+<ul>
+<li>Alignment caveat: tags 1–15 have identical lengths in all 35 files, so the</li>
+</ul>
+<p>  raw map is alignment-clean for [0, 17024). The trailing region [17024, 19152)</p>
+<p>  is re-chunked in <code>b38</code> (§6), which contributes the last two micro-spans.</p>
+<ul>
+<li>48.7% of variable offsets in [0,17024) have all 35 values within ±64 of the</li>
+</ul>
+<p>  majority byte (small signed corrections); the rest include larger jumps,</p>
+<p>  consistent with multi-byte LE fields <code>[I]</code>.</p>
+<h2>4. Record structure inside the IEs <code>[F]</code></h2>
+<p>The variability map exposes fixed-stride record tables (strides measured on the</p>
+<p>variable-offset indicator, phases relative to table start, not file start):</p>
+<table>
+<tr>
+<th>table</th>
+<th>abs range</th>
+<th>IE</th>
+<th>record size</th>
+<th>records</th>
+<th>variable part</th>
+</tr>
+<tr>
+<td>A</td>
+<td>[5166, 5566)</td>
+<td>tag 8</td>
+<td>40 B</td>
+<td>10</td>
+<td>exactly record bytes [10,40) — <strong>300/300</strong> variable offsets fit the phase</td>
+</tr>
+<tr>
+<td>B</td>
+<td>[7798, 8398)</td>
+<td>tag 8</td>
+<td>40 B</td>
+<td>15</td>
+<td>exactly record bytes [10,40) — <strong>450/450</strong> fit</td>
+</tr>
+<tr>
+<td>C</td>
+<td>[7124, 7442)</td>
+<td>tag 8</td>
+<td>40 B</td>
+<td>~8</td>
+<td>2 variable bytes per record, at offsets ≡ 2,3 (mod 40)</td>
+</tr>
+<tr>
+<td>D</td>
+<td>[15700, 15740)</td>
+<td>tag 13</td>
+<td>4 B</td>
+<td>10</td>
+<td>first 3 bytes of each record vary, byte 3 constant</td>
+</tr>
+</table>
+<p>Additional stride signals: constant 0x3C-heavy runs at <strong>stride 9</strong></p>
+<p>([12920,12956), tag 12) and <strong>stride 14</strong> ([12372,12399) etc., tag 12) indicate</p>
+<p>further 9/14-byte record tables where one field is fleet-constant <code>[I]</code>.</p>
+<p>Plain byte autocorrelation on the raw file does <strong>not</strong> show sharp peaks</p>
+<p>(0.806 @40 vs 0.866 @1) because the file is ~85–94% zero everywhere; the</p>
+<p>variable-offset indicator is the right lens here <code>[N on autocorr]</code>.</p>
+<h2>5. What distinguishes the clusters <code>[F]</code></h2>
+<p>Reference: file <code>102</code> is byte-identical to the per-offset fleet majority at</p>
+<p>every offset (0 diffs), i.e. it <em>is</em> the consensus template.</p>
+<ol>
+<li><strong>Per-board discriminator field.</strong> A u16 LE at abs [10,12) (tag-1 payload</li>
+</ol>
+<p>   bytes [6,8)) takes <strong>28 distinct values across the 29 clusters</strong> and is</p>
+<p>   invariant within each cluster (including the 6 duplicate pairs). Hypothesis:</p>
+<p>   board ID / board config selector. It does <strong>not</strong> equal the filename number</p>
+<p>   under decimal or hex interpretations (0/28) — semantics unknown <code>[H]</code>.</p>
+<p>   A second field, u16 LE at abs [408,410) (tag-1 payload [404,406)), takes only</p>
+<p>   <strong>3 distinct values</strong> across the fleet — a coarse selector (e.g. region/SKU</p>
+<p>   class) <code>[H]</code>.</p>
+<ol>
+<li><strong>Minimal-diff pairs prove the template model.</strong> Distinct md5 clusters that</li>
+</ol>
+<p>   differ from each other in only a handful of bytes:</p>
+<p>   - <code>107</code> vs <code>108</code>: <strong>2 bytes</strong> (abs 11 and 27, both tag-1 payload)</p>
+<p>   - <code>b35</code> vs <code>b36</code>: <strong>2 bytes</strong> (abs 10 and 408, both tag-1 payload)</p>
+<p>   - <code>b07</code> vs <code>b0d</code>: <strong>4 bytes</strong> (abs [10,12) + [408,410))</p>
+<p>   So adjacent board IDs frequently share one calibration body and differ only</p>
+<p>   in the ID/selector fields.</p>
+<ol>
+<li><strong>Calibration deltas of widely varying size.</strong> Aligned per-IE diff counts vs</li>
+</ol>
+<p>   <code>102</code> range from 701 bytes (<code>105</code>, <code>106</code>) through ~1.4–2.7 KB (<code>bin</code>, <code>b15</code>,</p>
+<p>   <code>104</code>, …) to ~3.3 KB (<code>cxo</code>, <code>qor</code>, <code>t*</code>); <code>b38</code> adds the §6 re-chunking on</p>
+<p>   top. Diffs are distributed across tags: e.g. <code>105</code> = tag8:432, tag14:102,</p>
+<p>   tag16:45, tag11:27, tag9:25, tag13:30, tag1:35; <code>107</code> = tag8:1725,</p>
+<p>   tag11:416, tag9:185, tag16:73. Full 29×29 aligned pairwise matrix and</p>
+<p>   per-cluster span lists are in the JSON.</p>
+<ol>
+<li><strong>Optional-IE population pattern.</strong> Which of the mostly-zero IEs (3, 13, 14,</li>
+</ol>
+<p>   16) carry non-zero payload is cluster-correlated (see IE map), suggesting</p>
+<p>   per-board feature/tuning options rather than uniform templates <code>[I]</code>.</p>
+<h2>6. <code>b38</code> — the one structural outlier <code>[F]</code></h2>
+<p><code>b38</code> re-partitions the trailing zero region into different IEs while keeping</p>
+<p>the total at 19,152:</p>
+<table>
+<tr>
+<th>IE</th>
+<th>common files</th>
+<th>b38</th>
+</tr>
+<tr>
+<td>tag 16</td>
+<td>len 2052</td>
+<td>len <strong>516</strong></td>
+</tr>
+<tr>
+<td>tag 17</td>
+<td>len 68</td>
+<td>len <strong>1532</strong></td>
+</tr>
+<tr>
+<td>tag 18</td>
+<td>absent</td>
+<td><strong>len 68</strong> (new)</td>
+</tr>
+</table>
+<p>The non-zero island [17032,17148) stays inside tag 16 in both layouts; the rest</p>
+<p>of the moved space is zeros. Effects: raw-offset maps beyond 17024 are shifted</p>
+<p>for <code>b38</code> (its last IE header lands at [19080,19084) with tag byte differing —</p>
+<p>hence the 1-byte "variability" at abs 19080), and aligned-by-tag comparisons</p>
+<p>must be used for the tail (the JSON does this).</p>
+<h2>7. ASCII strings <code>[N]</code></h2>
+<p>All ≥6-char printable runs extracted from all 35 files:</p>
+<ul>
+<li><strong>1,261 distinct runs</strong> — none is real text. Every run is a coincidental</li>
+</ul>
+<p>  sequence of bytes in the 0x20–0x3C range, i.e. small numeric calibration</p>
+<p>  values that happen to be printable (these are <em>not</em> strings; per lab rules</p>
+<p>  their bytes are not reproduced here).</p>
+<ul>
+<li><strong>10 runs are constant across all 35 files</strong> (the longest structure-relevant</li>
+</ul>
+<p>  ones are the stride-9 and stride-14 <code>&lt;</code>-runs inside tag 12, plus repeating</p>
+<p>  2-value patterns inside tag 9). These are byte-value patterns, not strings.</p>
+<ul>
+<li><strong>No alphabetic metadata exists</strong>: no version banner, board name, build ID,</li>
+</ul>
+<p>  or magic string anywhere <code>[N]</code>. Board identity lives only in the FAT filename</p>
+<p>  and (presumably) the binary ID field of §5.</p>
+<h2>8. Entropy map (256-byte blocks, file <code>bin</code>) <code>[F]</code></h2>
+<ul>
+<li>mean <strong>0.909</strong>, min ≈ 0, max <strong>5.108</strong> bits/byte — no block comes anywhere</li>
+</ul>
+<p>  near dense/random (8 bits); the entire file is sparse/structured.</p>
+<ul>
+<li>Only 5 blocks exceed 3.0 bits/byte, all inside known calibration islands:</li>
+</ul>
+<p>  4352 and 6144 (tag 8 islands; 6144 = the [6137,7124) island is the densest),</p>
+<p>  7424 (tag 8), 9472 (tag 9), 12288 (tag 12).</p>
+<ul>
+<li>Per-IE entropies in §2 table; full 75-block list in the JSON.</li>
+</ul>
+<h2>9. Checksum <code>[N]</code></h2>
+<p>No checksum or CRC field identified:</p>
+<ul>
+<li>The last ≥64 bytes are byte-identical (all-zero) in all 35 variants — a</li>
+</ul>
+<p>  constant tail cannot encode a per-file checksum.</p>
+<ul>
+<li>crc32/adler32/sum16/sum32/xor-accumulators over <code>file[:-L]</code> for L ∈</li>
+</ul>
+<p>  {2,4,8,16,64} match no stored tail value in any file (earlier "hits" were</p>
+<p>  trivial zero==zero matches) <code>[N]</code>.</p>
+<ul>
+<li>Curiosity: the XOR of <strong>all</strong> file bytes is 0x00 in every one of the 35</li>
+</ul>
+<p>  files. With thousands of differing bytes per variant this is structural</p>
+<p>  (byte-value parity symmetry of the table content), not a stored field <code>[I]</code>.</p>
+<h2>10. Open items</h2>
+<ul>
+<li>Decode the tag enumeration 1..17 (needs a Qualcomm BDF tool/spec or firmware</li>
+</ul>
+<p>  strings; tag semantics unknown).</p>
+<ul>
+<li>Confirm the §5 ID field hypothesis against the loader (cnss/firmware board-ID</li>
+</ul>
+<p>  selection) — the value does not match the filename number directly, so either</p>
+<p>  it is a different namespace or it is not the ID at all.</p>
+<ul>
+<li>Field semantics inside the big IEs (8/9/11/12): record tables A–D have clear</li>
+</ul>
+<p>  geometry but unknown field meaning; tag 14's stride-4-per-2-byte pattern</p>
+<p>  ([15748,16002), 43 spans) looks like another per-record table.</p>
+<ul>
+<li>Explain the optional-IE population pattern (which clusters populate tags</li>
+</ul>
+<p>  3/13/14/16) against feature flags/regs databases.</p>
+<ul>
+<li><code>105|106</code> differ in 652 bytes yet are the closest large-delta pair; whether</li>
+</ul>
+<p>  they are two markets of one board is unresolved.</p>
+<h2>11. Reproduction</h2>
+<pre><code class="language-sh">
+python3 -I librephone-blob-research/blob-matrix/desktop/tools/fat_extract.py \
+    data-fetch/enchilada/modem.img /tmp/modem-fat3
+python3 -I analysis/tools/bdwlan_probe.py  /tmp/modem-fat3 analysis/out/bdwlan-variants.json
+python3 -I analysis/tools/bdwlan_tlv_probe.py /tmp/modem-fat3
+python3 -I analysis/tools/bdwlan_final.py  /tmp/modem-fat3 analysis/out/bdwlan-variants.json
+</code></pre>
+<p>Scripts (lab-rule compliant: no payload bytes printed, offsets/hashes/maps</p>
+<p>only): <code>analysis/tools/bdwlan_probe.py</code>, <code>analysis/tools/bdwlan_tlv_probe.py</code>,</p>
+<p><code>analysis/tools/bdwlan_final.py</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

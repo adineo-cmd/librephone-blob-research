@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/qca-bt — clean-room QCA BT TLV patch/NVRAM parser — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/qca-bt — clean-room QCA BT TLV patch/NVRAM parser</h1><p>A structural parser/verifier for the Qualcomm Bluetooth ROM-patch</p><p>Evidence: none</p>
+<h1>implementations/qca-bt — clean-room QCA BT TLV patch/NVRAM parser</h1>
+<p>A structural parser/verifier for the Qualcomm Bluetooth ROM-patch</p>
+<p>(<code>*.tlv</code> rampatch) and NVRAM (<code>*.bin</code> NVM) container families — the #1</p>
+<p>leverage family in the lab's blob census (recon.md top-20 rows 1-6: **one</p>
+<p>RE pass covers the BT bring-up of up to 29 devices**). It walks the</p>
+<p>documented TLV structure, verifies the structural invariants the mainline</p>
+<p>kernel's own download path relies on, decodes every field the GPL header</p>
+<p>pins, and emits the record table as JSON. Pure stdlib; no proprietary</p>
+<p>material was accessed (clean-room statement in <code>qca_tlv.py</code>).</p>
+<p><strong>Ground truth (fetched byte-exact 2026-11-16 from torvalds/linux master):</strong></p>
+<p><code>drivers/bluetooth/btqca.h</code> + <code>btqca.c</code> — <code>struct tlv_type_hdr</code></p>
+<p>(<code>type_len</code> LE32; <strong>type in the low byte, length in bits 8..31</strong>),</p>
+<p><code>struct tlv_type_patch</code> (24 B: total_size, data_length, format_version,</p>
+<p>signature, download_mode, reserved1, product_id, rom_build, patch_version,</p>
+<p>reserved2, entry), <code>struct tlv_type_nvm</code> (12-B prefix: tag_id, tag_len,</p>
+<p>reserve1, reserve2), the type-4 multi-NVM enclosing-header unwrap, the</p>
+<p>three kernel-known NVM tags (BD_ADDR=2, HCI=17, DEEP_SLEEP=27), the chip→</p>
+<p>filename switch, and the download protocol (whole file in 243-byte</p>
+<p>segments over VSC <code>0xFC00</code>/<code>0x1E</code>; last segment always acked; synthetic</p>
+<p>command-complete injected when VSE is skipped). ELF rampatches</p>
+<p>(<code>msbtfw*.mbn</code>) are <strong>raw ELF</strong>, not TLV-wrapped — kernel reads bytes</p>
+<p>4..6 of the file itself (btqca.c:310-320); handled as a separate path.</p>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>qca_tlv.py</code></td>
+<td>parser/verifier + JSON emitter + CLI (<code>python3 -I qca_tlv.py &lt;file&gt; [--json out.json] [--hash] [--brief]</code>; exit 1 on error-class diagnostics)</td>
+</tr>
+<tr>
+<td><code>make_fixture.py</code></td>
+<td>deterministic synthetic-fixture generator (self-made bytes from the documented layout; regenerates <code>fixtures/</code>)</td>
+</tr>
+<tr>
+<td><code>fixtures/*.tlv|.bin|.mbn</code></td>
+<td>synthetic fixtures — sizes mirror the fleet magnitudes (crbtfw20.tlv 56,180 B; crnv20.bin 3,936 B; apnv10.bin 1,243 B); byte-exact regenerable, the test suite verifies determinism. Note: repo <code>.gitignore</code> excludes <code>*.bin</code>/<code>*.mbn</code> (working-tree artifacts — rerun <code>python3 -I make_fixture.py</code>); the <code>*.tlv</code> fixtures are not gitignored</td>
+</tr>
+<tr>
+<td><code>test_qca_tlv.py</code></td>
+<td>unittest suite: <code>python3 -m unittest -v test_qca_tlv</code></td>
+</tr>
+</table>
+<h2>Fleet scope (coverage-matrix.csv; md5s are upstream-DB facts, payloads NOT on this box)</h2>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5 (upstream DB)</th>
+<th>chip family (btqca.c switch)</th>
+<th>linux-firmware</th>
+</tr>
+<tr>
+<td><code>crbtfw20.tlv</code></td>
+<td>56,180</td>
+<td><code>16077492405d178c5198b86b3cec7eef</code></td>
+<td>WCN3990/3991/3998 (<code>cr</code>)</td>
+<td><strong>absent</strong> from WHENCE</td>
+</tr>
+<tr>
+<td><code>apbtfw10.tlv</code></td>
+<td>56,052</td>
+<td><code>42a31bb8b2afa5b805dfda78cb1ed4c6</code></td>
+<td>WCN3988 (<code>ap</code>)</td>
+<td>present (<code>BTFM.CHE.2.0.0-00082-QCACHROMZ-1</code>)</td>
+</tr>
+<tr>
+<td><code>crbtfw11.tlv</code></td>
+<td>29,368</td>
+<td><code>eae2d0a1fa6690a9eac392a1cef28092</code></td>
+<td>WCN3990/3991/3998 (<code>cr</code>)</td>
+<td><strong>absent</strong> from WHENCE</td>
+</tr>
+<tr>
+<td><code>crnv20.bin</code></td>
+<td>3,936</td>
+<td><code>bb6ca169095f116ce20029238b4ca4c1</code></td>
+<td>WCN3990/3991/3998 NVM</td>
+<td><strong>absent</strong></td>
+</tr>
+<tr>
+<td><code>crnv11.bin</code></td>
+<td>2,798</td>
+<td><code>7c0db76f1a434d20b3ce3e261b2d00c6</code></td>
+<td>WCN3990/3991/3998 NVM</td>
+<td><strong>absent</strong></td>
+</tr>
+<tr>
+<td><code>apnv10.bin</code></td>
+<td>1,243</td>
+<td><code>4905d516ca6ff77eee8f9f82a17a14ff</code></td>
+<td>WCN3988 NVM</td>
+<td>present (no version string)</td>
+</tr>
+</table>
+<p><strong>All six files appear on the identical 29 devices</strong> (each md5 = 29 device</p>
+<p>rows): Defy 2021, Edge 30 Neo, FP4, G Stylus 5G-2 2022, Mi A3, Moto E7</p>
+<p>Plus, Moto G10, Moto G30, Moto G32, Moto G34 5G, Moto G42, Moto G52,</p>
+<p>Moto G 5G 2024, Moto G82 5G, Moto G84 5G, Moto G9, Moto G9 Power, Moto G</p>
+<p>Power, Moto G Stylus 5G, Nord CE2, Nord CE3, OnePlus 7 Pro, OnePlus 7,</p>
+<p>OnePlus 7T Pro, OnePlus 7T, Phone 1, Pro 1X, Realme 10 Pro, Realme 9 Pro</p>
+<p>(SoCs SD460/662/665/680/695/778G+/750G/835/855). Every device carries the</p>
+<p>whole multi-family set: the kernel selects at runtime by the controller-</p>
+<p>reported ROM version (<code>qca_read_soc_version</code> → <code>rom_ver</code> math, chip-</p>
+<p>specific shifts for WCN3988/WCN3998), not by what the partition ships —</p>
+<p>so e.g. OnePlus 7/7T (WCN3998-class) and FP4 (WCN3988-class) both carry</p>
+<p>both <code>cr*</code> and <code>ap*</code> families. Structural consequence: **parsing one md5</p>
+<p>frees the parser findings across all 29 devices at once**; per-file RE</p>
+<p>(not per-device RE) is the multiplier, exactly as recon.md predicted.</p>
+<p>Sibling-family prior work in this lab: `qualcomm-fp6/docs/</p>
+<p>bt-firmware-census.md` decoded the FP6 Moselle/EVROS family headers</p>
+<p>against the same structs (and observed the vendor 32-byte patch header +</p>
+<p>type-4 multi-NVM form on evrnv20.bin); this component generalizes that</p>
+<p>decode into a tested, fleet-scoped tool.</p>
+<h2>What RE questions the parser enables</h2>
+<ol>
+<li><strong>Record-boundary analysis</strong> — where the container header ends and the</li>
+</ol>
+<p>   patch payload begins (and whether a fleet file uses the upstream</p>
+<p>   24-byte header or a vendor-extended one; structurally undecidable from</p>
+<p>   the length field alone, flagged <code>size_note</code>/[OPEN] until a payload</p>
+<p>   lands). This is the prerequisite boundary for any later payload RE.</p>
+<ol>
+<li><strong>Patch-segment coverage</strong> — the documented download loop sends the</li>
+</ol>
+<p>   WHOLE file in 243-byte segments over VSC <code>0xFC00</code> sub-command <code>0x1E</code>;</p>
+<p>   the parser computes the exact segment map (e.g. 56,180 B → 232</p>
+<p>   segments, last 47 B), i.e. the file↔on-wire HCI download stream</p>
+<p>   correspondence is reconstructible without hardware.</p>
+<ol>
+<li><strong>NVRAM field mapping</strong> — full tag enumeration with stride arithmetic;</li>
+</ol>
+<p>   the kernel's three mutation targets are annotated (tag 2 BD-address</p>
+<p>   slot — the Android vendor HAL writes the device BD_ADDR there before</p>
+<p>   download; tag 17 HCI transport params incl. the chip-dependent baud</p>
+<p>   byte position; tag 27 deep-sleep enable). Unknown tags are kept opaque</p>
+<p>   (sha1 + 16-byte preview only — facts-not-blobs).</p>
+<ol>
+<li><strong>Format contract for a free replacement</strong> — the kernel's acceptance</li>
+</ol>
+<p>   criteria for a BT firmware file ARE this structure (<code>qca_tlv_check_data</code></p>
+<p>   bounds + segment loop); any future free implementation must emit</p>
+<p>   exactly this shape. The parser is that contract, executable and tested.</p>
+<ol>
+<li><strong>Fleet diffing</strong> — md5 equality says payload identity; parser output</li>
+</ol>
+<p>   adds structural identity (headers, tag sets) across nightlies/devices.</p>
+<h2>Honest boundaries [OPEN]</h2>
+<p><strong>The parser covers STRUCTURE only.</strong> What each patch payload <em>does</em> to</p>
+<p>the ROM (the actual patch hunks, the code at <code>entry</code>) is beyond public</p>
+<p>documentation — the kernel downloads the payload bytes opaquely — and is</p>
+<p>NOT attempted here. Specific open items:</p>
+<ul>
+<li>[OPEN] patch payload semantics (what the hunks patch in the ROM) —</li>
+</ul>
+<p>  needs payload RE; payloads are not on this box (md5s only, per</p>
+<p>  coverage-matrix.csv).</p>
+<ul>
+<li>[OPEN] whether the cr/ap fleet files carry 24-byte or vendor-extended</li>
+</ul>
+<p>  patch headers (FP6 census observed 32-byte vendor headers on the</p>
+<p>  sibling msbtfw/evr family).</p>
+<ul>
+<li>[OPEN] NVM tag semantics beyond the kernel's 2/17/27 (tag 1 = version</li>
+</ul>
+<p>  string is documented for the Moselle family by the FP6 census; cr/ap</p>
+<p>  unknown). ~60 opaque tags per fixture-sized NVM; real crnv20.bin</p>
+<p>  (3,936 B) will carry a similar tag census.</p>
+<ul>
+<li>[OPEN] product IDs / rom_build values actually carried by the fleet</li>
+</ul>
+<p>  files (WHENCE documents versions for the linux-firmware copies; device</p>
+<p>  builds differ — the FP6 census found linux-firmware sizes differ from</p>
+<p>  on-device builds for the Moselle family too).</p>
+<ul>
+<li>[OPEN] filename↔content codename question: linux-firmware WHENCE lists</li>
+</ul>
+<p>  <code>apbtfw10.tlv</code> as build <code>BTFM.CHE.2.0.0-*</code> (Cherokee naming) while</p>
+<p>  wairz's content-derived table maps the <code>apbtfw</code> prefix to APA (Apache)</p>
+<p>  banners — only a payload settles it (wairz's own postmortem flags</p>
+<p>  filename↔content mismatches as a class).</p>
+<h2>RULE 0 prior-art check (2026-11-16, recorded queries)</h2>
+<p>Searches before building (GitHub code search + web). No public tool</p>
+<p>combines structural TLV walking + kernel-faithful verification + NVM tag</p>
+<p>enumeration + JSON emission + tests:</p>
+<ul>
+<li><code>"crbtfw" OR "apbtfw" parser</code> (GitHub code search, 84 hits) → closest</li>
+</ul>
+<p>  prior art: <a href="https://github.com/CrimsonGlory/wairz">CrimsonGlory/wairz</a></p>
+<p>  <code>backend/app/services/hardware_firmware/parsers/bt_firmware_banner.py</code></p>
+<p>  + <code>data/bt_qca_codenames.yaml</code> — a <strong>content-banner parser</strong> (extracts</p>
+<p>  vendor/version/chipset from banners; filename-prefix→codename table</p>
+<p>  CMC/CHE/APA/HAS/MOS; postmortem documents banner-at-end scanning and a</p>
+<p>  "filename↔content mismatch" flag). It does NOT walk TLV record</p>
+<p>  structure (their postmortem: <code>.tlv</code> files "returned family=unknown"</p>
+<p>  until the banner scan was added; it never parses records). Delta built:</p>
+<p>  structural record walk + verification + NVM tags, complementary to</p>
+<p>  their banner layer. All other code-search hits are packaging manifests</p>
+<p>  (TheMuppets/LineageOS vendor.mk <code>crbtfw21.tlv</code> lines, fs_config lists —</p>
+<p>  incl. board-variant <code>crnv21.b71</code> naming in the wild, confirming</p>
+<p>  <code>qca_get_nvm_name_by_board</code>'s output form) and one kernel backport</p>
+<p>  patch (Emilelu/UniXNU-mondrian) — zero structural analysis.</p>
+<ul>
+<li><code>"qca tlv firmware parser"</code> / <code>"btqca parse"</code> — the kernel's own</li>
+</ul>
+<p>  <code>btqca.c</code>/<code>btqca.h</code> (GPL, fetched 2026-11-16, the ground truth cited</p>
+<p>  above) is the only public TLV-structure documentation; BlueZ has no QCA</p>
+<p>  TLV parser (bluez-firmware is Broadcom-only). The lab's</p>
+<p>  <code>qualcomm-fp6/tools/bt_tz_analyze.py</code> decoded the sibling Moselle/EVROS</p>
+<p>  family headers (results doc committed) but is a FP6-census script, not</p>
+<p>  a fleet component with tests/fixtures.</p>
+<ul>
+<li><a href="https://github.com/qualcomm-linux/qcom-linux-testkit">qualcomm-linux/qcom-linux-testkit</a></li>
+</ul>
+<p>  <code>Runner/utils/lib_bluetooth.sh</code> — filename-family matcher</p>
+<p>  (msbtfw/cmbtfw/apbtfw/crbtfw/htbtfw/hmtbtfw/hpbtfw/wcnhpbtfw + nvm</p>
+<p>  stems) — corroborates the family list parsed here; not a parser.</p>
+<ul>
+<li>Repo-internal (implementations/README.md, 2026-11-16): "Qualcomm</li>
+</ul>
+<p>  Bluetooth ROM patch .tlv format reverse engineering crbtfw apbtfw — no</p>
+<p>  dedicated RE writeup of the QCA .tlv patch format exists" — confirmed</p>
+<p>  again this session and sharpened: the one adjacent tool is wairz's</p>
+<p>  banner parser, named above.</p>
+<ul>
+<li>Pattern precedent for fixtures: <code>implementations/mediatek/container/</code></li>
+</ul>
+<p>  (parser + make_fixture + tests + README; fixtures regenerable).</p>
+<h2>Test results</h2>
+<p><code>python3 -m unittest -v test_qca_tlv</code> — <strong>30 tests, all passing</strong> (2026-11-16):</p>
+<p>struct sizes vs btqca.h (24-B patch header, 12-B NVM tag prefix), type/</p>
+<p>length decomposition (type low byte / length bits 8..31), full patch-</p>
+<p>header field decode at fleet magnitude (56,180 B → 232×243-B segments,</p>
+<p>last 47 B), single-set + multi-set (type-4) NVM walks with kernel</p>
+<p>first-set-only semantics, kernel-known tag annotations, opaque-tag</p>
+<p>handling, truncation/length-mismatch/unknown-type error paths (exit 1),</p>
+<p>raw-ELF msbtfw path, per-chip rom_ver math (default + WCN3988 + WCN3998</p>
+<p>formulas, u8 truncation modelled), fixture determinism, and the JSON/</p>
+<p>brief CLI contracts. Fixture generation is deterministic (SHA-256 counter</p>
+<p>stream); regeneration reproduces every fixture byte-for-byte.</p>
+<p>Not legal advice, not a replacement implementation: this component</p>
+<p>documents the documented container format. Regulatory/legal hurdles for</p>
+<p>actually replacing radio firmware: `../../upstream-contribution/</p>
+<p>radio-regulatory-hurdles.md`.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

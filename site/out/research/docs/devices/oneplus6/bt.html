@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 (enchilada) — Bluetooth family — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 (enchilada) — Bluetooth family</h1><p>**Evidence class: format-spec** (container decoded; fleet files extracted</p><p>Evidence: none</p>
+<h1>OnePlus 6 (enchilada) — Bluetooth family</h1>
+<p><strong>Evidence class: format-spec</strong> (container decoded; fleet files extracted</p>
+<p>with byte-exact identity; patch-entry interior still open).</p>
+<p>Source: LineageOS 22.2 nightly 2026-11-11 enchilada, OTA payload partition</p>
+<p><code>bluetooth</code> → <code>bt.img</code> (765,952 B, sha256</p>
+<p><code>a01be531d8f9bcab42beda4c84032492bedbb3c9896902111311420e14fe5721</code>).</p>
+<h2>The partition is a FAT16 filesystem (container decoded 2026-11-16)</h2>
+<p><code>bt.img</code> opens <code>EB 3C 90</code> + <code>MSDOS5.0</code> — a FAT16 volume (BPB:</p>
+<p>4,096 B/sector, 4 sec/cluster, 1 reserved sector, 2 FATs × 3 sectors, 512</p>
+<p>root entries; declares 16,384 sectors while the OTA writes only the first</p>
+<p>187 — the live tree fits entirely in the written region). Root holds one</p>
+<p><code>IMAGE</code> directory containing <strong>the complete QCA BT patch/NVM fleet</strong>:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5 (first 8)</th>
+<th>matrix fleet match</th>
+</tr>
+<tr>
+<td>APBTFW10.TLV</td>
+<td>56,052</td>
+<td><code>42a31bb8</code></td>
+<td>✓ 29 devices (also = public linux-firmware)</td>
+</tr>
+<tr>
+<td>APBTFW11.TLV</td>
+<td>216,372</td>
+<td><code>3eaa6452</code></td>
+<td>sibling variant</td>
+</tr>
+<tr>
+<td>APNV10.BIN</td>
+<td>1,243</td>
+<td><code>4905d516</code></td>
+<td>✓ 29 devices (also = linux-firmware)</td>
+</tr>
+<tr>
+<td>APNV11.BIN</td>
+<td>4,760</td>
+<td><code>b88ce73d</code></td>
+<td>sibling variant</td>
+</tr>
+<tr>
+<td>CRBTFW11.TLV</td>
+<td>29,368</td>
+<td><code>eae2d0a1</code></td>
+<td>✓ 29 devices</td>
+</tr>
+<tr>
+<td>CRBTFW20.TLV</td>
+<td>56,180</td>
+<td><code>16077492</code></td>
+<td>✓ 29 devices</td>
+</tr>
+<tr>
+<td>CRBTFW21.TLV</td>
+<td>217,676</td>
+<td><code>bad9ca7b</code></td>
+<td>sibling variant</td>
+</tr>
+<tr>
+<td>CRNV11.BIN</td>
+<td>2,798</td>
+<td><code>7c0db76f</code></td>
+<td>✓ 29 devices</td>
+</tr>
+<tr>
+<td>CRNV20.BIN</td>
+<td>3,936</td>
+<td><code>bb6ca169</code></td>
+<td>✓ 29 devices</td>
+</tr>
+<tr>
+<td>CRNV21.BIN</td>
+<td>4,619</td>
+<td><code>114219c8</code></td>
+<td>sibling variant</td>
+</tr>
+</table>
+<p>So one SDM845 device ships every top-20 QCA BT fleet blob (recon.md #1-#6)</p>
+<p>byte-exactly, and the desktop half's single highest-leverage RE family is</p>
+<p>fully covered by this one payload. Full format spec + per-file parse</p>
+<p>results: [../../blob-matrix/desktop/fleet-re/qca-bt-format.md]</p>
+<p>(../../blob-matrix/desktop/fleet-re/qca-bt-format.md).</p>
+<p><code>/vendor/bt_firmware</code> in the vendor image is an empty mount point —</p>
+<p>consistent with the payload living in this partition.</p>
+<h2>What the fleet files are (format layer)</h2>
+<ul>
+<li>Patch files (<code>type 1</code>): 24-byte <code>tlv_type_patch</code> header (public btqca.h</li>
+</ul>
+<p>  struct, verified against real bytes: <code>total_size == data_length + 24</code></p>
+<p>  5/5), <code>rom_build</code> equals the filename suffix (0x0101/0x0200/0x0201),</p>
+<p>  <code>download_mode</code> splits by Rome generation (1.1 → 0, 2.x → 3), 256-byte</p>
+<p>  unknown tail per file, per-generation entry addresses (0x1b0e0 / 0x1b15c</p>
+<p>  / 0x209e4).</p>
+<ul>
+<li>NVM files (<code>type 4</code> enclosing): one inner type-2 tag set (parsed</li>
+</ul>
+<p>  exactly) plus one type-3 set (443-1,237 B, unknown, skipped by</p>
+<p>  btqca.c entirely), 9-45 tags per variant, all six carry BD_ADDR</p>
+<p>  (0x0002), HCI transport (0x0011), deep-sleep (0x001b); the further</p>
+<p>  tag IDs are enumerated as honest unknowns.</p>
+<h2>ISA/proof status</h2>
+<p>Patch-stream interior: byte pattern consistent with ARM Thumb</p>
+<p>(0xb5f8 push) — observation only, ISA unconfirmed; no public parser of</p>
+<p>the entry-level structure exists (checked 2026-11-16).</p>
+<h2>Open questions</h2>
+<ul>
+<li>patch-stream entry structure + the 256-byte tails</li>
+<li><code>ap*</code> vs <code>cr*</code> chip-family attribution</li>
+<li>WCN3990-specific semantics (this device's chip) vs the fleet files it</li>
+</ul>
+<p>  carries (it ships files for several generations)</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>htt — open item (no implementation) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>htt — open item (no implementation)</h1><p>HTT message-layout facts are NOT spec&#x27;d anywhere in the lab&#x27;s published</p><p>Evidence: none</p>
+<h1>htt — open item (no implementation)</h1>
+<p>HTT message-layout facts are NOT spec'd anywhere in the lab's published</p>
+<p>documents: the WMI dispatch paper covers WMI dispatch only; the CE/HTC notes</p>
+<p>cover the transport, not the HTT payload. The wpss.b10 trace table names HTT</p>
+<p>85 times (F-22) but contains no message layout.</p>
+<p>Per the clean-room rule ("never guess beyond the spec"), no HTT codec is</p>
+<p>implemented here. This README is the honest gap marker.</p>
+<p>Next levers, in spec-source order:</p>
+<ol>
+<li>mainline ath11k HTT structures (GPL public) — a fetchable spec source for</li>
+</ol>
+<p>   host-side message layouts; a future component can derive from them with</p>
+<p>   the same provenance discipline as wmi/tlv and htc/frame-layer. (The two</p>
+<p>   fetch attempts this session failed: raw.githubusercontent 404 + rate</p>
+<p>   limit, kernel.org path returned a directory page — the ath11k HTT header</p>
+<p>   path needs locating first.)</p>
+<ol>
+<li>PR #58's payload defines the transport it needs (PCIe endpoint + MHI</li>
+</ol>
+<p>   slave + QRTR); HTT-over-CE frames are what its author lists as missing.</p>
+<ol>
+<li>The lab's CE interface note section 3 sketches the emulated-blob test</li>
+</ol>
+<p>   shape this component should plug into.</p>
+<p>RULE 0 note (2026-11-16): searches above; no existing open implementation of</p>
+<p>HTT for WCN6750 found.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

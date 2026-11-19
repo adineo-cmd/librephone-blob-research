@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Per-SoC upstream method plans — what LibrePhone could accept per SoC family (2026-11-17) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Per-SoC upstream method plans — what LibrePhone could accept per SoC family (2026-11-17)</h1><p>Upstream-facing half of the per-SoC planning layer: for each SoC family</p><p>Evidence: none</p>
+<h1>Per-SoC upstream method plans — what LibrePhone could accept per SoC family (2026-11-17)</h1>
+<p>Upstream-facing half of the per-SoC planning layer: for each SoC family</p>
+<p>in the LibrePhone device universe, **what the project could accept</p>
+<p>upstream today** — (a) per-family doc stubs in <code>docs/</code>, (b)</p>
+<p><code>data/sizes.csv</code> rows, (c) driver-anchored interface facts — and which</p>
+<p>census-method variant produces that material, adapting the lab's two</p>
+<p>exemplar pipelines:</p>
+<ul>
+<li><strong>Qualcomm exemplar:</strong> FP6 (QCM6490) — container walk → ISA</li>
+</ul>
+<p>  identification → per-family census → interface decode</p>
+<p>  (<a href="research/qualcomm/docs/fp6-architecture-census.html">fp6-architecture-census.md</a>;</p>
+<p>  already packaged upstream as pr1–pr8 + pr10 texts and pr7</p>
+<p>  sizes.csv rows).</p>
+<ul>
+<li><strong>MediaTek exemplar:</strong> MT6785 ("rosemary") — vendor container</li>
+</ul>
+<p>  formats, per-payload record chains, ISA decode with the honest-gap</p>
+<p>  discipline (<code>mediatek/docs/</code>: md1rom = MIPS32+MIPS16e hybrid,</p>
+<p>  md1dsp = MD32 spec gap named, not guessed).</p>
+<p>Companion files (read-only references, not duplicated here): the</p>
+<p>device-universe distribution + data-quality findings live in</p>
+<p><a href="research/soc/per-soc-method-plans.html">blob-matrix/per-soc-method-plans.md</a>;</p>
+<p>the shared-blob fleets (QCA BT ×29 devices, ADSP bm2nXX ×22–26,</p>
+<p>Adreno GMU) live in <code>blob-matrix/laptop/</code>; the device matrix is</p>
+<p><a href="../upstream-contribution/blob-database/">blob-database/coverage-matrix.csv</a>.</p>
+<h2>Data basis (all committed, no re-fetch needed)</h2>
+<ul>
+<li><code>blob-matrix/laptop/devices-half.csv</code> (118 devices, rows 119–236):</li>
+</ul>
+<p>  SoC populated for 28 (7 distinct strings, all Qualcomm: SDM845 ×9,</p>
+<p>  SM6375 ×8, SM8250 ×6, SM8350 ×2, SM8150-AC ×1, SM8475 ×1, SDM636</p>
+<p>  ×1); 90 blank; 62/118 blob-populated (16,883 rows, 31.92 GB, 7,042</p>
+<p>  distinct md5s, 62.3 % shared-instance share).</p>
+<ul>
+<li><code>blob-matrix/desktop/fragmentation-half.md</code> (222 devices): 89</li>
+</ul>
+<p>  Qualcomm named across 29 generations, 14 Google Tensor, 3 Amlogic,</p>
+<p>  116 blank.</p>
+<ul>
+<li>Mainline support levels re-verified 2026-11-17 against</li>
+</ul>
+<p>  torvalds/master fetches: <code>qcom_q6v5_pas.c</code> PAS compatible table</p>
+<p>  (includes <code>qcom,sdm845-adsp-pas</code>, <code>qcom,milos-{adsp,cdsp,mpss,wpss}-pas</code>),</p>
+<p>  <code>ath11k/core.c</code> (<code>ATH11K_HW_WCN6750_HW10</code>), <code>qcom-cpucp-mbox.c</code>,</p>
+<p>  <code>gunyah_wdt.c</code>; QSEECOM mainline = `drivers/firmware/qcom/</p>
+<p>  qcom_qseecom.c<code> + </code>qcom_scm.c` ABI (TA-image loading NOT mainlined).</p>
+<ul>
+<li>BT chip identities per cluster decode from the upstream DB's own</li>
+</ul>
+<p>  filenames through mainline <code>btqca.c</code>'s rampatch-prefix switch</p>
+<p>  (verified 2026-11-16/17): msbtfw→WCN6750, crbtfw→WCN3990/91/98,</p>
+<p>  apbtfw→WCN3988, cmbtfw→WCN3950, htbtfw→QCA6390, hpbtfw→QCA2066,</p>
+<p>  wcnhpbtfw→WCN6855, hmtbtfw→WCN7850.</p>
+<p>---</p>
+<h2>1. QCM6490 (Fairphone FP6) — the completed exemplar</h2>
+<ul>
+<li>Cluster: FP6 upstream rows are 444 devices.csv entries with **zero</li>
+</ul>
+<p>  sizes.csv rows** until pr7 (the FP6 row package, 2026-11-16); the</p>
+<p>  upstream SOC cell is <code>\N</code> (blank-bucket member).</p>
+<ul>
+<li>Census method: the full four-phase pipeline, end-to-end committed</li>
+</ul>
+<p>  (bt/bootchain/trustzone/architecture censuses + 9 interface</p>
+<p>  one-pagers + results JSONs).</p>
+<ul>
+<li><strong>Upstream-acceptable (done or in packages):</strong> pr7 sizes.csv rows</li>
+</ul>
+<p>  (B-10); pr1–pr4 doc corrections; pr5 ISA corrections; pr8 interface</p>
+<p>  docs; pr10 split/BT/radio/signed-loading comments; one-cell SOC</p>
+<p>  fix (SOC = QCM6490). Mainline cross-check exists:</p>
+<p>  <code>milos-fairphone-fp6.dts</code> (Luca Weiss, compatible</p>
+<p>  <code>fairphone,fp6</code>/<code>qcom,milos</code>) — the device is partially mainlined,</p>
+<p>  so every interface fact can be anchored to an in-tree dts/driver.</p>
+<ul>
+<li>Blocked: Hexagon disassembly (mdt tooling negative on this box) —</li>
+</ul>
+<p>  modem internals and the wpss endpoint-emulator segment stay [OPEN].</p>
+<h2>2. MT6785 / Helio G95 (MediaTek "rosemary") — the second exemplar</h2>
+<ul>
+<li>Cluster: the lab's MediaTek device doc (12 partitions, ISA map,</li>
+</ul>
+<p>  <code>mediatek/docs/</code> + rosemary-census.md). Upstream has **zero</p>
+<p>  MediaTek content** (audit C-3) — the largest open landing zone.</p>
+<ul>
+<li>Census method: the MTK variant of the pipeline — vendor container</li>
+</ul>
+<p>  grammar (documented byte-for-byte in the lab docs), per-payload</p>
+<p>  record chains, and the two decode verdicts: md1rom = MIPS32 LE</p>
+<p>  trampoline + MIPS16e islands (nanoMIPS attribution does NOT apply</p>
+<p>  to this generation), md1dsp = MD32 with a <strong>named spec gap</strong> (the</p>
+<p>  SLEIGH spec is a stalled WIP; machine id 0x2454) — the gap is</p>
+<p>  filed, not papered over.</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> a MediaTek hardware/firmware page from the</li>
+</ul>
+<p>  committed rosemary census (first MTK content upstream); md1rom/</p>
+<p>  md1dsp/md32 doc stubs; sizes.csv rows from the rosemary census;</p>
+<p>  interface facts for the public kernel side (mtk-serial/modem</p>
+<p>  helpers). Owner call on timing (audit flags it as a large package).</p>
+<ul>
+<li>Blocked: MD32 payload decode (spec gap), MTK boot-chain ISA map</li>
+</ul>
+<p>  beyond committed census.</p>
+<h2>3. SDM845 (Snapdragon 845) — the best-mainlined cluster</h2>
+<ul>
+<li>Cluster: 16 devices universe-wide (9 in the laptop half's populated</li>
+</ul>
+<p>  SoC set: OnePlus 6/7T-Pro class, Sony XZ2 family, Pixel 3, Poco F1,</p>
+<p>  LG G7/V35/V40, Razer Phone 2, Shift 6MQ). DB state: nearly</p>
+<p>  unpopulated (3 devices, 83 rows — Adreno a530 fleet + camera cpp).</p>
+<ul>
+<li>Census method: FP6 pipeline verbatim — same MDT grammar, same PAS</li>
+</ul>
+<p>  loading; the WiFi anchor differs (ath10k SNOC + WCNSS NV blob, not</p>
+<p>  ath11k).</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) doc stubs — the strongest landing zone</li>
+</ul>
+<p>  of any cluster: <code>sdm845.dtsi</code> + 24 dts files incl. mainlined Pixel 3</p>
+<p>  (<code>sdm845-google-blueline.dts</code>), PAS compatibles verified</p>
+<p>  (<code>qcom,sdm845-adsp-pas</code>), modem via <code>qcom_q6v5_mss</code> — one doc stub</p>
+<p>  per family lands on an in-tree anchor; (b) sizes.csv rows for the 13</p>
+<p>  unpopulated devices (first-population from ~1–1.3 GB LineageOS</p>
+<p>  packages each — fetch-plan-gated); (c) interface facts: ath10k-SNOC</p>
+<p>  probe/download sequence, a530 GMU-less GPU firmware set (one RE pass</p>
+<p>  frees the whole cluster's GPU story — a530_* 7 files).</p>
+<ul>
+<li>Blocked: payload RE for the unpopulated devices (packages not on</li>
+</ul>
+<p>  this box).</p>
+<h2>4. SM6375 (Snapdragon 695) — the largest modern populated cluster</h2>
+<ul>
+<li>Cluster: 15 devices universe-wide (8 in the laptop half: Moto G34/</li>
+</ul>
+<p>  G82/G84/Edge 30 Neo, OnePlus Nord CE2/CE3/N20, Realme 9/10 Pro,</p>
+<p>  Sony Xperia 10 IV/V); 12 populated at 345–506 rows each; row mass</p>
+<p>  dominated by touch-panel firmware fleets (FW_NF_NT36672C_TIANMA</p>
+<p>  ×28, FW_FT3518_SAMSUNG ×24, FW_NF_ILI7807S_TIANMA ×16).</p>
+<ul>
+<li>BT chips (decoded): crbtfw→WCN3990/91/98 ×28, apbtfw→WCN3988 ×16 —</li>
+</ul>
+<p>  the WCN39xx generation, NOT FP6's WCN6750.</p>
+<ul>
+<li>Census method: FP6 pipeline + two additions: (a) a touch-IC census</li>
+</ul>
+<p>  template (filename → vendor token → panel vendor; sizes/hashes</p>
+<p>  only); (b) the BT census is the Rome flavor — the lab's QCA BT</p>
+<p>  fleet doc + btqca.c's crbtfw branches cover the driver side.</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) per-family doc stubs (modem/adsp/cdsp/</li>
+</ul>
+<p>  mpss + WCN39xx WiFi/BT) — upstream has zero 6xx-generation content;</p>
+<p>  <code>sm6375.dtsi</code> + Xperia murray dts exist in-tree (PAS compatibles</p>
+<p>  verified: adsp/cdsp/mpss); (b) sizes.csv rows for the 12 populated</p>
+<p>  devices — sizes.csv has <strong>zero 695-family rows</strong> today (mechanical</p>
+<p>  from the DB dump); (c) interface facts: the crbtfw/WCN39xx download</p>
+<p>  path straight from btqca.c (public), the touch-fleet naming grammar.</p>
+<ul>
+<li>Blocked: nothing census-side; touch-IC payload RE needs packages.</li>
+</ul>
+<h2>5. SM8250 (Snapdragon 865/870) — the OnePlus-8 cluster</h2>
+<ul>
+<li>Cluster: 8 devices (6 in the laptop half: OnePlus 8/8 Pro/8T/9R/9RT,</li>
+</ul>
+<p>  Xperia 5 II, Moto Edge 20 Pro/Edge S); 6 populated; row mass =</p>
+<p>  OnePlus fast-charge firmware (oplus_vooc_fw*.bin ×80+ — the ×36</p>
+<p>  fleet's home) + Samsung touch fleets.</p>
+<ul>
+<li>BT chips (decoded): htbtfw→QCA6390 ×6, hpbtfw→QCA2066 ×4 — the</li>
+</ul>
+<p>  discrete-BT-chip generation (QCA6390 is PCIe-attached, unlike</p>
+<p>  WCN6750's UART).</p>
+<ul>
+<li>Census method: FP6 pipeline verbatim; WiFi/BT interface anchors =</li>
+</ul>
+<p>  ath11k QCA6390 hw params (a genuinely different transport — PCIe</p>
+<p>  MHI); the fast-charge/touch fleets need the vendor "other" template.</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) sizes.csv rows for the 6 populated</li>
+</ul>
+<p>  devices; (b) a fast-charge firmware family doc (oplus_vooc_fw: one</p>
+<p>  RE pass covers ×80+ device-rows fleet-wide — the #1 leverage</p>
+<p>  family in the desktop half's corrected ranking); (c) interface</p>
+<p>  facts: QCA6390 BT (htbtfw branch + PCIe transport note), ath11k</p>
+<p>  QCA6390_HW20 anchor.</p>
+<ul>
+<li>Blocked: no OnePlus dts in mainline (checked 2026-11-16) — device</li>
+</ul>
+<p>  dts anchoring waits for upstream device support; VOOC payload RE</p>
+<p>  needs packages.</p>
+<h2>6. SM8150 (Snapdragon 855) — the mislabel-affected cluster</h2>
+<ul>
+<li>Cluster: 5 devices universe-wide (OnePlus 7 Pro/7T Pro populated at</li>
+</ul>
+<p>  435/436 rows; flame/fajita/guacamoleb/hotdogb carry wrong SOC cells</p>
+<p>  — the data-quality finding that shifts 871 rows between clusters).</p>
+<ul>
+<li>BT chips (decoded): crbtfw ×6 + apbtfw ×4 (Rome/WCN39xx generation).</li>
+<li>Census method: FP6 pipeline verbatim; the data lever is the SOC-cell</li>
+</ul>
+<p>  corrections themselves.</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) SOC-cell corrections upstream (flame =</li>
+</ul>
+<p>  SDM845 not SM8150; coral = SDM845 not SM7250; guacamoleb/hotdogb =</p>
+<p>  SM8150 not MSM8998; fajita = SDM845 not SM8150) — a small data PR</p>
+<p>  that fixes the matrix's join keys for every downstream consumer;</p>
+<p>  (b) sizes.csv rows for guacamole/hotdog; (c) interface facts:</p>
+<p>  <code>sm8150.dtsi</code> + 7 dts in-tree (HDK855, Surface Duo, MTP), full PAS</p>
+<p>  set verified.</p>
+<ul>
+<li>Blocked: payload RE for the OnePlus 7 family (packages not fetched).</li>
+</ul>
+<h2>7. SM8350 (Snapdragon 888)</h2>
+<ul>
+<li>Cluster: 3 devices (OnePlus 9 Pro, Xperia 5 III, Moto G200); 2</li>
+</ul>
+<p>  populated (1,344 rows).</p>
+<ul>
+<li>Census method: FP6 pipeline verbatim (same generation grammar as</li>
+</ul>
+<p>  SM8250; the discrete-BT generation).</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) doc stubs — <code>sm8350.dtsi</code> + 7 dts</li>
+</ul>
+<p>  in-tree, PAS full set; (b) sizes.csv rows for the 2 populated</p>
+<p>  devices; (c) interface facts: same QCA6390/QCA2066 decode as SM8250</p>
+<p>  (per-device BT filenames decide which).</p>
+<ul>
+<li>Blocked: payload RE (packages); nothing else specific.</li>
+</ul>
+<h2>8. SM7325 (Snapdragon 778G) — the BT-reuse cluster</h2>
+<ul>
+<li>Cluster: 4 devices (berlin/berlna/dubai = Moto Edge 20 family,</li>
+</ul>
+<p>  Spacewar = Nothing Phone 1); all populated (bluetooth.img/boot/</p>
+<p>  vbmeta/sequence_manifest.bin ×4).</p>
+<ul>
+<li>BT chips (decoded): <strong>msbtfw→WCN6750 ×12</strong> (msbtfw10 + msbtfw11,</li>
+</ul>
+<p>  msnv10 + msnv11) + cmbtfw→WCN3950 ×6 — the **same BT firmware</p>
+<p>  family as the FP6**, at different patch versions; msnv10 is absent</p>
+<p>  from FP6's partition, so this cluster extends the lab's BT census by</p>
+<p>  one NVM generation.</p>
+<ul>
+<li>Census method: FP6 pipeline; the BT half reuses the lab's</li>
+</ul>
+<p>  msbtfw/WCN6750 expertise directly (bt-firmware-census.md +</p>
+<p>  interface-bt-driver.md — same btqca branches).</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) extend the BT census doc with the</li>
+</ul>
+<p>  SM7325-variant rows (msnv10 vs msnv11 NVM tag diff as the first</p>
+<p>  deliverable); (b) sizes.csv rows for the 4 populated devices</p>
+<p>  (zero 7325-family rows today); (c) interface facts: reuse</p>
+<p>  interface-bt-driver.md wholesale (the driver side is identical).</p>
+<ul>
+<li>Blocked/flagged: no sm7325-specific PAS entries in mainline</li>
+</ul>
+<p>  (nearest resources: sm8350) — stated honestly in the plans file.</p>
+<h2>9. SM6115 (Snapdragon 662) — the best landing zone of the mid tier</h2>
+<ul>
+<li>Cluster: 4 devices (Fxtec Pro1-X, Moto Defy 2021, Moto G30, Moto G</li>
+</ul>
+<p>  Power); fully populated (967 rows).</p>
+<ul>
+<li>BT chips (decoded): cmbtfw→WCN3950 ×20.</li>
+<li>Census method: FP6 pipeline (older-grammar alert: WCN3950 combo</li>
+</ul>
+<p>  generation).</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) doc stubs anchored to in-tree support:</li>
+</ul>
+<p>  <code>sm6115.dtsi</code> + <code>sm6115-fxtec-pro1x.dts</code> + <code>sm6115-xiaomi-lemon.dts</code></p>
+<p>  (the Pro1-X is an official mainline-adjacent device — the cluster's</p>
+<p>  natural first stub), PAS full set (adsp/cdsp/mpss) verified;</p>
+<p>  (b) sizes.csv rows for the 4 populated devices; (c) interface</p>
+<p>  facts: the cmbtfw/WCN3950 download path from btqca.c.</p>
+<ul>
+<li>Blocked: payload RE (packages not fetched).</li>
+</ul>
+<h2>10. Google Tensor (GS101/GS201/G3/G4) — the non-Qualcomm contrast</h2>
+<ul>
+<li>Cluster: 14 devices (Pixel 6 → 9 Pro Fold), every one populated with</li>
+</ul>
+<p>  a uniform Arm-trusted-boot file set (abl/bl1/bl2/bl31/tzsw/pbl/ldfw</p>
+<p>  ×14 — identical filenames, one grammar; no Qualcomm MDT anywhere).</p>
+<ul>
+<li>Census method: the <strong>MT6785-style grammar</strong> (vendor containers,</li>
+</ul>
+<p>  raw-AArch64 identification, DTB/DTBO parsing) adapted to Samsung's</p>
+<p>  chain — NOT the FP6 pipeline; interface decode is blocked on AOSP</p>
+<p>  kernel sources (no gs101/gs201/zuma dtsi in torvalds master —</p>
+<p>  verified 2026-11-16).</p>
+<ul>
+<li><strong>Upstream-acceptable:</strong> (a) a **radio-directory inventory doc per</li>
+</ul>
+<p>  Tensor device** (what files, sizes, hash identity across the 14 —</p>
+<p>  the DB already shows shared filenames; the Exynos modem is the</p>
+<p>  freedom-critical blob and this is the honest, interface-claim-free</p>
+<p>  deliverable); (b) sizes.csv rows (all 14 devices); (c) SOC-cell</p>
+<p>  additions (caiman/comet are public Tensor G4).</p>
+<ul>
+<li>Blocked: all interface claims until the AOSP kernel cross-reference</li>
+</ul>
+<p>  is done (exynos9820-era drivers; gs101/gs201 are public in AOSP —</p>
+<p>  citable but not mainline).</p>
+<p>---</p>
+<h2>Upstream acceptance summary (ranked by devices covered × effort)</h2>
+<table>
+<tr>
+<th>#</th>
+<th>deliverable</th>
+<th>SoC families</th>
+<th>upstream target</th>
+<th>evidence class</th>
+<th>effort</th>
+</tr>
+<tr>
+<td>1</td>
+<td>sizes.csv rows for populated devices (zero 695/7325/8550 rows today; FP6 rows packaged as pr7)</td>
+<td>all Qualcomm clusters + Tensor</td>
+<td><code>data/sizes.csv</code></td>
+<td>METADATA (from the DB dump / committed censuses)</td>
+<td>mechanical</td>
+</tr>
+<tr>
+<td>2</td>
+<td>SOC-cell corrections (flame, coral, guacamoleb, hotdogb, fajita, caiman/comet; FP6 blank cell)</td>
+<td>SDM845/SM8150/SM7250/Tensor/FP6</td>
+<td><code>data/</code> CSVs + SQL</td>
+<td>METADATA (public device identity vs recorded cell)</td>
+<td>one-session data PR</td>
+</tr>
+<tr>
+<td>3</td>
+<td>per-family doc stubs for the PAS clusters (modem/adsp/cdsp + WiFi + BT per decoded chip)</td>
+<td>SM6375, SM8250, SM8150, SM8350, SM6115, SM7325, SDM845, QCM6490</td>
+<td><code>docs/</code> one stub per family per device-class</td>
+<td>census + mainline anchors (verified per family above)</td>
+<td>1 session each, FP6-exemplar format</td>
+</tr>
+<tr>
+<td>4</td>
+<td>BT-fleet generation doc (WCN39xx vs WCN6750 vs QCA6390/QCA2066/WCN7850 across the DB's own filenames; driver side = btqca.c branches)</td>
+<td>all Qualcomm clusters</td>
+<td>extend <code>docs/files.md</code> bluetooth section / new fleet doc</td>
+<td>METADATA + PUBLIC kernel</td>
+<td>small; decode table committed</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Tensor radio-directory inventory (14-device shared-filename analysis)</td>
+<td>Tensor</td>
+<td><code>docs/</code> (track.md-style)</td>
+<td>METADATA only; interface claims stay blocked</td>
+<td>medium</td>
+</tr>
+<tr>
+<td>6</td>
+<td>touch-panel firmware family template (FW_<em>/LIMIT_</em> naming grammar: vendor, panel, FAE/AGING variants)</td>
+<td>SM6375, SM8250, MSM8998</td>
+<td>new <code>docs/other.md</code> section</td>
+<td>METADATA (DB-derivable grammar)</td>
+<td>small</td>
+</tr>
+<tr>
+<td>7</td>
+<td>oplus fast-charge fleet doc (oplus_vooc_fw*.bin, ×36-device fleet)</td>
+<td>SM8250 (+ blank bucket)</td>
+<td>new <code>docs/other.md</code> section</td>
+<td>METADATA + one payload RE pass when packages land</td>
+<td>small</td>
+</tr>
+<tr>
+<td>8</td>
+<td>MediaTek first-content package (rosemary census → hardware page + md1rom/md1dsp/md32 stubs + sizes rows)</td>
+<td>MT6785</td>
+<td><code>docs/</code> + <code>data/</code></td>
+<td>census (committed)</td>
+<td>owner call (large)</td>
+</tr>
+</table>
+<h2>Honest limits</h2>
+<ul>
+<li>Row counts and BT decodes above are <strong>metadata-level</strong> (upstream SQL</li>
+</ul>
+<p>  md5/size + filename grammar); payload RE for the non-FP6 clusters is</p>
+<p>  fetch-plan-gated (~1–1.3 GB per device package) and stated as</p>
+<p>  blocked where it is.</p>
+<ul>
+<li>Mainline support claims were re-verified 2026-11-17 (fetch log in</li>
+</ul>
+<p>  the companion docs); the two negative results (no sm7250/sm6225/</p>
+<p>  sm8475/gs101 dtsi; no mainline TA-image loader) are recorded as</p>
+<p>  negatives, not assumed.</p>
+<ul>
+<li>SOC-cell contradictions mean cluster row-counts are reported under</li>
+</ul>
+<p>  the DB's labels as-is; fixing the labels (deliverable #2 above) is</p>
+<p>  itself an upstream contribution.</p>
+<h2>Sources</h2>
+<ul>
+<li>Committed: <code>blob-matrix/laptop/devices-half.csv</code>,</li>
+</ul>
+<p>  <code>blob-matrix/laptop/fragmentation-half.md</code> + summary JSON,</p>
+<p>  <code>blob-matrix/desktop/fragmentation-half.md</code>,</p>
+<p>  <code>blob-matrix/per-soc-method-plans.md</code> (universe distribution +</p>
+<p>  mislabels), <code>blob-matrix/laptop/qualcomm-{qca-bt,adsp-bm2n,adreno-gmu}-fleet.md</code>,</p>
+<p>  <code>upstream-contribution/blob-database/coverage-matrix.csv</code>,</p>
+<p>  <code>upstream-contribution/pr7-sizes-fp6.md</code>,</p>
+<p>  <code>qualcomm-fp6/docs/*</code> (the FP6 exemplar), <code>mediatek/docs/*</code> (the</p>
+<p>  MT6785 exemplar).</p>
+<ul>
+<li>Public (torvalds/linux master, fetched 2026-11-16/17, failures</li>
+</ul>
+<p>  logged): <code>drivers/remoteproc/qcom_q6v5_pas.c</code> (PAS compatible</p>
+<p>  table), <code>drivers/net/wireless/ath/ath11k/core.c</code> (WCN6750_HW10),</p>
+<p>  <code>drivers/bluetooth/btqca.{c,h}</code> (rampatch-prefix switch),</p>
+<p>  <code>drivers/firmware/qcom/qcom_qseecom.c</code> + <code>Kconfig</code> + <code>qcom_scm.c</code>,</p>
+<p>  <code>drivers/mailbox/qcom-cpucp-mbox.c</code>, <code>drivers/watchdog/gunyah_wdt.c</code>;</p>
+<p>  dts/dtsi presence per cluster per the plans file's 2026-11-16</p>
+<p>  fetches.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

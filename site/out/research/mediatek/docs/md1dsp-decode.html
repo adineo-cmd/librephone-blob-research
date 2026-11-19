@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>md1dsp decode: the modem DSP self-identifies as MTK **MD32** — but no available decoder decodes its bytes (F-36) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>md1dsp decode: the modem DSP self-identifies as MTK **MD32** — but no available decoder decodes its bytes (F-36)</h1><p>**Finding:** The MT6785 (&quot;rosemary&quot;, Helio G95) modem DSP firmware `md1dsp`</p><p>Evidence: none</p>
+<h1>md1dsp decode: the modem DSP self-identifies as MTK <strong>MD32</strong> — but no available decoder decodes its bytes (F-36)</h1>
+<p><strong>Finding:</strong> The MT6785 ("rosemary", Helio G95) modem DSP firmware <code>md1dsp</code></p>
+<p>(6,783,260 B, sha256 <code>265e2c5a…3636</code>, size matches census F-16 exactly) is the</p>
+<p>modem <strong>L1/PHY DSP</strong> image, and its own embedded build tree names the core:</p>
+<p><strong>122 source-path strings under <code>md32/…</code></strong> (<code>md32/usip/brp/modem/lte/…</code>,</p>
+<p><code>md32/rake/modem/c2k/…</code>, <code>md32/usip/common/driver/sys_drv/…</code>) — the same</p>
+<p><strong>MD32</strong> core for which Ghidra 12.2 ships a stock processor module</p>
+<p>(<code>MD32:LE:32:default</code>, "MediaTek MD32"). Task strings are pure LTE L1/PHY:</p>
+<p><code>4g_dci_parse_task.c</code>, <code>4g_pcfich_parse_task.c</code>, <code>4g_pdsch_crc_task.c</code>,</p>
+<p><code>4g_pdsch_proc_task.c</code>, plus HSPA (<code>hspa_agch_event_task.c</code>) and CDMA2000</p>
+<p>(<code>c2k_scheduler.c</code>, <code>LISR_c2k_pilot_arrival</code>). **But the instruction stream</p>
+<p>itself is an honest negative:** decode-density testing in Ghidra 12.2</p>
+<p>headless across <strong>six</strong> languages — MIPS32, MIPS16e, microMIPS, nanoMIPS</p>
+<p>(NCC), Xtensa, and Ghidra's own MD32 module — produces no coherent code</p>
+<p>anywhere (max <strong>6.25 %</strong> on non-artifact windows, vs 88–100.8 % for the</p>
+<p>md1rom MIPS16e islands in F-31). The census's Coresonic attribution</p>
+<p>(F-16/F-17) is superseded at string level for this generation (Coresonic</p>
+<p>remains valid for the older MT6295 DSP per cyrozap); the ISA-level question</p>
+<p>stays open and is now precisely characterized.</p>
+<h2>Claim</h2>
+<ol>
+<li><strong>Container byte-verified:</strong> 512-B mtk_hdr (<code>FILE_INFO</code>, declares payload</li>
+</ol>
+<p>   0x678000 B at file offset 0x118) followed by a <strong><code>DSP!</code></strong> image header:</p>
+<p>   magic at 0x118, <code>+0x0C</code> size 0x678000, <code>+0x10</code> version 1, <code>+0x18</code> marker</p>
+<p>   <code>0x12345678</code>, <code>+0x1C</code> chip id <code>"MT6785"</code>, <code>+0x2C</code> <code>"DEFAULT_ASIC"</code>,</p>
+<p>   <code>+0xAC</code> build string <code>MOLY.LR13.R1.MP.V89.6.P79</code> — **identical to the</p>
+<p>   md1rom build** (same MOLY LR13 package, two different cores).</p>
+<ol>
+<li><strong>Core self-identification (string level, strong):</strong> 122 <code>md32/…</code> paths +</li>
+</ol>
+<p>   <code>DSP_BIN_RO_ADDRESS</code> / <code>DSP_CONTROL_IDLE</code> asserts + DEMOD register asserts</p>
+<p>   at 0xBD300000. This is the first self-naming evidence for any rosemary</p>
+<p>   DSP core (audio_dsp self-names <code>hifi3</code> in its file names; md1dsp self-names</p>
+<p>   <code>md32</code> in its build tree).</p>
+<ol>
+<li><strong>Instruction-level decode: honest negative.</strong> Six languages, identical</li>
+</ol>
+<p>   256-B windows, F-31 methodology (cold-start, <code>clearListing</code> + forced</p>
+<p>   disassembly, coverage = instruction bytes / 256). Code regions</p>
+<p>   (0x40000–0xC0000, 0x140000–0x180000, 0x53C000–0x600000 — dense non-zero</p>
+<p>   bytes hosting the string pools) decode at 0–6.25 % in <em>every</em> language,</p>
+<p>   including <code>MD32:LE:32:default</code>. Whole-image auto-analysis under MIPS32</p>
+<p>   creates <strong>2 instructions and 0 functions</strong> (15,594 data items — the</p>
+<p>   strings — confirming there is no MIPS code to find).</p>
+<ol>
+<li><strong>Family map (corrects F-31's closing note):</strong> the MT6785 modem subsystem</li>
+</ol>
+<p>   runs on at least two core families — MIPS32 LE + MIPS16e islands (md1rom,</p>
+<p>   F-31) and an md32-class DSP (md1dsp, this pass) — with HiFi3/Xtensa</p>
+<p>   (audio_dsp) a third. The nanoMIPS story is unaffected (already overturned</p>
+<p>   for md1rom; md1dsp decodes near-zero under nanoMIPS too).</p>
+<h2>Decode-density table (256-B windows, coverage %; 256 KiB step)</h2>
+<table>
+<tr>
+<th>window</th>
+<th>MIPS32</th>
+<th>MIPS16e</th>
+<th>microMIPS</th>
+<th>nanoMIPS</th>
+<th>Xtensa</th>
+<th>MD32</th>
+</tr>
+<tr>
+<td>0x0 (hdr)</td>
+<td>1.6</td>
+<td>10.9</td>
+<td>1.6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0x118 (DSP!)</td>
+<td>4.7</td>
+<td>20.3</td>
+<td>4.7</td>
+<td>18.0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0x40000</td>
+<td>0</td>
+<td>2.3</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0x80000 (code)</td>
+<td>1.6</td>
+<td>1.6</td>
+<td>1.6</td>
+<td>0.8</td>
+<td>3.5</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0x140000 (code)</td>
+<td>0</td>
+<td>5.5</td>
+<td>0</td>
+<td>3.9</td>
+<td>3.5</td>
+<td>1.6</td>
+</tr>
+<tr>
+<td>0x4c0000 (data)</td>
+<td>0</td>
+<td>29.7</td>
+<td>0</td>
+<td>28.1</td>
+<td>0.8</td>
+<td>14.1</td>
+</tr>
+<tr>
+<td>0x540000 (code)</td>
+<td>0</td>
+<td>7.8</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3.1</td>
+</tr>
+<tr>
+<td>0x600000 (tail)</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0x640000 (tail)</td>
+<td>0</td>
+<td>9.4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>zero windows (≈20)</td>
+<td>26.6</td>
+<td>13.3</td>
+<td>26.6</td>
+<td>26.6</td>
+<td>0–1.2</td>
+<td>26.6</td>
+</tr>
+</table>
+<p><strong>Artifact note (essential):</strong> pure-zero windows "decode" exactly 68 bytes in</p>
+<p>every fixed 32-bit ISA (17 × 4-byte instructions — <code>nop</code> in MIPS terms), and</p>
+<p>34 × 2-byte under MIPS16e — identical coverage appears in the same windows</p>
+<p>under every language, so those rows are disassembler behavior on zero runs,</p>
+<p>not evidence of code. The only other &gt;20 % cell (16e at 0x4c0000, 29.7 %) is</p>
+<p>a repeating 4-byte data pattern partially decoding as alternating</p>
+<p><code>addiu v1,sp,0x3a0 / addiu s0,sp,0x100</code> ×7 — data, not code. After removing</p>
+<p>artifacts, the best real-content coverage anywhere is <strong>6.25 %</strong> (MD32 at</p>
+<p>0xaeb00, fine sweep), and the fine sweep through every string-bearing region</p>
+<p>(0x60000–0x5dd000, 13 windows) never exceeds 35 % under any language</p>
+<p>(0x5dd000 under 16e — again a data artifact). Full per-window data in</p>
+<p><code>results/md1dsp-decode.json</code>.</p>
+<h2>Interpretation and hypotheses (flagged as hypotheses)</h2>
+<ul>
+<li>The build tree self-name <code>md32</code> is decisive for core <em>identity</em> but the</li>
+</ul>
+<p>  bytes show Ghidra's stock MD32 module does not cover this image. Plausible</p>
+<p>  causes: (a) the code sections are packed/compressed (the 0x600000+ tail is</p>
+<p>  high-entropy; the DSP! header suggests a load protocol we have not</p>
+<p>  expanded), (b) an MD32 ISA generation gap (Ghidra's module is evidently</p>
+<p>  built from a different subsystem's MD32), (c) per-segment load addresses</p>
+<p>  from the DSP! header are needed before disassembly can take.</p>
+<ul>
+<li>Prior art: <a href="https://github.com/cyrozap/mediatek-lte-baseband-re">cyrozap/mediatek-lte-baseband-re</a></li>
+</ul>
+<p>  establishes the <strong>Coresonic</strong> DSP for the older MT6295-era modem DSP;</p>
+<p>  CEVA acquired Coresonic in 2014 and no open Ghidra/SLEIGH decoder exists</p>
+<p>  for that ISA family either. For MT6785 the self-naming <code>md32</code> tree makes</p>
+<p>  Coresonic unlikely for <em>this</em> generation, but the byte-level core identity</p>
+<p>  remains open.</p>
+<ul>
+<li><a href="https://research.checkpoint.com/2021/looking-for-vulnerabilities-in-mediatek-audio-dsp">Check Point 2021</a></li>
+</ul>
+<p>  is the closest public methodology (MTK DSP firmware, custom opcodes) but</p>
+<p>  targets the audio DSP, not md1dsp.</p>
+<h2>Honest negatives / limitations</h2>
+<ul>
+<li>No language tested decodes md1dsp; we could not byte-verify the ISA.</li>
+<li>Ghidra's MD32 module was used stock: no DSP!-header segment expansion, no</li>
+</ul>
+<p>  pspec tuning, base 0x0 flat import. A follow-up pass that parses the DSP!</p>
+<p>  segment table (or unpacks the image) may still close it.</p>
+<ul>
+<li>Auto-analysis (for the string harvest) was run under MIPS32-default since</li>
+</ul>
+<p>  no language won; instruction/function counts are therefore not meaningful</p>
+<p>  beyond confirming the negative.</p>
+<ul>
+<li>The tail 0x600000–0x678000 is high-entropy and likely a compressed secondary</li>
+</ul>
+<p>  image; not analyzed this pass.</p>
+<h2>Reproduce</h2>
+<pre><code>
+GH=/…/ghidra_12.2_PUBLIC; JAVA_HOME=/…/jdk-25.0.5+8
+analyzeHeadless /tmp/proj p -import 06_md1dsp.bin -processor &lt;LANG&gt; \
+  -loader-baseAddr 0x0 -noanalysis -scriptPath &lt;tools&gt; \
+  -postScript window_stats.java 0x0,0x118,0x200,… out.json
+</code></pre>
+<p>Scripts: <code>window_stats.java</code> (per-window clearListing + forced disassembly,</p>
+<p>JSON out) and <code>harvest_md1dsp.java</code> (auto-analysis counts + defined strings).</p>
+<p>Languages: <code>MIPS:LE:32:default</code>, <code>MIPS:LE:32:16e</code>, <code>MIPS:LE:32:micro</code>,</p>
+<p><code>nanomips:LE:32:default</code>, <code>Xtensa:LE:32:default</code>, <code>MD32:LE:32:default</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

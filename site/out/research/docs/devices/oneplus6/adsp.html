@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 (enchilada) — ADSP family — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 (enchilada) — ADSP family</h1><p>**Evidence class: census** (files extracted + hashed; container magics recorded; no</p><p>Evidence: none</p>
+<h1>OnePlus 6 (enchilada) — ADSP family</h1>
+<p><strong>Evidence class: census</strong> (files extracted + hashed; container magics recorded; no</p>
+<p>ISA decode). Source: LineageOS 22.2 nightly 2026-11-11 enchilada, partition <code>vendor</code></p>
+<p>(<code>/vendor/lib/rfsa/adsp</code>, 24 files) + partition <code>dsp</code> (33,554,432 B raw image).</p>
+<h2>Container layout</h2>
+<ul>
+<li><code>/vendor/lib/rfsa/adsp/*.so</code> — 24 Hexagon shared objects, all magic</li>
+</ul>
+<p>  <code>elf32-le</code>: compute/audio/sensor DSP skel libraries (<code>libfastcvadsp.so</code></p>
+<p>  1,277,032 B, <code>libhexagon_nn_skel.so</code> 1,177,940 B, <code>libFastRPC_UTF_Forward_skel.so</code></p>
+<p>  963,716 B, <code>libfastcvdsp_skel.so</code> 639,952 B, <code>libdirac-capiv2.so</code> 370,468 B,</p>
+<p>  <code>libscveT2T_skel.so</code>, <code>libdepthmap_skel.so</code>, <code>libVC1Dec.so</code>, <code>libVC1DecDsp_skel.so</code>,</p>
+<p>  aptX/HD capi_v2 codecs, dirac resource <code>.dar</code>, sns_* sensors, dspCV, halide</p>
+<p>  remote, morpho HVX, thread blur, apps_mem_heap, dsp_streamer).</p>
+<ul>
+<li>Partition <code>dsp</code> (33,554,432 B, magic raw) — the ADSP PIL image itself</li>
+</ul>
+<p>  (the <code>adsp</code> boot image; upstream's 23-partition manifest carries no separate</p>
+<p>  <code>adsp</code> name on enchilada, the partition is named <code>dsp</code>).</p>
+<h2>Fragmentation significance</h2>
+<p>This is the OP6-side sibling of recon.md top-20 #7-#13 (the <code>bm2nXX.bin</code></p>
+<p>ADSP-region fleet, 25-26 devices, 0.8-3.1 MB each, typed <code>MODEM</code> upstream but</p>
+<p>living in <code>vendor/lib/rfsa/adsp</code>). OnePlus 6 (SDM845) carries named <code>.so</code></p>
+<p>DSP libraries instead of the <code>bm2nXX.bin</code> naming of the SM6xxx generation —</p>
+<p>same family, different file-naming generation. The <code>bm2n</code> fleet RE would</p>
+<p>benefit from this device as a second-generation comparison point: both are</p>
+<p>Hexagon ELF shared objects on the same DSP.</p>
+<h2>ISA/proof status</h2>
+<p>The <code>.so</code> files are standard ELF32 little-endian Hexagon QDSP6 shared</p>
+<p>objects (magic <code>elf32-le</code> recorded per file; full e_machine check not run</p>
+<p>this session — expected 164/EM_QDSP6 per the lab's wpss finding; verify in</p>
+<p>a follow-up). No decode.</p>
+<h2>Interface facts</h2>
+<p>Consumers: FastRPC user→DSP calling convention (public: <code>libadsprpc</code> /</p>
+<p><code>fastrpc</code> mainline kernel driver); each <code>_skel.so</code> is the DSP-side skeleton</p>
+<p>of an interface whose host side ships in the vendor APK/lib set. No</p>
+<p>per-file interface doc committed yet.</p>
+<h2>Open questions</h2>
+<ul>
+<li>e_machine confirmation per file (one hexdump pass)</li>
+<li><code>dsp</code> partition image container type (raw PIL header vs ELF MDT — magic</li>
+</ul>
+<p>  probe says raw 16-byte head; parse its header next session)</p>
+<ul>
+<li>which of these files are shared fleet-wide (needs cross-device payloads)</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

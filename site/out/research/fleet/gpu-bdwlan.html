@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WORKORDER-001 (desktop): Adreno microcode containers, gfp9508, cross-device bdwlan — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>WORKORDER-001 (desktop): Adreno microcode containers, gfp9508, cross-device bdwlan</h1><p>**Devices:** OnePlus 6 (enchilada, SDM845 — Adreno 630) and OnePlus Nord CE3 (larry,</p><p>Evidence: <span class="evidence" data-evidence="f">F</span> <span class="evidence" data-evidence="h">H</span> <span class="evidence" data-evidence="i">I</span> <span class="evidence" data-evidence="n">N</span></p>
+<h1>WORKORDER-001 (desktop): Adreno microcode containers, gfp9508, cross-device bdwlan</h1>
+<p><strong>Devices:</strong> OnePlus 6 (enchilada, SDM845 — Adreno 630) and OnePlus Nord CE3 (larry,</p>
+<p>SM6375 Snapdragon 695 — Adreno 619/615/660 files present).  </p>
+<p><strong>Evidence classes:</strong> <code>[F]</code> fact (measured) · <code>[I]</code> inference (strong, derived) ·</p>
+<p><code>[H]</code> hypothesis (plausible, unverified) · <code>[N]</code> honest negative (probed, not found).  </p>
+<p><strong>Companion JSON:</strong> <code>analysis/out/gpu-bdwlan-analysis.json</code> (main + merged follow-up;</p>
+<p>per-file hashes, ELF tables, pairwise matrices, per-IE maps).  </p>
+<p><strong>Discipline:</strong> no proprietary payload bytes in this document — offsets, sizes,</p>
+<p>hashes, structural facts, ≤16-byte hex samples and short ASCII strings only.</p>
+<p>---</p>
+<h2>1. Adreno ZAP shader containers (mdt/bNN/elf) <code>[F]</code></h2>
+<p>All six MDTs (<code>a630_zap.mdt</code> OP6; <code>a615_zap.mdt</code>, <code>a660_zap.mdt</code> larry) parse as</p>
+<p>ELF32, little-endian, <code>e_type=2</code> (ET_EXEC), <strong><code>e_machine=164</code> (EM_QDSP6)</strong>,</p>
+<p><code>e_entry=0x5000</code>, <code>e_flags=3</code>, 3 program headers, 0 section headers.</p>
+<p>Segment geometry is identical across all three families:</p>
+<table>
+<tr>
+<th>phdr</th>
+<th>type</th>
+<th>vaddr</th>
+<th>memsz</th>
+<th>file (split)</th>
+<th>OP6 a630</th>
+<th>larry a615</th>
+<th>larry a660</th>
+</tr>
+<tr>
+<td>0</td>
+<td>PT_NULL</td>
+<td>0</td>
+<td>0</td>
+<td><code>.b00</code></td>
+<td>148</td>
+<td>148</td>
+<td>148</td>
+</tr>
+<tr>
+<td>1</td>
+<td>PT_NULL</td>
+<td>0x6000</td>
+<td>8192</td>
+<td><code>.b01</code></td>
+<td>6536</td>
+<td>6560</td>
+<td>6560</td>
+</tr>
+<tr>
+<td>2</td>
+<td>PT_LOAD</td>
+<td>0x5000 (= e_entry)</td>
+<td>=filesz</td>
+<td><code>.b02</code></td>
+<td>1968</td>
+<td>1984</td>
+<td>1976</td>
+</tr>
+</table>
+<ul>
+<li><code>.b00</code> = 148 B = ELF header (52) + phdr table (3×32) exactly, in every family <code>[F]</code>.</li>
+<li><code>mdt = b00-content + b01-content</code> concatenated (mdt − 148 = b01 size; verified all</li>
+</ul>
+<p>  three families: 6684/6708/6708) <code>[F]</code>.</p>
+<ul>
+<li>The <code>.elf</code> file is the <strong>page-aligned image variant of the same content</strong>: phdr1</li>
+</ul>
+<p>  payload at file offset 4096, phdr2 at 12288; both payloads are byte-identical to</p>
+<p>  <code>.b01</code>/<code>.b02</code> (<code>b01_in_elf</code>, <code>b02_in_elf</code> true, exact find offsets) <code>[F]</code>.</p>
+<p>  Size check: 148 + pad→4096 + b01 + pad→12288 + b02 = elf size exactly (a630:</p>
+<p>  14256) <code>[F]</code>.</p>
+<ul>
+<li>Every <code>p_filesz</code> matches its <code>.bNN</code> size in all families <code>[F]</code>.</li>
+<li>Pairwise mdt equality: a630 vs a615 = 688/1671 words equal (common prefix 100 B);</li>
+</ul>
+<p>  a630 vs a660 = 686/1671 — same container/ISA layout, different shader payloads <code>[F]</code>.</p>
+<ul>
+<li>All 7 OP6 GPU files match <code>analysis/out/enchilada-census.csv</code> sha256+size;</li>
+</ul>
+<p>  all 14 larry GPU files match <code>analysis/out/second-device-census.csv</code> <code>[F]</code>.</p>
+<h2>2. GMU / SQE microcode containers across generations</h2>
+<h3>2.1 a630 (OP6) vs a619 (larry) — same container generation <code>[F]</code></h3>
+<table>
+<tr>
+<th>property</th>
+<th>a630_gmu.bin</th>
+<th>a619_gmu.bin</th>
+</tr>
+<tr>
+<td>bytes</td>
+<td>32768</td>
+<td>32768</td>
+</tr>
+<tr>
+<td>entropy</td>
+<td>3.871</td>
+<td>3.867</td>
+</tr>
+<tr>
+<td>head hex16</td>
+<td><code>803f0400 09000000 054880f3 08880548</code></td>
+<td>identical</td>
+</tr>
+<tr>
+<td>nonzero frac (first 4 KiB)</td>
+<td>0.737</td>
+<td>0.738</td>
+</tr>
+<tr>
+<td>alpha strings ≥6</td>
+<td>26</td>
+<td>26 (incl. the shared RTOS string <code>SIGABRT: Abnormal termination</code> at 1588)</td>
+</tr>
+</table>
+<ul>
+<li>Common prefix <strong>1076 bytes</strong>, 59% of u32 words equal over the full 32 KiB</li>
+</ul>
+<p>  (4844/8192) — same firmware skeleton, different build <code>[F]</code>.</p>
+<ul>
+<li>Diffs concentrate in [1076, 16384) (two large merged regions [2748,12000) and</li>
+</ul>
+<p>  [12018,16106) at gap-16 merge); <strong>[16386, 32768) is byte-identical except 2 bytes</strong></p>
+<p>  — the second half of the 32 KiB image is generation-invariant <code>[F]</code>.</p>
+<h3>2.2 a660 (larry) — a different container generation <code>[F]</code></h3>
+<ul>
+<li>55,256 B, entropy 6.46, <strong>common prefix with a630/a619 = 0 bytes</strong>; ~0% words equal.</li>
+<li>Head (8 u32-LE pairs): `(0,0), (1,0x1dc), (0x4000,0), (1,0xd4cc), (0x200,0),</li>
+</ul>
+<p>  (1,0x3a64), (0x100000,0), (1,0x85b4)` — a zero block, then a table-like pattern.</p>
+<p>  **Update 2026-11-19: this leading table is DECODED as the mainline</p>
+<p>  <code>struct block_header</code> prealloc-request TOC** (11 zero-size requests fitting</p>
+<p>  mainline's hardcoded a660 allocations + 4 DEADBEEF-tagged data blocks routed</p>
+<p>  ITCM/icache/DTCM) — full decode in <a href="research/fleet/qsee-crossgen.html">qsee-crossgen.md</a> §5 <code>[F]</code>.</p>
+<ul>
+<li>Non-zero density ≈0.87–0.92 through offset 49152, then 0.161 / 0.019 — trailing</li>
+</ul>
+<p>  padding region <code>[F]</code>. 170 alphabetic strings (vs 26) — denser code, RS64-era build <code>[I]</code>.</p>
+<ul>
+<li>No ASCII banner/version string identified in any gmu file beyond the RTOS crash</li>
+</ul>
+<p>  string <code>[N]</code>.</p>
+<h3>2.3 SQE files <code>[F]</code></h3>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>entropy</th>
+<th>head hex16</th>
+</tr>
+<tr>
+<td>OP6 a630_sqe.fw</td>
+<td>32136</td>
+<td>3.79 (ent in JSON)</td>
+<td><code>…</code> (in JSON)</td>
+</tr>
+<tr>
+<td>larry a630_sqe.fw</td>
+<td>32456</td>
+<td>—</td>
+<td>first 4 bytes equal to OP6's</td>
+</tr>
+<tr>
+<td>larry a660_sqe.fw</td>
+<td>40496</td>
+<td>—</td>
+<td>first 4 bytes equal to both</td>
+</tr>
+</table>
+<ul>
+<li>All three share <strong>exactly a 4-byte common prefix</strong> (one u32 word) and 15/16</li>
+</ul>
+<p>  non-zero words in the first 64 B — raw instruction streams, no header <code>[F]</code>.</p>
+<ul>
+<li>OP6 a630_sqe vs larry a630_sqe: +320 B delta but <strong>not an insert-only patch</strong></li>
+</ul>
+<p>  (common prefix 4, common suffix 43, 23,680 differing bytes ≈ 74% of the smaller</p>
+<p>  file) — two builds of the same a630-generation SQE <code>[F]</code>.</p>
+<ul>
+<li>a660 sqe vs a630 sqe: 0.6–0.7% words equal — different generation <code>[F]</code>.</li>
+<li>No version/count word and no ASCII metadata in any sqe (<code>[N]</code>; the two string-like</li>
+</ul>
+<p>  runs in a630 sqe are coincidental printable byte patterns).</p>
+<h3>2.4 Cross-generation header signature <code>[N]</code></h3>
+<p>There is <strong>no common gmu header magic across generations</strong>: a630/a619 begin with</p>
+<p>instruction words; a660 begins with a zero block and the (now-decoded) prealloc TOC.</p>
+<p>No meaningful shared version/count word found <code>[N]</code>. Generation identity is carried</p>
+<p>by the filename, not an in-file version field (probed: first 64 B words, string</p>
+<p>table, fleet md5 set).</p>
+<h2>3. Fleet identity (md5 cross-check vs coverage-matrix.csv) <code>[F]</code></h2>
+<table>
+<tr>
+<th>on-disk file</th>
+<th>md5</th>
+<th>verdict</th>
+<th>db rows (devices)</th>
+</tr>
+<tr>
+<td>OP6 a630_gmu.bin</td>
+<td><code>1ade6a659713…</code></td>
+<td><strong>PROVEN fleet blob</strong></td>
+<td>a630_gmu.bin: 8 devices (OnePlus 7/7T/7T Pro/7 Pro, Mi A3, Galaxy A71, Redmi Note 8, Z5 Pro GT)</td>
+</tr>
+<tr>
+<td>OP6 a630_sqe.fw</td>
+<td><code>d172aac301b0…</code></td>
+<td><strong>PROVEN fleet blob</strong></td>
+<td>a630_sqe.fw (32136 B variant): 1 device (Redmi Note 7 Pro)</td>
+</tr>
+<tr>
+<td>larry a619_gmu.bin</td>
+<td><code>9e23c52057bb…</code></td>
+<td><strong>PROVEN fleet blob</strong></td>
+<td>a619_gmu.bin: 24 devices (Pixel 4A 5G/5/5A, Moto G200/G34/G84/Stylus, Edge 20/30/30 Neo/Fusion, FP4, Xperia 5 II/5 III/1 II, Nord 200/CE2/CE3, Realme 9 Pro/10 Pro, G Stylus 2022, Edge 2021, Moto G 5G 2024)</td>
+</tr>
+<tr>
+<td>larry a630_sqe.fw</td>
+<td><code>21693ef6f2d6…</code></td>
+<td><strong>PROVEN fleet blob</strong></td>
+<td>a630_sqe.fw (32456 B variant): 19 devices</td>
+</tr>
+<tr>
+<td>larry a660_gmu.bin</td>
+<td><code>179caf2e3b7d…</code></td>
+<td><strong>PROVEN fleet blob</strong></td>
+<td>a660_gmu.bin: 19 devices</td>
+</tr>
+<tr>
+<td>larry a660_sqe.fw</td>
+<td><code>08b7662ccd68…</code></td>
+<td><strong>PROVEN fleet blob</strong></td>
+<td>a660_sqe.fw (40496 B variant): 21 devices</td>
+</tr>
+<tr>
+<td>all 10 zap files (OP6 a630 ×5, larry a615 ×5 + a660 ×5 = 15)</td>
+<td>—</td>
+<td><strong>NOT IN DB</strong></td>
+<td>coverage-matrix.csv contains no <code>*zap*</code> rows at all</td>
+</tr>
+</table>
+<ul>
+<li>The DB's a630_sqe.fw splits into 7 md5 variants (32136/32264/32272/32304/32448/</li>
+</ul>
+<p>  32456/32504) — the filename is fleet-shared but the content is SoC-vendor-build</p>
+<p>  specific; same for a660_gmu (55252/55256/53672) and a660_sqe (40496/43068) <code>[F]</code>.</p>
+<ul>
+<li><code>a615_gmu.bin</code>, <code>a615_sqe.fw</code>, <code>a619_sqe.fw</code> have <strong>no rows</strong> in the DB <code>[N]</code></li>
+</ul>
+<p>  — the SM6375 generation ships <code>a619_gmu.bin</code> + <code>a630_sqe.fw</code> (naming is</p>
+<p>  chip-generation-scoped, not device-scoped) <code>[I]</code>.</p>
+<p><strong>Bottom line:</strong> every gmu/sqe file on disk (both devices) is byte-identical to a</p>
+<p>fleet-wide blob carried by 1–24 devices; the ZAP shader files could not be checked</p>
+<p>against the DB (absent from it).</p>
+<h2>4. gfp9508.<em> classification (modem.img FAT: IMAGE_GFP9508.</em>) <code>[F]</code></h2>
+<p>9 files: <code>IMAGE_GFP9508.{MDT,B00..B07}</code> (companion set IMAGE_GFP5288.* also present).</p>
+<ul>
+<li>MDT: ELF32 LE, <strong><code>e_machine=40</code> (EM_ARM)</strong>, <code>e_type=3</code> (ET_DYN), <code>e_entry=0</code>,</li>
+</ul>
+<p>  8 phdrs ↔ 8 <code>.bNN</code> segment files <code>[F]</code>.</p>
+<ul>
+<li>MDT contains an embedded X.509 chain (short ASCII strings): `QUALCOMM Attestation</li>
+</ul>
+<p>  CA<code>, </code>SecTools Test User<code>, </code>San Diego<code>, </code>CDMA Technologies`, validity timestamps</p>
+<p>  <code>211125155130Z</code>/<code>211125155136Z</code> (2021-11-25) <code>[F]</code>.</p>
+<ul>
+<li>Segment profile (9508): B00 308 B (header), B01 6,696, B02 2,792,936 (ent 6.49),</li>
+</ul>
+<p>  B03 126, B04 4,470,952 (only 5.2% non-zero — sparse), B05 736, B06 152, B07 70,920.</p>
+<ul>
+<li>GFP5288 vs GFP9508: same 9-file structure, same MDT/B00/B01/B05/B06 sizes, but</li>
+</ul>
+<p>  <strong>all 18 files have distinct md5s</strong> (zero shared content); B02/B04/B07 differ</p>
+<p>  hugely in size (e.g. B04: 4.47 MB vs 0.95 MB) <code>[F]</code>.</p>
+<ul>
+<li>Classification: <strong>signed ARM TrustZone (QSEE/PIL) user-app images</strong> — not Hexagon</li>
+</ul>
+<p>  DSP code (machine = ARM, e_type = DYN) <code>[F]</code>. Attribution of the <code>GFP</code> prefix to a</p>
+<p>  fingerprint-sensor app (GF-family sensor models 5288/9508) is plausible from naming</p>
+<p>  and app-image shape but unverified <code>[H]</code>.</p>
+<h2>5. Cross-device bdwlan (larry vs OnePlus 6) — same grammar, new tail</h2>
+<p>Grammar per <code>analysis/drafts/bdwlan-format.md</code>: <code>IE := {u16 LE tag, u16 LE len, payload[len]}</code>.</p>
+<h3>5.1 larry's three files parse cleanly <code>[F]</code></h3>
+<p><code>bdwlan.bin</code>, <code>bdwlan_in.bin</code>, <code>bdwlan_us.bin</code> (all 26,328 B,</p>
+<p><code>odm/etc/wifi/</code>): each walks header-to-EOF cleanly, **19 IEs with strictly</p>
+<p>sequential tags 1..19**, <code>Σ(4+len) = 26328</code> exactly.</p>
+<ul>
+<li>The u16 LE self-reference at abs [8,10) = <strong>26328</strong> (file size) in all three —</li>
+</ul>
+<p>  the same field as OP6's 19152 <code>[F]</code>.</p>
+<ul>
+<li>Per-file discriminator u16 LE at abs [10,12): three distinct values across the</li>
+</ul>
+<p>  three files (mechanism identical to OP6's 28-values-across-29-clusters field;</p>
+<p>  values differ) <code>[F]</code>. Second selector at [408,410) = 1 in all three (OP6: 3</p>
+<p>  distinct values) <code>[F]</code>.</p>
+<h3>5.2 IE skeleton vs OP6 template <code>[F]</code></h3>
+<table>
+<tr>
+<th>tags</th>
+<th>lens</th>
+<th>comparison to OP6</th>
+</tr>
+<tr>
+<td>1–15</td>
+<td>1028, 292, 484, 1028, 656, 636, 280, 4932, 920, 928, 1028, 3432, 44, 260, 1016</td>
+<td><strong>byte-length identical to the OP6 34-file layout</strong></td>
+</tr>
+<tr>
+<td>16</td>
+<td>516</td>
+<td>OP6 common: 2052 — but <strong>exactly the OP6 <code>b38</code> outlier's re-chunk</strong></td>
+</tr>
+<tr>
+<td>17</td>
+<td>1532</td>
+<td>OP6 common: 68 — <code>b38</code> uses 1532</td>
+</tr>
+<tr>
+<td>18</td>
+<td>68</td>
+<td>absent in 34/35 OP6 files; <code>b38</code> has it</td>
+</tr>
+<tr>
+<td>19</td>
+<td>7172</td>
+<td><strong>new IE, absent from the entire OP6 fleet</strong>; payload nonzero fraction 0.4099 with six all-zero 256-B blocks, entropy 3.50. <strong>Update 2026-11-19: tag 19 content is DECODED as a stride-14 regdb-class country table</strong> (199 records × 14 B, 0xA028 marker, 147/199 records byte-identical to larry's regdb.bin, CC set adds CW / drops AO+IR) — full analysis in <a href="research/fleet/bm2n-isa-bt.html">bm2n-isa-bt.md</a> §3 <code>[F]</code> (this doc's earlier "100% non-zero" claim corrected per that measurement)</td>
+</tr>
+</table>
+<p>So the tail re-partition first seen in OP6's one-off <code>b38</code> (16/17/18 = 516/1532/68)</p>
+<p>became the standard tail layout on this generation, extended by a large new</p>
+<p>regdb-class IE (tag 19) <code>[I]</code>.</p>
+<h3>5.3 Per-tag variability vs OP6 consensus (file <code>102</code>) <code>[F]</code></h3>
+<p>Aligned per-tag differing-byte counts (larry <code>bdwlan.bin</code> / <code>_in</code> / <code>_us</code> vs OP6 102):</p>
+<p>tag1 66/66/66 · tag2 2/2/2 · <strong>tag3 0/0/0</strong> · tag4 12/3/12 · <strong>tag5 0</strong> · <strong>tag6 0</strong></p>
+<p>· tag7 60/60/60 · tag8 625/642/635 · tag9 91/117/92 · <strong>tag10 0/0/0</strong> · tag11</p>
+<p>330/356/347 · tag12 573/473/<strong>105</strong> · tag13 30/30/30 · tag14 104/104/104 · tag15</p>
+<p>28/28/28.</p>
+<ul>
+<li>Tags 3, 5, 6, 10 are <strong>byte-identical across both device generations</strong>. Tag 10 was</li>
+</ul>
+<p>  already fleet-constant across all 35 OP6 files — it is constant across</p>
+<p>  generations too; tags 5/6 are zero-padding there and here <code>[F]</code>.</p>
+<ul>
+<li>Tag 12 shows the strongest region selectivity: the <code>_us</code> variant differs from the</li>
+</ul>
+<p>  OP6 consensus by only 105 bytes while <code>_in</code> differs by 473 <code>[F]</code>.</p>
+<ul>
+<li>Within larry: bin vs in = 1,428 differing B (350 spans), bin vs us = 1,147 (282),</li>
+</ul>
+<p>  in vs us = 1,272 (292); first diffs at [10,12), then [38,39), [62,63), then</p>
+<p>  calibration islands inside tag 8 — the same "ID/selector fields + calibration</p>
+<p>  delta" model as OP6 <code>[F]</code>.</p>
+<h3>5.4 Fleet-identity verdict <code>[N]</code></h3>
+<p>None of larry's four wifi files matches any of the 29 OP6 md5 clusters (sizes</p>
+<p>26,328 vs 19,152 cannot match). Board data is <strong>device/chip-generation specific</strong>;</p>
+<p>only the container grammar and the fixed-config IEs are shared across generations.</p>
+<h2>6. regdb.bin — a different container <code>[F]</code></h2>
+<p>19,348 B, entropy 1.60, md5 <code>f94fc7f186e6…</code>.</p>
+<ul>
+<li><strong>Not the bdwlan TLV grammar</strong>: the LE {u16,u16} walk from offset 0 produces</li>
+</ul>
+<p>  nonsense IEs and degenerates into a (0,0) chain after 17152 (558 nominal IEs) <code>[F]</code>.</p>
+<ul>
+<li>Actual structure (measured): 6-byte head, then a **fixed-stride 14-byte record</li>
+</ul>
+<p>  table from offset 6**. A recurring u32 LE marker <code>28 a0 00 00</code> occurs 189 times at</p>
+<p>  record offset +6 with dominant stride 14 (179 of 188 consecutive gaps) <code>[F]</code>.</p>
+<ul>
+<li>Each record: ISO 3166-1 alpha-2 code + NUL at +0, <strong>the same code repeated</strong> at +3,</li>
+</ul>
+<p>  constant u32 0xA028 at +6, two u16 fields at +10/+12. First records: `AF, AX, AL,</p>
+<p>  DZ, AS, AD<code> — the official ISO 3166-1 list order </code><span class="evidence" data-evidence="f">F</span>` (codes are short ASCII,</p>
+<p>  reproduced as facts).</p>
+<ul>
+<li>Table extent: last marker at 2770, last uppercase pair at 2781 (~198 records);</li>
+</ul>
+<p>  beyond it a sparse region [~2774, 17152) with 1,315 non-zero bytes (structure</p>
+<p>  unanalyzed), tail [17152, 19348) all-zero <code>[F]</code>.</p>
+<ul>
+<li>Classification: regulatory database (country → rules), structurally unrelated to</li>
+</ul>
+<p>  the bdwlan container <code>[I]</code>; semantics of the two u16 fields and the 0xA028</p>
+<p>  constant unknown <code>[open]</code>. **Note 2026-11-19: the same record shape is embedded</p>
+<p>  as bdwlan tag 19 in the SM6375 generation — see bm2n-isa-bt.md §3.**</p>
+<h2>7. Honest negatives</h2>
+<ol>
+<li>No cross-generation gmu header signature/magic exists (§2.4) <code>[N]</code>.</li>
+<li>No meaningful shared version word across the three gmu files (only a zero) <code>[N]</code>.</li>
+<li>No zap rows in coverage-matrix.csv — zap fleet identity not checkable <code>[N]</code>.</li>
+<li>a615/a619 gmu+sqe naming absent from the DB (<code>a619_gmu.bin</code> is the one gmu that</li>
+</ol>
+<p>   exists for this generation) <code>[N]</code>.</p>
+<ol>
+<li>No larry bdwlan/regdb md5 matches any OP6 cluster <code>[N]</code>.</li>
+<li>No ASCII version/banner strings in gmu/sqe beyond the shared RTOS crash string <code>[N]</code>.</li>
+<li>OP6 FAT re-extraction (<code>/tmp/modem-fat-b</code>) reproduced all 35 BDWLAN md5s exactly —</li>
+</ol>
+<p>   consistent with the previous session's JSON <code>[F]</code> (positive, listed as repro check).</p>
+<h2>8. Open items</h2>
+<ul>
+<li>Decode the a630 vs a615/a660 zap payload differences (100-byte mdt prefix).</li>
+<li>Confirm the <code>[10,12)</code> discriminator semantics (board ID namespace) for larry's</li>
+</ul>
+<p>  three values; link to QMI/board-id selection.</p>
+<ul>
+<li>Decode the regdb.bin post-table sparse region and the u16 fields; find the public</li>
+</ul>
+<p>  qcacld/qcacmn parser for confirmation.</p>
+<h2>9. Reproduction</h2>
+<pre><code class="language-sh">
+python3 -I librephone-blob-research/blob-matrix/desktop/tools/fat_extract.py \
+    data-fetch/enchilada/modem.img /tmp/modem-fat-b
+python3 -I analysis/tools/gpu_bdwlan_probe.py
+python3 -I analysis/tools/gpu_bdwlan_followup.py
+</code></pre>
+<p>Scripts (lab-rule compliant): <code>analysis/tools/gpu_bdwlan_probe.py</code>,</p>
+<p><code>analysis/tools/gpu_bdwlan_followup.py</code>. Machine-readable outputs:</p>
+<p><code>analysis/out/gpu-bdwlan-analysis.json</code> (merged), <code>analysis/out/gpu-bdwlan-followup.json</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

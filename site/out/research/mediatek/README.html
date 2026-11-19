@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediaTek front — Xiaomi Redmi Note 10S (rosemary, Helio G95 / MT6785), LineageOS 24.0 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>MediaTek front — Xiaomi Redmi Note 10S (rosemary, Helio G95 / MT6785), LineageOS 24.0</h1><p>MediaTek firmware research front (same methodology as `qualcomm-fp6/`:</p><p>Evidence: none</p>
+<h1>MediaTek front — Xiaomi Redmi Note 10S (rosemary, Helio G95 / MT6785), LineageOS 24.0</h1>
+<p>MediaTek firmware research front (same methodology as <code>qualcomm-fp6/</code>:</p>
+<p>architecture ID, segment maps, version strings, prior-art checks).</p>
+<p>Content so far: <code>rosemary-census.md</code> — the first MTK device census (12</p>
+<p>firmware partitions; the zero-ELF <code>mtk_hdr</code> container finding; ARCv2 CCU</p>
+<p>identification) — plus decode follow-ups in <code>docs/</code> (<code>md1rom-decode.md</code>,</p>
+<p><code>md1dsp-decode.md</code>, <code>md32-gap.md</code>), machine results in <code>results/</code>, and</p>
+<p>tooling in <code>tools/</code>. Headline findings are summarized in the repo-root</p>
+<p>README's MediaTek section.</p>
+<p>Families covered (from the rosemary census): <code>md1img</code> (modem: md1rom</p>
+<p>MIPS32+MIPS16e per F-31, md1dsp MD32-class per F-36 with the decode-gap</p>
+<p>diagnosis in F-45), <code>scp</code> (Cortex-M4F + FreeRTOS), <code>sspm</code> (encrypted),</p>
+<p><code>spmfw</code> (SPM/PCM microcode), <code>audio_dsp</code> (HiFi3/Xtensa, name-level),</p>
+<p><code>cam_vpu*</code> (ARM32 Thumb-2), CCU (ARCv2). No <code>mcupm</code>, <code>dpm</code>, <code>vcp</code>, or</p>
+<p><code>piimg</code> partitions exist on this device.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

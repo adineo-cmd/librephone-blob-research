@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QMMI and DIAG mode from a host computer (FP6) — for upstream issue #46 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>QMMI and DIAG mode from a host computer (FP6) — for upstream issue #46</h1><p>One-page literature-survey note, from **public data only**</p><p>Evidence: none</p>
+<h1>QMMI and DIAG mode from a host computer (FP6) — for upstream issue #46</h1>
+<p>One-page literature-survey note, from <strong>public data only</strong></p>
+<p>([upstream issue</p>
+<p>#46](https://codeberg.org/rsavoye/librephone/issues/46): "QMMI Mode ...</p>
+<p>a manufacturer and Qualcomm-oriented diagnostic environment ... There</p>
+<p>doesn't seem to be any documentation on the QMMI protocol, and how to</p>
+<p>use it from a host computer"). Written 2026-11-16.</p>
+<p><strong>Legend:</strong> [PUBLIC] = public fact with source; [LAB] = lab-derived</p>
+<p>fact; [OPEN] = not establishable without hardware — flagged, not</p>
+<p>guessed.</p>
+<h2>1. The two things called "diag/QMMI"</h2>
+<p>These are distinct and worth separating before protocol work:</p>
+<ol>
+<li><strong>DIAG</strong> — the Qualcomm diagnostic <strong>protocol</strong> spoken between the</li>
+</ol>
+<p>   modem/AP and a host tool over a serial-flavored channel (USB</p>
+<p>   function <code>diag</code>, historically HSIC/serial). Framed around</p>
+<p>   <code>0x4B</code>-prefixed command requests, log/wireless log packets, and a</p>
+<p>   command set that includes memory reads, NV item read/write, and</p>
+<p>   event/log streaming. Consumers today: factory calibration, baseband</p>
+<p>   development, and — notably for this project — the DIAG channel is</p>
+<p>   how FTM/UTF-adjacent tooling talks in the field.</p>
+<ol>
+<li><strong>QMMI</strong> — the Qualcomm <strong>factory test application</strong> ("Man-Machine</li>
+</ol>
+<p>   Interface"): an on-device test harness (<code>com.qualcomm.qti.qmmi</code></p>
+<p>   package in public vendor/device trees) that runs hardware self-tests</p>
+<p>   (sensors, touch, audio, camera, ...) and reports results to factory</p>
+<p>   software. It is a UI/plugin framework, not a wire protocol; its host</p>
+<p>   protocol is vendor/tooling-specific and <strong>not publicly documented</strong></p>
+<p>   ([OPEN] — see §4).</p>
+<h2>2. DIAG from a host — what is public</h2>
+<ul>
+<li>[PUBLIC] On-device enablement: the diag USB function is enabled via</li>
+</ul>
+<p>  USB function composition (vendor <code>sys.usb.config</code> strings incl.</p>
+<p>  <code>diag</code>, per upstream's own ftm.md example:</p>
+<p>  <code>setprop sys.usb.config diag,diag_mdm,qdss,qdss_mdm,serial_cdev,dpl,rmnet,adb</code>)</p>
+<p>  or engineering menus (<code>*#*#4636#*#*</code> and vendor dial codes per</p>
+<p>  upstream ftm.md / public device docs).</p>
+<ul>
+<li>[PUBLIC] Kernel side, the DIAG character driver is public Qualcomm</li>
+</ul>
+<p>  code (<code>drivers/char/diag/*</code> — diagchar_core/diagfwd/diag_dpl etc.)</p>
+<p>  in public Android msm kernel trees. It is <strong>not</strong> present in the</p>
+<p>  FP6 GKI kernel tree</p>
+<p>  (<code>github.com/LineageOS/android_kernel_fairphone_SM7635</code> — probed</p>
+<p>  <code>drivers/char/diag/diagchar_core.c</code>, 404, 2026-11-16) — on GKI</p>
+<p>  devices DIAG lives in vendor modules/dt or is handled by the modem</p>
+<p>  stack via the channels below. Honest negative recorded.</p>
+<ul>
+<li>[PUBLIC] Channel plumbing on modern devices: DIAG reaches the host</li>
+</ul>
+<p>  as USB endpoints backed by the diag driver, while on-device log</p>
+<p>  data also flows over GLINK channels (<code>DIAG</code>, <code>DPL</code> data-path logging)</p>
+<p>  — the same rpmsg channel model documented in</p>
+<p>  <code>qualcomm-fp6/docs/interface-cellular.md</code> (§2).</p>
+<ul>
+<li>[PUBLIC] Host tooling literature: the 0x4B command framing and</li>
+</ul>
+<p>  DIAG command repertoire are implemented in public community tools</p>
+<p>  and write-ups (e.g. <code>github.com/Alephgsm/qualcomm-diag-protocol</code> —</p>
+<p>  "All qualcomm devices have diag connection mode ...", GitHub repo</p>
+<p>  search hit 2026-11-16; plus the well-known postmarketOS/Android</p>
+<p>  development tooling). No canonical vendor spec is public; the</p>
+<p>  community implementations are the de-facto reference.</p>
+<ul>
+<li>[LAB] The lab has not captured DIAG traffic (no FP6 hardware on</li>
+</ul>
+<p>  this box); nothing below §2 is lab-derived.</p>
+<h2>3. QMMI from a host — what is public</h2>
+<ul>
+<li>[PUBLIC] QMMI is reachable via boot-mode entry (e.g. `adb reboot</li>
+</ul>
+<p>  ftm` per upstream ftm.md's bootloader-menu observation on some</p>
+<p>  devices) or service menus; the test plugins live in vendor trees</p>
+<p>  (package <code>com.qualcomm.qti.qmmi</code>, test-module APKs) — public</p>
+<p>  device/vendor dumps, listable via standard tree browsing.</p>
+<ul>
+<li>[OPEN] The host↔device QMMI exchange (what factory fixtures speak —</li>
+</ul>
+<p>  vendor private protocols over adb sockets/USB) is **not publicly</p>
+<p>  documented anywhere this box could find** (searched 2026-11-16:</p>
+<p>  Codeberg/GitHub issue text, public kernel trees, community repos).</p>
+<p>  Documenting it requires a capture on hardware — blocked here, and</p>
+<p>  the honest answer to #46 is: DIAG = partially public (above), QMMI</p>
+<p>  = needs capture.</p>
+<h2>4. What a first capture would record (when hardware is available)</h2>
+<ol>
+<li>USB descriptors with the diag function active (interface classes</li>
+</ol>
+<p>   exposed).</p>
+<ol>
+<li>DIAG session: 0x4B request/response log, one command family at a</li>
+</ol>
+<p>   time (version, then memory-read, then NV read) — derive the exact</p>
+<p>   framing from the capture, cross-check against the public driver's</p>
+<p>   <code>DIAG_IOCTL</code> surface in a public msm tree.</p>
+<ol>
+<li>QMMI session: traffic between the factory test UI and any host</li>
+</ol>
+<p>   component (adb-forwarded sockets first), identifying whether QMMI</p>
+<p>   is adb-shell-driven (UI only) or has a real wire protocol.</p>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>upstream <code>docs/ftm.md</code> (USB composition string, <code>*#*#4636#*#*</code>,</li>
+</ul>
+<p>  <code>adb reboot ftm</code> — fetched from codeberg raw)</p>
+<ul>
+<li>https://api.github.com/search/repositories?q=qualcomm+diag+protocol</li>
+</ul>
+<p>  (hit: <code>Alephgsm/qualcomm-diag-protocol</code>)</p>
+<ul>
+<li>probe (negative, recorded):</li>
+</ul>
+<p>  <code>raw.githubusercontent.com/LineageOS/android_kernel_fairphone_SM7635/HEAD/drivers/char/diag/diagchar_core.c</code> → 404</p>
+<ul>
+<li>https://wiki.postmarketos.org/wiki/Qualcomm_Diag → 404 (page does</li>
+</ul>
+<p>  not exist; recorded honestly)</p>
+<ul>
+<li>Lab: <code>qualcomm-fp6/docs/interface-cellular.md</code> (rpmsg DIAG/DPL</li>
+</ul>
+<p>  channel model)</p>
+<p><strong>Clean-room statement:</strong> public facts and honest negatives only; no</p>
+<p>proprietary protocol dumps, no captive firmware content. The blocked</p>
+<p>hardware-capture part is stated as blocked, not filled from memory.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

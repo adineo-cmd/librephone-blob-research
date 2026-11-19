@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 (enchilada) — WiFi family — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 (enchilada) — WiFi family</h1><p>**Evidence class: format-spec** (RESOLVED 2026-11-17 — the census-negative</p><p>Evidence: none</p>
+<h1>OnePlus 6 (enchilada) — WiFi family</h1>
+<p><strong>Evidence class: format-spec</strong> (RESOLVED 2026-11-17 — the census-negative</p>
+<p>finding is confirmed AND resolved; bdwlan container format decoded).</p>
+<p>Source: LineageOS 22.2 nightly 2026-11-11 enchilada, partition <code>modem</code>.</p>
+<h2>What is actually in the vendor image</h2>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>note</th>
+</tr>
+<tr>
+<td><code>WCNSS_qcom_cfg.ini</code></td>
+<td>0</td>
+<td>zero bytes in this build</td>
+</tr>
+<tr>
+<td><code>wlan_mac.bin</code></td>
+<td>0</td>
+<td>zero bytes in this build</td>
+</tr>
+</table>
+<p>Both zero-byte: the A/B OTA vendor tree carries no WLAN calibration/config</p>
+<p>payload for this chip.</p>
+<h2>Where the WLAN firmware really is (RESOLVED 2026-11-17)</h2>
+<p><code>modem.img</code> is a FAT16 volume (same layout family as <code>bt.img</code>) whose</p>
+<p><code>IMAGE</code> directory carries 404 named firmware files — including</p>
+<p><strong><code>image_wlanmdsp.mbn</code> (3,035,876 B, md5 <code>771a9c2e…90df5</code>)</strong>, the</p>
+<p>WCN3990 WLAN firmware, plus a <strong>35-file</strong> <code>image_bdwlan.*</code> board-data set</p>
+<p>(19,152 B each). The hypothesis below is confirmed and upgraded to fact.</p>
+<p>SDM845's WiFi is the integrated WCN3990; its firmware image ships inside</p>
+<p>the <code>modem</code> partition's FAT tree, not as a standalone vendor file. This</p>
+<p>mirrors the upstream DB's mislabeling class (recon.md finding 4:</p>
+<p><code>a660_sqe.fw</code> typed AUDIO, <code>bm2nXX.bin</code> typed MODEM) — on enchilada the</p>
+<p>entire wifi family is structurally hidden inside the modem partition.</p>
+<h2>Board-data format (decoded 2026-11-17)</h2>
+<p>The <code>bdwlan.*</code> container is a <strong>flat TLV chain</strong> (`{u16 LE tag, u16 LE len,</p>
+<p>payload}` to EOF, no outer magic): 34 files carry 17 strictly sequential</p>
+<p>IEs (tags 1..17; <code>b38</code> re-chunks the tail into 18), chain sums to exactly</p>
+<p>19,152 on every file, IE-1 payload self-references the file size. Distinct</p>
+<p>from ath10k <code>board-2.bin</code> (32-bit IEs). Variability map: 4,199/19,152 bytes</p>
+<p>vary, 28 disjoint regions over 12 IEs, stride-40 and stride-4 record tables</p>
+<p>identified, per-board ID fields at abs [10,12) (28 values) and [408,410)</p>
+<p>(3 values); <strong>29 md5 clusters</strong> with minimal-diff pairs (2 bytes). Full</p>
+<p>spec: [../../blob-matrix/desktop/fleet-re/bdwlan-format.md]</p>
+<p>(../../blob-matrix/desktop/fleet-re/bdwlan-format.md).</p>
+<h2>Interface facts</h2>
+<p>Consumers: WCN3990 support is in mainline <code>ath10k</code> via the SNOC bus;</p>
+<p><code>bdwlan.*</code> board files are the per-board calibration variants the firmware</p>
+<p>selects from (board-ID keyed). No interface doc committed yet.</p>
+<h2>Open questions</h2>
+<ul>
+<li>tag 1..17 semantics (needs a Qualcomm BDF tool/spec — none public)</li>
+<li>board-ID field decode vs the cnss loader (28 values ≠ filename numbers)</li>
+<li>zero-byte <code>WCNSS_qcom_cfg.ini</code>: generated at runtime by the driver?</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

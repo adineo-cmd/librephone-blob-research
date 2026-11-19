@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FTM/UTF instrumentation points (WLAN) — for upstream issues #44 and #45 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>FTM/UTF instrumentation points (WLAN) — for upstream issues #44 and #45</h1><p>One-page extension of upstream `docs/ftm.md`, from **public source</p><p>Evidence: none</p>
+<h1>FTM/UTF instrumentation points (WLAN) — for upstream issues #44 and #45</h1>
+<p>One-page extension of upstream <code>docs/ftm.md</code>, from **public source</p>
+<p>trees** ([upstream issue</p>
+<p>#44](https://codeberg.org/rsavoye/librephone/issues/44): "identify</p>
+<p>where instrumentation code can be inserted, and if it's possible to</p>
+<p>update that code for our own custom tests"; and #45: "expand the FTM</p>
+<p>doc"). Written 2026-11-16. All cited files verified present in the</p>
+<p>public FP6 tree</p>
+<p><code>github.com/LineageOS/android_kernel_fairphone_sm7635-modules</code></p>
+<p>(<code>qcom/opensource/wlan/...</code> — three probes fetched OK 2026-11-16).</p>
+<p><strong>Legend:</strong> [PUBLIC] = public-tree fact (upstream <code>docs/ftm.md</code> +</p>
+<p>the wlan module tree); [LAB] = lab-derived fact; [OPEN] = needs the</p>
+<p>blob binary, not on this box.</p>
+<h2>0. Scope note</h2>
+<p>Upstream <code>docs/ftm.md</code> already documents the FTM/UTF command channel</p>
+<p>(ioctl <code>0x1000/0x1001</code>, nl80211 testmode cmd 0, <code>ftm_seg_hdr_info</code></p>
+<p>16-byte reassembly, 2048 B/segment, <code>wmi_pdev_utf_cmd_id</code>/<code>_event_id</code>).</p>
+<p>This page adds what #44 asks for: <strong>where to hook</strong>.</p>
+<h2>1. Instrumentation points, outermost → blob boundary</h2>
+<p>Each layer is a public file; hooks at earlier layers are pure kernel</p>
+<p>work and need no blob knowledge:</p>
+<table>
+<tr>
+<th>#</th>
+<th>layer / file</th>
+<th>hook type</th>
+<th>use</th>
+</tr>
+<tr>
+<td>1</td>
+<td><code>os_if/linux/ftm/src/wlan_cfg80211_ftm.c</code> (nl80211 entry)</td>
+<td>wrap <code>wlan_cfg80211_ftm_testmode_cmd</code> + the rx-event pushback</td>
+<td>record every userspace↔driver FTM exchange; ideal for logging/test-harness harnessing</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>os_if/linux/ftm/src/wlan_ioctl_ftm.c</code> (ioctl <code>0x1000/0x1001</code>)</td>
+<td>wrap the two ioctl handlers</td>
+<td>same, for the ioctl-based daemon path</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>ftm/dispatcher/src/wlan_ftm_ucfg_api.c</code> (<code>ucfg_wlan_ftm_testmode_cmd</code> + reassembly)</td>
+<td>insert at the converged single point both paths pass through</td>
+<td>one chokepoint sees all commands AND complete reassembled responses — the best place for an automated test suite</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>target_if/ftm/src/target_if_ftm.c</code> (<code>target_if_ftm_cmd_send</code> / <code>target_if_ftm_process_utf_event</code>)</td>
+<td>shim immediately above <code>wmi_unified_pdev_utf_cmd_send</code></td>
+<td>byte-exact capture of what actually goes to/comes from the blob</td>
+</tr>
+<tr>
+<td>5</td>
+<td>WMI layer (<code>wmi_unified_pdev_utf_cmd_send</code>)</td>
+<td>filter/patch outbound UTF commands</td>
+<td>format-level tracing; [LAB] the WMI registry/decorators this firmware uses are documented in <code>papers/wmi-dispatch-architecture.md</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>blob side (WCN6750 UTF handler)</td>
+<td>—</td>
+<td>[OPEN] the handler lives in the Hexagon/RV32 wpss image; instrumenting <em>inside</em> the blob means replacing segments, which is blocked upstream by the PAS signing chain (PR #58 thread: scm PAS rejects any replaced segment)</td>
+</tr>
+</table>
+<p><strong>Activation context</strong> [PUBLIC]: the FTM channel is only live in</p>
+<p><code>QDF_GLOBAL_FTM_MODE</code> — module param <code>con_mode_ftm</code></p>
+<p>(<code>/sys/module/qca_cld3_qca6750/parameters/con_mode_ftm</code> in upstream's</p>
+<p>own list) or <code>adb reboot ftm</code>; the driver must be loaded in FTM mode</p>
+<p>before any of layers 1–5 see traffic.</p>
+<h2>2. Custom tests without touching the blob</h2>
+<p>Yes — [PUBLIC] the UTF payload is <strong>opaque</strong> end-to-end: the driver</p>
+<p>only segments/reassembles (<code>ftm_seg_hdr_info</code>), it does not parse</p>
+<p>UTF content. Consequences:</p>
+<ul>
+<li>a userspace test tool can send arbitrary ≤2048-byte blobs through</li>
+</ul>
+<p>  nl80211 testmode or the ioctl and get the blob's echo back;</p>
+<ul>
+<li>instrumentation inserted at layer 3 or 4 can synthesize/modify UTF</li>
+</ul>
+<p>  payloads in-kernel, i.e. "our own custom tests" at the command</p>
+<p>  level without any blob modification;</p>
+<ul>
+<li>constraints to respect: FTM mode active, one pdev priv-obj per</li>
+</ul>
+<p>  interface, 2048 B/segment, <code>total_segments</code>/<code>current_seq</code> bookkeeping</p>
+<p>  on responses.</p>
+<p>What is <strong>not</strong> possible without blob work: adding new <em>blob-side</em></p>
+<p>behaviors (the blob executes only its own Hexagon/RV32 code). That is</p>
+<p>the [LAB] boundary the lab's census work frames — see</p>
+<p><code>qualcomm-fp6/docs/fp6-architecture-census.md</code> for the blob's ISA</p>
+<p>map (Hexagon segments + RV32 QURT app) and the F-8 QURT finding.</p>
+<h2>3. Doc-expansion checklist for #45 (what upstream ftm.md does not yet carry)</h2>
+<ol>
+<li>the instrumentation table above;</li>
+<li>the custom-test mechanics (opaque payload path, limits);</li>
+<li>the FTM↔HTT independence note (already there) plus the CE pipe</li>
+</ol>
+<p>   numbers FTM does NOT use (FTM rides WMI, not the CE4 HTT data pipe</p>
+<p>   — see <code>qualcomm-fp6/docs/interface-copyengine.md</code>);</p>
+<ol>
+<li>a pointer to the WMI dispatch spec for anyone decoding UTF event</li>
+</ol>
+<p>   IDs against the registry.</p>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>upstream <code>docs/ftm.md</code></li>
+</ul>
+<p>  (https://codeberg.org/rsavoye/librephone/raw/branch/main/docs/ftm.md —</p>
+<p>  fetched, 260 lines)</p>
+<ul>
+<li>public FP6 wlan module tree: <code>wlan_ftm_svc.c</code>, <code>wlan_hdd_ftm.c</code>,</li>
+</ul>
+<p>  <code>wlan_cfg80211_ftm.c</code> — HTTP 200 on</p>
+<p>  <code>raw.githubusercontent.com/LineageOS/android_kernel_fairphone_sm7635-modules/HEAD/qcom/opensource/wlan/...</code></p>
+<ul>
+<li>lab: <code>papers/wmi-dispatch-architecture.md</code>,</li>
+</ul>
+<p>  <code>qualcomm-fp6/docs/interface-copyengine.md</code>,</p>
+<p>  <code>qualcomm-fp6/docs/fp6-architecture-census.md</code></p>
+<p><strong>Clean-room statement:</strong> public-tree file/struct facts + lab</p>
+<p>census/paper facts; no decompiled code, no blob payload contents.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

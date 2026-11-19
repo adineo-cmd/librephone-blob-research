@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QCA BT patch/NVM fleet — container format decoded (fleet-re, 2026-11-16) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>QCA BT patch/NVM fleet — container format decoded (fleet-re, 2026-11-16)</h1><p>**Evidence class: format-spec** (container layer fully derived from public</p><p>Evidence: none</p>
+<h1>QCA BT patch/NVM fleet — container format decoded (fleet-re, 2026-11-16)</h1>
+<p><strong>Evidence class: format-spec</strong> (container layer fully derived from public</p>
+<p>GPL parser code + byte-verified against the 29-device fleet; patch-entry</p>
+<p>interior remains open). One RE pass on 10 files documents the BT bring-up</p>
+<p>surface of up to 29 devices per file — recon.md top-20 entries #1-#6 and</p>
+<p>their siblings.</p>
+<h2>Identity chain (the load-bearing result)</h2>
+<p>The six top-20 fleet blobs (md5-keyed, 29 devices each in the committed</p>
+<p>matrix) are byte-identical to files extracted from the OnePlus 6</p>
+<p><code>bluetooth</code> partition (official LineageOS 22.2 nightly 2026-11-11,</p>
+<p>sha256-verified zip):</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>fleet devices</th>
+<th>identity provenance</th>
+</tr>
+<tr>
+<td><code>apbtfw10.tlv</code></td>
+<td>56,052</td>
+<td><code>42a31bb8…d4c6</code></td>
+<td>29</td>
+<td>OP6 payload <strong>and</strong> public linux-firmware (qca/) — double match</td>
+</tr>
+<tr>
+<td><code>apnv10.bin</code></td>
+<td>1,243</td>
+<td><code>4905d516…14ff</code></td>
+<td>29</td>
+<td>OP6 payload <strong>and</strong> linux-firmware — double match</td>
+</tr>
+<tr>
+<td><code>crbtfw20.tlv</code></td>
+<td>56,180</td>
+<td><code>16077492…7eef</code></td>
+<td>29</td>
+<td>OP6 payload (linux-firmware lacks the name — 404)</td>
+</tr>
+<tr>
+<td><code>crbtfw11.tlv</code></td>
+<td>29,368</td>
+<td><code>eae2d0a1…8092</code></td>
+<td>29</td>
+<td>OP6 payload</td>
+</tr>
+<tr>
+<td><code>crnv20.bin</code></td>
+<td>3,936</td>
+<td><code>bb6ca169…b4c1</code></td>
+<td>29</td>
+<td>OP6 payload</td>
+</tr>
+<tr>
+<td><code>crnv11.bin</code></td>
+<td>2,798</td>
+<td><code>7c0db76f…00c6</code></td>
+<td>29</td>
+<td>OP6 payload</td>
+</tr>
+</table>
+<p>Plus four sibling variants extracted from the same volume: <code>apbtfw11.tlv</code></p>
+<p>(216,372), <code>crbtfw21.tlv</code> (217,676), <code>apnv11.bin</code> (4,760), <code>crnv21.bin</code></p>
+<p>(4,619). Facts only committed; payload bytes never leave this analysis.</p>
+<h2>The container that carries them (new partition-level fact)</h2>
+<p>The OnePlus 6 <code>bt.img</code> partition (765,952 B) is a <strong>FAT16 volume</strong></p>
+<p>(<code>EB 3C 90</code> + <code>MSDOS5.0</code> OEM; BPB: 4,096 B/sector, 4 sec/cluster, 1</p>
+<p>reserved sector, 2 FATs × 3 sectors, 512 root entries), whose root holds a</p>
+<p>single <code>IMAGE</code> directory containing the ten fleet files above. The volume</p>
+<p>declares 16,384 sectors but the OTA writes only the first 187 — the</p>
+<p>written region contains the whole live directory tree. Upstream counts</p>
+<p><code>bt.img</code> as one opaque blob; it is in fact a filesystem carrying the</p>
+<p>entire patch fleet, which is how one SDM845 device ships all 29-device</p>
+<p>fleet files at once.</p>
+<h2>Format spec (every field grounded in public GPL code)</h2>
+<p>Outer header — <code>struct tlv_type_hdr</code> (btqca.h): one LE32 `type_len =</p>
+<p>(length &lt;&lt; 8) | type<code>, 4 bytes; </code>len_check` passes 10/10.</p>
+<p>Patch files (<code>type = 1 = TLV_TYPE_PATCH</code>), payload = `struct</p>
+<p>tlv_type_patch` (24 bytes, btqca.h):</p>
+<table>
+<tr>
+<th>field</th>
+<th>apbtfw10</th>
+<th>apbtfw11</th>
+<th>crbtfw11</th>
+<th>crbtfw20</th>
+<th>crbtfw21</th>
+</tr>
+<tr>
+<td>total_size</td>
+<td>55,792</td>
+<td>216,112</td>
+<td>29,108</td>
+<td>55,920</td>
+<td>217,416</td>
+</tr>
+<tr>
+<td>data_length</td>
+<td>55,768</td>
+<td>216,088</td>
+<td>29,084</td>
+<td>55,896</td>
+<td>217,392</td>
+</tr>
+<tr>
+<td>format_version</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>signature</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>download_mode</td>
+<td>3</td>
+<td>3</td>
+<td><strong>0</strong></td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>product_id</td>
+<td>10</td>
+<td>10</td>
+<td>10</td>
+<td>10</td>
+<td>10</td>
+</tr>
+<tr>
+<td>rom_build</td>
+<td>0x0200</td>
+<td>0x0201</td>
+<td>0x0101</td>
+<td>0x0200</td>
+<td>0x0201</td>
+</tr>
+<tr>
+<td>patch_version</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>entry</td>
+<td>0x1b0e0</td>
+<td>0x209e4</td>
+<td>0x1b15c</td>
+<td>0x1b0e0</td>
+<td>0x209e4</td>
+</tr>
+</table>
+<ul>
+<li><code>total_size == data_length + 24</code> holds 5/5 — the struct is exactly</li>
+</ul>
+<p>  self-describing against real bytes.</p>
+<ul>
+<li><code>download_mode</code> 0 vs 3 is the Rome-generation split btqca.c documents</li>
+</ul>
+<p>  ("Rome 1.1-3.1 acks every segment via VSE; &gt;= 3.2 may skip; field</p>
+<p>  indicates"): crbtfw11 (ROM 1.1) = 0, all 2.x = 3 (<code>SKIP_EVT_VSE_CC</code>).</p>
+<ul>
+<li><strong><code>rom_build</code> equals the filename suffix</strong> — filename ↔ header identity</li>
+</ul>
+<p>  proven 5/5; <code>ap*</code>/<code>cr*</code> are two patch families for the same ROM</p>
+<p>  versions (chip-family split not yet attributed — open item).</p>
+<ul>
+<li><strong><code>entry</code> pairs by generation</strong>: the 2.0 files carry 0x1b0e0 (crbtfw11's</li>
+</ul>
+<p>  1.1 variant: 0x1b15c), the 2.1 files carry 0x209e4 — per-generation</p>
+<p>code entry addresses, ap<em> and cr</em> agreeing.</p>
+<ul>
+<li>Every patch file carries a <strong>256-byte tail after <code>total_size</code></strong> (0.4-1.2%</li>
+</ul>
+<p>  zero bytes — content, not padding). Unknown role: attestation/</p>
+<p>  signature/manifest — open item.</p>
+<ul>
+<li><code>data_length</code> bytes after the 24-byte header are the patch stream;</li>
+</ul>
+<p>  first bytes of apbtfw10's stream (<code>f8 b5 5e 48 00 24 00 68 80 47…</code>)</p>
+<p>  are consistent with ARM Thumb (0xb5f8 = push {r2-r7,lr}) — **observed</p>
+<p>  byte pattern, ISA unconfirmed**; the entry-level structure of the</p>
+<p>  stream is not parsed by any public code we found (btqca.c sends it</p>
+<p>  verbatim in 243-byte segments per <code>MAX_SIZE_PER_TLV_SEGMENT</code>).</p>
+<p>NVM files (<code>type = 4</code> enclosing): each wraps **one inner <code>type = 2</code> tag</p>
+<p>set + one <code>type = 3</code> set** (443-1,237 B, unknown content — btqca.c reads</p>
+<p>only the first type-2 set and skips the type-3 set entirely). Each type-2</p>
+<p>entry is a <code>struct tlv_type_nvm</code> = 12-byte header (`tag_id u16, tag_len</p>
+<p>u16, reserve1 u32, reserve2 u32<code>) + </code>tag_len` data bytes; the parser</p>
+<p>consumes set 1 <strong>exactly</strong> (6/6 <code>exact_close</code>).</p>
+<ul>
+<li>All 6/6 carry the three tags btqca.c handles: <code>0x0002</code> BD_ADDR</li>
+</ul>
+<p>  (tag_len 6 ✓), <code>0x0011</code> HCI transport (baud-rate byte per soc_type),</p>
+<p>  <code>0x001b</code> deep-sleep.</p>
+<ul>
+<li>Tag-table growth decodes ROM progression: apnv10 = 9 tags →</li>
+</ul>
+<p>  apnv11 = 44 / crnv21 = 45 tags. **First public enumeration of the NVM</p>
+<p>  tag surface beyond the 3 kernel-handled tags** (RULE 0: btqca.c handles</p>
+<p>  exactly 3; no public tag-name table beyond it was found — checked</p>
+<p>  2026-11-16; tag IDs ≥ 0x0020 are honest unknowns).</p>
+<ul>
+<li>BD_ADDR placeholders differ per variant (<code>200000108039</code>,</li>
+</ul>
+<p>  <code>000774118039</code>, <code>006401019039</code>, <code>000053209039</code>, <code>000774219039</code>) —</p>
+<p>  default/template addresses replaced at provisioning; the generic</p>
+<p>  linux-firmware <code>apnv10.bin</code> carries the same placeholder as the OP6</p>
+<p>  copy (byte-identical).</p>
+<h2>Deliverables</h2>
+<ul>
+<li><code>tools/qca_tlv_parse.py</code> — the parser (stdlib only)</li>
+<li><code>tools/fat_extract.py</code> — the minimal FAT16 walker used for <code>bt.img</code></li>
+<li>Full per-file parse results (headers, tag histograms + per-entry</li>
+</ul>
+<p>  values, BD_ADDR placeholders, checks): regenerable byte-identically</p>
+<p>  with `python3 blob-matrix/desktop/tools/qca_tlv_parse.py</p>
+<p>  qca-bt-tlv.json &lt;extracted fleet files&gt;` — the pipeline is committed</p>
+<p>  and the inputs are public (any official LineageOS nightly of a</p>
+<p>  fleet-carrying device, e.g. enchilada 2026-11-11); the 53 KB results</p>
+<p>  JSON stayed local this session for the same push-path reason as</p>
+<p>  <code>devices-001-222.csv</code> (see STATUS-DESKTOP.md push mechanics).</p>
+<ul>
+<li>The 29-device leverage entry in <code>fragmentation-half.md</code> §2 is now</li>
+</ul>
+<p>  backed by an actual format spec instead of a name.</p>
+<h2>Open items</h2>
+<ol>
+<li>Patch-stream entry structure (post-header) — needs one of: CodeLinaro</li>
+</ol>
+<p>   qca-bt opensource <code>hci_rome.c</code> fetch, or a controlled diff between</p>
+<p>   rom_build variants (2.0 vs 2.1 of the same family).</p>
+<ol>
+<li><code>ap*</code> vs <code>cr*</code> chip-family attribution.</li>
+<li>The 256-byte patch tails (role unknown).</li>
+<li>NVM tags ≥ 0x0020 naming (would need one Qualcomm-side spec leak —</li>
+</ol>
+<p>   none found public; checked 2026-11-16).</p>
+<ol>
+<li>The other four fleet files in linux-firmware's qca/ dir are named</li>
+</ol>
+<p>   differently (404 on the matrix names) — upstream matrix filenames are</p>
+<p>   LineageOS-vendor-tree names, not linux-firmware names; the md5 joins</p>
+<p>   above prove equivalence where both exist.</p>
+<p>RULE 0 record (2026-11-16): `Qualcomm Bluetooth ROM patch .tlv format</p>
+<p>reverse engineering crbtfw apbtfw` — no dedicated RE writeup exists</p>
+<p>(Broadcom/Realtek have public RE work; QCA does not, beyond btqca.c's</p>
+<p>protocol layer). The container-layer spec + fleet identity chain here is</p>
+<p>the first public one for these files.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

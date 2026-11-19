@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>md1dsp MD32 decode gap: diagnosis (F-36 follow-up, F-45) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>md1dsp MD32 decode gap: diagnosis (F-36 follow-up, F-45)</h1><p>**Finding:** The F-36 decode failure is **not** a wrong-offset artifact and</p><p>Evidence: none</p>
+<h1>md1dsp MD32 decode gap: diagnosis (F-36 follow-up, F-45)</h1>
+<p><strong>Finding:</strong> The F-36 decode failure is <strong>not</strong> a wrong-offset artifact and</p>
+<p><strong>not</strong> an endianness artifact. Ghidra's MD32 module traces to</p>
+<p><a href="https://github.com/cyrozap/ghidra-md32">cyrozap/ghidra-md32</a> — a **stalled</p>
+<p>work-in-progress SLEIGH spec*<em> for the </em>older* ADI-heritage MD32</p>
+<p>(<a href="https://github.com/cyrozap/mediatek-lte-baseband-re/issues/6">mediatek-lte-baseband-re issue #6</a>:</p>
+<p><code>cycle_count_md32.h</code> carries an Analog Devices 2004-2008 copyright; MTK bought</p>
+<p>ADI's cellular ops in 2007; MD32 ELF files use machine id <strong>0x2454</strong> = MTK's</p>
+<p>TWSE ticker). The LR13-era (MT6785, 2019-20) md1dsp payload is a</p>
+<p><strong>sectioned image</strong> — the DSP! header carries a descriptor table with named</p>
+<p>sections (<code>USIP</code> @0x274, <code>RAKE</code> @0x4b4) whose (offset,size,crc32) records chain</p>
+<p>exactly over the <code>md32/rake/</code> string zone (0x58c814+0x4d0c=0x591520→…→0x60a9d0)</p>
+<p>— and the string families map 1:1 onto the section tags (<code>md32/usip/</code>,</p>
+<p><code>md32/rake/</code>, <code>md32/scq16/</code>, <code>md32/brp/</code>, <code>md32/inner/</code>, <code>md32/common/</code>).</p>
+<p>Decoding at the string-adjacent regions fails under MD32 (native <strong>0–3.13 %</strong></p>
+<p>real coverage), MD32 with 16-bit byte-swap (tests the spec's</p>
+<p><code>instructionEndian="big"</code> against LE fetch — the two 100 % windows are pure</p>
+<p><strong>data artifacts</strong>: endless <code>mv rX,#imm</code> with monotonically increasing</p>
+<p>immediates and cycling registers, zero control-flow mnemonics), and MIPS32 BE</p>
+<p>(≤6.25 %). **Diagnosis: generation/variant mismatch of the only public MD32</p>
+<p>spec is the leading cause; wrong-region is refuted for the tested windows</p>
+<p>(they are rodata/data, and no window under any language yields control flow);</p>
+<p>the true code most plausibly lives in the unexplained dense zone</p>
+<p>0x120000–0x160000 (H≈6.9, no strings) or the packed tail 0x600000+.**</p>
+<h2>Claim</h2>
+<ol>
+<li><strong>Region map (new, supersedes F-36's unstructured view).</strong> 64 KB-block</li>
+</ol>
+<p>   entropy/zero/ASCII census (full image) + 9,796 ASCII runs (≥6 chars):</p>
+<p>   - header 0x0–0x6xx (DSP! magic @0x118 re-verified; size 0x678000 @0x124,</p>
+<p>     version 1 @0x128, marker 0x12345678 @0x134, "MT6785" @0x138);</p>
+<p>     descriptor table @0x248: three 16-B records (u32 off, u32 len, u32 rsv,</p>
+<p>     u32 tag) — (0x15c,0x58b814,0,1), (0x39c,0x73d4,0,2),</p>
+<p>     (0x56c,0x49a58,0,"USIP"); <code>USIP</code> section body @0x278 with</p>
+<p>     (0x1,0x100000,0xaee80,crc) + (0x0,0x101000,0x48b814,crc) style records</p>
+<p>     (field semantics not fully pinned); <code>RAKE</code> @0x4b4 with 16-B records</p>
+<p>     chaining (off=0x58c814,len=0x4d0c,crc)→(0x591520,0x26c8)→(0x5d6540,</p>
+<p>     0x12484)→(0x5efac4,0x54a8)→(0x5f4f6c,0x10c68)→(0x605bd4,0x4dfc) —</p>
+<p>     <strong>tiling 0x58c814→0x60a9d0</strong>, exactly the md32/rake/scq16 string zone.</p>
+<p>   - rodata/assert pools: 0x80000–0xa0000 (<code>md32/usip/</code>, <code>md32/brp/</code>,</p>
+<p>     <code>md32/inner/</code> LTE/HSPA/c2k task strings), 0x4b0000–0x530000,</p>
+<p>     0x590000–0x5e0000 (<code>md32/rake/</code> c2k + <code>md32/scq16/</code> + <code>md32/common/</code>,</p>
+<p>     1,022 strings in the RAKE window alone).</p>
+<p>   - plain LE data tables: 0x4c0000 (<code>e8034000</code> repeats, increasing u32s),</p>
+<p>     0xa0000+ (monotonic u16 index table), 0xb0000–0x100000 all-zero hole.</p>
+<p>   - <strong>unexplained dense zone 0x120000–0x160000</strong>: H≈6.85–6.95, ASCII ~35 %,</p>
+<p>     but <em>no</em> long strings (only ≤8-char noise runs) — consistent with code in</p>
+<p>     an unknown encoding or LZ-compressed data; byte samples show high</p>
+<p>     byte-pair diversity with recurring 16-bit patterns.</p>
+<p>   - tail 0x600000–0x678000: H up to 7.9 — compressed secondary image</p>
+<p>     (F-36's note stands).</p>
+<ol>
+<li>**Language tests at string-adjacent regions (F-31 methodology, 21 windows</li>
+</ol>
+<p>   ×256 B, cold-start <code>clearListing</code>+forced disassembly; new runs this pass).**</p>
+<p>   - <code>MD32:LE:32:default</code> native: max real coverage <strong>3.13 %</strong> (2 insns at</p>
+<p>     0x86000); the three 26.56 % cells are the known 68-B zero-run artifact.</p>
+<p>   - MD32 on a <strong>16-bit byte-swapped copy</strong> of the whole image (converts LE</p>
+<p>     storage→BE fetch, testing the spec's <code>instructionEndian="big"</code> in both</p>
+<p>     directions): 100.00 % at 0xa0000 and 100.78 % at 0x540000 — <strong>but</strong> the</p>
+<p>     dumped listings are disassembler artifacts: 40/40 instructions are `mv</p>
+<p>     rX,#imm` with strictly increasing immediates (0x2000, 0x7000, 0xf001,</p>
+<p>     0x16001, …) and a cycling register pattern; **no jump/call/load/store in</p>
+<p>     any window**. The <code>mv</code> opcode space in cyrozap's spec is so permissive it</p>
+<p>     absorbs arbitrary data. Coverage alone is not evidence here.</p>
+<p>   - <code>MIPS:BE:32:default</code> (MTK big-endian hypothesis): max real <strong>6.25 %</strong></p>
+<p>     (0x591520, 0x5dd000 — string bytes), nothing elsewhere.</p>
+<ol>
+<li><strong>Provenance of the stock MD32 module (web, 2026-11-13).</strong> Ghidra 12.2's</li>
+</ol>
+<p>   <code>Ghidra/Processors/md32</code> ships <code>MD32:LE:32:default</code> with ldefs</p>
+<p>   <code>instructionEndian="big"</code>, <code>alignment=2</code>, and a sinc declaring</p>
+<p>   r0–r15, loop registers (ls0/le0/lc0 ×3), accumulator a0, bundle/phase</p>
+<p>   context bits — the ADI-heritage shape. cyrozap's README states the module</p>
+<p>   is WIP and <strong>stalled</strong> because Ghidra cannot model instruction bundles and</p>
+<p>   lacks delay-slot support for variable-length ISAs (Ghidra issues #3942,</p>
+<p>   #4390, #4581); the chip it was derived from is the older</p>
+<p>   mediatek-lte-baseband-re target (MT6295-era), not an LR13 Helio modem.</p>
+<p>   <a href="https://research.checkpoint.com/2021/looking-for-vulnerabilities-in-mediatek-audio-dsp">Check Point 2021</a></p>
+<p>   reversed the <em>audio</em> DSP (also self-named MD32-class) with custom opcodes —</p>
+<p>   methodology prior art, different subsystem.</p>
+<h2>Hypotheses tested (F-36's a/b/c + new d)</h2>
+<table>
+<tr>
+<th>hypothesis</th>
+<th>verdict</th>
+<th>evidence</th>
+</tr>
+<tr>
+<td>(a) MD32 generation mismatch</td>
+<td><strong>leading</strong></td>
+<td>only public spec is stalled WIP from MT6295-era core; MT6785 is 6+ years newer; no byte evidence of cyrozap's encodings</td>
+</tr>
+<tr>
+<td>(b) code region compressed/packed</td>
+<td><strong>partial, localized</strong></td>
+<td>tail 0x600000+ H≈7.9 (compressed); dense zone 0x120000–0x160000 unidentified; string zones plaintext so image is not wholly packed</td>
+</tr>
+<tr>
+<td>(c) wrong offset tested</td>
+<td><strong>refuted for tested windows</strong></td>
+<td>F-36's 0x80000/0x140000/0x540000 are rodata/data/table zones; the string-adjacent code candidates were also tested this pass (21 windows incl. 0x84000/0x86000/0x591520/0x5dd000) — no control flow under any language</td>
+</tr>
+<tr>
+<td>(d) instruction endianness (new)</td>
+<td><strong>refuted</strong></td>
+<td>16-bit-swapped import under MD32: 100 % cells are <code>mv</code>-only data artifacts</td>
+</tr>
+</table>
+<h2>Honest negatives / limitations</h2>
+<ul>
+<li>We still cannot byte-verify the MT6785 MD32 ISA; no decoder produces</li>
+</ul>
+<p>  control-flow-coherent code anywhere in the image.</p>
+<ul>
+<li>The 0x120000–0x160000 dense zone is <em>not</em> string-localized: it may be the</li>
+</ul>
+<p>  code (unknown encoding) or packed data — unproven either way.</p>
+<ul>
+<li>DSP! descriptor field semantics (esp. the USIP block's addr/size/crc</li>
+</ul>
+<p>  records) are partially parsed; a full expansion (esp. whether some sections</p>
+<p>  decompress into DSP memory) may relocate the code.</p>
+<ul>
+<li>The <code>mv</code>-absorbs-everything behavior means <em>any</em> future MD32 coverage number</li>
+</ul>
+<p>  must be judged on mnemonic coherence (control-flow + register pipeline), not</p>
+<p>  coverage %.</p>
+<ul>
+<li>Tail 0x600000–0x678000 not decompressed (no known container for it).</li>
+</ul>
+<h2>Named next lever</h2>
+<ol>
+<li><strong>Get a real MD32 ELF (machine 0x2454) or newer spec</strong>: search MTK's</li>
+</ol>
+<p>   GPL modem source drops and cyrozap's repo history for a newer</p>
+<p>   <code>md32.sinc</code>; a symbol-bearing ELF pins the encoding of the <em>matching</em></p>
+<p>   generation and would immediately falsify/confirm the variant gap.</p>
+<ol>
+<li>Parse the DSP! section descriptors end-to-end (esp. USIP block) and check</li>
+</ol>
+<p>   per-section crc32 against file content — proves which sections are stored</p>
+<p>   vs packed, and whether the 0x120000 zone or tail is a compressed segment.</p>
+<ol>
+<li>Hand-build a minimal SLEIGH from the 0x120000–0x160000 zone using the</li>
+</ol>
+<p>   Check Point methodology (find NOP-ish patterns, register fields, branch</p>
+<p>   structure) if 1–2 fail.</p>
+<h2>Reproduce</h2>
+<pre><code>
+# three headless runs (JDK 25, Ghidra 12.2), windows: 0x0,0x40000,0x60000,
+# 0x80000,0x84000,0x86000,0xa0000,0x120000,0x140000,0x180000,0x4b0000,
+# 0x4d0000,0x530000,0x540000,0x580000,0x590000,0x591520,0x5a0000,
+# 0x5c0000,0x5dd000,0x600000
+analyzeHeadless /tmp/f45proj p1 -import 06_md1dsp.bin -processor MD32:LE:32:default \
+  -loader-baseAddr 0x0 -noanalysis -scriptPath mediatek/tools \
+  -postScript window_stats.java "$WINS" out.json
+# + same on a 16-bit byte-swapped copy (md32_swap16 build script in scratch)
+# + MIPS:BE:32:default; listing dumps via dump_win.java
+</code></pre>
+<p>Scripts: <code>mediatek/tools/window_stats.java</code>, <code>mediatek/tools/dump_win.java</code></p>
+<p>(new). Per-window data: <code>results/md32-gap.json</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

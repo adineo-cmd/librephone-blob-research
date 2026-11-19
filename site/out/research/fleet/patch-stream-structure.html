@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QCA BT ROM-patch files — 256-byte tail + patch-stream structure (OnePlus 6 / enchilada) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>QCA BT ROM-patch files — 256-byte tail + patch-stream structure (OnePlus 6 / enchilada)</h1><p>**Evidence classes:** `[F]` fact (directly measured) · `[I]` inference (strong, derived from</p><p>Evidence: <span class="evidence" data-evidence="f">F</span> <span class="evidence" data-evidence="h">H</span> <span class="evidence" data-evidence="i">I</span> <span class="evidence" data-evidence="n">N</span></p>
+<h1>QCA BT ROM-patch files — 256-byte tail + patch-stream structure (OnePlus 6 / enchilada)</h1>
+<p><strong>Evidence classes:</strong> <code>[F]</code> fact (directly measured) · <code>[I]</code> inference (strong, derived from</p>
+<p>measurements) · <code>[H]</code> hypothesis (plausible, unverified) · <code>[N]</code> honest negative (probed, not found).</p>
+<p><strong>Source:</strong> <code>data-fetch/enchilada/bt-fat/</code> — <code>APBTFW10.TLV</code> (56,052 B, rom 0x0200),</p>
+<p><code>APBTFW11.TLV</code> (216,372 B, 0x0201), <code>CRBTFW11.TLV</code> (29,368 B, 0x0101), <code>CRBTFW20.TLV</code></p>
+<p>(56,180 B, 0x0200), <code>CRBTFW21.TLV</code> (217,676 B, 0x0201). Machine-readable companion:</p>
+<p><code>analysis/out/patch-stream-structure.json</code> (regenerable byte-identically with</p>
+<p>`python3 -I analysis/tools/patch_stream_structure.py data-fetch/enchilada/bt-fat</p>
+<p>analysis/out/patch-stream-structure.json`). Discipline: offsets/lengths/hashes and ≤16-byte</p>
+<p>hex samples only; no payload committed.</p>
+<p><strong>Layout recap (per <code>blob-matrix/desktop/fleet-re/qca-bt-format.md</code>):</strong> 4-byte outer</p>
+<p><code>type_len</code> (type 1) → 24-byte patch struct → <code>data_length</code>-byte stream (abs offset 28) →</p>
+<p>256-byte tail. Re-verified here 5/5: <code>len == 4 + total_size + 256 == 28 + data_length + 256</code></p>
+<p>and <code>total_size == data_length + 24</code> <code>[F]</code>.</p>
+<p><strong>Header recheck (Rule 1 correction):</strong> the local artifact <code>analysis/out/qca-bt-tlv.json</code></p>
+<p>records <code>entry: "0x80000002"</code> for the patch files — a u32 misread at offset 20</p>
+<p>(patch_version 0x0002 | reserved2 0x8000&lt;&lt;16). The actual u32 at offset 24 is</p>
+<p><code>e0 b0 01 00</code> / <code>e4 09 02 00</code> / <code>5c b1 01 00</code> = <strong>0x1b0e0 / 0x209e4 / 0x1b15c</strong>, matching</p>
+<p>qca-bt-format.md's table and the committed parser (<code>blob-matrix/desktop/tools/qca_tlv_parse.py</code></p>
+<p>reads entry@24 correctly) <code>[F]</code>. The stale JSON predates that fix; regenerate it or patch the</p>
+<p>field when the repo copy is next touched.</p>
+<p>---</p>
+<h2>1. The 256-byte tail — verdict: per-file-unique high-entropy block, signature/attestation-like <code>[F]</code></h2>
+<p>Every tail byte-compared pairwise across all 10 file pairs, plus per-file structure tests:</p>
+<table>
+<tr>
+<th>test</th>
+<th>result</th>
+</tr>
+<tr>
+<td>entropy (bits/byte)</td>
+<td>7.129 – 7.203 (5/5)</td>
+</tr>
+<tr>
+<td>distinct byte values</td>
+<td>157 / 160 / 157 / 158 / 163 of 256</td>
+</tr>
+<tr>
+<td>zero fraction</td>
+<td>0 – 0.0117 (expected 0.0039 for uniform bytes)</td>
+</tr>
+<tr>
+<td>max count of any single byte value</td>
+<td>4 – 5 (expected ~4–6 for 256 iid uniform bytes)</td>
+</tr>
+<tr>
+<td>stride periodicity (k = 4, 8, 16, 32, 64, 128)</td>
+<td>match fraction 0 – 0.016 — at/below chance; <strong>no repeating stride</strong></td>
+</tr>
+<tr>
+<td>repeated 4-byte LE words inside a tail</td>
+<td><strong>0</strong> in all 5 tails (64 aligned words, all distinct)</td>
+</tr>
+<tr>
+<td>4-byte words shared between any two tails</td>
+<td><strong>0</strong> of 320 distinct aligned words</td>
+</tr>
+<tr>
+<td>pairwise byte differences</td>
+<td>254–256 of 256 differ on <strong>all 10 pairs</strong>; common prefix 0, common suffix 0; 0/16 identical 16-byte rows on every pair</td>
+</tr>
+<tr>
+<td>same-ROM cross-family pair (apbtfw10 vs crbtfw20)</td>
+<td>256/256 bytes differ — <strong>completely</strong></td>
+</tr>
+<tr>
+<td>same-family cross-ROM pairs (crbtfw20 vs crbtfw21, crbtfw11 vs crbtfw20/21)</td>
+<td>254/256 differ</td>
+</tr>
+<tr>
+<td>tail vs 24-byte patch-struct prefix / outer 4 bytes</td>
+<td>not equal (5/5)</td>
+</tr>
+<tr>
+<td>tail head-16 present in own stream</td>
+<td>0 hits (5/5)</td>
+</tr>
+<tr>
+<td>tail == sha256/md5/sha1 of stream (or struct+stream, or outer+stream)</td>
+<td><strong>no</strong> (full and first-16 comparisons, 5/5) <code>[N]</code></td>
+</tr>
+<tr>
+<td>any 4-byte word == rom_build or entry (u32 and u16 LE patterns, all values)</td>
+<td><strong>0 hits in all tails</strong></td>
+</tr>
+</table>
+<p>Interpretation:</p>
+<ul>
+<li>The distinct-value counts, zero fractions and max-value counts match the statistics of 256</li>
+</ul>
+<p>  uniformly random bytes (expected distinct ≈ 162; observed 157–163) <code>[I]</code>.</p>
+<ul>
+<li>No internal structure at any tested granularity: no repeats, no stride, no shared words even</li>
+</ul>
+<p>  between the two 2.0-family files whose patch streams are 98.3% identical (§3). The tail is</p>
+<p>  unique per file even when the payload it follows is near-identical <code>[F]</code>.</p>
+<ul>
+<li>Not a digest of the stream under any simple construction (sha256/md5/sha1, raw/with-header)</li>
+</ul>
+<p>  <code>[N]</code>; not a header copy, not zero padding.</p>
+<ul>
+<li><strong>Verdict:</strong> attestation/signature/hash-material-like per-file block. "Table" and "padded</li>
+</ul>
+<p>  header" hypotheses are refuted; "signature/attestation" is the only surviving class, with</p>
+<p>  the exact construction still unknown (open item §7).</p>
+<h2>2. Patch-stream composition — flat dense image, no zero-run framing <code>[F]</code></h2>
+<p>Per-stream facts (stream = bytes 28..28+data_length):</p>
+<table>
+<tr>
+<th>stream</th>
+<th>len</th>
+<th>zero frac</th>
+<th>zero runs ≥16 B</th>
+<th>longest</th>
+<th>dup 16-B block values</th>
+<th>max nonzero mult</th>
+<th>longest repeated substring</th>
+</tr>
+<tr>
+<td>apbtfw10</td>
+<td>55,768</td>
+<td>0.088</td>
+<td>3</td>
+<td>45</td>
+<td>14</td>
+<td>×4</td>
+<td>79</td>
+</tr>
+<tr>
+<td>apbtfw11</td>
+<td>216,088</td>
+<td>0.0885</td>
+<td>14</td>
+<td>284</td>
+<td>31</td>
+<td>×7</td>
+<td>97</td>
+</tr>
+<tr>
+<td>crbtfw11</td>
+<td>29,084</td>
+<td>0.087</td>
+<td>2</td>
+<td>25</td>
+<td>1</td>
+<td>×3</td>
+<td>46</td>
+</tr>
+<tr>
+<td>crbtfw20</td>
+<td>55,896</td>
+<td>0.088</td>
+<td>3</td>
+<td>42</td>
+<td>14</td>
+<td>×4</td>
+<td>79</td>
+</tr>
+<tr>
+<td>crbtfw21</td>
+<td>217,392</td>
+<td>0.0885</td>
+<td>15</td>
+<td>284</td>
+<td>32</td>
+<td>×7</td>
+<td>97</td>
+</tr>
+</table>
+<ul>
+<li>Zero fraction ~8.8% with all 256 byte values present and per-4-KB entropy 4.4–7.0 bits —</li>
+</ul>
+<p>  code-like density everywhere <code>[F]</code>.</p>
+<ul>
+<li><strong>Long zero runs are essentially absent from the body</strong> (2–15 runs ≥16 B in files of</li>
+</ul>
+<p>  29–217 KB). The few that exist cluster in the <strong>last ~3 KB</strong> of each stream (e.g. apbtfw10:</p>
+<p>  runs at 55348/45, 55394/42, 55698/26 — the final 420 bytes; apbtfw11: 284-byte run at</p>
+<p>  214704 of a last-3-KB cluster) — end-of-image padding-like, not block separators</p>
+<p>  <code>[F]</code>. The "zero runs as record/block separators" framing hypothesis is <strong>refuted</strong> <code>[N]</code>.</p>
+<ul>
+<li>Duplicate 16-B blocks are rare (1–32 duplicated values per stream, mostly ×2; the ×39/×37</li>
+</ul>
+<p>  multiplicities are the zero tail blocks). Longest repeated substrings are 46–97 bytes.</p>
+<p>  Two notable repeats: an <strong>80-byte run of byte 0x66</strong> near the stream end (apbtfw10</p>
+<p>  55032–55111; crbtfw20 55160–55239 — exactly +128 apart, matching the pair's offset shift,</p>
+<p>  §3), and a <strong>46-byte nonzero span duplicated at stream offsets 2974 and 10262</strong> in</p>
+<p>  crbtfw11 — the only mid-body duplicate found <code>[F]</code>. Role unknown (open item §7).</p>
+<h2>3. Same-ROM pair apbtfw10 vs crbtfw20 (delta exactly 128) — near-identical builds, offset shift +128</h2>
+<p>Byte-exact diff (difflib, autojunk off) of the two streams <code>[F]</code>:</p>
+<table>
+<tr>
+<th>property</th>
+<th>value</th>
+</tr>
+<tr>
+<td>common prefix (after 24-B header)</td>
+<td><strong>214 bytes</strong></td>
+</tr>
+<tr>
+<td>common suffix</td>
+<td><strong>0</strong> (final byte differs — every stream ends uniquely, all 6 pairs §5)</td>
+</tr>
+<tr>
+<td>equal bytes</td>
+<td>54,749 (98.33% of the longer stream)</td>
+</tr>
+<tr>
+<td>edit sites</td>
+<td>524 replaces (765 a-bytes / 899 b-bytes), 7 inserts (34 B), 10 deletes (40 B); net +134+34−40 = <strong>+128 ✓</strong></td>
+</tr>
+<tr>
+<td>largest single insert</td>
+<td>24 B at b-stream offset 24000</td>
+</tr>
+<tr>
+<td>largest single delete</td>
+<td>16 B at a-stream offset 24653</td>
+</tr>
+<tr>
+<td>opcode offset alignment</td>
+<td>insert/replace sites spread over all mod-16 classes; the few ≥16-B inserts are 16-aligned</td>
+</tr>
+</table>
+<p>Drift profile (b-offset − a-offset at each edit boundary, per 4-KB region) <code>[F]</code>:</p>
+<table>
+<tr>
+<th>a-offset region</th>
+<th>drift</th>
+</tr>
+<tr>
+<td>0 – 20,480</td>
+<td><strong>0</strong> throughout (221 length-neutral edit sites)</td>
+</tr>
+<tr>
+<td>20,480 – 24,576</td>
+<td>rises 0 → <strong>128</strong> (the 23.7–24.7K edit cluster)</td>
+</tr>
+<tr>
+<td>24,576 – 55,288</td>
+<td><strong>exactly 128</strong> throughout (equal spans up to 2,879 B)</td>
+</tr>
+<tr>
+<td>55,288 – end</td>
+<td>±3–8 wobble, resolving so final drift = 128 ✓</td>
+</tr>
+</table>
+<p><strong>Insertion-point answer:</strong> the extra 128 bytes do <strong>not</strong> sit in one insertion block. They</p>
+<p>accumulate inside one localized region (a-side ≈ 23,668–24,674), as a cluster of small</p>
+<p>inserts/deletes/replaces (largest 24 B), while the remaining ~500 scattered 1–2-byte edits</p>
+<p>are length-neutral. Before the region the streams are byte-identical positionally; after it</p>
+<p>they are byte-identical at a constant +128 shift — one firmware built twice with a ~128-byte</p>
+<p>larger section in the cr variant <code>[I]</code>. Corroboration: the rom_build u32 literal sits at</p>
+<p>stream offset 24267 (apbtfw10) vs 24395 (crbtfw20) = +128, and again at 54335/54463 = +128 <code>[F]</code>.</p>
+<h2>4. Same-ROM pair apbtfw11 vs crbtfw21 (delta 1,304) — same generation, substantially different builds</h2>
+<p>16-byte block-anchored diff with byte-level edge refinement (byte-exact difflib is</p>
+<p>quadratic-risk at 216 KB) <code>[F]</code>:</p>
+<table>
+<tr>
+<th>property</th>
+<th>value</th>
+</tr>
+<tr>
+<td>common prefix</td>
+<td><strong>176 bytes</strong></td>
+</tr>
+<tr>
+<td>common suffix</td>
+<td>0</td>
+</tr>
+<tr>
+<td>bytes in ≥16-B exact-match spans</td>
+<td>44,278 ≈ <strong>20.5%</strong> of the stream</td>
+</tr>
+<tr>
+<td>opcode totals</td>
+<td>426 replaces (171,634 / 172,762 B), <strong>2 inserts</strong> (64 B @ b216384, 112 B @ b217024 — both 16-aligned, both in the final ~1.5 KB), 0 deletes</td>
+</tr>
+<tr>
+<td>largest replace</td>
+<td>a35392, 23,004 → 23,052 B</td>
+</tr>
+</table>
+<p>Alignment is <strong>not stable</strong>: block-level drift oscillates in the front region (0–24 K), is</p>
+<p>locally flat at ~544–576 through ~60–118 K, then wanders to ~1300 <code>[F]</code>. Independent anchors</p>
+<p>agree with a slowly growing shift: the rom_build 0x0200 u32 literals sit at 62087 (apbtfw11)</p>
+<p>vs 62631 (crbtfw21) = <strong>+544</strong>, and at 212291 vs 213591 = <strong>+1300</strong>; the end-of-stream</p>
+<p>zero-run skeleton (284/88/81/57/50-byte runs) corresponds at +1300 … +1308 <code>[F]</code>.</p>
+<p><strong>Insertion-point answer:</strong> no single insertion block. The +1304 accumulates across the</p>
+<p>stream (front-heavy: ~+300 by 16 K, +544 by 62 K, +1300 by 212 K), only two discrete pure</p>
+<p>inserts exist (64 + 112 = 176 B, both at the very end, 16-aligned), and ~80% of bytes differ</p>
+<p>in place — the two 2.1-family files are substantially different builds of the same-generation</p>
+<p>patch that nevertheless keep a parallel section layout <code>[I]</code>.</p>
+<h2>5. Cross-generation context pairs <code>[F]</code></h2>
+<table>
+<tr>
+<th>pair</th>
+<th>delta</th>
+<th>common prefix</th>
+<th>bytes in ≥16-B equal spans</th>
+<th>similarity</th>
+</tr>
+<tr>
+<td>crbtfw11 vs crbtfw20 (same family)</td>
+<td>+26,812</td>
+<td>2</td>
+<td>4,605</td>
+<td>8.2%</td>
+</tr>
+<tr>
+<td>crbtfw11 vs apbtfw10</td>
+<td>+26,684</td>
+<td>2</td>
+<td>4,574</td>
+<td>8.2%</td>
+</tr>
+<tr>
+<td>apbtfw10 vs apbtfw11 (same family)</td>
+<td>+160,320</td>
+<td>2</td>
+<td>487</td>
+<td>0.23%</td>
+</tr>
+<tr>
+<td>crbtfw20 vs crbtfw21 (same family)</td>
+<td>+161,496</td>
+<td>2</td>
+<td>483</td>
+<td>0.22%</td>
+</tr>
+</table>
+<p>Different ROM generations share essentially nothing beyond the first 2 stream bytes — the</p>
+<p>"flat image" is per-generation content. Every one of the 6 pairs has <strong>common suffix 0</strong>:</p>
+<p>each stream ends with a byte unique to that file — weak but consistent hint of a per-file</p>
+<p>end marker/checksum byte (unverified, open item §7).</p>
+<h2>6. Literal entry / rom_build words in the stream <code>[F]</code></h2>
+<ul>
+<li>Each stream contains <strong>exactly one</strong> u32 LE equal to its own <code>entry</code> value: at stream</li>
+</ul>
+<p>  offset 472 (apbtfw10, crbtfw20 — 2.0 gen), 636 (apbtfw11, crbtfw21 — 2.1 gen), 428</p>
+<p>  (crbtfw11 — 1.1). Same offset per generation across both families; no other generation's</p>
+<p>  entry word appears anywhere. Reads as an early self-reference to the entry address <code>[I]</code>.</p>
+<ul>
+<li>rom_build u32 literals: 1–7 scattered hits per stream (e.g. 0x0200 at 24267/54335 in</li>
+</ul>
+<p>  apbtfw10 vs 24395/54463 in crbtfw20, both +128; 0x0101 appears 7–8× in the 2.1 files).</p>
+<p>  No framing role; the u16 pattern (<code>00 02</code> etc.) is too generic to be meaningful</p>
+<p>  (9–193 hits).</p>
+<ul>
+<li>Tails: 0 hits for all entry/rom patterns (§1).</li>
+</ul>
+<h2>7. Open items</h2>
+<ol>
+<li><strong>Tail role</strong> — signature/attestation-class per file (§1); exact construction unknown.</li>
+</ol>
+<p>   Next lever: public loader/protocol sources for the post-download 256-byte block (ath3k /</p>
+<p>   btusb / Qualcomm QDL docs); digest constructions probed here are all negative.</p>
+<ol>
+<li><strong>Trailing byte uniqueness</strong> — every stream's final byte is pairwise-unique (6/6 pairs,</li>
+</ol>
+<p>   common suffix 0). Possible end checksum; needs a second fleet sample set to attack.</p>
+<ol>
+<li><strong>0x66 × 80 run</strong> near stream end in both 2.0 files (+128 apart); the crbtfw11 46-B</li>
+</ol>
+<p>   mid-body duplicate (2974 vs 10262) — unexplained.</p>
+<ol>
+<li><strong>2.1 front region</strong> — the first ~24 K hosts the largest replace blocks (incl. one</li>
+</ol>
+<p>   23,004-B replace at a35392) and unstable alignment; section boundary semantics unknown.</p>
+<ol>
+<li><strong>ISA attribution</strong> — unchanged from qca-bt-format.md (Thumb-consistent byte patterns,</li>
+</ol>
+<p>   unconfirmed).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

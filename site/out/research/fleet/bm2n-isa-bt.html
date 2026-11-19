@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WORKORDER-001 (desktop) pass: bm2n ADSP fleet container + ISA evidence, OnePlus 8 BT fleet, larry bdwlan tag-19 geometry — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>WORKORDER-001 (desktop) pass: bm2n ADSP fleet container + ISA evidence, OnePlus 8 BT fleet, larry bdwlan tag-19 geometry</h1><p>**Devices:** OnePlus Nord CE3 (larry, SM6375) — bm2n fleet + bdwlan; OnePlus 8 (instantnoodle,</p><p>Evidence: <span class="evidence" data-evidence="f">F</span> <span class="evidence" data-evidence="h">H</span> <span class="evidence" data-evidence="i">I</span> <span class="evidence" data-evidence="n">N</span></p>
+<h1>WORKORDER-001 (desktop) pass: bm2n ADSP fleet container + ISA evidence, OnePlus 8 BT fleet, larry bdwlan tag-19 geometry</h1>
+<p><strong>Devices:</strong> OnePlus Nord CE3 (larry, SM6375) — bm2n fleet + bdwlan; OnePlus 8 (instantnoodle,</p>
+<p>SM8250, WCN3998) — bluetooth partition; OnePlus 6 (enchilada, SDM845) — known-Hexagon and</p>
+<p>BT-fleet reference side.</p>
+<p><strong>Evidence classes:</strong> <code>[F]</code> fact (measured) · <code>[I]</code> inference (strong, derived) ·</p>
+<p><code>[H]</code> hypothesis (plausible, unverified) · <code>[N]</code> honest negative (probed, not found).</p>
+<p><strong>Companion JSON:</strong> <code>analysis/out/bm2n-isa-bt.json</code> (all numbers quoted here are in it).</p>
+<p><strong>Scripts (lab-rule compliant):</strong> <code>analysis/tools/bm2n_isa_probe2.py</code>,</p>
+<p><code>bm2n_isa_probe3.py</code>, <code>bt_fleet_join2.py</code>, <code>tag19_geometry.py</code>,</p>
+<p><code>tag19_regdb_compare.py</code>, <code>bm2n_isa_bt_merge.py</code>.</p>
+<p><strong>Discipline:</strong> no proprietary payload bytes in this document — offsets, sizes, hashes,</p>
+<p>statistics, ≤16-byte hex samples and short ASCII strings only.</p>
+<p>**Method class note (per <code>librephone-blob-research/mediatek/docs/md1dsp-decode.md</code></p>
+<p>vocabulary, applied without reusing its MediaTek content):** capstone is not installed</p>
+<p>in this environment and has no Hexagon backend anyway, so the <code>isa_probe.py</code></p>
+<p>decode-rate sanity cannot run and no byte-level decode was attempted. The probe used</p>
+<p>is the lab's decode-gap statistics class (the same honest-negative reporting used for</p>
+<p>the md1dsp decode-density table): alignment statistics, word-histogram comparison</p>
+<p>against verified references, and string-level provenance. Where the evidence stops,</p>
+<p>the verdict says "unknown" — no ISA is claimed as decoded.</p>
+<p>Prior-art searches (Rule 0, recorded with dates in the JSON): <code>bm2n.bin</code> has no public</p>
+<p>matches (2026-11-19); BitML is publicly a Qualcomm internal ML stack on the Hexagon NSP</p>
+<p>via <code>libbitml_nsp_skel.so</code> (Qualcomm support forum, QNN LPAI API history, meta-qcom);</p>
+<p><code>htbtfw20.tlv</code>/<code>htnv20.bin</code> filenames are publicly shipped in linux-firmware for</p>
+<p>WCN399x (Ubuntu/Fedora packages; kernel btqca WCN3998 ROM-version fix). The delta here</p>
+<p>is byte-level: md5 joins, container measurements, and the tag-19/regdb relation.</p>
+<p>---</p>
+<h2>1. bm2n fleet container — raw loader-header images, not ELF <code>[F]</code></h2>
+<p>Files (<code>data-fetch/second-device/larry/tree-vendor/lib/rfsa/adsp/</code>), md5-verified</p>
+<p>against the committed matrix rows (fleet identity already proven in</p>
+<p><code>second-device-larry.md</code>):</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>matrix alias</th>
+</tr>
+<tr>
+<td>bm2n06.bin</td>
+<td>864,824</td>
+<td><code>9010bb1a…38c6</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>3,091,896</td>
+<td><code>1275a2d2…0156</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>bm2n12.bin</td>
+<td>2,623,528</td>
+<td><code>5c86c8fc…3aac8</code></td>
+<td>≡ bm2n37.bin</td>
+</tr>
+<tr>
+<td>bm2n13.bin</td>
+<td>1,106,944</td>
+<td><code>bf635d90…d299b</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>bm2n14.bin</td>
+<td>103,168</td>
+<td><code>805176af…5d498</code></td>
+<td>≡ bm2n55.bin</td>
+</tr>
+<tr>
+<td>bm2n15.bin</td>
+<td>1,082,856</td>
+<td><code>2ce8163c…3d0ea1</code></td>
+<td>≡ bm2n31.bin</td>
+</tr>
+</table>
+<ul>
+<li><strong>No ELF magic in any file</strong> — the lab suspicion of raw images is confirmed <code>[F]</code>.</li>
+<li><strong>Every file starts with the same loader-header shape</strong> (u32-LE fields, first 64 B):</li>
+</ul>
+<p>  word0 = word7 = word9 = <code>0x200000</code> (bm2n06: <code>0x400000</code>), word1 = 0, word2 = 7,</p>
+<p>  then a <strong>7-char lowercase-hex ASCII build id at [12,19)</strong>, word5 = <code>0xFA0000FA</code>,</p>
+<p>  word6 = 4, word8 = 2 or 3, word10 = <code>0x10400</code> (constant across all six), words</p>
+<p>  11–15 per-file. Build ids: 06=<code>4bd22b0</code>, 08=<code>32da3bd</code>, 12=<code>2c855d1</code>, 13=<code>5371806</code>,</p>
+<p>  14=<code>2a8527c</code>, 15=<code>5371806</code> <code>[F]</code>.</p>
+<p>  - <strong>bm2n13 and bm2n15 carry the same build id <code>5371806</code></strong> — two payloads of one</p>
+<p>    build (sizes differ by 24,088 B; common prefix 45 B) <code>[F]</code>.</p>
+<ul>
+<li>Header semantics unknown beyond the repeated size-class words; <code>0x10400</code> (66,560 B)</li>
+</ul>
+<p>  is a strong candidate for a fixed header/TOC region <code>[H]</code>.</p>
+<h3>1.1 Entropy and zero-run maps <code>[F]</code></h3>
+<ul>
+<li>Mean 4K-block entropy: 06 = 3.874, 08 = 5.041, 12 = 3.678, 13 = 3.384, 14 = 3.629,</li>
+</ul>
+<p>  15 = 3.375. No compressed-image profile anywhere except bm2n08: it has **56 blocks</p>
+<p>  ≥ 7.5 bits/B** in scattered islands of 4–44 KiB — packed/compressed sections inside</p>
+<p>  an otherwise mid-entropy image; the other five files have ≤ 5 blocks ≥ 6 bits/B and</p>
+<p>  <strong>zero</strong> blocks ≥ 7.5 <code>[F]</code>.</p>
+<ul>
+<li>Zero runs: bm2n06 top runs are exactly 3,072 B (34 runs ≥ 256); bm2n13/15 top runs</li>
+</ul>
+<p>  2,256 B then repeating 628 B (440 runs ≥ 256 each, identical profile); bm2n08 has</p>
+<p>  308 runs ≥ 256; bm2n14 only 2. **Long-run start offsets are never 4,096- or</p>
+<p>  1,024-aligned** (0% in all six) — the layout is not page-granular <code>[F]</code>.</p>
+<h3>1.2 ISA evidence (no Hexagon decoder — statistics + provenance)</h3>
+<p><strong>(a) Word alignment.</strong> Nonzero-u32 fraction across shifts 0..3 is nearly flat</p>
+<p>(e.g. 06: 0.593/0.599/0.601/0.604) — the literal "fraction of aligned nonzero words"</p>
+<p>statistic is weak here because the images are data-dominant <code>[F]</code>. The sharper</p>
+<p>statistics:</p>
+<ul>
+<li><strong>Nonzero-indicator autocorrelation</strong> (lags 1–12): bm2n12/13/14/15 peak exactly at</li>
+</ul>
+<p>  lags 4/8/12 — 12: 0.478/0.415/0.605 vs lag-1 0.179; 13: 0.628/0.595/0.687 vs 0.451;</p>
+<p>  15: 0.642/0.607/0.683 vs 0.465; 14: 0.405/0.415/0.497 vs 0.138. bm2n06 is flat-high</p>
+<p>  (long zero runs dominate); bm2n08 mixed <code>[F]</code>.</p>
+<ul>
+<li><strong>Endianness/word-class:</strong> byte position mod 4 shows the LE small-value asymmetry in</li>
+</ul>
+<p>  12/13/14/15 (byte[3] nonzero 10–18% vs bytes 0–2 40–63%); top-byte-zero word</p>
+<p>  fraction 0.48–0.82 — consistent with tables/data-heavy DSP images, unlike dense code</p>
+<p>  (Hexagon ELF code ref: 0.229 top-byte-zero; ARM64 ref: 0.060) <code>[F]</code>.</p>
+<p><strong>(b) 32-bit word histogram vs verified references.</strong> Cosine similarity of the</p>
+<p>256-bin top-byte histogram (nonzero 4-aligned words):</p>
+<table>
+<tr>
+<th>file</th>
+<th>a630_gmu (raw Hexagon µcode)</th>
+<th>fastcv code (Hexagon ELF)</th>
+<th>bitml code (Hexagon ELF)</th>
+<th>ARM64 ELF code</th>
+</tr>
+<tr>
+<td>bm2n06</td>
+<td>0.738</td>
+<td>0.590</td>
+<td>0.588</td>
+<td>0.485</td>
+</tr>
+<tr>
+<td>bm2n08</td>
+<td>0.658</td>
+<td>0.524</td>
+<td>0.491</td>
+<td>0.503</td>
+</tr>
+<tr>
+<td>bm2n12</td>
+<td>0.693</td>
+<td>0.545</td>
+<td>0.584</td>
+<td>0.365</td>
+</tr>
+<tr>
+<td>bm2n13</td>
+<td>0.698</td>
+<td>0.550</td>
+<td>0.587</td>
+<td>0.373</td>
+</tr>
+<tr>
+<td>bm2n14</td>
+<td>0.689</td>
+<td>0.541</td>
+<td>0.580</td>
+<td>0.362</td>
+</tr>
+<tr>
+<td>bm2n15</td>
+<td>0.699</td>
+<td>0.550</td>
+<td>0.587</td>
+<td>0.374</td>
+</tr>
+</table>
+<p>12/13/14/15 sit far closer to both Hexagon references than to the ARM64 contrast</p>
+<p>reference; 06 is Hexagon-leaning with a weaker margin; 08 does not separate</p>
+<p>(hist ambiguity from its packed islands) <code>[F]</code>.</p>
+<p><strong>(c) String provenance — the strongest signal.</strong> All six files share</p>
+<p>**30–52 Itanium-mangled C++ type-name fragments with</p>
+<p><code>libbitml_nsp_v2_skel.so</code>** — a verified Hexagon ELF (<code>e_machine=164</code>, ET_DYN)</p>
+<p>sitting in the same directory: <code>10DmaStartOp</code>, <code>11TensorShapeILj4E</code>,</p>
+<p><code>12ArtNet_DepthIS4_</code>, <code>13QUint8CroutonEER</code>, <code>14ConcreteTensor</code>,</p>
+<p><code>14DmaSyncMultiOp</code>, <code>10QuantUint8EEEiRT</code>… (short mangled fragments only; full</p>
+<p>inventories in the JSON). Counts: 06 = 34, 08 = 44, 12 = 52, 13 = 41, 14 = 30,</p>
+<p>15 = 41 <code>[F]</code>. BitML is publicly a Qualcomm internal ML stack executed on the</p>
+<p>Hexagon NSP through <code>libbitml_nsp_skel.so</code> (prior-art sources in JSON) <code>[F]</code>.</p>
+<h3>1.3 Per-file ISA verdicts</h3>
+<table>
+<tr>
+<th>file</th>
+<th>verdict</th>
+</tr>
+<tr>
+<td>bm2n06</td>
+<td><strong>Hexagon-consistent <span class="evidence" data-evidence="i">I</span></strong> — header + histogram lean + lag-4/8/12 (weak) + 34 BitML type names; margin smaller</td>
+</tr>
+<tr>
+<td>bm2n08</td>
+<td><strong>Hexagon-consistent with packed islands <span class="evidence" data-evidence="i">I</span></strong> — 44 BitML type names prove the build stack; histogram does not separate; ISA of the ≥7.5-bit/B islands <strong>unknown <span class="evidence" data-evidence="n">N</span></strong></td>
+</tr>
+<tr>
+<td>bm2n12</td>
+<td><strong>Hexagon-consistent <span class="evidence" data-evidence="i">I</span></strong> — strong lag-4/8/12, Hexagon&gt;ARM 0.584 vs 0.365, 52 type names</td>
+</tr>
+<tr>
+<td>bm2n13</td>
+<td><strong>Hexagon-consistent <span class="evidence" data-evidence="i">I</span></strong> — as 12</td>
+</tr>
+<tr>
+<td>bm2n14</td>
+<td><strong>Hexagon-consistent <span class="evidence" data-evidence="i">I</span></strong> — as 12; carries the <code>14ConcreteTensor</code> RTTI run</td>
+</tr>
+<tr>
+<td>bm2n15</td>
+<td><strong>Hexagon-consistent <span class="evidence" data-evidence="i">I</span></strong> — as 13</td>
+</tr>
+</table>
+<p>No file is claimed as <em>decoded</em> Hexagon: no public Hexagon disassembler was available</p>
+<p>in this environment; per lab discipline the ISA-level identification is reported as</p>
+<p>consistent-by-statistics, not verified <code>[N]</code>.</p>
+<h3>1.4 Inter-file structure <code>[F]</code>/<code>[N]</code></h3>
+<ul>
+<li>Pairwise common prefixes 2–45 B (header only), suffixes 0–7 B,</li>
+</ul>
+<p>  <strong>0 shared nonzero 4 KiB blocks across all 15 pairs</strong> — six genuinely distinct</p>
+<p>  payloads related by container format and build stack only <code>[F]</code>.</p>
+<ul>
+<li><strong>No internal repetition in any file</strong>: zero duplicate nonzero 4 KiB blocks;</li>
+</ul>
+<p>  half/quarter self-equality 0.09–0.56 (sparse-image baseline). The matrix aliases</p>
+<p>  (bm2n12≡bm2n37, bm2n14≡bm2n55, bm2n15≡bm2n31) are **content identity under two</p>
+<p>  filenames, not internal repetition** <code>[N for repetition]</code>.</p>
+<p>---</p>
+<h2>2. Cross-device BT fleet — OnePlus 8 (WCN3998) ships the <code>ht*</code> family, zero md5 overlap with OP6 <code>[F]</code></h2>
+<h3>2.1 Volume and files</h3>
+<p><code>data-fetch/second-device/instantnoodle/bluetooth.img</code> (454,656 B) is a FAT16 volume</p>
+<p>with the same BPB generation as OP6's bt.img (4,096 B/sector, 4 sec/cluster, 2 FATs ×</p>
+<p>3 sectors, 512 root entries, 16,384 declared sectors) <code>[F]</code>. Root holds one</p>
+<p>subdirectory (8.3 short name <code>PCAFUI~2</code>) with 5 files; LFNs recovered by a direct FAT</p>
+<p>walk (the earlier extraction kept only mangled names):</p>
+<table>
+<tr>
+<th>LFN</th>
+<th>8.3 name</th>
+<th>bytes</th>
+<th>md5</th>
+</tr>
+<tr>
+<td>htbtfw10.tlv</td>
+<td>PCAFUI~2_3ZDPGQ~2.TLV</td>
+<td>129,964</td>
+<td><code>31268dce…80da9</code></td>
+</tr>
+<tr>
+<td>htbtfw20.tlv</td>
+<td>PCAFUI~2_EXBNED~2.TLV</td>
+<td>205,836</td>
+<td><code>2112a118…379b9</code></td>
+</tr>
+<tr>
+<td>htbtfw20.ver</td>
+<td>PCAFUI~2_GHRMCI~2.VER</td>
+<td>36</td>
+<td><code>7ea73f61…9e77d</code></td>
+</tr>
+<tr>
+<td>htnv10.bin</td>
+<td>PCAFUI~2_GZOYAZ~2.BIN</td>
+<td>3,569</td>
+<td><code>32a41273…f3489f</code></td>
+</tr>
+<tr>
+<td>htnv20.bin</td>
+<td>PCAFUI~2_LSB5SP~2.BIN</td>
+<td>5,815</td>
+<td><code>0ef258ea…f16ec3</code></td>
+</tr>
+</table>
+<p><code>htbtfw20.ver</code> is ASCII: <code>BTFM.HST.2.0.0.c3-00476-QCACHROMZ-1</code> (a BTFM package</p>
+<p>version string) <code>[F]</code>.</p>
+<h3>2.2 md5 joins</h3>
+<ul>
+<li><strong>Coverage matrix:</strong> every md5 matches exactly <strong>2 rows</strong> — OnePlus_8 and</li>
+</ul>
+<p>  OnePlus_8_Pro (<code>db_path oneplus/instantnoodle{,p}/bluetooth/image</code>). These files are</p>
+<p>  <strong>device-pair-scoped, not a broad fleet</strong> <code>[F]</code>.</p>
+<ul>
+<li><strong>vs OP6 10-file fleet (<code>data-fetch/enchilada/bt-fat/</code>): zero md5 overlap</strong> <code>[F]</code>.</li>
+</ul>
+<p>  The OnePlus 8 WCN3998 ships a <strong>third QCA prefix family (<code>ht*</code>)</strong> alongside OP6's</p>
+<p>  <code>ap*</code> (apbtfw/apnv) and <code>cr*</code> (crbtfw/crnv) families. Of the OP6 set, the six</p>
+<p>  fleet files still show 29-device rows; the four sibling variants (apbtfw11, apnv11,</p>
+<p>  crbtfw21, crnv21) remain 0-row device-specific builds <code>[F]</code> (matches</p>
+<p>  <code>qca-bt-format.md</code>).</p>
+<ul>
+<li><strong>Same filename, different content elsewhere:</strong> Samsung Tab S7 (LTE/WiFi) and</li>
+</ul>
+<p>  Galaxy S20 FE carry <code>htnv20.bin</code> at 5,950 B, md5 <code>993c5274…d5603</code> — a different</p>
+<p>  NVM variant; no other-device rows exist for the four OnePlus-8 ht* md5s <code>[F]</code>.</p>
+<ul>
+<li>Public linux-firmware ships <code>htbtfw20.tlv</code>/<code>htnv20.bin</code> for WCN399x (Ubuntu/Fedora</li>
+</ul>
+<p>  package file lists; kernel <code>btqca</code> has a WCN3998 ROM-version fix naming this file</p>
+<p>  pair) — chip attribution <code>WCN3998 → ht*</code> is public knowledge <code>[F]</code>; **md5 identity</p>
+<p>  of the OnePlus-8 copies vs upstream not checked** (local snapshot contains only the</p>
+<p>  ap/cr six; upstream copies are .zst/.xz) <code>[N]</code>.</p>
+<h3>2.3 Container parses (committed <code>qca_tlv_parse.py</code> + direct field dump)</h3>
+<p>Patches (outer type 1, <code>len_check</code> true):</p>
+<table>
+<tr>
+<th>field</th>
+<th>htbtfw10.tlv</th>
+<th>htbtfw20.tlv</th>
+<th>OP6 apbtfw10 (ref)</th>
+</tr>
+<tr>
+<td>total_size</td>
+<td>129,928</td>
+<td>205,800</td>
+<td>55,792</td>
+</tr>
+<tr>
+<td>data_length</td>
+<td>129,892</td>
+<td>205,764</td>
+<td>55,768</td>
+</tr>
+<tr>
+<td>total − data</td>
+<td><strong>36</strong></td>
+<td><strong>36</strong></td>
+<td>24</td>
+</tr>
+<tr>
+<td>format_version</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>signature</td>
+<td><strong>0</strong></td>
+<td><strong>0</strong></td>
+<td>2</td>
+</tr>
+<tr>
+<td>download_mode</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>product_id</td>
+<td><strong>16</strong></td>
+<td><strong>16</strong></td>
+<td>10</td>
+</tr>
+<tr>
+<td>rom_build</td>
+<td>0x0100</td>
+<td>0x0200</td>
+<td>0x0200</td>
+</tr>
+<tr>
+<td>patch_version</td>
+<td>0x1050</td>
+<td>0x4509</td>
+<td>2</td>
+</tr>
+<tr>
+<td>entry word</td>
+<td>0x0</td>
+<td>0x0</td>
+<td>0x1b0e0</td>
+</tr>
+<tr>
+<td>tail after total</td>
+<td><strong>32 B</strong></td>
+<td><strong>32 B</strong></td>
+<td>256 B</td>
+</tr>
+</table>
+<ul>
+<li><code>rom_build</code> still equals the filename suffix (same filename↔header identity rule as</li>
+</ul>
+<p>  the ap/cr families) <code>[F]</code>.</p>
+<ul>
+<li>The ht* generation changed the patch envelope: 36-B header (24 in ap/cr), 32-B tail</li>
+</ul>
+<p>  (256 B), signature 0 (2), product_id 16 (10), entry word 0 (0x1b0e0) <code>[F]</code>.</p>
+<p>  The exact ht* header field layout (words at +24/+28/+32) is <strong>not decoded</strong> <code>[N]</code>.</p>
+<ul>
+<li>Both ht* patch streams begin (after the 36-B header) with <code>…f8 b5 …</code> — the same</li>
+</ul>
+<p>  ARM-Thumb-consistent push pattern documented for apbtfw10; observed pattern only,</p>
+<p>  ISA unconfirmed (same caveat as the OP6 draft) <code>[F pattern, I interpretation]</code>.</p>
+<p>NVM (outer type <strong>2</strong> — a direct tag set, vs OP6's outer type-4 envelope wrapping</p>
+<p>type-2 + type-3 sets):</p>
+<ul>
+<li>htnv10.bin: 35 tags, walk closes exactly at EOF; htnv20.bin: 51 tags, exact close</li>
+</ul>
+<p>  <code>[F]</code>.</p>
+<ul>
+<li>Both start with tag <code>0x0002</code> (EDL_TAG_ID_BD_ADDR, len 6), value</li>
+</ul>
+<p>  <code>ad5a00000000</code> — identical placeholder in both files (OP6 files carry</p>
+<p>  per-file addresses like <code>200000108039</code>) <code>[F]</code>.</p>
+<ul>
+<li>Tag-ID overlap with the OP6 fleet's 64 distinct (set-type, tag) pairs: <strong>38</strong>; 14</li>
+</ul>
+<p>  tag IDs are new to this generation (up to <code>0xc5</code>) <code>[F]</code>.</p>
+<ul>
+<li>Full <code>(tag_id, len)</code> streams in the JSON; the 12-byte tag header</li>
+</ul>
+<p>  (id, len, 8 zero bytes) matches the OP6 grammar exactly <code>[F]</code>.</p>
+<p><strong>Bottom line:</strong> the OnePlus 8 BT bring-up surface is the same container technology</p>
+<p>family as OP6 (btqca TLV patch + NVM tags) but a distinct chip-family file set with a</p>
+<p>newer patch envelope and a mostly-shared NVM tag dictionary; **no file is shared</p>
+<p>byte-for-byte across the two devices** <code>[F]</code>.</p>
+<p>---</p>
+<h2>3. larry bdwlan tag 19 — a stride-14 regdb-class country table, not an extended tag-8 <code>[F]</code></h2>
+<h3>3.1 Walk and placement <code>[F]</code></h3>
+<p>All three files (<code>bdwlan.bin</code>, <code>bdwlan_in.bin</code>, <code>bdwlan_us.bin</code>, 26,328 B,</p>
+<p><code>odm/etc/wifi/</code>) walk header-to-EOF cleanly with 19 sequential IEs (tags 1..19),</p>
+<p><code>Σ(4+len) = 26,328</code>. Tag 19 spans abs <strong>[19,152, 26,328)</strong> in all three — it begins</p>
+<p>exactly at the OP6 file size (19,152): the SM6375 layout = OP6 tail re-chunk</p>
+<p>(tags 16/17/18 = 516/1,532/68, the b38-style partition totalling the same 2,120 B)</p>
+<p>plus a 7,176-B tag 19 appended <code>[F]</code>.</p>
+<h3>3.2 Cross-file variability: no signal <code>[N]</code></h3>
+<p><strong>The tag-19 payload is byte-identical across bin/in/us</strong> (0 differing bytes, equal</p>
+<p>md5s). The OP6 variable-offset-indicator method therefore has nothing to fit —</p>
+<p>phase-fit for candidate strides 20/28/40/44 returns var_count = 0 <code>[N]</code>. Per-board</p>
+<p>calibration deltas live in tags 1–8 as in OP6; tag 19 is generation-constant, not</p>
+<p>board-constant-or-variable calibration <code>[F]</code>.</p>
+<h3>3.3 Internal structure: stride-14 record table with the regdb marker <code>[F]</code></h3>
+<p>With cross-file variability unavailable, the lab's internal-structure probes were</p>
+<p>used instead (nonzero-indicator autocorrelation + recurring-marker stride analysis,</p>
+<p>the regdb method of <code>gpu-bdwlan.md</code> §6):</p>
+<ul>
+<li><strong>Nonzero-indicator autocorrelation peaks at lag 28</strong> (0.735) with the whole</li>
+</ul>
+<p>  28-family up (70: 0.716, 14: 0.707, 42: 0.680, 56: 0.641) <code>[F]</code>.</p>
+<ul>
+<li><strong>Byte-level marker scan:</strong> u32 <code>0xa028</code> occurs <strong>194 times</strong>, consecutive gaps 14</li>
+</ul>
+<p>  (×188) and 28 (×5), at a single phase (record byte +6), first at payload 14, last</p>
+<p>  at 2,786 <code>[F]</code>.</p>
+<ul>
+<li>Table geometry: <strong>199 records × 14 B from payload offset 8</strong> (8 + 199×14 = 2,794),</li>
+</ul>
+<p>  each record = 2-letter country code at +0, <code>0xa028</code> marker at +6, numeric fields at</p>
+<p>  +10/+12 — the **same record shape, stride, marker and +6 offset as</p>
+<p>  <code>regdb.bin</code>** (larry's 19,348-B regulatory DB: records from abs 6, 189 markers,</p>
+<p>  dominant stride 14) <code>[F]</code>. CC order matches the official ISO 3166 list:</p>
+<p>  AF, AX, AL, DZ, AS, AD, AI, AG, AR, AM … WF, YE, ZW; 198 distinct codes <code>[F]</code>.</p>
+<h3>3.4 Content relation to regdb.bin: substantial <code>[F]</code></h3>
+<ul>
+<li>**147 of 199 full 14-byte records are byte-identical to larry's regdb.bin</li>
+</ul>
+<p>  records** (199 records there as well) <code>[F]</code>.</p>
+<ul>
+<li>The 50 differing records differ only in value fields: 40 records differ **only at</li>
+</ul>
+<p>  record byte 12**, 5 only at byte 7, 3 at bytes 10–12, 1 at 7+12, 1 (<code>XA</code>) at</p>
+<p>  10–11 <code>[F]</code>.</p>
+<ul>
+<li>Country-set delta vs regdb: tag 19 <strong>adds <code>CW</code></strong> and <strong>drops <code>AO</code> and <code>IR</code></strong></li>
+</ul>
+<p>  (policy/ISO update or rule-set change — attribution open <code>[H]</code>) <code>[F]</code>.</p>
+<h3>3.5 Relation to OP6 tag 8: none <code>[N]</code></h3>
+<ul>
+<li><strong>0 shared nonzero 16-B blocks</strong> between tag 19 and OP6 tag 8 / 9 / 11 / 12 and</li>
+</ul>
+<p>  larry's own tag 8 <code>[N]</code>.</p>
+<ul>
+<li>Geometry differs: OP6 tag 8 = stride-40 record tables (known); tag 19 = stride-14.</li>
+</ul>
+<p>  <strong>Tag 19 is not an extended tag-8</strong> — it is a regdb-class table appended to the</p>
+<p>  board-data container <code>[F]</code>.</p>
+<ul>
+<li>Method control passed: the same 3-file phase-fit applied to OP6 tag 8 (files 102 /</li>
+</ul>
+<p>  105 / CXO) reproduces the known tables — matching <code>bdwlan-format.md</code> §4; and</p>
+<p>  <strong>larry's own tag 8 autocorrelates at lag 40</strong> (0.846) — the stride-40 geometry</p>
+<p>  persists in this generation while tag 19 uses stride 14 <code>[F]</code>.</p>
+<h3>3.6 The tail <code>[2794, 7172)</code> — unresolved <code>[N]</code></h3>
+<p>4,378 B, 27.6% nonzero, entropy 2.43; six all-zero 256-B blocks (payload offsets</p>
+<p>2,816, 6,144, 6,400, 6,656, 6,912, 7,168); no dominant marker constant; no clean</p>
+<p>single-stride table at tested strides 16/20/28/40/44 <code>[N]</code>. Mixed 10/16/20-family</p>
+<p>periodicity hints at a second table with a different shape — open item.</p>
+<h3>3.7 Correction to prior doc (applied in the same push)</h3>
+<p><code>librephone-blob-research/blob-matrix/desktop/fleet-re/gpu-bdwlan.md</code> §5.2 described</p>
+<p>tag 19 as "payload 100% non-zero, entropy 3.50". Measured: **byte-level nonzero</p>
+<p>fraction 0.4099<strong>, entropy 3.501 (confirmed), and </strong>six all-zero 256-B blocks** —</p>
+<p>"100% non-zero" is wrong at byte and block level. Corrected in gpu-bdwlan.md §5.2 in</p>
+<p>the same push (file owner = same agent session).</p>
+<p>---</p>
+<h2>4. Honest negatives (summary)</h2>
+<ol>
+<li>No Hexagon disassembler available; bm2n ISA verdicts are statistical + string</li>
+</ol>
+<p>   provenance, never byte-decoded <code>[N]</code>.</p>
+<ol>
+<li>No ELF magic and no matched public container signature for the bm2n</li>
+</ol>
+<p>   <code>0xFA0000FA</code> header family <code>[N]</code>.</p>
+<ol>
+<li>No internal block repetition in any bm2n file; matrix aliases are pure content</li>
+</ol>
+<p>   identity <code>[N]</code>.</p>
+<ol>
+<li>Zero md5 overlap between OnePlus 8 <code>ht*</code> and OP6 <code>ap*/cr*</code> BT fleets; local</li>
+</ol>
+<p>   linux-firmware snapshot has no ht* copies (upstream check pending) <code>[N]</code>.</p>
+<ol>
+<li>ht* patch header interior (+24/+28/+32 fields) not decoded <code>[N]</code>.</li>
+<li>Tag 19: variable-offset method has no signal (payload identical across all three</li>
+</ol>
+<p>   larry files) <code>[N]</code>; zero shared blocks vs OP6 tag 8/9/11/12 and larry tag 8 <code>[N]</code>.</p>
+<ol>
+<li>Tag 19 tail [2794, 7172) has no clean table at the tested strides <code>[N]</code>.</li>
+<li>No REGDB file in the OP6 modem FAT — no OP6-side regdb comparison possible <code>[N]</code>.</li>
+</ol>
+<h2>5. Open items</h2>
+<ul>
+<li>Decode the bm2n loader header (size-class words, <code>0xFA0000FA</code>, <code>0x10400</code>,</li>
+</ul>
+<p>  per-file words 11–15) against the BitML/NSP loader; obtain a Hexagon disassembler</p>
+<p>  and byte-verify the ISA verdicts.</p>
+<ul>
+<li>Attribute bm2n08's packed islands (compressed weights vs encrypted section).</li>
+<li>Check linux-firmware upstream md5s for htbtfw10/20.tlv + htnv10/20.bin vs the</li>
+</ul>
+<p>  OnePlus-8 payload copies.</p>
+<ul>
+<li>Decode the ht* 36-B patch header and the 32-B tail role.</li>
+<li>Decode the tag-19 tail (4,378 B, mixed 10/16/20-family periodicity).</li>
+<li>Confirm the CW add / AO+IR remove against qcacld regulatory rule builds.</li>
+</ul>
+<h2>6. Reproduction</h2>
+<pre><code class="language-sh">
+python3 -I analysis/tools/bm2n_isa_probe2.py /tmp/bm2n-parts/bm2n.json
+python3 -I analysis/tools/bm2n_isa_probe3.py /tmp/bm2n-parts/bm2n3.json
+python3 -I analysis/tools/bt_fleet_join2.py  /tmp/bm2n-parts/bt.json
+python3 -I librephone-blob-research/blob-matrix/desktop/tools/qca_tlv_parse.py \
+    /tmp/bm2n-parts/bt-tlv.json data-fetch/second-device/instantnoodle/bt-fat/*
+python3 -I analysis/tools/tag19_geometry.py  /tmp/bm2n-parts/tag19.json
+python3 -I analysis/tools/tag19_regdb_compare.py /tmp/bm2n-parts/tag19regdb.json
+python3 -I analysis/tools/bm2n_isa_bt_merge.py
+</code></pre>
+<p>Machine-readable output: <code>analysis/out/bm2n-isa-bt.json</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

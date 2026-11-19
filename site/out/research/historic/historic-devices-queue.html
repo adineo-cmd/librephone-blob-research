@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historic-device universe extension — the RE queue beyond the upstream 236 (2026-11-17) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Historic-device universe extension — the RE queue beyond the upstream 236 (2026-11-17)</h1><p>The owner&#x27;s directive: historically MANY mobile devices need blob RE — extend</p><p>Evidence: none</p>
+<h1>Historic-device universe extension — the RE queue beyond the upstream 236 (2026-11-17)</h1>
+<p>The owner's directive: historically MANY mobile devices need blob RE — extend</p>
+<p>beyond the LibrePhone upstream 236. This file builds that queue from the</p>
+<p>four community "devices people actually want freed" lists, cross-references</p>
+<p>every candidate against the upstream universe (249 inventory identities),</p>
+<p>and applies RULE 0 (existing pmOS/Replicant/LineageOS/UBports documentation</p>
+<p>cited, not duplicated; the lab's delta is **blob-level documentation per</p>
+<p>device**, which none of those projects produce).</p>
+<h2>1. Headline finding — the upstream list skews modern, and the free-software flagship is missing</h2>
+<ol>
+<li><strong>Fairphone FP2 is not in the upstream universe at all.</strong> The FSF-era</li>
+</ol>
+<p>   famous free-software phone (2015; Replicant 6.0 100%-free device,</p>
+<p>   UBports official port, postmarketOS port) is absent from</p>
+<p>   <code>device-inventory.csv</code> (fairphone rows = FP3/FP4/FP5/FP6 only; verified</p>
+<p>   by codename grep 2026-11-17) and absent from the /e/OS supported table</p>
+<p>   too. The single most culturally important historic device for this</p>
+<p>   program is uncovered.</p>
+<ol>
+<li>Cross-checked against the upstream 249: of the classic RE-target devices</li>
+</ol>
+<p>   below, **every row is ABSENT except Mi 5 (<code>gemini</code>), Essential PH-1</p>
+<p>   (<code>mata</code>), F(x)tec Pro 1/1X, OnePlus 6/6T, Mi 6, POCO F1, Mi 8, Pixel 3**.</p>
+<p>   The upstream list is a 2016-2024 Snapdragon + Tensor fleet (its</p>
+<p>   <code>builds.csv</code> SOC strings are 29 Snapdragon generations; no pre-2016</p>
+<p>   device survives). Nothing from the 2011-2015 era is covered.</p>
+<ol>
+<li>The historic universe is big: **214 non-archived + 457 archived device</li>
+</ol>
+<p>   packages in postmarketOS pmaports alone** (671 total), 604 devices</p>
+<p>   currently listed by the LineageOS wiki, 111 Ubuntu Touch ports, 287</p>
+<p>   /e/OS table rows, 10+ Replicant-supported devices — with tiny overlap</p>
+<p>   between the lists (a device can be freed four ways and still be in none</p>
+<p>   of them upstream).</p>
+<ol>
+<li>The lead's P1 pointer included "Gryphon" — <strong>no public codename match</strong></li>
+</ol>
+<p>   (GitHub/LineageOS/pmOS searches, 2026-11-17, 0 hits for a phone device</p>
+<p>   tree of that name). P1 below is therefore defined operationally:</p>
+<p>   devices with active free-software communities. If "Gryphon" refers to a</p>
+<p>   specific device the lead knows, it slots into P1 with the same blob</p>
+<p>   treatment.</p>
+<h2>2. Sources (all fetched 2026-11-17, route + size logged)</h2>
+<table>
+<tr>
+<th>#</th>
+<th>source</th>
+<th>URL</th>
+<th>result</th>
+<th>route notes</th>
+</tr>
+<tr>
+<td>S1</td>
+<td>postmarketOS pmaports device packages (the wiki's own package source of truth; the wiki is generated from it)</td>
+<td><code>https://gitlab.postmarketos.org/api/v4/projects/postmarketOS%2Fpmaports/repository/tree?path=device/&lt;cat&gt;&amp;recursive=true&amp;per_page=100&amp;page=N</code></td>
+<td><strong>671 device packages</strong>: community 38, testing 157, downstream 19, archived 457, main 0 (main = shared components only)</td>
+<td><code>wiki.postmarketos.org</code> is behind an <strong>Anubis anti-bot proof-of-work gate</strong> (page + api.php both 403/challenge, 2 UA variants tried) — pmaports used instead; it is strictly more authoritative for "what has a port"</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>LineageOS official supported devices</td>
+<td><code>https://wiki.lineageos.org/devices/</code> (full index HTML fetched)</td>
+<td><strong>604 device pages</strong> (current support list — historically-supported devices are dropped from the wiki when support ends; their device trees remain on GitHub)</td>
+<td>direct fetch, 2,495,778 B</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>LineageOS installed-base stats (demand signal: what people actually run)</td>
+<td><code>https://stats.lineageos.org/api/v1/stats</code></td>
+<td>250 codenames with installs, 1,439,442 total</td>
+<td>SPA shell at <code>/</code> needed bundle grep to find <code>/api/v1/stats</code></td>
+</tr>
+<tr>
+<td>S4</td>
+<td>Ubuntu Touch ports</td>
+<td><code>https://devices.ubuntu-touch.io/</code></td>
+<td><strong>111 device codenames</strong> (incl. release channel xenial/focal per link)</td>
+<td>Astro static site, links parsed from HTML</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>/e/OS supported devices</td>
+<td><code>https://doc.e.foundation/devices</code></td>
+<td><strong>287 device rows</strong> (24 on the official channel, incl. FP3/FP4/FP5/FP6; rest community installs)</td>
+<td>server-rendered table (<code>&lt;tr data-device-type=…&gt;</code>), parsed per row</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>Replicant supported devices</td>
+<td><code>https://replicant.us/supported-devices.php</code></td>
+<td>Galaxy Nexus, S2, S3(+4G), Note, Note 2, Note 8.0, Tab 2 7/10, GT-I9000…</td>
+<td>fetched, 10,795 B</td>
+</tr>
+<tr>
+<td>S7</td>
+<td>upstream universe (cross-ref target)</td>
+<td>repo: <code>upstream-contribution/blob-database/device-inventory.csv</code> (249 identities) + <code>blob-matrix/laptop/devices-half.csv</code></td>
+<td>membership by codename grep</td>
+<td>—</td>
+</tr>
+</table>
+<p>Overlap of S1-S6 with upstream, verified by codename: only FP3/FP4/FP5/FP6,</p>
+<p>mata, gemini, pro1/pro1x, enchilada/fajita, beryllium, dipper, blueline,</p>
+<p>sagit, kirin, devon, axolotl, and a few crosshatch/flame-era Pixels are in</p>
+<p>the upstream 249 — i.e. the four community lists and upstream intersect on</p>
+<p>roughly <strong>a dozen devices</strong>. Everything else in this queue is unreached by</p>
+<p>the upstream program.</p>
+<h2>3. The queue</h2>
+<p>Columns: codename; year; SoC; blob families of interest (the blob-level</p>
+<p>targets); where payloads are obtainable (all from public LineageOS/pmOS/UBports</p>
+<p>builds or vendor trees — same individually-fetchable pattern Mission 1</p>
+<p>proved for the QCA fleet); the known-hard blob; existing effort (RULE 0);</p>
+<p>priority (P1 free-software-community device / P2 popular legacy / P3 long</p>
+<p>tail); upstream-236 status (all ABSENT unless noted).</p>
+<h3>P1 — free-software-community devices</h3>
+<table>
+<tr>
+<th>device (codename)</th>
+<th>yr</th>
+<th>SoC</th>
+<th>blobs of interest</th>
+<th>payloads from</th>
+<th>known-hard blob</th>
+<th>existing effort (RULE 0)</th>
+<th>upstream?</th>
+</tr>
+<tr>
+<td>Fairphone FP2 (<code>FP2</code>)</td>
+<td>2015</td>
+<td>MSM8974AB-v2 (SD801)</td>
+<td>modem <code>mpss</code> (8974), WCN3680 WiFi/BT/FM (prima <code>wlan/prima</code>, <code>wcnss.mdtt</code>-class), adsp, sensors</td>
+<td>pmOS testing image; LineageOS 18.1-21 community builds; Replicant 6.0; UBports official</td>
+<td><strong>WCN3680 prima firmware + 8974 modem</strong> (Replicant documents WiFi/modem as the residual nonfree items)</td>
+<td>pmOS testing (device-fairphone-fp2); Replicant 6.0 supported; UBports official (focal)</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>PinePhone 1.2 (<code>pine64-pinephone</code>)</td>
+<td>2019</td>
+<td>Allwinner A64</td>
+<td>RTL8723CS WiFi/BT firmware; EG25-G modem (Qualcomm MDM9x07-class inside a Quectel module — fully opaque); Mali-400 GPU is FREE (lima)</td>
+<td>pmOS testing image; UBports; Megi's kernel trees</td>
+<td><strong>EG25-G modem internals</strong> (the only nonfree piece with RE interest; AT/QMI surface already documented by community)</td>
+<td>pmOS testing; UBports community; extensive mainline docs (megous)</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>PinePhone Pro (<code>pine64-pinephonepro</code>)</td>
+<td>2021</td>
+<td>RK3399S</td>
+<td>minimal — mainline nearly everything; optional M.2 modem</td>
+<td>pmOS community</td>
+<td>modem module if fitted</td>
+<td>pmOS community</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Purism Librem 5 (<code>purism-librem5</code>)</td>
+<td>2019</td>
+<td>NXP i.MX8M</td>
+<td>Redpine RS9116 WiFi firmware (known-hard), BM818/M.2 modem (Qualcomm class inside), GC7000 GPU is FREE (etnaviv)</td>
+<td>PureOS + pmOS community; Purism publishes schematic-level docs</td>
+<td><strong>RS9116 firmware</strong> (the last big blob; Purism has documented modem/vboot parts extensively)</td>
+<td>pmOS community; Purism's own docs (librem5-devkit)</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nokia N900 (<code>nokia-n900</code>)</td>
+<td>2009</td>
+<td>TI OMAP3430</td>
+<td>TI WL1273 WiFi/BT firmware; Calypso GSM modem (RE'd: OsmocomBB layer1 is free); ads7846 touch is plain Linux</td>
+<td>pmOS community image; Maemo-era firmware dumps</td>
+<td>WL1273 firmware (in linux-firmware, still a blob); modem is the historic success story</td>
+<td>pmOS community (strong page); OsmocomBB; Neo900 heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Samsung Galaxy S3 i9300 (<code>samsung-m0</code>)</td>
+<td>2012</td>
+<td>Exynos 4412</td>
+<td>BCM4330 WiFi/BT + nvram; XMM6262 modem via Samsung-IPC userspace (Replicant heritage, free load protocol); MFC codec</td>
+<td>pmOS community image; Replicant 6.0</td>
+<td><strong>BCM4330 firmware + Samsung-IPC modem bring-up</strong> (protocol free, firmware blob)</td>
+<td>pmOS community; Replicant 6.0 supported; mainline Linux port (wichtel/SCRIPTed)</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nexus 10 (<code>google-manta</code>)</td>
+<td>2012</td>
+<td>Exynos 5250</td>
+<td>bcmdhd WiFi class (BCM4330-family) + nvram; Exynos MFC; modem n/a (tablet)</td>
+<td>pmOS community</td>
+<td>Exynos 5-series display/codec blobs</td>
+<td>pmOS community</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>SHIFT6mq (<code>shift-axolotl</code>)</td>
+<td>2020</td>
+<td>SD845</td>
+<td>same blob family as OnePlus 6 (WCN3990 TLV fleet — Mission 1 files apply!)</td>
+<td>pmOS community; SHIFT's own images</td>
+<td>covered by the fleet analysis + SDM845 common trees</td>
+<td>pmOS community; SHIFT officially friendly</td>
+<td><strong>COVERED</strong> (shift/Shift_6MQ)</td>
+</tr>
+<tr>
+<td>Fairphone FP1 (<code>fairphone-fp1</code>)</td>
+<td>2013</td>
+<td>MT6589</td>
+<td>MOLY modem stack (MediaTek), MT6628 WiFi/BT combo, MediaTek preloader/LK</td>
+<td>pmOS downstream image; FP1-era LineageOS</td>
+<td><strong>MTK MOLY modem + MT6628 combo</strong> — opens the entire MediaTek historic family</td>
+<td>pmOS downstream</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Openmoko Neo FreeRunner + Neo900</td>
+<td>2008/…</td>
+<td>S3C2442 / OMAP3530</td>
+<td>Calypso modem (free via OsmocomBB); the only fully-free modem lineage ever</td>
+<td>historic; GTA02 archives; Neo900 project repo (on hold)</td>
+<td>none left — the monument</td>
+<td>OsmocomBB, Neo900</td>
+<td>ABSENT</td>
+</tr>
+</table>
+<h3>P2 — popular legacy (the classic RE-target devices)</h3>
+<table>
+<tr>
+<th>device (codename)</th>
+<th>yr</th>
+<th>SoC</th>
+<th>blobs of interest</th>
+<th>payloads from</th>
+<th>known-hard blob</th>
+<th>existing effort (RULE 0)</th>
+<th>upstream?</th>
+</tr>
+<tr>
+<td>Nexus 4 (<code>mako</code>)</td>
+<td>2012</td>
+<td>APQ8064T</td>
+<td>modem 8960, WCN3660 prima, adsp</td>
+<td>pmOS archived; LineageOS 18.1-era builds (dropped from wiki)</td>
+<td>WCN3660 prima fw</td>
+<td>pmOS archived; long LineageOS history</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nexus 5 (<code>hammerhead</code>)</td>
+<td>2013</td>
+<td>MSM8974</td>
+<td>modem <code>mpss</code> 8974, <strong>WCN3680 prima</strong>, adsp, venus</td>
+<td>pmOS <strong>testing</strong>; LineageOS 14.1-18.1 builds; UBports community</td>
+<td>WCN3680 prima + 8974 modem</td>
+<td>pmOS testing; UBports community</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nexus 6 (<code>shamu</code>)</td>
+<td>2014</td>
+<td>APQ8084</td>
+<td>modem 8084, WCN3660B prima, adsp</td>
+<td>LineageOS builds; pmOS absent</td>
+<td>prima fw</td>
+<td>LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nexus 5X (<code>bullhead</code>)</td>
+<td>2015</td>
+<td>MSM8992</td>
+<td>modem 8992, <strong>BCM4356</strong> WiFi/BT, venus</td>
+<td>LineageOS 14.1-15.1 builds</td>
+<td>BCM4356 firmware + nvram</td>
+<td>LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nexus 6P (<code>angler</code>)</td>
+<td>2015</td>
+<td>MSM8994</td>
+<td>modem 8994, <strong>BCM4356</strong>, adsp</td>
+<td>LineageOS builds; device trees live on GitHub</td>
+<td>BCM4356 fw</td>
+<td>LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nexus 7 2013 (<code>flo</code>/<code>deb</code>)</td>
+<td>2013</td>
+<td>APQ8064T</td>
+<td>WCN3660 prima, adsp</td>
+<td>pmOS archived (flo); LineageOS builds</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nexus 9 (<code>flounder</code>)</td>
+<td>2014</td>
+<td>Tegra K1</td>
+<td>BCM4356; NVIDIA Tegra bc, DSI panel chain</td>
+<td>LineageOS builds; pmOS archived</td>
+<td>Tegra display/avp blobs</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>OnePlus One (<code>bacon</code>)</td>
+<td>2014</td>
+<td>MSM8974AC</td>
+<td>modem 8974, WCN3660 prima, adsp</td>
+<td>pmOS <strong>testing</strong>; LineageOS builds</td>
+<td>prima fw</td>
+<td>pmOS testing; the single most-flashed custom-ROM device of its era</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>OnePlus 2 (<code>oneplus2</code>)</td>
+<td>2015</td>
+<td>MSM8994</td>
+<td>modem 8994, combo chip per vendor tree (not pinned this session), adsp</td>
+<td>pmOS archived</td>
+<td>8994 modem</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>OnePlus 3/3T (<code>oneplus3</code>)</td>
+<td>2016</td>
+<td>MSM8996</td>
+<td>modem 8996, <code>qcwcn</code> WiFi/BT (BoardConfig <code>BOARD_WLAN_DEVICE:=qcwcn</code>, verified this session), adsp, venus</td>
+<td>pmOS archived; LineageOS 14.1-18.1</td>
+<td>qcwcn prima-class fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy S4 LTE (<code>jfltexx</code>)</td>
+<td>2013</td>
+<td>APQ8064T</td>
+<td>modem 8960, WCN3680, adsp</td>
+<td>pmOS archived; Replicant-adjacent trees</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy S5 (<code>klte</code>)</td>
+<td>2014</td>
+<td>MSM8974</td>
+<td>modem 8974, WCN3680, adsp</td>
+<td>pmOS archived; LineageOS builds</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy Note 3 (<code>hlte</code>)</td>
+<td>2013</td>
+<td>MSM8974</td>
+<td>same family as S5</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy S6 (<code>zerofltexx</code>)</td>
+<td>2015</td>
+<td>Exynos 7420</td>
+<td><strong>BCM4359</strong> WiFi/BT (verified in universal7420 vendor lists), Samsung-IPC modem (Shannon333)</td>
+<td>pmOS testing-era trees; mainline project exists</td>
+<td><strong>Shannon modem + BCM4359 fw</strong></td>
+<td>mainline Linux port; LineageOS 18.1 unofficial</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy S7 (<code>herolte</code>)</td>
+<td>2016</td>
+<td>Exynos 8890</td>
+<td>Shannon 359 modem, BCM4359-class combo</td>
+<td>pmOS archived; LineageOS 18.1-21</td>
+<td><strong>Shannon 359 modem</strong> (mainline projects exist)</td>
+<td>pmOS archived; LineageOS heritage; installed base 52,588+52,360 = ~105k (S3 source) — biggest legacy install base</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy Note 8 (<code>greatlte</code>)</td>
+<td>2017</td>
+<td>Exynos 8895</td>
+<td>Shannon 363 modem, Broadcom combo</td>
+<td>LineageOS official-era builds; installed base 21,031</td>
+<td>Shannon modem</td>
+<td>LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy S2 (<code>i9100</code>)</td>
+<td>2011</td>
+<td>Exynos 4210</td>
+<td>BCM4330, XMM6272 modem via Samsung-IPC</td>
+<td>Replicant 6.0; historic LineageOS</td>
+<td>Samsung-IPC + BCM4330</td>
+<td>Replicant 6.0 supported</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy Note 2 (<code>n7100</code>)</td>
+<td>2012</td>
+<td>Exynos 4412</td>
+<td>BCM4330, XMM6262 modem</td>
+<td>Replicant 6.0</td>
+<td>Samsung-IPC + BCM4330</td>
+<td>Replicant 6.0 supported</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy Tab 2 7/10 (<code>p31xx</code>/<code>p51xx</code>)</td>
+<td>2012</td>
+<td>OMAP4430</td>
+<td>WL1273 TI firmware, XMM modem</td>
+<td>Replicant 6.0</td>
+<td>TI combo fw</td>
+<td>Replicant 6.0 supported</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Galaxy Nexus (<code>maguro</code>)</td>
+<td>2011</td>
+<td>OMAP4460</td>
+<td>WL1285 TI combo, XMM6270 modem</td>
+<td>Replicant 6.0; pmOS-era trees</td>
+<td>TI combo fw</td>
+<td>Replicant 6.0 supported</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Xperia Z (<code>yuga</code>)</td>
+<td>2013</td>
+<td>APQ8064</td>
+<td>WCN3660, modem 8960</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Xperia Z1 (<code>honami</code>)</td>
+<td>2013</td>
+<td>MSM8974</td>
+<td>WCN3680, modem 8974</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Xperia Z3 Compact (<code>amami</code>)</td>
+<td>2014</td>
+<td>MSM8974</td>
+<td>WCN3680, modem 8974</td>
+<td>pmOS archived; huge community</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Xperia X (<code>suzu</code>)</td>
+<td>2016</td>
+<td>MSM8952</td>
+<td>WCN3660B?/combo per vendor tree, modem 8952</td>
+<td>UBports community</td>
+<td>8952 modem</td>
+<td>UBports community</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>LG G2 (<code>d802</code>)</td>
+<td>2013</td>
+<td>MSM8974</td>
+<td>WCN3680, modem 8974</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>LG G3 (<code>d855</code>)</td>
+<td>2014</td>
+<td>MSM8974AC</td>
+<td>WCN3680, modem 8974</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>LG G4 (<code>h815</code>)</td>
+<td>2015</td>
+<td>MSM8994</td>
+<td>combo per vendor tree, modem 8994</td>
+<td>pmOS absent; mainline project exists</td>
+<td>8994 modem</td>
+<td>mainline port (G4 mainline project)</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Moto G 2013 (<code>falcon</code>)</td>
+<td>2013</td>
+<td>MSM8226</td>
+<td>modem 8226, WCN3620 combo</td>
+<td>pmOS archived</td>
+<td>8226 modem</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Moto G 2014 (<code>titan</code>)</td>
+<td>2014</td>
+<td>MSM8226</td>
+<td>modem 8226, WCN3620</td>
+<td>pmOS archived</td>
+<td>8226 modem</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Moto G 2015 (<code>osprey</code>/<code>merlin</code>)</td>
+<td>2015</td>
+<td>MSM8916</td>
+<td>modem 8916 (known pmOS hard case), WCN3660B</td>
+<td>pmOS archived</td>
+<td><strong>MSM8916 modem</strong> (pmOS documentation discusses its difficulty)</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Moto X 2014 (<code>victara</code>)</td>
+<td>2014</td>
+<td>MSM8974AC</td>
+<td>WCN3680, modem 8974</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Xiaomi Mi 4 (<code>cancro</code>)</td>
+<td>2014</td>
+<td>MSM8974</td>
+<td>WCN3680, modem 8974</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Xiaomi Mi A1 (<code>tissot</code>)</td>
+<td>2017</td>
+<td>SD625 (MSM8953)</td>
+<td>modem 8953, WCN3680B? per tree; pmOS has generic-qcom-msm8953</td>
+<td>pmOS msm8953 community target; LineageOS builds; installed base 15,661</td>
+<td>8953 modem (pmOS msm8953 effort documents it)</td>
+<td>pmOS community (device-qcom-msm8953 generic); LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Redmi Note 4 (<code>mido</code>)</td>
+<td>2017</td>
+<td>SD625/MT6797</td>
+<td>same 8953 family</td>
+<td>LineageOS builds</td>
+<td>8953 modem</td>
+<td>LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Nokia N9 (<code>nokia-n9</code>)</td>
+<td>2011</td>
+<td>TI OMAP3630</td>
+<td>WL1271 TI combo, modem (ST-Ericsson)</td>
+<td>pmOS archived</td>
+<td>TI combo fw</td>
+<td>pmOS archived (MeeGo heritage)</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>BQ Aquaris E4.5 Ubuntu Edition (<code>krillin</code>)</td>
+<td>2015</td>
+<td>MT6582</td>
+<td>MOLY modem, MT66 combo</td>
+<td>UBports heritage trees</td>
+<td>MTK MOLY stack</td>
+<td>UBports historic flagship</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Meizu Pro 5 (<code>arale</code>)</td>
+<td>2015</td>
+<td>Exynos 7420</td>
+<td>BCM4356-class combo (pin per vendor tree), Shannon modem via Samsung-IPC</td>
+<td>UBports official (xenial)</td>
+<td>Samsung-IPC + combo fw</td>
+<td>UBports official</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>HTC One M7 (<code>m7ul</code>)</td>
+<td>2013</td>
+<td>APQ8064T</td>
+<td>WCN3660, modem 8960</td>
+<td>pmOS absent; LineageOS heritage</td>
+<td>prima fw</td>
+<td>LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>HTC One M8 (<code>m8</code>)</td>
+<td>2014</td>
+<td>MSM8974AC</td>
+<td>WCN3680, modem 8974</td>
+<td>pmOS archived</td>
+<td>prima fw</td>
+<td>pmOS archived</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>HTC 10 (<code>pme</code>)</td>
+<td>2016</td>
+<td>MSM8996</td>
+<td>qcwcn, modem 8996</td>
+<td>pmOS absent; LineageOS heritage</td>
+<td>qcwcn fw</td>
+<td>LineageOS heritage</td>
+<td>ABSENT</td>
+</tr>
+<tr>
+<td>Essential PH-1 (<code>mata</code>)</td>
+<td>2017</td>
+<td>SDM845</td>
+<td>the SDM845 blob set — carries crbtfw20.tlv/crnv20.bin (Mission 1 sources came from mata's own vendor tree)</td>
+<td>LineageOS 18.1-22.2 official-era builds (TheMuppets mata tree verified in Mission 1)</td>
+<td>SDM845 modem</td>
+<td>LineageOS official heritage</td>
+<td><strong>COVERED</strong> (essential/PH_1)</td>
+</tr>
+</table>
+<h3>P3 — long tail (enumerated, not row-documented)</h3>
+<p>The long tail is enumerated in Appendix A (full lists) rather than</p>
+<p>row-documented: 157 pmOS testing devices (from <code>device-sony-amami</code>-class</p>
+<p>archive returns to <code>device-xiaomi-ido</code>-class downstream keepers), 457</p>
+<p>archived pmOS devices (every device pmOS ever ported but retired), the</p>
+<p>historic tail of the 604 LineageOS wiki devices, 111 Ubuntu Touch ports,</p>
+<p>287 /e/OS rows. Priority within P3 = the LineageOS installed-base ranking</p>
+<p>(S3 source): herolte ~105k installs, sagit 48k (covered), greatlte 21k,</p>
+<p>tissot 16k, chiron 13k, crownlte 12k… — i.e. the Exynos 8890/8995 Shannon</p>
+<p>modem family is the highest-demand P3 cluster.</p>
+<h2>4. Fragmentation insight for HISTORIC devices</h2>
+<p>Historic devices repeat SoCs far more than modern ones — one RE pass frees</p>
+<p>whole eras:</p>
+<table>
+<tr>
+<th>SoC / platform</th>
+<th>devices above sharing it</th>
+<th>blob families RE'd once</th>
+</tr>
+<tr>
+<td>MSM8974 / APQ8064T (SD800/801 era, 2012-2015)</td>
+<td>FP2, Nexus 5, OnePlus One, LG G2/G3, Moto X 2014, Sony Z1/Z3, Mi 4, S5, Note 3, HTC M8</td>
+<td>8974 modem (mpss), <strong>WCN3680/WCN3660 prima firmware</strong>, adsp — the prima firmware family is COMPLETELY different from the modern WCN399x TLV fleet (Mission 1) and is the single biggest historic blob family</td>
+</tr>
+<tr>
+<td>MSM8994/8992 (SD808/810, 2015)</td>
+<td>Nexus 5X/6P, OnePlus 2, LG G4, Xperia Z5</td>
+<td>8994/8992 modem + BCM4356 combo</td>
+</tr>
+<tr>
+<td>MSM8996 (SD820/821, 2016)</td>
+<td>OnePlus 3/3T, HTC 10, Xperia XZ, Mi 5 (covered)</td>
+<td>8996 modem + qcwcn combo</td>
+</tr>
+<tr>
+<td>MSM8226/8916 (2013-2016 budget)</td>
+<td>Moto G 2013/2014/2015</td>
+<td>small modems + WCN36xx — the pmOS budget-phone universe</td>
+</tr>
+<tr>
+<td>MSM8953 (SD625, 2017)</td>
+<td>Mi A1, Redmi Note 4, pmOS generic-msm8953</td>
+<td>8953 modem — pmOS has an ACTIVE generic target</td>
+</tr>
+<tr>
+<td>Exynos 4412/5250 (2012)</td>
+<td>S3, Note 2, Nexus 10, Replicant set</td>
+<td>BCM4330 + Samsung-IPC/XMM modems — protocol free (Replicant), firmware blob</td>
+</tr>
+<tr>
+<td>Exynos 7420/8890/8895 (2015-2017)</td>
+<td>S6, S7, Note 8, Meizu Pro 5</td>
+<td><strong>Shannon modem</strong> (the un-RE'd Samsung modem lineage) + BCM4359-class</td>
+</tr>
+<tr>
+<td>OMAP3/4/5 TI</td>
+<td>N900, Galaxy Nexus, Tab 2</td>
+<td>TI WL12xx combo firmware; Calypso modem already free (OsmocomBB)</td>
+</tr>
+<tr>
+<td>MediaTek MT6589/82</td>
+<td>FP1, Aquaris E4.5</td>
+<td>MOLY modem + MT66xx combos — the historic-MTK gate</td>
+</tr>
+</table>
+<p>Blob-family insight: the historic WiFi/BT gate is <strong>WCN36xx prima</strong> (the</p>
+<p>8974 era's integrated combo — ~15 devices above) and **Broadcom bcmdhd</p>
+<p>(BCM4330/4339/4356/4359)** — both completely different firmware containers</p>
+<p>from the modern QCA TLV fleet; the historic modem gate is either **Qualcomm</p>
+<p>mpss (per generation)<strong> or </strong>Samsung-IPC Shannon/XMM<strong> or </strong>MTK MOLY**.</p>
+<p>Mission 1's fleet analysis + this table together now cover the BT blob</p>
+<p>families of both the modern (TLV) and the 8974-era (prima) Qualcomm fleets.</p>
+<h2>5. Recommended first-3 RE targets</h2>
+<ol>
+<li><strong>Fairphone FP2</strong> (P1, 2015, MSM8974AB-v2). The free-software flag the</li>
+</ol>
+<p>   FSF-leaning community actually holds up — and it is absent from the</p>
+<p>   upstream 236, so the lab owns it outright. Its blob set (8974 modem +</p>
+<p>   WCN3680 prima + adsp) is exactly the MSM8974-era cluster (§4 row 1), so</p>
+<p>   the documentation transfers to Nexus 5, OnePlus One, LG G3, Sony Z3 and</p>
+<p>   the rest. Payloads: small pmOS testing / LineageOS community builds;</p>
+<p>   RULE 0 anchoring exists (Replicant's freedom audit, pmOS page) but no</p>
+<p>   project produces blob-level docs — pure delta.</p>
+<ol>
+<li><strong>Nexus 5 <code>hammerhead</code></strong> (P2, 2013). Same blob families as FP2 (one RE</li>
+</ol>
+<p>   pass, two flagships), the most-bought-and-flashed 8974 device, pmOS</p>
+<p>   testing + UBports community + years of LineageOS builds to diff blobs</p>
+<p>   against; every payload individually fetchable.</p>
+<ol>
+<li><strong>Galaxy S3 <code>samsung-m0</code></strong> (P1/P2 bridge, 2012). pmOS <em>community</em></li>
+</ol>
+<p>   (actively maintained), Replicant 6.0's other 100%-free device, and a</p>
+<p>   completely different modem lineage (Samsung-IPC + XMM6262 + BCM4330) —</p>
+<p>   the pass that opens the Exynos/Samsung-IPC universe (S2, Note 2, Galaxy</p>
+<p>   Nexus, Meizu Pro 5, S6/S7 Shannon family) rather than a second</p>
+<p>   Qualcomm generation.</p>
+<h2>Appendix A — source lists (fetched verbatim, 2026-11-17)</h2>
+<h3>A1. postmarketOS pmaports device packages (671)</h3>
+<ul>
+<li><strong>community (38)</strong>: device-fairphone-fp4, device-generic-ppc64le,</li>
+</ul>
+<p>  device-generic-x86_64, device-google-asurada, device-google-bonito,</p>
+<p>  device-google-cherry, device-google-corsola, device-google-gru,</p>
+<p>  device-google-kukui, device-google-manta, device-google-oak,</p>
+<p>  device-google-peach-pit, device-google-sargo, device-google-trogdor,</p>
+<p>  device-google-veyron, device-google-x64cros, device-lenovo-21bx,</p>
+<p>  device-nokia-n900, device-odroid-xu4, device-oneplus-enchilada,</p>
+<p>  device-oneplus-fajita, device-pine64-pinebookpro, device-pine64-pinenote,</p>
+<p>  device-pine64-pinephonepro, device-pine64-rockpro64,</p>
+<p>  device-purism-librem5, device-qcom-msm8953, device-qcom-qcs6490,</p>
+<p>  device-qcom-sm7150, device-qemu-aarch64, device-qemu-amd64,</p>
+<p>  device-samsung-coreprimevelte, device-samsung-espresso10,</p>
+<p>  device-samsung-espresso7, device-samsung-m0, device-samsung-starqltechn,</p>
+<p>  device-shift-axolotl. (Phone-class devices — PinePhone, FP2, Nexus 5,</p>
+<p>  OnePlus One — verified this session to sit under <strong>device/testing</strong> in</p>
+<p>  current pmaports; the community category holds</p>
+<p>  mainline-chromebook/tablet-class devices plus n900, m0, manta, librem5,</p>
+<p>  axolotl.)</p>
+<ul>
+<li><strong>testing (157)</strong> and <strong>downstream (19)</strong>: full machine lists retained in</li>
+</ul>
+<p>  scratch (<code>/tmp/astro_s/pmos_devices_all.json</code>, regeneratable via the</p>
+<p>  route in §2 S1). Historic-relevant downstream picks: device-fairphone-fp1,</p>
+<p>  device-xiaomi-ido (Redmi 1S), device-lg-elsa (L Bello), device-lg-vee3e</p>
+<p>  (G2 mini), device-samsung-j4lte, device-samsung-m20lte,</p>
+<p>  device-htc-golfu, device-bq-gohan, device-amazon-sheldon.</p>
+<ul>
+<li><strong>archived (457)</strong>: every retired pmOS port — the long tail's long tail;</li>
+</ul>
+<p>  counts by category in the JSON; notable archived members verified this</p>
+<p>  session: device-lg-hammerhead's sibling generations, device-sony-amami/</p>
+<p>  yuga/honami, device-samsung-klte/herolte, device-xiaomi-cancro/gemini,</p>
+<p>  device-google-crosshatch/manta-class tablets, device-htc-m8,</p>
+<p>  device-oneplus-oneplus2/oneplus3, device-motorola-titan/falcon,</p>
+<p>  device-nokia-n9, device-essential-mata.</p>
+<h3>A2. Ubuntu Touch ports (111 codenames)</h3>
+<p>algiz, amar-row-lte, amar-row-wifi, angelica, angelican, angler, ansuz,</p>
+<p>arale, axolotl, bacon, begonia, beryllium, beyond0lte, beyond1lte,</p>
+<p>beyond2lte, billie, billie2, biloba, bonito, cancro, cheeseburger, citrus,</p>
+<p>cooler, cosmo-communicator, curtana, d2s, deb, denniz, dipper, dora,</p>
+<p>dumpling, enchilada, excalibur, fajita, flo, (…full list in scratch</p>
+<p><code>/tmp/astro_s/ut_devices.txt</code>) — including the historic UT flagships</p>
+<p>(arale = Meizu Pro 5, bacon = OnePlus One, angler = Nexus 6P, cancro =</p>
+<p>Mi 4) and the LP-environment devices.</p>
+<h3>A3. /e/OS table (287 rows; 24 official channel)</h3>
+<p>Brand distribution: Xiaomi 61, Motorola 41, Samsung 37, OnePlus 34,</p>
+<p>Google 28, LG 22, Sony 19, Nubia 8, Fairphone 4 (FP3/FP4/FP5/FP6 — FP2</p>
+<p>absent), Asus 3, Nothing 3, Razer 3, BQ 2, F(x)tec 2, Essential 1,</p>
+<p>Gigaset 1, SHIFT 1, Solana 1, ZUK 1 (scratch: <code>efdn_devices.json</code>).</p>
+<h3>A4. Replicant supported (from fetched page)</h3>
+<p>Galaxy Nexus (maguro/toro), Galaxy S (GT-I9000), S 2 (GT-I9100),</p>
+<p>S 3 (GT-I9300 + 4G), Note (GT-I9250/N7000), Note 2 (N7100),</p>
+<p>Note 8.0 (GT-N5110), Tab 2 7.0/10.1 (P31xx/P51xx), Nexus S-era GT-I9020</p>
+<p>heritage devices.</p>
+<h3>A5. LineageOS installed-base top (historic-relevant only; S3)</h3>
+<p>herolte 52,588 + hero2lte 52,360 (Galaxy S7/S7 Edge), greatlte 21,031</p>
+<p>(Note 8), tissot 15,661 (Mi A1), crownlte 12,251 (Note 9), starlte 26,548</p>
+<p>(S9), chiron 13,379 (Mi 6 Plus-era), j7y17lte 11,701 — versus covered</p>
+<p>devices: sagit (Mi 6) 48,267, dipper (Mi 8) 33,767, instantnoodlep 33,803</p>
+<p>(OnePlus 8? — modern). The uncovered legacy installed base rivals the</p>
+<p>covered one: more evidence the list skews modern.</p>
+<h2>Appendix B — method + honesty notes</h2>
+<ul>
+<li>Membership greps were run against <code>build_codename</code> in</li>
+</ul>
+<p>  <code>device-inventory.csv</code> (2026-11-17); every "ABSENT" claim in the queue</p>
+<p>  table was checked individually (incl. alias attempts m7/m7ul, FP1/FP2).</p>
+<ul>
+<li>WiFi/BT combo chips: pinned this session for FP2 (WCN3680), hammerhead</li>
+</ul>
+<p>  (WCN3680), oneplus3 (qcwcn via BoardConfig fetch), zerofltexx (BCM4359</p>
+<p>  via universal7420 proprietary-files search); where a combo could not be</p>
+<p>  verified this session the row says so — pinning those is exactly the</p>
+<p>  per-device blob documentation the lab should produce next.</p>
+<ul>
+<li><code>wiki.postmarketos.org</code> Anubis gate: both <code>wiki.postmarketos.org/wiki/Devices</code></li>
+</ul>
+<p>  and <code>/w/api.php</code> returned the Anubis challenge (2 user-agents tried);</p>
+<p>  pmaports GitLab API used as the authoritative substitute. A browser-tool</p>
+<p>  pass could retrieve the wiki's mainline-status columns per device as a</p>
+<p>  follow-up session.</p>
+<ul>
+<li>Years/SoCs in the queue table are well-established device facts, not</li>
+</ul>
+<p>  fetched per-device from the blocked wiki; the blob columns are the lab's</p>
+<p>  new content. Payload obtainability column reflects the Mission 1 route</p>
+<p>  proof (LineageOS/TheMuppets/pmOS/vendor trees, individually fetchable).</p>
+<ul>
+<li>No git commit / no push (per instructions). Scratch:</li>
+</ul>
+<p>  <code>/tmp/astro_s/</code> (pmOS JSONs, UT list, e-fdn JSON, lineage stats JSON,</p>
+<p>  lineage wiki index, replicant page).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualcomm QCA BT patch + NVRAM fleet (laptop half) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Qualcomm QCA BT patch + NVRAM fleet (laptop half)</h1><p>Phase 2 (WORKORDER-002-laptop) — evidence class: METADATA (upstream SQL md5/size; no payload RE yet).</p><p>Evidence: none</p>
+<h1>Qualcomm QCA BT patch + NVRAM fleet (laptop half)</h1>
+<p>Phase 2 (WORKORDER-002-laptop) — evidence class: METADATA (upstream SQL md5/size; no payload RE yet).</p>
+<p>The QCA BT patch (crbtfwXX.tlv) and NVRAM (crnvXX.bin / apnvXX.bin) fleet is the recon's #1 leverage family: one RE pass covers up to 29 devices database-wide. In the laptop half: 4 devices carry each file. The .tlv patch format and .bin NVRAM layout for QCA BT controllers have PARTIAL public documentation via the BlueZ/kernel btqca driver (firmware-download protocol is public; the patch CONTENT is not). These docs are METADATA-LEVEL for the laptop-half devices.</p>
+<table>
+<tr>
+<th>device (vendor/model/build)</th>
+<th>file</th>
+<th>type</th>
+<th>bytes</th>
+<th>md5 (upstream)</th>
+</tr>
+<tr>
+<td>oneplus/OnePlus_7T_Pro (hotdog)</td>
+<td>apnv10.bin</td>
+<td>UNKNOWN</td>
+<td>1243</td>
+<td>4905d516ca6ff77eee8f9f82a17a14ff</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_7T_Pro (hotdog)</td>
+<td>crnv11.bin</td>
+<td>UNKNOWN</td>
+<td>2798</td>
+<td>7c0db76f1a434d20b3ce3e261b2d00c6</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_7T_Pro (hotdog)</td>
+<td>crnv20.bin</td>
+<td>UNKNOWN</td>
+<td>3936</td>
+<td>bb6ca169095f116ce20029238b4ca4c1</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_7T_Pro (hotdog)</td>
+<td>apbtfw10.tlv</td>
+<td>UNKNOWN</td>
+<td>56052</td>
+<td>42a31bb8b2afa5b805dfda78cb1ed4c6</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_7T_Pro (hotdog)</td>
+<td>crbtfw11.tlv</td>
+<td>UNKNOWN</td>
+<td>29368</td>
+<td>eae2d0a1fa6690a9eac392a1cef28092</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_7T_Pro (hotdog)</td>
+<td>crbtfw20.tlv</td>
+<td>UNKNOWN</td>
+<td>56180</td>
+<td>16077492405d178c5198b86b3cec7eef</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9 (lemonade)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9 (lemonade)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9 (lemonade)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9 (lemonade)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9 (lemonade)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9 (lemonade)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9_Pro (lemonadep)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9_Pro (lemonadep)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9_Pro (lemonadep)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9_Pro (lemonadep)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9_Pro (lemonadep)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9_Pro (lemonadep)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9RT (martini)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9RT (martini)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9RT (martini)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9RT (martini)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9RT (martini)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>oneplus/OnePlus_9RT (martini)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>apnv10.bin</td>
+<td>UNKNOWN</td>
+<td>1243</td>
+<td>4905d516ca6ff77eee8f9f82a17a14ff</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>crnv11.bin</td>
+<td>UNKNOWN</td>
+<td>2798</td>
+<td>7c0db76f1a434d20b3ce3e261b2d00c6</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>crnv20.bin</td>
+<td>UNKNOWN</td>
+<td>3936</td>
+<td>bb6ca169095f116ce20029238b4ca4c1</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>apbtfw10.tlv</td>
+<td>UNKNOWN</td>
+<td>56052</td>
+<td>42a31bb8b2afa5b805dfda78cb1ed4c6</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>crbtfw11.tlv</td>
+<td>UNKNOWN</td>
+<td>29368</td>
+<td>eae2d0a1fa6690a9eac392a1cef28092</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>crbtfw20.tlv</td>
+<td>UNKNOWN</td>
+<td>56180</td>
+<td>16077492405d178c5198b86b3cec7eef</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>a619_gmu.bin</td>
+<td>GPU</td>
+<td>32768</td>
+<td>9e23c52057bb573dee9ba31f1fdba4fa</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>realme/Realme_10_Pro (luigi)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>apnv10.bin</td>
+<td>UNKNOWN</td>
+<td>1243</td>
+<td>4905d516ca6ff77eee8f9f82a17a14ff</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>crnv11.bin</td>
+<td>UNKNOWN</td>
+<td>2798</td>
+<td>7c0db76f1a434d20b3ce3e261b2d00c6</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>crnv20.bin</td>
+<td>UNKNOWN</td>
+<td>3936</td>
+<td>bb6ca169095f116ce20029238b4ca4c1</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>apbtfw10.tlv</td>
+<td>UNKNOWN</td>
+<td>56052</td>
+<td>42a31bb8b2afa5b805dfda78cb1ed4c6</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>crbtfw11.tlv</td>
+<td>UNKNOWN</td>
+<td>29368</td>
+<td>eae2d0a1fa6690a9eac392a1cef28092</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>crbtfw20.tlv</td>
+<td>UNKNOWN</td>
+<td>56180</td>
+<td>16077492405d178c5198b86b3cec7eef</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>a619_gmu.bin</td>
+<td>GPU</td>
+<td>32768</td>
+<td>9e23c52057bb573dee9ba31f1fdba4fa</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>realme/Realme_9_Pro (oscar)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_IV (pdx225)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_IV (pdx225)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_IV (pdx225)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_IV (pdx225)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_IV (pdx225)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_IV (pdx225)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_V (pdx235)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_V (pdx235)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_V (pdx235)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_V (pdx235)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_V (pdx235)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>sony/Xperia_10_V (pdx235)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>sony/Xperia_1_II (pdx215)</td>
+<td>a619_gmu.bin</td>
+<td>GPU</td>
+<td>32768</td>
+<td>9e23c52057bb573dee9ba31f1fdba4fa</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_II (pdx206)</td>
+<td>a619_gmu.bin</td>
+<td>GPU</td>
+<td>32768</td>
+<td>9e23c52057bb573dee9ba31f1fdba4fa</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_III (pdx214)</td>
+<td>a619_gmu.bin</td>
+<td>GPU</td>
+<td>32768</td>
+<td>9e23c52057bb573dee9ba31f1fdba4fa</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_III (pdx214)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>864824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_III (pdx214)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3091896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_III (pdx214)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>2623528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_III (pdx214)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1106944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_III (pdx214)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>103168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+</tr>
+<tr>
+<td>sony/Xperia_5_III (pdx214)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1082856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12 (cupid)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12 (cupid)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>d3e4f74372a9a418bdba3b5d34ac3515</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12_Pro (zeus)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12_Pro (zeus)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>d3e4f74372a9a418bdba3b5d34ac3515</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S (mayfly)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>44e31e18b0c9b35ca3522ba9d2b180fc</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S (mayfly)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>ea1abfc1dcb0cfd5aab2055ccb5bb4a3</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S (mayfly)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S (mayfly)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>1638360</td>
+<td>b92a2ba4418d76c2132242342789a5e4</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S (mayfly)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S (mayfly)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Pro (unicorn)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>44e31e18b0c9b35ca3522ba9d2b180fc</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Pro (unicorn)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Pro (unicorn)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>1638360</td>
+<td>b92a2ba4418d76c2132242342789a5e4</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Pro (unicorn)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Pro (unicorn)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>ea1abfc1dcb0cfd5aab2055ccb5bb4a3</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Pro (unicorn)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Ultra (thor)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>ea1abfc1dcb0cfd5aab2055ccb5bb4a3</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Ultra (thor)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Ultra (thor)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>1638360</td>
+<td>b92a2ba4418d76c2132242342789a5e4</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Ultra (thor)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Ultra (thor)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>44e31e18b0c9b35ca3522ba9d2b180fc</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12S_Ultra (thor)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12T_Pro (diting)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>1638360</td>
+<td>b92a2ba4418d76c2132242342789a5e4</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12T_Pro (diting)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12T_Pro (diting)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12T_Pro (diting)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12T_Pro (diting)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>44e31e18b0c9b35ca3522ba9d2b180fc</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_12T_Pro (diting)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>ea1abfc1dcb0cfd5aab2055ccb5bb4a3</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_A3 (laurel_sprout)</td>
+<td>apnv10.bin</td>
+<td>UNKNOWN</td>
+<td>1243</td>
+<td>4905d516ca6ff77eee8f9f82a17a14ff</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_A3 (laurel_sprout)</td>
+<td>crnv11.bin</td>
+<td>UNKNOWN</td>
+<td>2798</td>
+<td>7c0db76f1a434d20b3ce3e261b2d00c6</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_A3 (laurel_sprout)</td>
+<td>crnv20.bin</td>
+<td>UNKNOWN</td>
+<td>3936</td>
+<td>bb6ca169095f116ce20029238b4ca4c1</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_A3 (laurel_sprout)</td>
+<td>apbtfw10.tlv</td>
+<td>UNKNOWN</td>
+<td>56052</td>
+<td>42a31bb8b2afa5b805dfda78cb1ed4c6</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_A3 (laurel_sprout)</td>
+<td>crbtfw11.tlv</td>
+<td>UNKNOWN</td>
+<td>29368</td>
+<td>eae2d0a1fa6690a9eac392a1cef28092</td>
+</tr>
+<tr>
+<td>xiaomi/Mi_A3 (laurel_sprout)</td>
+<td>crbtfw20.tlv</td>
+<td>UNKNOWN</td>
+<td>56180</td>
+<td>16077492405d178c5198b86b3cec7eef</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5 (marble)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>1638360</td>
+<td>b92a2ba4418d76c2132242342789a5e4</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5 (marble)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5 (marble)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>ea1abfc1dcb0cfd5aab2055ccb5bb4a3</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5 (marble)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5 (marble)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>44e31e18b0c9b35ca3522ba9d2b180fc</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5 (marble)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5_Pro (mondrian)</td>
+<td>bm2n06.bin</td>
+<td>MODEM</td>
+<td>836968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5_Pro (mondrian)</td>
+<td>bm2n13.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>ea1abfc1dcb0cfd5aab2055ccb5bb4a3</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5_Pro (mondrian)</td>
+<td>bm2n12.bin</td>
+<td>MODEM</td>
+<td>1638360</td>
+<td>b92a2ba4418d76c2132242342789a5e4</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5_Pro (mondrian)</td>
+<td>bm2n15.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5_Pro (mondrian)</td>
+<td>bm2n14.bin</td>
+<td>MODEM</td>
+<td>1339032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+</tr>
+<tr>
+<td>xiaomi/Poco_F5_Pro (mondrian)</td>
+<td>bm2n08.bin</td>
+<td>MODEM</td>
+<td>3059736</td>
+<td>44e31e18b0c9b35ca3522ba9d2b180fc</td>
+</tr>
+</table>
+<p>Every md5 above is the durable identification key — the same blob bytes shared across devices (see fragmentation-half analysis when it lands).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

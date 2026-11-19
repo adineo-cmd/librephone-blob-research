@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desktop Phase 1 deep-RE notes (metadata-first) — 2026-11-16 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Desktop Phase 1 deep-RE notes (metadata-first) — 2026-11-16</h1><p>WORKORDER-001-desktop v3 (F-71 amended), Phase 1, desktop half. Everything</p><p>Evidence: none</p>
+<h1>Desktop Phase 1 deep-RE notes (metadata-first) — 2026-11-16</h1>
+<p>WORKORDER-001-desktop v3 (F-71 amended), Phase 1, desktop half. Everything</p>
+<p>below is derivable from committed sources; scratch scripts and downloaded</p>
+<p>artifacts stay off-repo.</p>
+<h2>1. The device-universe reconciliation (first-class finding)</h2>
+<p>The work order's premise ("444 listed devices", <code>devices.csv</code> split</p>
+<p>222/222) does not survive contact with the file it names:</p>
+<ul>
+<li><code>devices.csv</code> (codeberg <code>data/devices.csv</code>, fetched 2026-11-16,</li>
+</ul>
+<p>  518,612 B, 3,880 rows, repr'd-list quoting) yields **exactly 123</p>
+<p>  distinct device tokens**, bidirectional set-equality with the 123</p>
+<p>  blob-populated devices of <code>coverage-matrix.csv</code> (verified by parse:</p>
+<p>  tokens-matrix = ∅ both ways).</p>
+<ul>
+<li>recon.md's "248 tokens / 47% coverage (123/248)" line is therefore a</li>
+</ul>
+<p>  parse artifact of the recon session — the true token count is 123 and</p>
+<p>  coverage is 100%. Flagged for the lead (shared file, not edited</p>
+<p>  here per file-wall rules).</p>
+<ul>
+<li>The "444" number traces to the F-69 audit's FP6-rows count (444,</li>
+</ul>
+<p>  corrected to 418 in recon.md's own recheck note) — it was never a</p>
+<p>  device count.</p>
+<ul>
+<li>The full listed universe = <code>device-inventory.csv</code> <strong>249 identities</strong></li>
+</ul>
+<p>  (236 SQL devices incl. the 113 listed-not-populated + 13</p>
+<p>  builds.csv-only).</p>
+<p><strong>Split executed (literal + gapless):</strong> codepoint sort by device name</p>
+<p>(<code>model</code>, fallback <code>build_codename</code>; identical rule derivable by both</p>
+<p>machines from the committed inventory) over the 249 identities →</p>
+<p>**desktop = rows 1–222, laptop remainder = rows 223–249 (27 devices,</p>
+<p>flagged to the lead)**. This satisfies Phase 1(a)'s own arithmetic</p>
+<p>(123 extracted + 113 listed-not-populated both in range) and tiles the</p>
+<p>universe with zero overlap/gap under both work orders' literal row</p>
+<p>numbers. Workload imbalance (222 vs 27) is a lead-rebalance decision;</p>
+<p>12 of the 123 populated devices (all Sony Xperia + tail X/Z names) fall</p>
+<p>in the laptop-flagged zone.</p>
+<h2>2. Half mapping (Phase 1a answer)</h2>
+<p>Desktop rows 1–222 contain:</p>
+<table>
+<tr>
+<th>status</th>
+<th>devices</th>
+</tr>
+<tr>
+<td>populated (matrix rows present)</td>
+<td>110 of the 123</td>
+</tr>
+<tr>
+<td>listed-not-populated (SQL NULL blobs)</td>
+<td>100</td>
+</tr>
+<tr>
+<td>builds-csv-only</td>
+<td>12</td>
+</tr>
+</table>
+<p>Identity-join finding: the inventory carries two <code>Phone_2</code> identities —</p>
+<p><code>aura</code> (blank vendor, SQL NULL blobs → listed-not-populated) and <code>Pong</code></p>
+<p>(nothing, 654 blob rows → populated). A display-name join misclassifies</p>
+<p>aura and double-counts Pong's rows; the correct join key is the matrix</p>
+<p><code>db_path</code> codename, which this deliverable uses (341+654 row arithmetic</p>
+<p>reconciles exactly: 34,135 name-joined rows − 654 double-counted = 33,481</p>
+<p>codename-joined rows).</p>
+<p>Desktop half matrix extent: <strong>33,481 blob rows / 67.48 GB</strong> (matrix total</p>
+<p>33,917 / 69.80 GB). The deliverable CSV holds 33,649 rows (33,481</p>
+<p>metadata + 111 summary rows + 57 OnePlus_6 census rows).</p>
+<p>Family breakdown of the half (matrix rows): modem 2,533 rows /</p>
+<p>25.94 GB · boot 1,000 / 22.05 GB · other 14,870 / 14.15 GB · adsp 3,173 /</p>
+<p>3.49 GB · wifi 5,568 / 0.71 GB · tz 4,256 / 0.67 GB · cdsp 940 /</p>
+<p>0.28 GB · bt 445 / 0.12 GB · gpu 696 / 0.09 GB.</p>
+<p>SoC spread (222 devices): Qualcomm 29 chip generations dominate (SM6375</p>
+<p>×12 incl. one stray <code>\u00ff</code> byte on one SOC cell — upstream data-quality</p>
+<p>flag already logged in recon.md; inventory duplicates it), Google Tensor</p>
+<p>GS101/GS201/G3/G4 ×14, 56 devices carry a blank SOC upstream.</p>
+<p>Inventory data-quality flags found this session (lead, shared files —</p>
+<p>not edited): duplicate model name <code>Xperia_1_II</code> (two codenames, breaks</p>
+<p>the "one row per distinct identity" model name join), probable typo</p>
+<p><code>Poco_F6_PRo</code>.</p>
+<p>Upstream duplicate-row finding (lead, shared files — not edited): the</p>
+<p>committed coverage matrix itself contains **586 true duplicate</p>
+<p>(device, filename, md5) triples** (341 inside the half) — same blob</p>
+<p>listed twice per device — plus 264 same-filename/different-md5 rows in</p>
+<p>the half that are legitimate versioned entries. recon.md's "33,917 blob</p>
+<p>rows (device,file)" counts the duplicates. This deliverable mirrors the</p>
+<p>matrix faithfully and quantifies the duplication rather than silently</p>
+<p>deduping it.</p>
+<h2>3. Leverage-first ordering (Phase 1b answer, corrected)</h2>
+<p>Recomputing the recon.md ranking from the committed matrix (≥1 KB,</p>
+<p>non-manifest, grouped by (filename, md5)) produces a correction to the</p>
+<p>work order's input: **the true fleet-wide #1 is the oplus VOOC fast-charge</p>
+<p>firmware pair, not the QCA BT fleet.**</p>
+<table>
+<tr>
+<th>entry</th>
+<th>fleet-wide devices</th>
+<th>in half</th>
+</tr>
+<tr>
+<td><code>oplus_vooc_fw_rk826.bin</code> (md5 <code>76835ccc…</code>) + <code>oplus_vooc_fw.bin</code> (md5 <code>1ec85cbd…</code>) — OnePlus/realme VOOC charge firmware pair</td>
+<td><strong>36 + 36</strong></td>
+<td>36 + 36</td>
+</tr>
+<tr>
+<td><code>crbtfw20.tlv</code> / <code>apbtfw10.tlv</code> / <code>crbtfw11.tlv</code> + <code>crnv20.bin</code> / <code>crnv11.bin</code> / <code>apnv10.bin</code> (QCA BT patch fleet, #3-#8)</td>
+<td>29</td>
+<td>29</td>
+</tr>
+<tr>
+<td><code>bm2n06/08/12/13/14/15.bin</code> ADSP fleet</td>
+<td>25</td>
+<td>22</td>
+</tr>
+<tr>
+<td><code>sequence_manifest.bin</code> / <code>unified_ksqs.bin</code></td>
+<td>25</td>
+<td>22</td>
+</tr>
+<tr>
+<td><code>a619_gmu.bin</code></td>
+<td>24</td>
+<td>21</td>
+</tr>
+<tr>
+<td><code>a660_sqe.fw</code></td>
+<td>21</td>
+<td>20</td>
+</tr>
+<tr>
+<td><code>a630_sqe.fw</code></td>
+<td>19</td>
+<td>16</td>
+</tr>
+<tr>
+<td><code>aoa_cldb_falcon.bin</code> / <code>aoa_cldb_swl14.bin</code></td>
+<td>17</td>
+<td>16</td>
+</tr>
+</table>
+<p><strong>All 20 of recon.md's top-20 entries still sit inside the desktop half</strong></p>
+<p>(the 27 flagged laptop devices carry no top-20 member), so the</p>
+<p>leverage-first headline is: (1) the oplus VOOC pair — one RE pass covers</p>
+<p>the fast-charge firmware of 36 devices, all in the half; (2) the QCA BT</p>
+<p><code>.tlv</code>/NVRAM fleet — 29 devices; (3) the <code>bm2nXX</code> ADSP fleet — the</p>
+<p>byte-weighted third target. recon.md's top-20 table (shared file) should</p>
+<p>be re-ranked by the lead accordingly.</p>
+<p>Phase-2/3 headline: **one QCA BT <code>.tlv</code>/NVRAM RE pass covers BT bring-up</p>
+<p>of 29 devices in the half**; the <code>bm2nXX</code> ADSP fleet is the</p>
+<p>byte-weighted second target. md5s for every fleet entry are in the</p>
+<p>half's matrix rows (e.g. <code>crnv20.bin</code> = <code>bb6ca169…4c1</code>).</p>
+<h2>4. Phase 1(c): first not-populated device populated — OnePlus 6 (enchilada)</h2>
+<p>Candidate chosen: P2-priority (public mainline/ports basis), official</p>
+<p>LineageOS 22.2, Adreno 630 + QCA BT families.</p>
+<ul>
+<li>Fetch: <code>lineage-22.2-20261111-nightly-enchilada-signed.zip</code>,</li>
+</ul>
+<p>  1,074,415,436 B, sha256 <code>dfb50b750c32b9b534cf43b5523f5a461297dd82cbeca6fa02389a17c7ef7b6e</code></p>
+<p>  (matches the LineageOS API value byte-exact; one 0-byte transfer</p>
+<p>  failure recovered by following mirrorbits redirects — logged as an</p>
+<p>  honest negative in the session notes).</p>
+<ul>
+<li>Unpacked with the lab's own tools (<code>payload_dump.py</code> — 23 partitions;</li>
+</ul>
+<p>  <code>extract_ext4.py</code> + debugfs): vendor (1,073,741,824 B), bluetooth</p>
+<p>  (765,952), tz (2,056,192), dsp (33,554,432), modem (119,820,288).</p>
+<ul>
+<li>Census: <strong>57 unique files, 165,975,523 B</strong>, sha256 + container magic</li>
+</ul>
+<p>  per file, merged into <code>devices-001-222.csv</code> with</p>
+<p>  <code>public_status=populated-local-session</code>. Family summary: adsp 24</p>
+<p>  files/39.5 MB (Hexagon ELF <code>.so</code> fleet) · modem 119.8 MB (partition)</p>
+<p>  · camera 3.3 MB (CAMERA_ICP.elf ELF) · gpu 7 files (a630_gmu.bin</p>
+<p>  32,768 B + a630_sqe.fw 32,136 B — the exact size classes of top-20</p>
+<p>  #10/#18 — + zap MDT set) · bt 765,952 B (bt.img partition) · tz</p>
+<p>  2.06 MB · radio 11 qcril.db/SQL files (config, not firmware) ·</p>
+<p>  wifi <strong>structurally absent from vendor</strong> (2 zero-byte stubs — the</p>
+<p>  WCN3990 firmware rides inside the modem partition; census-negative</p>
+<p>  finding).</p>
+<ul>
+<li>A/B lesson (method finding): vendor blob dirs (<code>bt_firmware</code>, <code>dsp</code>,</li>
+</ul>
+<p>  <code>radio</code>) are empty mount points on A/B devices — the blob surface</p>
+<p>  lives in the OTA's named partitions. Upstream's per-device extraction</p>
+<p>  counts both surfaces; ours records where each actually lives.</p>
+<ul>
+<li>No payload committed. Only names, sizes, sha256, magic strings.</li>
+</ul>
+<h2>5. RULE 0 prior-art record (2026-11-16, exact queries)</h2>
+<p>Recorded in <a href="research/implementations/README.html">implementations/README.md</a></p>
+<p>(searched before each built artifact) and summarized: no RE-status</p>
+<p>coverage matrix exists (closest: arXiv:2410.11075 staleness study); no</p>
+<p>QCA <code>.tlv</code> format RE beyond mainline <code>btqca.c</code>; no <code>bm2n</code> analysis; no</p>
+<p>open LPEC decoder; no firmware-side clean-room WMI dispatcher reference.</p>
+<h2>6. Honest negatives / open items</h2>
+<ul>
+<li>100 listed-not-populated + 12 builds-csv-only devices in the half</li>
+</ul>
+<p>  remain metadata-only; OnePlus 6 is the proof-of-population. Per-device</p>
+<p>  cost: ~1.07 GB + ~6 tool invocations — 100 more devices ≈ ~107 GB</p>
+<p>  fetch + storage budget decision needed (lead).</p>
+<ul>
+<li>sha256↔md5 join across the matrix needs payload access per device</li>
+</ul>
+<p>  family (upstream publishes md5 only).</p>
+<ul>
+<li>P2 devices' "mainline basis" strings in the inventory are</li>
+</ul>
+<p>  agent-knowledge flagged for verification against the postmarketOS</p>
+<p>  wiki — not verified this session.</p>
+<ul>
+<li><code>bt.img</code>/<code>dsp.img</code>/<code>modem.img</code> container parsing, MDT segment maps:</li>
+</ul>
+<p>  bt.img done (fleet-re §8); dsp.img/modem.img open (method exists,</p>
+<p>  budget pending).</p>
+<ul>
+<li>cmnlib/cmnlib64/keymaster/boot-chain partitions are one payload_dump</li>
+</ul>
+<p>  call each from being censused (hashing not run this session).</p>
+<h2>7. Deliverables this phase</h2>
+<ul>
+<li><code>blob-matrix/desktop/devices-001-222.csv</code> — 33,649 rows (110 populated</li>
+</ul>
+<p>  upstream-metadata devices + 100 listed-not-populated + 12</p>
+<p>  builds-csv-only summaries + 57 OnePlus_6 census rows with sha256);</p>
+<p>  sha256 <code>aebb473a972dbf47aff45ce9951026e6e1d19d45655b2b0cb6d7c646ad4276ac</code>,</p>
+<p>  byte-reproducible from the committed matrix + inventory +</p>
+<p>  <code>enchilada-census.csv</code> via <code>tools/phase1_build.py</code></p>
+<ul>
+<li><code>blob-matrix/desktop/deep-re-notes.md</code> — this file</li>
+<li><code>blob-matrix/desktop/fragmentation-half.md</code> — Phase 4 analysis</li>
+<li><code>docs/devices/oneplus6/</code> — 7 family docs (Phase 2)</li>
+<li><code>implementations/</code> — 5 components + open-item marker (Phase 3)</li>
+<li><code>workorders/inbox/STATUS-DESKTOP.md</code> — session status</li>
+</ul>
+<h2>8. Fleet deep-RE, pass 1: the QCA BT patch/NVM fleet (2026-11-16, same session)</h2>
+<p>The leverage-first plan got its first execution pass. The OnePlus 6</p>
+<p><code>bt.img</code> partition turned out to be a <strong>FAT16 volume</strong> whose <code>IMAGE</code></p>
+<p>directory carries the complete QCA BT patch/NVM fleet — all six top-20</p>
+<p>md5s extract byte-exactly from this one device payload (two of them</p>
+<p>double-verified against public linux-firmware), plus four sibling</p>
+<p>variants. Container format fully decoded from public GPL btqca.h/btqca.c</p>
+<p>structs and verified 10/10 against real bytes: patch headers</p>
+<p>(<code>total_size == data_length + 24</code> 5/5; <code>rom_build</code> == filename suffix;</p>
+<p><code>download_mode</code> splits Rome 1.1 vs 2.x), NVM enclosing-header sets (one</p>
+<p>exact-closing tag set + one unknown type-3 set each; btqca.c reads only</p>
+<p>the first), and the first public</p>
+<p>enumeration of the NVM tag surface (9→45 tags; the 3 kernel-handled tags</p>
+<p>BD_ADDR/HCI/deep-sleep present 6/6). Spec + results + tools:</p>
+<p><code>fleet-re/qca-bt-format.md</code>, <code>fleet-re/qca-bt-tlv.json</code>, <code>tools/</code>.</p>
+<p>This upgrades the §3 headline from "prioritized" to "container-format</p>
+<p>decoded, fleet-identity proven, patch-stream interior open". The 29</p>
+<p>devices per fleet file are covered by this one spec.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

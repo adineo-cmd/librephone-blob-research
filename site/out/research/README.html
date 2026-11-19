@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open Device — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Open Device</h1><p>**Firmware blob research across every device class.**</p><p>Evidence: none</p>
+<p>&lt;div align="center"&gt;</p>
+<h1>Open Device</h1>
+<p><strong>Firmware blob research across every device class.</strong></p>
+<p>This project began as the FSF LibrePhone blob research effort and retains that</p>
+<p>work as its provenance. Its scope is every device class; current coverage</p>
+<p>concentrates on Android phones — Qualcomm (SDM845, SM6375, SM8250, QCM6490/FP6)</p>
+<p>and MediaTek — with per-file blob data: 33,917 rows across 123 devices. A</p>
+<p>further 122 devices of the 245 inventoried have no blob rows: tablets, TV boxes,</p>
+<p>single-board computers and developer boards are not yet catalogued per file.</p>
+<p><a href="https://github.com/adineo-cmd/open-device/stargazers">Stars</a> · <a href="https://github.com/adineo-cmd/open-device/commits">Last commit</a></p>
+<p><a href="#quick-start">Quick start</a> · <a href="#how-it-works">How it works</a> · <a href="#features">Features</a></p>
+<p>&lt;/div&gt;</p>
+<p>---</p>
+<p>Work for the FSF's <a href="https://www.fsf.org/news/librephone-project">LibrePhone</a></p>
+<p>initiative: identify what proprietary firmware actually is, and write it down.</p>
+<p>The measured corpus is 33,917 blob rows across 123 devices; the wider inventory</p>
+<p>holds 245 device models of which 122 have no per-file rows yet.</p>
+<p><strong>Facts are documented; blobs are never committed.</strong> Every analysis ships derived</p>
+<p>metadata only — headers, segment tables, hashes, version strings, protocol</p>
+<p>constants — plus the script that produced it.</p>
+<h2>Features</h2>
+<table>
+<tr>
+<th></th>
+<th>Feature</th>
+<th>What it does</th>
+</tr>
+<tr>
+<td>🔍</td>
+<td><strong>ISA identification</strong></td>
+<td>Instruction-level proof of which core runs each firmware family, including the vendor's own mistakes.</td>
+</tr>
+<tr>
+<td>📦</td>
+<td><strong>Format documentation</strong></td>
+<td>Container layouts, segment chains, signing schemes and the tools that walk them.</td>
+</tr>
+<tr>
+<td>🧾</td>
+<td><strong>Boot-chain census</strong></td>
+<td>Every firmware family on the SoC mapped, from bootloader to TrustZone.</td>
+</tr>
+<tr>
+<td>⬆️</td>
+<td><strong>Upstream package</strong></td>
+<td>Paste-ready contributions reconciled against live upstream documentation.</td>
+</tr>
+</table>
+<h2>How it works</h2>
+<p>Two vendor fronts, the same method:</p>
+<ol>
+<li><strong>Extract</strong> — pull the firmware partition and walk its container format.</li>
+<li><strong>Identify</strong> — disassemble entry points and prove the ISA from real</li>
+</ol>
+<p>   instruction coverage, not from a header field.</p>
+<ol>
+<li><strong>Cross-reference</strong> — compare against upstream drivers and public</li>
+</ol>
+<p>   documentation; record what upstream gets wrong.</p>
+<ol>
+<li><strong>Publish</strong> — write the finding, the evidence and the reproduction script.</li>
+</ol>
+<pre><code class="language-mermaid">
+flowchart LR
+  A[Firmware partition] --&gt; B[Container walk]
+  B --&gt; C[Per-family payloads]
+  C --&gt; D[ISA probe]
+  C --&gt; E[String and constant extraction]
+  D --&gt; F[Instruction coverage]
+  F --&gt; G[Finding]
+  E --&gt; H[Protocol and version map]
+  H --&gt; G
+  G --&gt; I[docs/ + results/]
+  G --&gt; J[upstream-contribution/]
+</code></pre>
+<h2>Quick start</h2>
+<p>Python 3.10+, <code>capstone</code> for disassembly. You supply your own device dump; none is in this repository.</p>
+<p><strong>Qualcomm — Fairphone FP6</strong></p>
+<pre><code class="language-bash">
+python3 tools/qualcomm/census.py --help
+python3 tools/qualcomm/wpss_disasm.py --help
+</code></pre>
+<p><strong>MediaTek — Redmi Note 10S</strong></p>
+<pre><code class="language-bash">
+python3 tools/mediatek/isa_probe.py --help
+python3 tools/mediatek/region_scan.py --help
+</code></pre>
+<h2>Project structure</h2>
+<pre><code class="language-text">
+research/         evidence-classed findings, grouped by subject
+                  fleet/ qualcomm/ mediatek/ soc/ laptop/ papers/ historic/
+tools/            analysis scripts by substrate
+                  fleet/ qualcomm/ mediatek/
+data/             derived CSV/JSON data; the frozen matrix and inventory stay
+                  under upstream-contribution/blob-database/
+implementations/  clean-room, spec-derived components
+docs/devices/     per-device family notes
+upstream/         paste-ready upstream PRs and issue filings
+site/             the Open Device static-site generator
+AGENTS.md         standing rules, including the issue-claim protocol (Rule 2)
+SCOPE.md          legal and ethical boundary
+</code></pre>
+<p>Work is decomposed into 2,836 atomic GitHub issues. Read</p>
+<p><code>docs/ISSUE-WORKFLOW.md</code> for the claim protocol and harness partition, then claim</p>
+<p>one with a <code>CLAIM</code> comment before touching its files. The machine-readable</p>
+<p>catalog is <code>docs/issue-catalog/issues.jsonl</code>; Rule 2 in <code>AGENTS.md</code> is binding.</p>
+<h2>Two findings worth the trip</h2>
+<table>
+<tr>
+<th>Vendor</th>
+<th>Finding</th>
+</tr>
+<tr>
+<td>Qualcomm</td>
+<td>The WCN6750 WiFi core is <strong>32-bit RISC-V</strong> — upstream Linux had labelled it an 8-bit AVR.</td>
+</tr>
+<tr>
+<td>Qualcomm</td>
+<td>The camera ICP and all video-processor firmware are RISC-V; the Bluetooth cores are ARM Thumb; TrustZone is monolithic AArch64.</td>
+</tr>
+<tr>
+<td>MediaTek</td>
+<td>The tinysys/scp core is <strong>ARM Cortex-M4F running FreeRTOS</strong>, not RISC-V.</td>
+</tr>
+<tr>
+<td>MediaTek</td>
+<td>The camera CCU is <strong>Synopsys ARCv2</strong> (two ARC EM4-FPU cores) — first binary-level identification on a production device.</td>
+</tr>
+<tr>
+<td>MediaTek</td>
+<td>The modem entry is MIPS32 LE with MIPS16e islands, which overturns the nanoMIPS attribution that belongs to later Dimensity silicon.</td>
+</tr>
+</table>
+<p>Full tables, evidence and the falsification chains live in each track's <code>docs/</code>.</p>
+<h2>Boundary</h2>
+<p>No proprietary binary, no decompiled output and no device-private data (MAC,</p>
+<p>serial, calibration tables) is committed. Only facts and the scripts that produce</p>
+<p>them. See <code>SCOPE.md</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

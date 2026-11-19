@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upstream contribution draft — LibrePhone (codeberg.org/rsavoye/librephone) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Upstream contribution draft — LibrePhone (codeberg.org/rsavoye/librephone)</h1><p>&gt; **Status update (2026-11-12):** superseded by the full upstream</p><p>Evidence: none</p>
+<h1>Upstream contribution draft — LibrePhone (codeberg.org/rsavoye/librephone)</h1>
+<blockquote><strong>Status update (2026-11-12):</strong> superseded by the full upstream</blockquote>
+<blockquote>contribution package in <a href="research/upstream/README.html"><code>upstream-contribution/</code></a></blockquote>
+<blockquote>(PR-1 = this draft's <code>docs/wireless.md</code> fix, carried forward; PR-2 = new</blockquote>
+<blockquote><code>docs/wmi-dispatch.md</code>; PR-3 = per-segment <code>wpss.bXX.md</code> corrections;</blockquote>
+<blockquote>PR-4 = <code>docs/files.md</code> BT + boot-chain pointers). **All claims below</blockquote>
+<blockquote>remain valid.** New since this draft, from the decoded dispatch</blockquote>
+<blockquote>analysis: the WMI <em>event-routing</em> code is <strong>Hexagon</strong> (<code>wpss.b06</code>,</blockquote>
+<blockquote>e_machine 164 per the mdt), not RISC-V — the RISC-V core runs the QURT</blockquote>
+<blockquote>application firmware (<code>wpss.b07</code>); the message-ID registry is in</blockquote>
+<blockquote><code>wpss.b09</code> (149 distinct IDs, anchor <code>0xc0691080</code>). Full research note:</blockquote>
+<blockquote><a href="https://github.com/adineo-cmd/librephone-blob-research/blob/main/papers/wmi-dispatch-architecture.md"><code>papers/wmi-dispatch-architecture.md</code></a>.</blockquote>
+<blockquote>The <code>docs/fp6-riscv-cores.md</code> suggestion below is folded into the</blockquote>
+<blockquote>package: the ICP/VPU e_machine=94 finding stays in</blockquote>
+<blockquote><code>qualcomm-fp6/docs/fp6-architecture-census.md</code> and is referenced from</blockquote>
+<blockquote>the PR-1/PR-4 descriptions rather than shipped as a separate upstream</blockquote>
+<blockquote>doc.</blockquote>
+<p>Status: <strong>ready to submit</strong> (needs a Codeberg account login; this lab has no</p>
+<p>Codeberg credentials). Submit as a documentation PR against <code>main</code>, file</p>
+<p><code>docs/wireless.md</code>, replacing the unverified processor guess in the</p>
+<p>"Wireless Chipset" section.</p>
+<h2>What to submit (doc change)</h2>
+<p>Current upstream text (docs/wireless.md):</p>
+<blockquote>This chip appears to have an embedded 8 bit ATMel AVR core, and</blockquote>
+<blockquote>possibly a RISCV32 core as well.</blockquote>
+<p>Proposed replacement:</p>
+<blockquote>The wpss firmware (<code>modem/image/qca6750/wpss.*</code>) runs on a **32-bit</blockquote>
+<blockquote>RISC-V** core. Verified from the ELF headers of the LineageOS FP6 image</blockquote>
+<blockquote>(2026-11-09 nightly): <code>wpss.b07</code> is ELF32 with `e_machine=243</blockquote>
+<blockquote>(EM_RISCV)<code>, entry </code>0x404000`, and its entry code disassembles as RV32</blockquote>
+<blockquote>machine-mode startup (<code>csrs mstatus</code> / <code>csrw mtvec</code> sequences). The</blockquote>
+<blockquote>firmware version string is <code>WLAN.MSL.3.0.1-00591-QCAMSLSWPLZ-1</code>; the</blockquote>
+<blockquote>ucode segment (<code>wpss.b08</code>, vaddr <code>0x4ff00000</code>) carries</blockquote>
+<blockquote><code>WLAN_UCODE_MOSELLE_4.2.0-00000</code> ("Moselle" is the WCN6750 firmware</blockquote>
+<blockquote>codename). Note: per-segment <code>.bXX</code> ELF headers carry junk <code>e_machine</code></blockquote>
+<blockquote>values (zeros, and even x86=3 on <code>wpss.b08</code>, which is a data segment) —</blockquote>
+<blockquote>architecture identification should use the program segment's headers +</blockquote>
+<blockquote>entry-point sanity, not segment headers.</blockquote>
+<p>Also suggested: a new short doc <code>docs/fp6-riscv-cores.md</code> documenting the</p>
+<p>same finding for the camera ICP and VPUs (see our full write-up:</p>
+<p>https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/fp6-architecture-census.md):</p>
+<blockquote>The camera ICP firmware (<code>CAMERA_ICP.mbn/.elf/.mdt</code>,</blockquote>
+<blockquote><code>CICP.FW.7.0-00021</code>) and all VPU firmware (<code>vpu20/30/33_*.mbn</code>) on FP6</blockquote>
+<blockquote>are ELF32 with <code>e_machine=94</code> — the historic RISC-V machine value used</blockquote>
+<blockquote>by early toolchains (243 was assigned later). Public Qualcomm</blockquote>
+<blockquote>documentation does not state the ICP/VPU ISA; this appears to be the</blockquote>
+<blockquote>first public identification of these cores as RISC-V.</blockquote>
+<h2>Why upstream wants this</h2>
+<ul>
+<li><code>docs/wireless.md</code> currently guesses the ISA; clean-room documentation</li>
+</ul>
+<p>  benefits from verified facts.</p>
+<ul>
+<li>Knowing the wpss is RISC-V means free-reimplementation analysis can target</li>
+</ul>
+<p>  RV32 disassembly (capstone handles RV32+RVC today), whereas Hexagon</p>
+<p>  remains the hard, toolless side.</p>
+<h2>Submission checklist</h2>
+<ul>
+<li>[ ] Fork codeberg.org/rsavoye/librephone under an account</li>
+<li>[ ] Branch <code>docs/wpss-riscv-architecture</code></li>
+<li>[ ] Apply the doc change above (keep upstream's doc tone/format)</li>
+<li>[ ] PR description links to our census write-up + raw census table</li>
+<li>[ ] Mention the IRC channel (#librephone) for follow-up</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

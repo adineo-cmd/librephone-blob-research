@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LibrePhone &quot;wants vs done&quot; master matrix — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>LibrePhone &quot;wants vs done&quot; master matrix</h1><p>The complete inventory of everything the FSF&#x27;s LibrePhone initiative has</p><p>Evidence: none</p>
+<h1>LibrePhone "wants vs done" master matrix</h1>
+<p>The complete inventory of everything the FSF's LibrePhone initiative has</p>
+<p>asked for or implicitly needs, cross-checked against the lab's committed</p>
+<p>work and against what other contributors have already pushed upstream.</p>
+<p>**This file is the audit of record; completeness over speed — every want</p>
+<p>is enumerated, including blocked and out-of-scope ones.**</p>
+<ul>
+<li>Audit date: <strong>2026-11-15</strong> (all URLs below fetched this date unless</li>
+</ul>
+<p>  noted). Auditor: Open Discovery Lab agent session (wants-vs-done audit).</p>
+<ul>
+<li>Upstream repos: https://codeberg.org/rsavoye/librephone (code + docs +</li>
+</ul>
+<p>  data) and https://codeberg.org/rsavoye/librephone-web (site source).</p>
+<ul>
+<li>Note: the Codeberg <em>org</em> <code>librephone</code></li>
+</ul>
+<p>  (<code>/api/v1/orgs/librephone</code>, <code>/api/v1/users/librephone/repos</code>) is an</p>
+<p>  empty user (created 2025-11-13, 0 repos) — all project content lives</p>
+<p>  under <code>rsavoye</code>. <code>librephone.org</code> redirect-loops (50-redirect cap, HTTP</p>
+<p>  302 recorded); the live site is <strong>https://librephone.fsf.org</strong> (linked</p>
+<p>  from the FSF campaign page), and <code>librephone.org/kernel-xref/html/</code> +</p>
+<p>  <code>/modules-xref/html/</code> (Doxygen trees) still resolve.</p>
+<h2>Status vocabulary</h2>
+<ul>
+<li><strong>LAB</strong> — the knowledge exists in the lab (cite the FINDINGS row /</li>
+</ul>
+<p>  committed doc); filing upstream is separately owner-gated.</p>
+<ul>
+<li><strong>OTHERS</strong> — already pushed/answered upstream (cite commit/PR/issue).</li>
+<li><strong>OPEN-E</strong> — open and executable now from this box (doc RE from public</li>
+</ul>
+<p>  data, corrections to upstream docs, provenance/hash records, bring-up</p>
+<p>  notes from public sources).</p>
+<ul>
+<li><strong>OPEN-B</strong> — open but blocked (needs binaries/hardware/owner accounts).</li>
+<li><strong>OOS</strong> — out of scope for the lab (writing firmware per RULE 3; owner</li>
+</ul>
+<p>  exclusions: CVE hunting, classical-cipher cryptanalysis).</p>
+<h2>Search log (RULE 0 — queries and dates)</h2>
+<table>
+<tr>
+<th>Date</th>
+<th>Query / fetch</th>
+<th>Result</th>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td><code>codeberg.org/api/v1/orgs/librephone</code> + <code>/orgs/librephone/repos</code></td>
+<td>empty user, 0 repos</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td><code>codeberg.org/api/v1/users/rsavoye/repos</code></td>
+<td>3 repos (librephone, librephone-web, abe)</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td><code>/repos/rsavoye/librephone/issues?state=all&amp;limit=50&amp;type=issues</code></td>
+<td>41 issues (28 open, 13 closed) — all bodies read</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td><code>/repos/rsavoye/librephone/pulls?state=open</code></td>
+<td>3 open PRs (+#58 comments, 13)</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td><code>/repos/rsavoye/librephone/commits?limit=50</code></td>
+<td>last 50 commits enumerated (back to 2026-09-10)</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td>raw fetch of 13 upstream docs + 3 data CSVs</td>
+<td>current text captured (b06/b07/b09/b10/b01, wireless, files, other, index, comparing, csvdata, totals-head, track-head)</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td>https://www.fsf.org/campaigns/librephone/ + /news/librephone-project</td>
+<td>campaign goals + announcement text extracted</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td>librephone.fsf.org (/, /hardware, /faq, /freedom, /site/, /site/tools/) + kernel-xref + modules-xref</td>
+<td>site want-surface captured</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td>all 41 issues scanned for prior corrections of <code>docs/other.md</code> Xtensa claims (<code>CAMERA_ICP</code>, <code>vpu</code>, <code>Xtensa</code>) — zero hits; last 50 commits — no other.md change</td>
+<td>the newly-found errors are uncorrected anywhere</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td>grep of upstream <code>data/sizes.csv</code> (1.6 MB) for FP6 rows</td>
+<td>0 FP6 rows (992 Fairphone rows, all FP5/FP4) while <code>data/devices.csv</code> has 444 FP6 rows — upstream data gap confirmed</td>
+</tr>
+<tr>
+<td>2026-11-15</td>
+<td>grep lab <code>wpss.b07.strings.txt</code> for L4/L4Ka markers</td>
+<td>absent (QURT vocabulary only) — backs the #38 answer</td>
+</tr>
+</table>
+<p>No public "wants vs done" audit of LibrePhone exists (this matrix maps</p>
+<p>the campaign's asks against the lab's own findings — inherently unique</p>
+<p>per RULE 0; the per-claim novelty of the underlying lab findings was</p>
+<p>audited at merge time, see FINDINGS.md header).</p>
+<p>---</p>
+<h2>Group A — explicit wants: the 28 open issues of rsavoye/librephone</h2>
+<p>Fetched via <code>/api/v1/repos/rsavoye/librephone/issues?state=open</code> on</p>
+<p>2026-11-15. Labels as upstream set them.</p>
+<table>
+<tr>
+<th>ID</th>
+<th>Issue</th>
+<th>Want (verbatim gist)</th>
+<th>Status</th>
+<th>Lab evidence</th>
+<th>Others' evidence</th>
+<th>Next action</th>
+</tr>
+<tr>
+<td>A-1</td>
+<td>#15 (High, Doc)</td>
+<td>"Document the interface between the Bluetooth driver and the blob"</td>
+<td>LAB (firmware side) / OPEN-E (driver side)</td>
+<td>F-14: BT partition census — FAT16 layout, btqca.h TLV decode, rom_build→filename kernel math, EVROS/WCN6450 identity (F-32) (<code>qualcomm-fp6/docs/bt-firmware-census.md</code>)</td>
+<td>hci_qca.c/btqca.c are the driver side; upstream doc not started</td>
+<td>Package the firmware-side facts as a doc PR (extends PR-4 text); driver-side interface doc executable-now from <code>sm7635-modules/qcom/opensource/bt-kernel</code></td>
+</tr>
+<tr>
+<td>A-2</td>
+<td>#17 (Medium, Doc)</td>
+<td>NFC driver↔blob interface doc</td>
+<td>OPEN-E</td>
+<td>none (no NFC work in lab)</td>
+<td>none found</td>
+<td>Executable-now: doc from public <code>sm7635-modules/qcom/opensource/data-kernel</code>/NFC stacks</td>
+</tr>
+<tr>
+<td>A-3</td>
+<td>#18 (Medium, Doc)</td>
+<td>Cellular radio driver↔blob interface doc, API-doc style, "to be turned into a test suite"</td>
+<td>OPEN-E</td>
+<td>partial: F-36/F-31 modem ISA decodes identify the firmware side</td>
+<td>none found</td>
+<td>Executable-now (MTK twin is ROADMAP M-3); large task, recommend scoping session</td>
+</tr>
+<tr>
+<td>A-4</td>
+<td>#19 (High, Research)</td>
+<td>Identify user-space vs loaded-firmware code</td>
+<td>OPEN-E (partial)</td>
+<td>F-15 boot-chain census; F-22/F-28 segment executability facts</td>
+<td>none found</td>
+<td>Partially executable from committed censuses; needs modem AArch64 PIE analysis to finish</td>
+</tr>
+<tr>
+<td>A-5</td>
+<td>#2 (good first issue)</td>
+<td>UI for the device database</td>
+<td>OPEN-B</td>
+<td>none</td>
+<td>PR #14 (db_interface) open since 2025-11-07</td>
+<td>Code contribution — out of lab's doc-RE charter; blocked on Codeberg account anyway</td>
+</tr>
+<tr>
+<td>A-6</td>
+<td>#23 (Low)</td>
+<td>OnePlus 15 Lineage support</td>
+<td>OPEN-B</td>
+<td>none</td>
+<td>none</td>
+<td>Needs hardware/build farm</td>
+</tr>
+<tr>
+<td>A-7</td>
+<td>#25</td>
+<td>"Clean Slate — Let's consider -1 one us well. -1,0,1"</td>
+<td>OPEN-B (noise)</td>
+<td>—</td>
+<td>—</td>
+<td>Apparent spam/noise; suggest upstream close</td>
+</tr>
+<tr>
+<td>A-8</td>
+<td>#26 (Medium, Doc)</td>
+<td>CopyEngine API doc (8-buffer ring for HIF/HTT→blob)</td>
+<td>OPEN-E</td>
+<td>none</td>
+<td>none</td>
+<td>Executable-now from public <code>sm7635-modules/qcom/opensource/wlan/cmn_utils</code></td>
+</tr>
+<tr>
+<td>A-9</td>
+<td>#33 (Medium, Research)</td>
+<td>Identify 16 shared libraries (05B04A44, 32552B22, evautil64, FD719D50, featenabler, focal64, hdcp1, hdcp2p2, hdcpsrm, ic5, loadalgota64, ops, smplap64, soter64, sp_license, winsecap)</td>
+<td>LAB (partial — 8 of 16 identified or characterized)</td>
+<td>trustzone-census.md: soter64 = SOTER device-attestation TA; smplap64 = Qualcomm "sample app" crypto/test TA; featenabler = RPMB-backed feature licensing (ships twice); 05B04A44+FD719D50 = secure-element service TAs (CESEService_<em>, GPQESE_</em> — GlobalPlatform SE API); 32552B22 = honest negative (no strings ≥8 chars); evautil64/hdcp* = AArch64 per census (<code>qualcomm-fp6/results/census.md</code> rows for all 16)</td>
+<td>b4e3f282 (2026-11-03) kernel fork loads 64-bit MDTs — removes the issue's "mdt_loader is ELF32-only" premise</td>
+<td>Paste-ready issue comment prepared (see pr5-corrections-package.md, C-3); focal64/ic5/ops/loadalgota64/sp_license/winsecap remain genuinely unidentified — executable-now if the image census is re-run against public Qualcomm trees (same method as F-32's EVROS identification)</td>
+</tr>
+<tr>
+<td>A-10</td>
+<td>#34 (Medium)</td>
+<td>"Figure out TrustZone exploit"</td>
+<td>OOS</td>
+<td>trustzone-census.md policy note: "no TrustZone code analysis, no keys, no bypass guidance"</td>
+<td>—</td>
+<td>Excluded by owner directive (CVE hunting excluded 2026-11-09); not lab work</td>
+</tr>
+<tr>
+<td>A-11</td>
+<td>#35 (Medium, Doc)</td>
+<td>Document how signed blobs get loaded (to enable future blob replacement)</td>
+<td>LAB (chain facts) / OPEN-E (kernel-side doc)</td>
+<td>F-14/F-15: SRoT MBNv7 → Fairphone "T2MO OEM Key" chain, X.509 validity, vbmeta flags=3, rollback_index-as-patch-date; F-18: MTK mtk_hdr dual-X.509 per-payload signing</td>
+<td>PR #58 thread: scm PAS rejects ANY replaced segment (confirmed independently by L123123)</td>
+<td>Lab chain censuses are the doc's facts; kernel PIL/qseecom loading doc executable-now from public sources</td>
+</tr>
+<tr>
+<td>A-12</td>
+<td>#36 (Medium, Doc)</td>
+<td>Identify blobs in the /radio directory</td>
+<td>LAB (partial)</td>
+<td>F-15 bootchain-census: xbl (3-ELF container), shrm/aop/aop_config/cpucp = RV32, qupfw = Hexagon claim, abl/uefi/xbl_ramdump build IDs — these are the radio-dir images</td>
+<td>upstream's own docs/track.md tracks radio files per device (no ISA IDs)</td>
+<td>Boot-chain census rows answer most of it; a paste-ready extension of PR-4's boot-chain block covers the rest</td>
+</tr>
+<tr>
+<td>A-13</td>
+<td>#37 (Medium, Research)</td>
+<td>Which WPSS blob is the PCIe bridge</td>
+<td>OPEN-E (partial)</td>
+<td>F-8 transport finding (PCIe-style WAKE# + IPC buffers); PR-2 WMI dispatch doc</td>
+<td>PR #58: L123123 bypasses the blob's endpoint role entirely (patched ath11k treats chip as real PCIe device); issue #56 lspci capture shows Device 1105</td>
+<td>Partially executable from committed work + public qcacld sources; needs the bridge/ICRSS role pinned in b01/b02/b03/b05 Hexagon segments</td>
+</tr>
+<tr>
+<td>A-14</td>
+<td>#38 (Medium, Research)</td>
+<td>"Check for L4 kernel in WPSS blobs"</td>
+<td><strong>LAB — answer available</strong></td>
+<td>F-8: wpss.b07 runs Qualcomm QURT RTOS on RV32 (<code>QURTK_*</code>, UTCB/TCB, <code>mcause</code> exception path); committed strings show no L4/L4Ka vocabulary</td>
+<td>upstream's own b07.md already says "RISCV32"</td>
+<td>Paste-ready issue comment prepared (pr5-corrections-package.md, C-1)</td>
+</tr>
+<tr>
+<td>A-15</td>
+<td>#39 (Medium, Research)</td>
+<td>What is the Gunyah hypervisor used for?</td>
+<td>OPEN-E</td>
+<td>none</td>
+<td>Gunyah is public (mainline <code>drivers/virt/gunyah</code>, Qualcomm's open-source pVM hypervisor)</td>
+<td>Executable-now: short doc from public sources + FP6 boot-log references</td>
+</tr>
+<tr>
+<td>A-16</td>
+<td>#40 (Medium, Research)</td>
+<td>readelf vs instrumented mdt_loader.c phdr address differences</td>
+<td>OPEN-E (partial)</td>
+<td>F-7 junk-header methodology is adjacent (segment ELF headers untrustworthy; .mdt phdrs authoritative)</td>
+<td>none</td>
+<td>Executable-now: read public <code>mdt_loader.c</code> (ELF32 ET_EXEC vs ET_DYN translation) + upstream's Lineage readelf build</td>
+</tr>
+<tr>
+<td>A-17</td>
+<td>#41 (High, Research)</td>
+<td>Identify <code>05B04A44-BF30-42DF-9E2F-B366B980ED19.*</code></td>
+<td><strong>LAB — identified</strong></td>
+<td>trustzone-census.md: secure-element service TA (<code>CESEService_*</code>, <code>GPQESE_Open/Transceive</code> — GlobalPlatform SE API); size/hash rows in results/census.md</td>
+<td>b4e3f282 removes the ELF32-mdt_loader premise</td>
+<td>Paste-ready issue comment prepared (pr5-corrections-package.md, C-2)</td>
+</tr>
+<tr>
+<td>A-18</td>
+<td>#42 (High, Research)</td>
+<td>Identify <code>32552B22-89FE-42B4-8A45-A0C4E2DB0326.*</code></td>
+<td><strong>LAB — honest negative</strong></td>
+<td>trustzone-census.md: no strings ≥8 chars in the TA; size/hash rows committed</td>
+<td>—</td>
+<td>Paste-ready issue comment prepared (pr5-corrections-package.md, C-2) — states the negative and the census rows</td>
+</tr>
+<tr>
+<td>A-19</td>
+<td>#43 (High, Research)</td>
+<td>Identify <code>FD719D50-FFFB-11EB-9A03-0242AC130003.*</code></td>
+<td><strong>LAB — identified</strong></td>
+<td>trustzone-census.md: secure-element service TA (same CESEService/GPQESE family as A-17)</td>
+<td>b4e3f282</td>
+<td>Paste-ready issue comment prepared (pr5-corrections-package.md, C-2)</td>
+</tr>
+<tr>
+<td>A-20</td>
+<td>#44 (High, Research)</td>
+<td>FTM code instrumentation points</td>
+<td>OPEN-E</td>
+<td>none</td>
+<td>upstream docs/ftm.md exists (8.9 KB)</td>
+<td>Executable-now from public Qualcomm library source</td>
+</tr>
+<tr>
+<td>A-21</td>
+<td>#45 (Medium, Doc)</td>
+<td>Expand the FTM doc</td>
+<td>OPEN-E</td>
+<td>none</td>
+<td>ftm.md exists</td>
+<td>Executable-now from public sources</td>
+</tr>
+<tr>
+<td>A-22</td>
+<td>#46 (High, Research)</td>
+<td>QMMI / Diag Mode protocol from a host computer</td>
+<td>OPEN-E</td>
+<td>none</td>
+<td>Qualcomm DIAG protocol (0x4B wrapper, DM/DL) is publicly documented across postmarketOS/OEM tooling literature</td>
+<td>Executable-now as a literature survey doc; protocol capture needs hardware (blocked part)</td>
+</tr>
+<tr>
+<td>A-23</td>
+<td>#50 (Medium)</td>
+<td>Kernel-module debugging via Bazel external modules</td>
+<td>OPEN-B</td>
+<td>none</td>
+<td>none</td>
+<td>Build-infrastructure work — outside lab charter</td>
+</tr>
+<tr>
+<td>A-24</td>
+<td>#56</td>
+<td>HIF "fake PCI" misunderstanding (WCN6750 as real PCIe endpoint)</td>
+<td>OPEN-E (partial)</td>
+<td>F-8 transport finding; papers/wmi-dispatch-architecture.md (the firmware-side dispatch)</td>
+<td>issue body's own lspci capture; PR #58 entire approach; commit b75b158f already corrected the transport doc to IPCI/ICNSS2 (2026-11-01)</td>
+<td>Lab adds the firmware-side dispatch facts; conclusion depends on hardware captures (blocked part)</td>
+</tr>
+<tr>
+<td>A-25</td>
+<td>#59 (good first issue, Medium)</td>
+<td>mdttool: replace a blob's certificate (needs cert-chain write path)</td>
+<td>OPEN-B</td>
+<td>F-14/F-15 cert-chain censuses document the chains being replaced</td>
+<td>none</td>
+<td>Code contribution — blocked on Codeberg account; lab cert censuses are the reference material</td>
+</tr>
+<tr>
+<td>A-26</td>
+<td>#61</td>
+<td>pytest fixture lookup breaks outside tests/</td>
+<td>OPEN-B</td>
+<td>none</td>
+<td>none</td>
+<td>Code contribution</td>
+</tr>
+<tr>
+<td>A-27</td>
+<td>#62</td>
+<td>test_split_blob refusal returns empty list</td>
+<td>OPEN-B</td>
+<td>none</td>
+<td>none</td>
+<td>Code contribution</td>
+</tr>
+<tr>
+<td>A-28</td>
+<td>#63 (Medium)</td>
+<td>Fix Lineage-24.0 FP6 build</td>
+<td>OPEN-B</td>
+<td>none</td>
+<td>none</td>
+<td>Needs build farm/hardware</td>
+</tr>
+</table>
+<p>Closed-issue completions already landed upstream (done-by-others,</p>
+<p>cited for the ledger): #16 wifi driver interface (docs/</p>
+<p>wifi-driver-interface.md, 26.8 KB, live on main), #27 HIF/HTT API</p>
+<p>(docs/hif.md 15.7 KB + docs/htt.md 31.3 KB + docs/ath11k.md 8.3 KB),</p>
+<p>#13 modem blob merging, #11 Hexagon Ghidra plugin (resolved both</p>
+<p>upstream and in the lab via Ghidra 12.2's public Hexagon module, F-28),</p>
+<p>#9 FP6 device files (ArianK16a tree), #8 standalone kernel, #5 initial</p>
+<p>blob functionality (the 215-device database), #1 best dev device (FP6),</p>
+<p>#47/#49/#52/#53 elf.py fixes (bobov, merged as PR #60, e32dfb1a,</p>
+<p>2026-11-06), #54 cert tests (FrossGus), #55 T2H dispatcher lookup</p>
+<p>(a92aa0df), transport correction b75b158f "docs: correct WCN6750</p>
+<p>transport to IPCI/ICNSS2" (2026-11-01).</p>
+<h2>Group B — implicit wants: upstream docs and data state</h2>
+<table>
+<tr>
+<th>ID</th>
+<th>Want</th>
+<th>Source (fetched 2026-11-15)</th>
+<th>Status</th>
+<th>Lab evidence</th>
+<th>Next action</th>
+</tr>
+<tr>
+<td>B-1</td>
+<td>Correct <code>docs/wireless.md</code> "8 bit ATMel AVR core, and possibly a RISCV32 core" guess</td>
+<td>https://codeberg.org/rsavoye/librephone/raw/branch/main/docs/wireless.md (lines 22-23, unchanged from 2026-11-12 fetch)</td>
+<td>LAB</td>
+<td>F-5 (RV32 instruction-level proof); packaged as PR-1 in upstream-contribution/README.md</td>
+<td>Owner files PR-1</td>
+</tr>
+<tr>
+<td>B-2</td>
+<td>Second AVR instance in wireless.md's WPSS section ("It seems to contain an ATmel AVR core... The blob that seems to be an Intel x86_32 is suspicious", lines 90-92)</td>
+<td>same URL</td>
+<td>LAB</td>
+<td>F-5/F-8 (QURT on RV32); F-7 (b08's x86 header is junk on a data segment)</td>
+<td>Newly packaged as PR-6 (pr5-corrections-package.md)</td>
+</tr>
+<tr>
+<td>B-3</td>
+<td><code>docs/wpss.b01.md</code> claims "ATMel AVR8 (ATmega8) micro-controller embedded in the WCN6750"</td>
+<td>https://codeberg.org/rsavoye/librephone/raw/branch/main/docs/wpss.b01.md</td>
+<td>LAB</td>
+<td>F-20/F-22: wpss.mdt phdrs mark only b01/b02/b03/b05/b06 executable and declare e_machine=164 (EM_HEXAGON) — b01 is a Hexagon code segment; F-7 methodology (r2 <code>-a avr</code> on raw segment bytes = plausible noise, the junk-header trap); upstream's own "Current Research" section already suspects one DSP6 image</td>
+<td>Newly packaged as PR-6</td>
+</tr>
+<tr>
+<td>B-4</td>
+<td>Per-segment docs wrong: b06 "single data file/error messages", b09 "PSX image", b07 "total garbage" blocks, b10 unexamined, b12 cross-check</td>
+<td>docs/wpss.b0{6,7,9}*.md — re-fetched 2026-11-15, unchanged</td>
+<td>LAB</td>
+<td>F-20/F-22/F-23/F-28/F-29; packaged as PR-2 + PR-3</td>
+<td>Owner files PR-2, PR-3</td>
+</tr>
+<tr>
+<td>B-5</td>
+<td>files.md lacks bluetooth-partition facts and a boot-chain section</td>
+<td>docs/files.md re-fetched (bluetooth.img section is still a bare file list, lines 81-90)</td>
+<td>LAB</td>
+<td>F-14/F-15; packaged as PR-4</td>
+<td>Owner files PR-4</td>
+</tr>
+<tr>
+<td>B-6</td>
+<td><code>docs/other.md</code> says CAMERA_ICP.b[0-9][0-9]/CAMERA_ICP.mbn = "Tensilica Xtensa certificates" and vpu20_2v.mbn = "Xtensa 32 Bit executable"</td>
+<td>https://codeberg.org/rsavoye/librephone/raw/branch/main/docs/other.md</td>
+<td><strong>LAB — NEW error found this session</strong></td>
+<td>F-6: CAMERA_ICP.mbn/.elf/.mdt + vpu20/30/33_*.mbn are ELF32 <strong>e_machine=94 (historic RISC-V)</strong>, ICP version <code>CICP.FW.7.0-00021</code>, platforms Mimas/Skye (<code>qualcomm-fp6/docs/fp6-architecture-census.md</code>); audit note: raw values publicly dumped by gdrci/Research 2026-10-08 — lab delta is the ISA interpretation</td>
+<td><strong>Newly packaged as PR-5 (pr5-corrections-package.md)</strong></td>
+</tr>
+<tr>
+<td>B-7</td>
+<td>BDF format unknown ("only documentation available from Qualcomm requires an NDA"); ath_bdf_tool could be updated</td>
+<td>wireless.md lines 67-76</td>
+<td>OPEN-E</td>
+<td>lab census has bdwlan.* as ARM ELF board-data files (60,000 B each) but has not decoded the BDF payload</td>
+<td>Executable-now: public ath11k BDF/wil6210 literature + lab census rows; recommend as future session</td>
+</tr>
+<tr>
+<td>B-8</td>
+<td>wpss.b02/b03/b04 "a bit mysterious... not ELF executables... raw binary files"</td>
+<td>wireless.md lines 94-101</td>
+<td>LAB</td>
+<td>F-20/F-22 phdr facts (executable segments of the Hexagon MDT image)</td>
+<td>Fold into PR-6 or a future per-segment PR; owner files</td>
+</tr>
+<tr>
+<td>B-9</td>
+<td>No docs exist for the modem/adsp/cdsp/camera/audio/sensor firmware families (other.md admits "more reverse engineering would be required")</td>
+<td>docs/other.md + docs/ tree listing</td>
+<td>OPEN-E</td>
+<td>Lab has censuses for: TrustZone (F-14), boot chain (F-15), BT (F-14), full ISA map (F-5/F-6) — Qualcomm side largely covered by lab docs; upstream-facing doc stubs not yet packaged</td>
+<td>Package per-family doc stubs as a future PR (after PR-1..PR-6 land, to avoid conflicts)</td>
+</tr>
+<tr>
+<td>B-10</td>
+<td><code>data/sizes.csv</code> (1.6 MB) has <strong>zero FP6 rows</strong> while <code>data/devices.csv</code> has 444 FP6 rows — the per-file hash/size/type dump predates the FP6 build</td>
+<td>data/sizes.csv + data/devices.csv (fetched 2026-11-15)</td>
+<td>OPEN-E</td>
+<td>Lab results/census.md carries FP6 per-file size/type/md5 rows (16-hex truncated md5s) for 665 files</td>
+<td>Executable-now: re-run the census with full md5 and contribute FP6 rows to sizes.csv (provenance cross-check at the same time)</td>
+</tr>
+<tr>
+<td>B-11</td>
+<td>PR #58's Zephyr payload implements the PCIe endpoint/MHI/QRTR/WLFW layers but explicitly NOT WMI/HTT/CE — whoever completes it needs a firmware-side WMI spec</td>
+<td>https://codeberg.org/rsavoye/librephone/pulls/58 (body + 13 comments, fetched 2026-11-15)</td>
+<td>LAB</td>
+<td>papers/wmi-dispatch-architecture.md = the first public WMI dispatch spec for this firmware (registry format, 225 records/149 IDs, 61 decoded events, dispatcher addresses)</td>
+<td>Reference the paper in a PR-58 comment once filed (owner-gated); the spec is the lab's RULE 3 contribution to the free implementation</td>
+</tr>
+</table>
+<h2>Group C — campaign-level wants (FSF pages)</h2>
+<table>
+<tr>
+<th>ID</th>
+<th>Want</th>
+<th>Source</th>
+<th>Status</th>
+<th>Lab evidence</th>
+<th>Next action</th>
+</tr>
+<tr>
+<td>C-1</td>
+<td>"Reverse-engineer and replace those proprietary modules with fully free software, for at least one modern phone"</td>
+<td>https://www.fsf.org/news/librephone-project</td>
+<td>OPEN-E (spec side) / OOS (implementation side)</td>
+<td>RULE 3: the lab is the clean-room SPEC producer — F-5..F-29 (Qualcomm), F-16..F-45 (MediaTek); B-11 shows the spec being consumed by the free-replacement PR</td>
+<td>Keep producing per-family specs; implementation is out of lab scope</td>
+</tr>
+<tr>
+<td>C-2</td>
+<td>Triage device packages; find the phone with the fewest, most fixable freedom problems (210-215 Lineage devices downloaded)</td>
+<td>announcement + docs/comparing.md + closed #5</td>
+<td>OTHERS (infrastructure) + OPEN-E (cross-device RE)</td>
+<td>Upstream has the database (devices.csv/count.csv/sizes.csv/devices.sql.bz2); the lab contributes per-device ISA censuses</td>
+<td>The lab's cross-vendor censuses (FP6 + rosemary) are exactly the "fewest fixable problems" evidence; continue per ROADMAP Rule 2</td>
+</tr>
+<tr>
+<td>C-3</td>
+<td>Hardware documentation page currently lists exactly ONE device (Fairphone 6)</td>
+<td>https://librephone.fsf.org/hardware</td>
+<td>OPEN-E</td>
+<td>Lab's mediatek/rosemary-census.md = complete MediaTek device doc (12 partitions, ISA map) — upstream has ZERO MediaTek content</td>
+<td>Package a MediaTek hardware/firmware page from committed lab docs (owner-gated filing; packaging executable)</td>
+</tr>
+<tr>
+<td>C-4</td>
+<td>"Once there is sufficient interest and funding, a detailed specification will be written so that programmers who are not bound by the DMCA can code free implementations"</td>
+<td>https://librephone.fsf.org/faq</td>
+<td>OPEN-E (spec side) / OOS (code side)</td>
+<td>Same as C-1</td>
+<td>Specs first (lab charter)</td>
+</tr>
+<tr>
+<td>C-5</td>
+<td>Donations, IRC community (#librephone Libera.chat)</td>
+<td>campaign page + FAQ</td>
+<td>OPEN-B</td>
+<td>—</td>
+<td>Not lab-actionable</td>
+</tr>
+<tr>
+<td>C-6</td>
+<td>Website FAQ volunteer links are plain list items with no hrefs (pages/faq.php lines 23-25) — the "how to help" path is incomplete</td>
+<td>codeberg.org/rsavoye/librephone-web raw pages/faq.php</td>
+<td>OPEN-B</td>
+<td>none</td>
+<td>Trivial site PR (link to Codeberg issues) — owner-gated filing</td>
+</tr>
+</table>
+<h2>Group D — open pull requests (other people's in-flight work)</h2>
+<table>
+<tr>
+<th>ID</th>
+<th>PR</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>D-1</td>
+<td>#58 "Add WCN6750 AMSS Zephyr implementation" (L123123, opened 2026-11-01, 13 comments)</td>
+<td>OTHERS (in progress)</td>
+<td>A Zephyr bring-up payload for the wpss RISC-V core (BHI load, PCIe endpoint, MHI slave, QRTR v1, WLFW stub); WMI/HTT/CE and RF/PHY NOT implemented; author works on a OnePlus ACE 3V (sm7675); confirms scm PAS rejects any replaced segment; SRAM &lt;200 KB constraint noted. Thread confirms lab facts: "the RISCV blob is wpss.b07" (maintainer), signing-chain lock (issue #34's premise)</td>
+</tr>
+<tr>
+<td>D-2</td>
+<td>#14 "db_interface" (zsaunders, 2025-11-07)</td>
+<td>OTHERS (stalled)</td>
+<td>Database interface work — overlaps A-5</td>
+</tr>
+<tr>
+<td>D-3</td>
+<td>#10 "WIP: Improvement on Issue #5" (S54, 2025-10-28)</td>
+<td>OTHERS (stalled)</td>
+<td>Blob-functionality spike</td>
+</tr>
+</table>
+<p>---</p>
+<h2>Classification counts (as of 2026-11-15)</h2>
+<p>Over the 47 enumerated actionable rows (28 issue rows minus noise row</p>
+<p>A-7, 11 doc/data rows, 6 campaign rows, 3 PR rows), one primary status</p>
+<p>per row (rows with a dual status are counted under their actionable</p>
+<p>half):</p>
+<table>
+<tr>
+<th>Status</th>
+<th>Count</th>
+<th>Rows</th>
+</tr>
+<tr>
+<td>LAB (knowledge done in the lab; filing owner-gated where upstream text is the target)</td>
+<td>15</td>
+<td>A-9<em>, A-11</em>, A-12*, A-14, A-17, A-18, A-19, B-1, B-2, B-3, B-4, B-5, B-6, B-8, B-11</td>
+</tr>
+<tr>
+<td>OTHERS (already pushed/answered upstream)</td>
+<td>4</td>
+<td>C-2 (device database infrastructure), D-1, D-2, D-3 — plus the closed-issue completions and merged PRs cited in the Group A tail (#16, #27, #5, PR-#60, PR-#55, b75b158f), which are done-by-others evidence rather than separate rows</td>
+</tr>
+<tr>
+<td>OPEN-E (open, executable now from this box)</td>
+<td>18</td>
+<td>A-1(driver side), A-2, A-3, A-4, A-8, A-13, A-15, A-16, A-20, A-21, A-22, A-24, B-7, B-9, B-10, C-1, C-3, C-4</td>
+</tr>
+<tr>
+<td>OPEN-B (blocked: hardware / build farm / owner accounts / code charter)</td>
+<td>9</td>
+<td>A-5, A-6, A-23, A-25, A-26, A-27, A-28, C-5, C-6</td>
+</tr>
+<tr>
+<td>OOS (out of lab scope per RULE 3 / owner exclusions)</td>
+<td>1</td>
+<td>A-10 (TrustZone exploit); the firmware-implementation halves of C-1/C-4/B-11 are noted OOS inside their rows</td>
+</tr>
+</table>
+<p>\* A-9/A-11/A-12 are partial: lab evidence covers the identified</p>
+<p>subset; the remainder is executable-now with another census pass.</p>
+<h2>Owner-gated items surfaced by this audit</h2>
+<ol>
+<li><strong>File PR-1..PR-4</strong> (existing package, upstream-contribution/</li>
+</ol>
+<p>   README.md) — all four target texts re-verified unchanged 2026-11-15.</p>
+<ol>
+<li><strong>File PR-5 + PR-6 and issue comments C-1..C-3</strong> (new package,</li>
+</ol>
+<p>   pr5-corrections-package.md) — newly-discovered upstream errors</p>
+<p>   (other.md Xtensa claims, wpss.b01.md ATmega8 claim, wireless.md WPSS</p>
+<p>   section) plus ready answers for issues #38/#41/#42/#43/#33.</p>
+<ol>
+<li><strong>Comment on PR #58</strong> with the WMI dispatch spec reference (B-11) —</li>
+</ol>
+<p>   the free-replacement implementers are the spec's first consumers.</p>
+<ol>
+<li><strong>Codeberg login</strong> remains the single gate for all filings.</li>
+<li><strong>MediaTek contribution decision</strong> — upstream has zero MediaTek</li>
+</ol>
+<p>   content; the lab's rosemary censuses could become the first (C-3).</p>
+<p>   Owner call on timing (large package).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

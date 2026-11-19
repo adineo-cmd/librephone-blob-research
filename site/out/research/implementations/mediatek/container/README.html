@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/mediatek/container — clean-room mtk_hdr + GFH record-chain parser — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/mediatek/container — clean-room mtk_hdr + GFH record-chain parser</h1><p>A verification-first parser/walker for the two MediaTek firmware container</p><p>Evidence: none</p>
+<h1>implementations/mediatek/container — clean-room mtk_hdr + GFH record-chain parser</h1>
+<p>A verification-first parser/walker for the two MediaTek firmware container</p>
+<p>formats the lab has documented byte-for-byte on production images</p>
+<p>(Xiaomi Redmi Note 10S "rosemary", MT6785, LineageOS 24.0 — see</p>
+<p><code>mediatek/rosemary-census.md</code>, section "Container formats"):</p>
+<ol>
+<li><strong>mtk_hdr signed record chain</strong> — magic <code>0x58881688</code> @0x00, payload size</li>
+</ol>
+<p>   @0x04, NUL-padded ASCII name @0x08 (&gt;=20 bytes on MT6785), extension</p>
+<p>   record <code>0x58891689</code> @0x30 (header size 0x200 @0x34, payload alignment</p>
+<p>   0x10 @0x44), next record at <code>align(payload_end)</code>; per-payload signature</p>
+<p>   pairs <code>cert1</code> (1,709 B) + <code>cert2</code> (957 B), both DER (<code>30 82 …</code>)</p>
+<p>   X.509 sequences.</p>
+<ol>
+<li><strong>GFH <code>MMM</code> record chain</strong> — <code>gfh_common_header</code> (magic <code>"MMM"</code>,</li>
+</ol>
+<p>   version 1, size u16, type u16), types {0 FILE_INFO, 1 BL_INFO,</p>
+<p>   2 ANTI_CLONE, 3 BL_SEC_KEY, 7 BROM_CFG, 8 BROM_SEC_CFG} per U-Boot</p>
+<p>   <code>tools/mtk_image.h</code> (the census confirms rosemary matches U-Boot's</p>
+<p>   structs exactly), plus md1dsp's type <strong>260 (0x104)</strong> which is beyond</p>
+<p>   U-Boot's enum (F-36).</p>
+<p>Every source file carries the clean-room statement header (written from the</p>
+<p>published spec documents on 2026-11-16; no proprietary material accessed).</p>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>mtk_container.py</code></td>
+<td>parser/verifier + JSON emitter + CLI (<code>python3 -I mtk_container.py &lt;file&gt; [--json out.json] [--hash]</code>)</td>
+</tr>
+<tr>
+<td><code>make_fixture.py</code></td>
+<td>deterministic synthetic-fixture generator (self-made bytes exercising the documented layout; regenerates <code>fixtures/</code>)</td>
+</tr>
+<tr>
+<td><code>fixtures/*.bin</code></td>
+<td>generated synthetic fixtures (mtk_hdr signed chain, GFH preloader chain, GFH md1dsp chain) — regenerable byte-exactly; the repo <code>.gitignore</code> excludes <code>*.bin</code>, so these are working-tree artifacts: run <code>python3 -I make_fixture.py</code> to recreate, the test suite verifies regeneration matches</td>
+</tr>
+<tr>
+<td><code>test_mtk_container.py</code></td>
+<td>unittest suite: <code>python3 -m unittest -v test_mtk_container</code></td>
+</tr>
+</table>
+<h2>What the verifier checks</h2>
+<ul>
+<li>record bounds at every step; payload truncation is reported, never</li>
+</ul>
+<p>  silently zero-filled (the lab's extraction walker `mediatek/tools/</p>
+<p>  payload_walk.py` truncates silently and caps at 64 records — this</p>
+<p>  component is the verifying counterpart);</p>
+<ul>
+<li>extension-record fields (<code>0x34</code> header size, <code>0x38</code>/<code>0x3C</code> verbatim,</li>
+</ul>
+<p>  <code>0x44</code> alignment) and power-of-two alignment;</p>
+<ul>
+<li>chain stride progress (next record = <code>align(payload_end, align)</code>);</li>
+<li>GFH record sizes/types, with per-type field decode only where the</li>
+</ul>
+<p>  public struct layout pins fields; everything else stays opaque</p>
+<p>  (facts-not-blobs);</p>
+<ul>
+<li>signature-block classification: cert1/cert2 by DER shape + the</li>
+</ul>
+<p>  documented rosemary pair sizes; per-record <code>signed-by-cert-pair</code> /</p>
+<p>  <code>none</code> flags reproducing the census's signed/unsigned payload split;</p>
+<ul>
+<li>diagnostics in <code>verification</code> (<code>bad-magic</code>, <code>truncated-payload</code>,</li>
+</ul>
+<p>  <code>bad-alignment</code>, <code>non-advancing-chain</code>) with exit status 1.</p>
+<h2>Scope boundary (honest)</h2>
+<p>RSA verification of the cert1/cert2 chain is <strong>out of scope here</strong> —</p>
+<p>public tooling already does it (prior art, below). This component detects</p>
+<p>and tabulates the signature records; it does not validate the crypto.</p>
+<h2>RULE 0 prior-art check (2026-11-16, recorded queries)</h2>
+<p>Before building, the following checks were run; no existing tool combines</p>
+<p>chain verification + GFH-record decode (incl. type 260) + signature-block</p>
+<p>classification + JSON emission + tests:</p>
+<ul>
+<li>Web search `"0x58881688" OR "58881688" MediaTek mtk_hdr parser record</li>
+</ul>
+<p>  chain<code> → U-Boot </code>tools/mtk_image.h<code> documents the magic (</code>LK_PART_MAGIC`)</p>
+<p>  for boot-image <em>generation/detection</em> only; no firmware-partition record</p>
+<p>  walker.</p>
+<ul>
+<li>GitHub code search <code>"58881688" language:python</code> (147 hits) → closest:</li>
+</ul>
+<p>  <a href="https://github.com/R0rt1z2/kaeru">R0rt1z2/kaeru <code>utils/dump.py</code></a> walks</p>
+<p>  the chain and prints text (no verification beyond magic, no certs, no</p>
+<p>  GFH, no JSON, no tests);</p>
+<p>  <a href="https://github.com/Maikyxd/val-protocol">Maikyxd/val-protocol <code>tools/verify_mtk_image.py</code></a></p>
+<p>  walks the chain and fully verifies cert1/cert2 via RSA-PSS + hash</p>
+<p>  comparison (text output; no GFH MMM records; no JSON; no tests);</p>
+<p>  <a href="https://github.com/blackeangel/md1img_repacker">blackeangel/md1img_repacker</a></p>
+<p>  (repacking); remaining hits are logo/bootimg tooling.</p>
+<ul>
+<li>GitHub code search <code>"58891689"</code> (103 hits) → same families plus</li>
+</ul>
+<p>  <a href="https://github.com/19h/zrax-isa-workbench">19h/zrax-isa-workbench <code>docs/socboot2.md</code></a></p>
+<p>  (the empirical layout doc; synthetic fixtures only — the rosemary census</p>
+<p>  is the production-image confirmation); <code>NatleoJ/MediaTek</code> raw fetch</p>
+<p>  404'd on <code>main</code> (unresolved branch — recorded as a check gap).</p>
+<ul>
+<li>GitHub code search <code>gfh "0x104"</code> → <strong>0 hits</strong>: no public tool names</li>
+</ul>
+<p>  md1dsp's GFH type 260. The lab census (F-36, 2026-11-13) remains the</p>
+<p>  only public documentation of that record type.</p>
+<ul>
+<li>Lab-internal: <code>mediatek/tools/payload_walk.py</code> (committed) is the</li>
+</ul>
+<p>  extraction walker this component generalizes and hardens.</p>
+<h2>Fixtures note</h2>
+<p>No MediaTek firmware exists on this machine (checked 2026-11-16: no</p>
+<p><code>rosemary</code>/<code>md1rom</code>/<code>preloader</code> images anywhere in the home tree), so per</p>
+<p>the workorder the fixtures are <strong>synthetic, self-made bytes</strong> generated by</p>
+<p><code>make_fixture.py</code> from the documented field layout alone. They prove the</p>
+<p>parser against the documented layout, not against real firmware; the</p>
+<p>parser has also been written so a real rosemary partition image can be</p>
+<p>dropped in (<code>python3 -I mtk_container.py md1img.img --json out.json</code>).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

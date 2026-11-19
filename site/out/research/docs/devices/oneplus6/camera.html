@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 (enchilada) — Camera + TrustZone + misc families (stubs) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 (enchilada) — Camera + TrustZone + misc families (stubs)</h1><p>**Evidence class: census** (hashed, container magic only).</p><p>Evidence: none</p>
+<h1>OnePlus 6 (enchilada) — Camera + TrustZone + misc families (stubs)</h1>
+<p><strong>Evidence class: census</strong> (hashed, container magic only).</p>
+<h2>Camera</h2>
+<p><code>/firmware/CAMERA_ICP.elf</code> — 3,299,320 B, magic elf32-le. The ICP (Image</p>
+<p>Collaborative Processor) firmware ELF. Upstream matrix camera families on</p>
+<p>SM845+ devices are larger sets; OP6's single-file camera surface is the</p>
+<p>SDM845 generation shape. Not decoded.</p>
+<h2>TrustZone</h2>
+<p>Partition <code>tz</code> → <code>tz.img</code>, 2,056,192 B, magic elf (ELF at offset 0 — the</p>
+<p>QSEE image). Plus <code>cmnlib</code>/<code>cmnlib64</code>/<code>keymaster</code> partitions present in the</p>
+<p>OTA manifest (dumped but not hashed this session — listed in</p>
+<p><code>data-fetch/enchilada/payload manifest</code>, kept out of the committed matrix</p>
+<p>to keep the census to what was actually hashed; next session can extend).</p>
+<p>The lab's TrustZone census method</p>
+<p>(<a href="research/qualcomm/docs/trustzone-census.html">qualcomm-fp6/docs/trustzone-census.md</a>)</p>
+<p>applies.</p>
+<h2>Other</h2>
+<p><code>ipa_fws.{b00..b04,mdt,elf}</code> — IPA firmware MDT set (elf32-le, 65,984 B</p>
+<p>total). <code>etc/firmware/tp/fw_synaptics_17819.img</code> — Synaptics touch</p>
+<p>firmware (103,920 B, raw).</p>
+<h2>Open questions</h2>
+<ul>
+<li>hash cmnlib/cmnlib64/keymaster/boot-chain partitions (they are in the</li>
+</ul>
+<p>  payload and one payload_dump call each away)</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NFC driver ↔ blob interface (Fairphone FP6) — for upstream issue #17 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>NFC driver ↔ blob interface (Fairphone FP6) — for upstream issue #17</h1><p>One-page interface note, built **from public data only** (issue bodies,</p><p>Evidence: none</p>
+<h1>NFC driver ↔ blob interface (Fairphone FP6) — for upstream issue #17</h1>
+<p>One-page interface note, built <strong>from public data only</strong> (issue bodies,</p>
+<p>mainline kernel sources, public kernel trees). Written 2026-11-16 for</p>
+<p><a href="https://codeberg.org/rsavoye/librephone/issues/17">upstream issue #17</a></p>
+<p>("Document the interface between the NFC driver and the blob", in an</p>
+<p>API-doc style so it can later become a test suite).</p>
+<p><strong>Legend:</strong> [PUBLIC] = public-kernel/standard fact with source; [LAB] =</p>
+<p>lab-derived fact with committed doc; [OPEN] = not establishable from</p>
+<p>data available here.</p>
+<h2>1. What the "blob" is on this device</h2>
+<ul>
+<li>[PUBLIC] The FP6 public kernel tree</li>
+</ul>
+<p>  (<code>github.com/LineageOS/android_kernel_fairphone_SM7635</code>, accessed</p>
+<p>  2026-11-16) carries only the standard mainline <code>drivers/nfc/</code> set</p>
+<p>  (<code>nxp-nci</code>, <code>pn533</code>, <code>st-nci</code>, <code>st21nfca</code>, <code>s3fwrn5</code>, ...), and the</p>
+<p>  vendor module tree</p>
+<p>  (<code>android_kernel_fairphone_sm7635-modules</code>, <code>qcom/opensource/</code>,</p>
+<p>  accessed 2026-11-16) has <strong>no</strong> NFC module directory — the NFC stack</p>
+<p>  is in-kernel driver + Android userspace HAL (<code>libnfc-nci</code>).</p>
+<ul>
+<li>[LAB] The lab's committed FP6 census (modem/vendor/dsp trees, 665</li>
+</ul>
+<p>  files) contains <strong>no NFC firmware image file</strong></p>
+<p>  (<code>qualcomm-fp6/results/census.md</code>, 2026-11-15). The NFC firmware</p>
+<p>  therefore ships either inside the NFC controller (OTP/flash) or is</p>
+<p>  fetched by the HAL from a path outside the censused partitions.</p>
+<ul>
+<li>[OPEN] The exact NFC controller part on FP6 (NXP SN100 family vs</li>
+</ul>
+<p>  other) is not stated in any data available to this box; the</p>
+<p>  <code>nxp-nci</code> driver below documents the corresponding interface.</p>
+<h2>2. The driver ↔ controller interface, layer by layer</h2>
+<p>All anchorable in mainline (<code>torvalds/linux</code>, accessed 2026-11-16):</p>
+<table>
+<tr>
+<th>layer</th>
+<th>what crosses it</th>
+<th>mainline anchor</th>
+</tr>
+<tr>
+<td>transport</td>
+<td>I2C/SPI byte stream to the NFC controller</td>
+<td><code>drivers/nfc/nxp-nci/i2c.c</code> (phy <code>set_mode</code> cold/NCI)</td>
+</tr>
+<tr>
+<td>framing</td>
+<td><strong>NCI</strong> packets: 3-byte control header (MT/PBF/GID-OID) + payload; NXP variant uses a 4-byte header (<code>NXP_NCI_HDR_LEN = 4</code>)</td>
+<td><code>include/net/nfc/nci.h</code>, <code>net/nfc/nci/</code> core; <code>drivers/nfc/nxp-nci/core.c</code></td>
+</tr>
+<tr>
+<td>boot mode</td>
+<td>controller cold start → FW-download mode → NCI mode (<code>NXP_NCI_MODE_COLD</code> → <code>NXP_NCI_MODE_NCI</code>)</td>
+<td><code>drivers/nfc/nxp-nci/core.c</code> (<code>nxp_nci_reset</code>, mode switching)</td>
+</tr>
+<tr>
+<td>firmware download</td>
+<td>the driver↔blob protocol itself — command set <code>0xF0 RESET</code>, <code>0xF1 GETVERSION</code>, <code>0xE0 CHECKINTEGRITY</code>, <code>0xC0 WRITE</code> (chunked, <code>NXP_NCI_FW_CHUNK_FLAG 0x0400</code>), <code>0xA2 READ</code>, <code>0xF2 GETSESSIONSTATE</code>, <code>0xA7 LOG</code>, <code>0xD0 FORCE</code>, <code>0xF4 GET_DIE_ID</code>; result codes (<code>NXP_NCI_FW_RESULT_OK = 0x00</code> ...); 30 s answer timeout</td>
+<td><code>drivers/nfc/nxp-nci/firmware.c</code></td>
+</tr>
+<tr>
+<td>runtime ops</td>
+<td>NCI core: CORE_RESET/CORE_INIT/CORE_SET_CONFIG, RF discovery, NFCEE management — NFC Forum NCI specification (public standard)</td>
+<td><code>net/nfc/nci/</code>, NFC Forum NCI spec</td>
+</tr>
+<tr>
+<td>userspace</td>
+<td>generic NFC netlink/family API to the HAL</td>
+<td><code>include/uapi/linux/nfc.h</code>, <code>net/nfc/netlink.c</code></td>
+</tr>
+</table>
+<h2>3. What a free re-implementation must provide (test-suite hooks)</h2>
+<ol>
+<li>Bring-up: probe → cold/NCI mode switch → <code>0xF1 GETVERSION</code> answer</li>
+</ol>
+<p>   parse → NCI <code>CORE_RESET</code>/<code>CORE_INIT</code> round trip.</p>
+<ol>
+<li>Firmware path: <code>0xF0</code> → <code>0xC0</code> WRITE chunk loop with integrity</li>
+</ol>
+<p>   check → session-state query; must tolerate the 30 s timeout window.</p>
+<ol>
+<li>Data plane: NCI data-connection open, RF interface activation,</li>
+</ol>
+<p>   ISO-DEP exchange — assertable with a virtual NCI device</p>
+<p>   (<code>drivers/nfc/virtual_ncidev.c</code> exists in mainline for exactly this</p>
+<p>   kind of testing).</p>
+<ol>
+<li>Config surface: <code>WCNSS_qcom_cfg.ini</code>-style runtime knobs do not</li>
+</ol>
+<p>   apply to NFC (that is WLAN); NFC config is NCI SET_CONFIG + HAL</p>
+<p>   params. [OPEN] FP6-specific HAL parameters not extractable here.</p>
+<h2>Sources consulted (accessed 2026-11-16; network flaky, all fetched OK)</h2>
+<ul>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/nfc/nxp-nci/core.c and <code>firmware.c</code> (fetched; command IDs quoted above)</li>
+<li>https://api.github.com/repos/torvalds/linux/contents/drivers/nfc (directory listing)</li>
+<li>https://api.github.com/repos/LineageOS/android_kernel_fairphone_sm7635-modules/contents/qcom/opensource (no NFC module)</li>
+<li>https://api.github.com/repos/LineageOS/android_kernel_fairphone_SM7635/contents/drivers/nfc (mainline-equivalent set present)</li>
+<li>Lab: <code>qualcomm-fp6/results/census.md</code> (no NFC firmware file in the censused trees)</li>
+</ul>
+<p><strong>Clean-room statement:</strong> everything above is public-kernel/standard</p>
+<p>material plus lab census negatives; no proprietary content, no</p>
+<p>decompiled code. The FP6 controller identity and any FP6-specific</p>
+<p>firmware file are flagged [OPEN] rather than guessed.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

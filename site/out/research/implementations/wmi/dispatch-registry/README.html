@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wmi/dispatch-registry — the decoded two-level WMI dispatch architecture, as a reference implementation — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>wmi/dispatch-registry — the decoded two-level WMI dispatch architecture, as a reference implementation</h1><p>Implements the lab&#x27;s decoded WCN6750 wpss WMI dispatch model</p><p>Evidence: none</p>
+<h1>wmi/dispatch-registry — the decoded two-level WMI dispatch architecture, as a reference implementation</h1>
+<p>Implements the lab's decoded WCN6750 wpss WMI dispatch model</p>
+<p>(<a href="research/papers/wmi-dispatch-architecture.html">papers/wmi-dispatch-architecture.md</a>,</p>
+<p>sections 4-5; findings F-22/F-23/F-28/F-29 in open-discovery-lab):</p>
+<ul>
+<li>ID space <code>grp&lt;&lt;12|cmd</code> (24-bit command header, per public ath11k <code>WMI_CMD_HDR_CMD_ID</code>)</li>
+<li>level 1, group routing: the b09 registry record model</li>
+</ul>
+<p>  <code>[handler-ptr, grp&lt;&lt;12|cmdID, 0]</code> (12-byte stride, anchored count-prefixed</p>
+<p>  runs; main run <code>0xc0691080-0xc06913b0</code>), head block <code>0xc0691050/0xc0691068</code></p>
+<p>  with the dispatcher's enable-mask arming (<code>setbit</code> at +0xd8/+0x104/+0x118 →</p>
+<p>  <code>0xc0691140/0xc069116c/0xc0691180</code>)</p>
+<ul>
+<li>level 2, event routing: PDEV jump table <code>0xc056423c</code> (85 words, index =</li>
+</ul>
+<p>  <code>(ID&amp;0xff)-1</code>, bounds <code>&lt;= 0x54</code>), STATS table <code>0xc05641fc</code> (16 words), MISC/</p>
+<p>  GPIO/SUSPEND/VDEV cmp-tree entries, shared exit <code>0xc02cedcc → 0xc04e61a8</code></p>
+<ul>
+<li>the firmware mechanics are modeled exactly: <code>R5 = ID&gt;&gt;8</code>, <code>R4 = ID&amp;0xff</code></li>
+</ul>
+<p>All handler addresses come from the lab's committed F-29 map</p>
+<p>(<code>wmi-dispatch-map.json</code>) via the committed generator</p>
+<p><a href="gen_wmi_tables.py">gen_wmi_tables.py</a></p>
+<p>→ generated <a href="wmi_dispatch_tables.h">wmi_dispatch_tables.h</a>. Where the map</p>
+<p>commits no static address (GPIO <code>0x1e001/0x1e002</code>, SUSPEND <code>0x11001</code> — runtime</p>
+<p>b09 pointer dispatch), the table honestly carries kind <code>RUNTIME</code> instead of an</p>
+<p>invented address.</p>
+<p>Files: <a href="wmi_dispatch.h">wmi_dispatch.h</a>, <a href="wmi_dispatch.c">wmi_dispatch.c</a></p>
+<p>(model + dispatch + self-test <code>main</code>), <a href="wmi_dispatch_tables.h">wmi_dispatch_tables.h</a></p>
+<p>(generated data).</p>
+<p>Build &amp; run:</p>
+<pre><code>
+gcc -std=c99 -Wall -Wextra -O2 -o wmi_dispatch_test wmi_dispatch.c
+./wmi_dispatch_test
+</code></pre>
+<p>Result: ALL SELFTESTS PASSED (33 checks: ID build/split, 41 PDEV + 9 STATS</p>
+<p>handled counts matching F-29, 61 decoded events routed to committed blocks,</p>
+<p>unhandled IDs → shared exit, registry head arming, record add/find).</p>
+<p>Open items (spec gaps, never guessed): the per-record 12-stride consumption</p>
+<p>loop and the dispatcher's call-site were not decoded by F-29; the model</p>
+<p>exposes the registry data structure but not a firmware-internal walker.</p>
+<p>SCAN/PEER/ROAM group dispatchers are separate functions (F-28</p>
+<p>decode-verified, not decoded end-to-end) and are outside this component.</p>
+<p>Clean-room statement: spec-only derivation, no proprietary access.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

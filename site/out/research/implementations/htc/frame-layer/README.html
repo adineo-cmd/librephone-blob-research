@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>htc/frame-layer — HTC frame header + service-connect codecs — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>htc/frame-layer — HTC frame header + service-connect codecs</h1><p>Spec facts (public ath11k `htc.h`, linux stable, fetched 2026-11-16, GPL):</p><p>Evidence: none</p>
+<h1>htc/frame-layer — HTC frame header + service-connect codecs</h1>
+<p>Spec facts (public ath11k <code>htc.h</code>, linux stable, fetched 2026-11-16, GPL):</p>
+<p>frame header word `HTC_HDR_ENDPOINTID GENMASK(7,0) | HTC_HDR_FLAGS</p>
+<p>GENMASK(15,8) | HTC_HDR_PAYLOADLEN GENMASK(31,16)` (4 bytes LE) with</p>
+<p>trailer control bytes <code>HTC_HDR_CONTROLBYTES0/1</code>;</p>
+<p><code>ATH11K_HTC_FLAG_NEED_CREDIT_UPDATE 0x01</code>,</p>
+<p><code>ATH11K_HTC_FLAG_SEND_BUNDLE 0x02</code>,</p>
+<p><code>ATH11K_HTC_FLAG_TRAILER_PRESENT 0x02</code>; service-connect message fields</p>
+<p>(<code>HTC_SVC_MSG_SERVICE_ID GENMASK(31,16)</code>,</p>
+<p><code>HTC_SVC_MSG_CONNECTIONFLAGS GENMASK(15,0)</code>,</p>
+<p><code>HTC_SVC_MSG_SERVICEMETALENGTH GENMASK(23,16)</code>,</p>
+<p><code>HTC_SVC_RESP_MSG_*</code> status/endpoint/max-msg-size/meta-length masks,</p>
+<p><code>HTC_MSG_MESSAGEID GENMASK(15,0)</code>).</p>
+<p>Implements: frame header pack/unpack; service-connect request (8-byte wire)</p>
+<p>and response (9-byte wire) codecs at the mask-derivable positions.</p>
+<p>Deliberately absent (never guessed): the HTC ready / setup-complete message</p>
+<p>codecs — their word layout is not derivable from the cited GENMASK list</p>
+<p>alone. Filed as the open item instead of inventing an order.</p>
+<p>Files: <a href="htc_frame.h">htc_frame.h</a>, <a href="htc_frame.c">htc_frame.c</a>, <a href="test_htc.c">test_htc.c</a>.</p>
+<p>Build &amp; run:</p>
+<pre><code>
+gcc -std=c99 -Wall -Wextra -O2 -o htc_test test_htc.c htc_frame.c
+./htc_test
+</code></pre>
+<p>Result: ALL SELFTESTS PASSED (23 checks).</p>
+<p>Clean-room statement: spec-only derivation (public GPL kernel facts), no</p>
+<p>proprietary access.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

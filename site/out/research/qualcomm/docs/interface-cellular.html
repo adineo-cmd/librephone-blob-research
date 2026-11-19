@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cellular modem driver ↔ blob interface (Fairphone FP6) — for upstream issue #18 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Cellular modem driver ↔ blob interface (Fairphone FP6) — for upstream issue #18</h1><p>One-page interface note, from **public data only**, in API-doc style for</p><p>Evidence: none</p>
+<h1>Cellular modem driver ↔ blob interface (Fairphone FP6) — for upstream issue #18</h1>
+<p>One-page interface note, from <strong>public data only</strong>, in API-doc style for</p>
+<p>the future test suite ([upstream issue</p>
+<p>#18](https://codeberg.org/rsavoye/librephone/issues/18)). Written</p>
+<p>2026-11-16.</p>
+<p><strong>Legend:</strong> [PUBLIC] = mainline kernel / public tree fact; [LAB] =</p>
+<p>lab-derived fact (committed doc); [OPEN] = needs data not on this box.</p>
+<h2>0. The blob</h2>
+<ul>
+<li>[LAB] The modem firmware on FP6 is the <code>modem</code> family: <code>modem.mdt</code> +</li>
+</ul>
+<p>  <code>modem.b00–b30</code>, Hexagon (QDSP6, e_machine 164) — sizes/hashes in</p>
+<p>  <code>qualcomm-fp6/results/census.md</code>; plus <code>modem/image/milos/qdsp6m.qdb</code></p>
+<p>  (6,506,187 B) and per-carrier mcfg payloads (<code>modem_pr/mcfg/...</code>).</p>
+<ul>
+<li>[LAB] ISA identification at instruction level: Hexagon (F-5/F-6,</li>
+</ul>
+<p>  <code>qualcomm-fp6/docs/fp6-architecture-census.md</code>).</p>
+<h2>1. Load &amp; authenticate (kernel → TrustZone → modem)</h2>
+<p>All [PUBLIC], mainline <code>torvalds/linux</code> (accessed 2026-11-16):</p>
+<table>
+<tr>
+<th>step</th>
+<th>interface</th>
+<th>anchor</th>
+</tr>
+<tr>
+<td>fetch <code>.mdt</code> + <code>.bNN</code> via request_firmware</td>
+<td>firmware-loader ABI</td>
+<td><code>drivers/soc/qcom/mdt_loader.c</code> (<code>qcom_mdt_load</code>, <code>qcom_mdt_bins_are_split</code>)</td>
+</tr>
+<tr>
+<td>segment placement</td>
+<td>phdr-driven: <code>offset = p_paddr - mem_reloc</code>; relocatable images (<code>p_flags &amp; QCOM_MDT_RELOCATABLE</code>, BIT(27)) rebase onto the allocated region</td>
+<td><code>mdt_loader.c</code> (<code>qcom_mdt_load_no_init</code>)</td>
+</tr>
+<tr>
+<td>metadata + auth</td>
+<td>hash segments (<code>QCOM_MDT_TYPE_HASH</code>) packed into "metadata" → <code>qcom_pas_init_image</code> → <strong>SCM/PAS call into TrustZone</strong>; PAS must return OK or the modem never starts</td>
+<td><code>mdt_loader.c</code> (<code>__qcom_mdt_pas_init</code>), <code>drivers/soc/qcom/qcom_scm.c</code></td>
+</tr>
+<tr>
+<td>reset &amp; boot</td>
+<td>mss power sequencing, halt/release</td>
+<td><code>drivers/remoteproc/qcom_q6v5_mss.c</code></td>
+</tr>
+<tr>
+<td>EFS store</td>
+<td>modem reads/writes <code>/persist</code> via the <strong>rmtfs</strong> protocol over the transport below; host allocates shared memory and answers block read/write requests</td>
+<td><code>drivers/soc/qcom/rmtfs_mem.c</code></td>
+</tr>
+</table>
+<h2>2. Transport &amp; channels (kernel ↔ running modem)</h2>
+<ul>
+<li>[PUBLIC] <strong>GLINK/SMEM</strong>: the modem exposes rpmsg channels over</li>
+</ul>
+<p>  Shared Memory; channel types include <code>DATA_CNTL</code> (control/QMI), the</p>
+<p>  <code>DATA1…DATA27</code> data channels (QMAP/rmnet), <code>DIAG</code>, <code>RMT</code> (rmtfs),</p>
+<p>  <code>LOOPBACK</code> — <code>drivers/rpmsg/qcom_glink_smem.c</code>,</p>
+<p>  <code>drivers/rpmsg/qcom_smd.c</code>.</p>
+<ul>
+<li>[PUBLIC] <strong>QRTR</strong>: the modem publishes services (QMI services:</li>
+</ul>
+<p>  dms/nas/wds/wda/pdc, plus DIAG) as QRTR service:instance tuples on</p>
+<p>  an IP-like node addressing scheme; the kernel network family is</p>
+<p>  <code>AF_QIPCRTR</code> — <code>net/qrtr/af_qrtr.c</code>, <code>net/qrtr/ns.c</code> (name server).</p>
+<ul>
+<li>[PUBLIC] <strong>QMI</strong>: TLV-based control protocol; encoding helpers in</li>
+</ul>
+<p>  <code>include/linux/soc/qcom/qmi.h</code> + <code>drivers/soc/qcom/</code> qmi helpers;</p>
+<p>  control handshake = QMICTL (<code>QMICTL_GET_VERSION</code>,</p>
+<p>  <code>QMICTL_GET_CLIENT_ID</code>).</p>
+<h2>3. Data plane</h2>
+<ul>
+<li>[PUBLIC] <strong>rmnet / QMAP</strong>: per-channel network devices; packets</li>
+</ul>
+<p>  carry the rmnet MAP header (aggregation, mux, checksum offload</p>
+<p>  flags) — <code>drivers/net/ethernet/qualcomm/rmnet/</code> (<code>rmnet_config.c</code>,</p>
+<p>  <code>rmnet_map.h</code>).</p>
+<ul>
+<li>[PUBLIC] MHI is the PCIe-attached variant of the same layering</li>
+</ul>
+<p>  (<code>drivers/bus/mhi/</code>) — not the transport on QCM6490, where the modem</p>
+<p>  is a glink/q6v5 remoteproc, but the same service model.</p>
+<h2>4. Test-suite hooks (what #18's suite can assert without hardware)</h2>
+<ol>
+<li>Parse a public <code>modem.mdt</code>: phdr table → loadable segments →</li>
+</ol>
+<p>   relocation math identical to <code>qcom_mdt_load_no_init</code></p>
+<p>   ([LAB]+[PUBLIC] cross — also answers #40's mechanics).</p>
+<ol>
+<li>QRTR service discovery: enumerate modem service IDs on a live</li>
+</ol>
+<p>   device; assert dms/nas/wds presence before radio enable.</p>
+<ol>
+<li>QMICTL handshake bytes: build/parse <code>QMICTL_GET_VERSION</code></li>
+</ol>
+<p>   request/response with the public TLV codec.</p>
+<ol>
+<li>QMAP header round-trip: encode/decode MAP v1/v2 frames incl.</li>
+</ol>
+<p>   aggregation.</p>
+<ol>
+<li>rmtfs: serve a synthetic EFS block device over an rpmsg loopback.</li>
+</ol>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>mainline: <code>drivers/soc/qcom/mdt_loader.c</code> (fetched, 508 lines),</li>
+</ul>
+<p>  <code>drivers/remoteproc/qcom_q6v5_mss.c</code>, <code>drivers/soc/qcom/rmtfs_mem.c</code>,</p>
+<p>  <code>net/qrtr/af_qrtr.c</code>, <code>drivers/rpmsg/qcom_glink_smem.c</code>,</p>
+<p>  <code>drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c</code>,</p>
+<p>  <code>include/linux/soc/qcom/qmi.h</code>, <code>include/linux/soc/qcom/mdt_loader.h</code></p>
+<p>  (all fetched OK / status 200)</p>
+<ul>
+<li>lab: <code>qualcomm-fp6/results/census.md</code>,</li>
+</ul>
+<p>  <code>qualcomm-fp6/docs/fp6-architecture-census.md</code></p>
+<p><strong>Clean-room statement:</strong> public-kernel facts + lab-derived census</p>
+<p>facts only. The modem blob's internal Hexagon handlers are NOT</p>
+<p>documented here (that is the WMI-paper level of detail for WLAN; for</p>
+<p>the modem it remains [OPEN] pending disassembly capacity).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

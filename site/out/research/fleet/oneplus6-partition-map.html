@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 partition map decoded — bt.img, modem.img, tz.img, dsp.img (fleet-re, 2026-11-17) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 partition map decoded — bt.img, modem.img, tz.img, dsp.img (fleet-re, 2026-11-17)</h1><p>**Evidence class: format-spec** (container layer; per-file census with</p><p>Evidence: none</p>
+<h1>OnePlus 6 partition map decoded — bt.img, modem.img, tz.img, dsp.img (fleet-re, 2026-11-17)</h1>
+<p><strong>Evidence class: format-spec</strong> (container layer; per-file census with</p>
+<p>matrix md5 joins). Extends <code>qca-bt-format.md</code>: what was one blob</p>
+<p>(<code>bt.img</code>) is now four decoded containers.</p>
+<h2>Container map (all four partitions probed)</h2>
+<table>
+<tr>
+<th>partition</th>
+<th>bytes</th>
+<th>container</th>
+<th>contents</th>
+</tr>
+<tr>
+<td><code>bluetooth</code> → bt.img</td>
+<td>765,952</td>
+<td>FAT16, <code>IMAGE/</code> dir</td>
+<td>10 QCA BT patch/NVM fleet files (see qca-bt-format.md)</td>
+</tr>
+<tr>
+<td><code>modem</code> → modem.img</td>
+<td>119,820,288</td>
+<td><strong>FAT16</strong>, <code>IMAGE/</code> dir</td>
+<td><strong>404 named firmware files / 113.5 MB</strong> — the whole OP6 firmware set (403 extracted; count corrected 2026-11-17 per raw FAT walk)</td>
+</tr>
+<tr>
+<td><code>tz</code> → tz.img</td>
+<td>2,056,192</td>
+<td><strong>ELF64 AArch64</strong> QSEE (e_type 2, e_machine 183, 17 phdrs; two vaddr regions 0x14680000 + 0x1c000000; version strings TZ.XF.5.0.1.C5-00083.1 / WAXAANAAA / CRM)</td>
+<td>TrustZone firmware — full segment map in dsp-tz-map.md</td>
+</tr>
+<tr>
+<td><code>dsp</code> → dsp.img</td>
+<td>33,554,432</td>
+<td><strong>ext4</strong> (volume "dsp", 4,096 B blocks, clean 4 MiB journal)</td>
+<td>62 files: 57 Hexagon ELF32 fastrpc user-PD modules under /adsp /cdsp /sdsp (25.3 MB) + map .txt files — see dsp-tz-map.md</td>
+</tr>
+</table>
+<p>Both FAT volumes share the layout family (MSDOS5.0 OEM, 4,096 B/sector,</p>
+<p>4 sec/cluster) and both declare more sectors than the OTA writes (the</p>
+<p>live tree fits in the written region) — a Qualcomm firmware-volume</p>
+<p>convention worth flagging: **the modem and bluetooth partitions are</p>
+<p>filesystems, not monolithic blobs; the dsp partition is ext4.** Upstream's</p>
+<p>counting treats them as opaque; the extractable, nameable surface is ~40×</p>
+<p>larger for this device.</p>
+<h2>The modem.img IMAGE tree (404 entries, 403 extracted)</h2>
+<p>Groups (by name after the <code>image_</code> prefix): <code>modem.b16/b17/b20/b24</code></p>
+<p>(mpss Hexagon segments; b20 alone 26.3 MB) · <code>adsp.b00-b13</code> (18 MDT</p>
+<p>segments) · <code>cdsp.b00-b10</code> · <code>slpi.*</code> · <code>mba.*</code> · <code>wlanmdsp.mbn</code></p>
+<p>(**3,035,876 B, md5 <code>771a9c2e…90df5</code> — the WCN3990 WiFi firmware;</p>
+<p>resolves the wifi-family census-negative finding<strong>) · </strong>35 ×</p>
+<p><code>bdwlan.*</code>** (19,152 B each — WCN3990 board-data variants; format decoded,</p>
+<p>see bdwlan-format.md) · <code>gfp9508.*</code> · <code>qdsp6m.qdb</code> (5.4 MB) ·</p>
+<p>keymaster/cmnlib/cmnlib64 MDT sets · the DSP launch manifests</p>
+<p>(<code>adspr.jsn</code>, <code>adspua.jsn</code>, <code>cdspr.jsn</code>, <code>modemr.jsn</code>…).</p>
+<h2>Fleet joins: 201 md5 matches</h2>
+<p>Cross-checking all extracted file md5s against the committed coverage matrix</p>
+<p><strong>yields 201 (device, md5) fleet matches</strong> — e.g. <code>image_adspr.jsn</code></p>
+<p>equals the 31-device <code>adspr.jsn</code> fleet blob. The sha256↔md5 fleet join</p>
+<p>(an open item in deep-re-notes §6, "needs payload access per device</p>
+<p>family") is thereby <strong>delivered for OnePlus 6 at fleet scale</strong>: one</p>
+<p>1.07 GB payload pins 201 multi-device blob identities.</p>
+<h2>Consequences for the leverage plan</h2>
+<ol>
+<li>The wifi family's "structurally absent from vendor" finding is</li>
+</ol>
+<p>   confirmed AND resolved: the firmware lives in <code>modem.img</code>'s FAT tree</p>
+<p>   as <code>image_wlanmdsp.mbn</code> + <code>bdwlan.*</code> board data.</p>
+<ol>
+<li>The <code>bm2nXX.bin</code> fleet question (OP6 comparison point) is answered</li>
+</ol>
+<p>   two ways: the SDM845 generation ships per-DSP MDT/bNN segment sets as</p>
+<p>   named files (<code>image_adsp.*</code>), AND the SM6375-generation <code>bm2nXX.bin</code></p>
+<p>   fleet md5s are now byte-verified from a real SM6375 payload (see</p>
+<p>   second-device-larry.md — 6/6 exact).</p>
+<ol>
+<li>Every segment file now has a name, size, and md5 — the OP6's modem/</li>
+</ol>
+<p>   adsp/cdsp surfaces are census-complete (the deep-re-notes census of</p>
+<p>   57 vendor files under-counted the real extractable surface by ~7×).</p>
+<h2>Deliverables</h2>
+<ul>
+<li><code>tools/fat_extract.py</code> — used for both FAT volumes (bt.img, modem.img)</li>
+<li><code>devices-001-222.csv</code> (+403 rows via the modem-FAT census, local,</li>
+</ul>
+<p>  regenerable) — census now reflects the full extractable surface</p>
+<ul>
+<li><code>docs/devices/oneplus6/{modem,wifi}.md</code> — upgraded to container-decoded</li>
+<li>Companion deep-dives: <code>dsp-tz-map.md</code> (ext4 + QSEE segment maps),</li>
+</ul>
+<p>  <code>bdwlan-format.md</code> (board-data container), <code>qca-bt-format.md</code> (BT fleet),</p>
+<p>  <code>patch-stream-structure.md</code> (patch/tail structure),</p>
+<p>  <code>second-device-larry.md</code> (SM6375 population)</p>
+<h2>Open items</h2>
+<ol>
+<li><code>tz.img</code> QSEE metadata layout (seg[1] hash-table geometry, cert chain</li>
+</ol>
+<p>   order) and the 3 embedded ELF magics inside fastrpc shells.</p>
+<ol>
+<li><code>bdwlan.*</code> tag 1..17 semantics (needs a Qualcomm BDF tool/spec — none</li>
+</ol>
+<p>   public; the 35-variant diff and ID fields are mapped in bdwlan-format.md).</p>
+<ol>
+<li>The remaining 202 non-fleet-joined modem-FAT files are OP6-specific</li>
+</ol>
+<p>   blobs (expected — not every file is fleet-shared).</p>
+<h2>Count-correction note (2026-11-17)</h2>
+<p>First pass recorded 403 extracted files and 37 bdwlan variants; the</p>
+<p>subagent deep-pass verified 404 FAT directory entries (0 deleted) and 35</p>
+<p>bdwlan files (29 md5 clusters). Both numbers here are corrected; the</p>
+<p>403-vs-404 delta is one unresolved entry, flagged for the lead.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Samsung Galaxy S III (m0 / GT-I9300) — blob census + Samsung-IPC modem status (2026-11-18) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Samsung Galaxy S III (m0 / GT-I9300) — blob census + Samsung-IPC modem status (2026-11-18)</h1><p>Third historic-device pass: the Exynos 4412 / Samsung-IPC universe opener.</p><p>Evidence: none</p>
+<h1>Samsung Galaxy S III (m0 / GT-I9300) — blob census + Samsung-IPC modem status (2026-11-18)</h1>
+<p>Third historic-device pass: the Exynos 4412 / Samsung-IPC universe opener.</p>
+<p>Per the task brief, this device's documentation is **census + cited</p>
+<p>status**, not re-RE of Replicant's work: the modem boot/protocol layer is</p>
+<p>already RE'd and FREE (libsamsung-ipc, Replicant heritage); the new lab</p>
+<p>delta is the per-file blob census with pins, and the combo-chip pin.</p>
+<h2>1. Combo-chip correction (matches the hammerhead finding)</h2>
+<p>The queue file and the task context pin m0's WiFi/BT as "BCM4330". The</p>
+<p>mainline-verified chip is <strong>BCM4334</strong>: pmOS `device/community/</p>
+<p>device-samsung-m0<code> depends on </code>firmware-samsung-midas-*` (the Midas board</p>
+<p>family = m0/m3/t0lte), and <code>firmware-samsung-midas</code> APKBUILD (fetched from</p>
+<p>the pmaports GitLab API 2026-11-18) installs:</p>
+<ul>
+<li><code>brcmfmac4334-sdio.bin</code> (mainline brcmfmac4334)</li>
+<li><code>brcmfmac4334-sdio.samsung,i9300.txt</code> — the m0 nvram</li>
+<li><code>bcm4334.hcd</code> — BT patchram</li>
+<li><code>p4412_s_fwbl1.bin</code> — the Midas BL1 bootloader stage</li>
+</ul>
+<p>BCM4330 remains the S2/Galaxy-Nexus-era chip (and linux-firmware's</p>
+<p><code>brcmfmac4330-sdio.bin</code>, fetched this session for comparison: 223,581 B,</p>
+<p>md5 <code>c6908817b83724800bb76b0114eec7a5</code>). The two chips share the Broadcom</p>
+<p>SDIO-firmware container family (one clean-room parser could serve 4330,</p>
+<p>4334, 4335, 4339 — [OPEN] target).</p>
+<h2>2. Provenance and verification (pmOS-pinned, individually fetchable)</h2>
+<p><code>firmware-samsung-midas</code> APKBUILD pins (fetched + verified 2026-11-18):</p>
+<table>
+<tr>
+<th>file</th>
+<th>source (pinned)</th>
+<th>fetched</th>
+<th>md5</th>
+</tr>
+<tr>
+<td><code>brcmfmac4334-sdio.bin</code></td>
+<td>linux-firmware <code>brcm/</code> @ <code>id=dc9576448222cc1922462d58796ab1c62b523ada</code> (pinned commit id in the APKBUILD URL)</td>
+<td>451,566 B</td>
+<td><code>0e5d2b9bfaaf3b6c43077405cfe92632</code></td>
+</tr>
+<tr>
+<td><code>brcmfmac4334-sdio.samsung,i9300.txt</code></td>
+<td><code>armbian/firmware</code> @ <code>5ff122ef…</code> — note: the file served is <code>brcm/brcmfmac4334-sdio.rockchip%2Crk3318-box.txt</code> (the APKBUILD renames a shared nvram to the Samsung DT-name; its header comments say "original nvram found in Android sources with name nvram_HS2734A.txt, substituted with a new version")</td>
+<td>2,406 B</td>
+<td>in census CSV</td>
+</tr>
+<tr>
+<td><code>bcm4334.hcd</code></td>
+<td><code>TheMuppets/proprietary_vendor_samsung</code> @ <code>fdd8c445…</code>, <code>smdk4412-common/proprietary/bin/</code></td>
+<td>53,957 B</td>
+<td>in census CSV</td>
+</tr>
+<tr>
+<td><code>p4412_s_fwbl1.bin</code></td>
+<td><code>dmarszk/exynos4_uboot</code> @ <code>2460919…</code>, <code>sd_fuse/</code></td>
+<td>8,192 B</td>
+<td>in census CSV</td>
+</tr>
+</table>
+<p>The BL1 file deserves its own sentence: pmOS comments it as "subpackage</p>
+<p>with bl1 that does not check signature of next bootloader, allowing open</p>
+<p>bootloaders like u-boot or xboot. Not yet used by pmOS." — i.e. the</p>
+<p>Exynos bootloader blob availability question has a public, already-extracted</p>
+<p>answer for the signature-bypass BL1 (the stock signed chain remains</p>
+<p>device-resident; Replicant's GalaxySIII table says "Signed" bootloader).</p>
+<p>The "exonoma" name in the task context does not resolve to any public</p>
+<p>Exynos bootloader project (web + GitHub searches, 2026-11-18, 0 hits) —</p>
+<p>recorded as a negative route; the real Exynos 4412 bootloader stack is</p>
+<p>BL1 (<code>p4412_s_fwbl1.bin</code>) → s-boot (signed, device-resident) with the</p>
+<p>U-Boot route above.</p>
+<h2>3. The modem: Samsung-IPC + XMM6260 (cited, not re-RE'd)</h2>
+<p>All statements in this section are <strong>citations from Replicant's wiki</strong></p>
+<p>(redmine.replicant.us, fetched 2026-11-18, pages retrieved as <code>.txt</code></p>
+<p>exports) plus pmOS's packaging of the free userspace:</p>
+<ul>
+<li><code>wiki/GalaxySIIIGTI9300</code> hardware table: Modem = <strong>XMM6260</strong> with "Free</li>
+</ul>
+<p>  userspace implementation: Samsung-RIL/libsamsung-ipc"; Wi-Fi = <strong>BCM4334</strong></p>
+<p>  ("Linux kernel support, proprietary loaded firmware"); Bluetooth =</p>
+<p>  <strong>BCM4334</strong>. (The queue file's "XMM6262" and the task-context chip name</p>
+<p>  are variant labels; Replicant's primary device page pins XMM6260, and</p>
+<p>  libsamsung-ipc's i9300 boot functions are the xmm626_hsic_* family.)</p>
+<ul>
+<li><code>wiki/GalaxySIII</code>: GT-I9300 runs Replicant 4.0/4.2/6.0; SoC Exynos 4412;</li>
+</ul>
+<p>  bootloader "Signed"; modem link "Isolated (HSIC)"; modem protocol</p>
+<p>  <strong>samsung-ipc</strong>. (GT-I9305 = QMI protocol instead, incomplete Replicant</p>
+<p>  support — the 4G variant is the different-lineage device.)</p>
+<ul>
+<li><code>wiki/GalaxySIIIGTI9300</code> partition table: RADIO (mmcblk0p7, 32 MiB,</li>
+</ul>
+<p>  "Unknown, raw data? — Modem OS partition") is device-resident; EFS</p>
+<p>  (mmcblk0p3, ext4) holds the modem data (/efs, nv_data).</p>
+<ul>
+<li><code>wiki/Samsung-ipc</code>: the protocol is implemented free in</li>
+</ul>
+<p>  <strong>libsamsung-ipc</strong>, with the Android RIL adapter in libsamsung-ril</p>
+<p>  (rild ↔ libsamsung-ril ↔ libsamsung-ipc ↔ kernel); used by S II, S III,</p>
+<p>  Note, Note II, Galaxy Nexus, Tab 2, Note 8.0. The pmOS repo packages the</p>
+<p>  same library (<code>pmaports/modem/libsamsung-ipc</code> — free, packaged).</p>
+<ul>
+<li><code>wiki/ModemFirmwarePartitions</code>: the GT-I9300 modem firmware partition</li>
+</ul>
+<p>  layout is DOCUMENTED with byte ranges — TOC <code>[0x0→0xfff]</code>,</p>
+<p>  PSIRAM (first-stage bootloader) <code>[0x1000→0xefff]</code>, EBL</p>
+<p>  <code>[0xF000→0x27fff]</code>, MAIN (firmware) <code>[0x28000→0x9fffff]</code>, SECPACK</p>
+<p>  <code>[0x9ff800→0x9fffff]</code>, NV (nvdata defaults) <code>[0xa00000→0xbfffff]</code> —</p>
+<p>  verified on GT-I9300 hardware by Replicant; load functions per stage:</p>
+<p>  <code>xmm626_hsic_psi_send</code> / <code>xmm626_hsic_ebl_send</code> /</p>
+<p>  <code>xmm626_hsic_firmware_send</code> / <code>xmm626_hsic_sec_start_send</code> /</p>
+<p>  <code>xmm626_hsic_nv_data_send</code> (libsamsung-ipc, free source).</p>
+<ul>
+<li><code>wiki/XMMBoot</code>: the boot sequence (power-off → configure link → send</li>
+</ul>
+<p>  firmware → re-enumeration) and per-device GPIO assignments are</p>
+<p>  documented; the XMM6262-era modem boots via the HSIC link.</p>
+<ul>
+<li><code>wiki/CellularModem</code> index also documents the Samsung backdoor research</li>
+</ul>
+<p>  (SamsungGalaxyBackdoor — the nonfree RIL side), ModemIsolationResearch,</p>
+<p>  BackupTheEFS, and the Wireshark dissector (SamsungIpcDissector).</p>
+<p>Modem status summary: **the load protocol and userspace are free</p>
+<p>(libsamsung-ipc); the modem firmware itself (XMM6260 MAIN section) is the</p>
+<p>nonfree blob**, delivered from the radio partition at every boot by the</p>
+<p>free loader. The firmware bytes are device-resident (radio partition) and</p>
+<p>are NOT re-RE'd here per the task brief and RULE 0 (Replicant's</p>
+<p>documentation covers the container; the code inside is the same class of</p>
+<p>[OPEN] as every modem code segment).</p>
+<p>nv_data (<code>/efs/nv_data.bin</code>): the IMEI/RF NV handled by libsamsung-ipc's</p>
+<p><code>nv_data_*</code> (documented in BackupTheEFS) — per-device secret-class data,</p>
+<p>not part of any repo census.</p>
+<h2>4. What the m0 set adds to the program</h2>
+<ul>
+<li>The <strong>Samsung-IPC universe</strong> (S2/S3/Note/Note2/Nexus/Tab2/Note8 + the</li>
+</ul>
+<p>  Meizu Pro 5 and Shannon-era devices in the queue) has a free host stack</p>
+<p>  and a documented firmware container — the lab's per-device delta for the</p>
+<p>  rest of that universe is exactly this kind of census (pins + container</p>
+<p>  facts), not protocol RE.</p>
+<ul>
+<li>The <strong>Broadcom SDIO WiFi family</strong> census now spans 4330/4334/4339 across</li>
+</ul>
+<p>  three devices (m0/m0-4334, hammerhead-4339, m0-comparison-4330) — a</p>
+<p>  clean-room brcm SDIO-firmware parser + nvram generator is the natural</p>
+<p>  next implementation target [OPEN].</p>
+<ul>
+<li>pmOS's BL1 note is the concrete Exynos free-bootloader hook (U-Boot on</li>
+</ul>
+<p>  Midas exists upstream — <code>dmarszk/exynos4_uboot</code> is the packaging repo).</p>
+<h2>5. Files created (this directory)</h2>
+<ul>
+<li><code>analysis.md</code> (this file)</li>
+<li><code>m0-blob-census.csv</code> — fetched files with md5 + pinned source</li>
+</ul>
+<p>Scratch (regeneratable): <code>/tmp/astro_w/payloads/m0/</code>,</p>
+<p><code>/tmp/astro_w/web/rep_*.txt</code> (Replicant wiki exports), pmaports APKBUILDs</p>
+<p>in <code>/tmp/astro_w/web/</code>. Payload bytes NOT committed.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

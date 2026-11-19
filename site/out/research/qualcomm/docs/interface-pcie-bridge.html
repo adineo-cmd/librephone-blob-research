@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The WPSS &quot;PCIe bridge&quot; — WCN6750 transport stack (FP6) — for upstream issue #37 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>The WPSS &quot;PCIe bridge&quot; — WCN6750 transport stack (FP6) — for upstream issue #37</h1><p>One-page research note from **public data + lab-derived facts**</p><p>Evidence: none</p>
+<h1>The WPSS "PCIe bridge" — WCN6750 transport stack (FP6) — for upstream issue #37</h1>
+<p>One-page research note from <strong>public data + lab-derived facts</strong></p>
+<p>(<a href="https://codeberg.org/rsavoye/librephone/issues/37">upstream issue #37</a>:</p>
+<p>"identify if one of the WPSS blobs is the PCIe bridge, and which file</p>
+<p>it is"). Written 2026-11-16.</p>
+<p><strong>Legend:</strong> [PUBLIC] = public fact; [LAB] = lab-derived, committed doc</p>
+<p>cited; [OPEN] = needs data not available on this box.</p>
+<h2>1. Answer available now</h2>
+<p>**The "PCIe bridge" is not a separate blob file — it is a firmware</p>
+<p>function inside the single wpss MDT image**, and the software bridge</p>
+<p>that plays the PCIe host role on Linux runs in the kernel vendor</p>
+<p>module (ICNSS/IPCI), not in the blob. Component by component:</p>
+<ul>
+<li>[LAB] The wpss firmware is <strong>one</strong> Hexagon MDT image</li>
+</ul>
+<p>  (<code>wpss.mdt</code> + <code>.b00–.b12</code>, e_machine 164, executable code segments</p>
+<p>  b01/b02/b03/b05/b06) containing one embedded ELF32 RISC-V executable</p>
+<p>  (<code>wpss.b07</code>, QURT RTOS, e_machine 243, entry 0x404000) —</p>
+<p>  <code>qualcomm-fp6/docs/fp6-architecture-census.md</code> +</p>
+<p>  <code>qualcomm-fp6/docs/wpss-qurt-rtos.md</code> (F-5/F-8/F-20/F-22). There is</p>
+<p>  no second image that could be "the bridge".</p>
+<ul>
+<li>[LAB] The endpoint-side transport behaviors live in that image: the</li>
+</ul>
+<p>  F-8 transport finding records PCIe-style semantics at the WPSS</p>
+<p>  boundary (WAKE# GPIO handshake + doorbell/IPC buffers), and the</p>
+<p>  committed WMI dispatch paper documents what the Hexagon segments do</p>
+<p>  with the traffic once it arrives (<code>papers/wmi-dispatch-architecture.md</code>).</p>
+<ul>
+<li>[PUBLIC] On the Linux side the vendor wlan stack talks through the</li>
+</ul>
+<p>  <strong>ICNSS2/IPCI</strong> platform layer — upstream's own transport doc was</p>
+<p>  corrected to exactly this in commit <code>b75b158f</code> "docs: correct</p>
+<p>  WCN6750 transport to IPCI/ICNSS2" (2026-11-01), and PR #58's author</p>
+<p>  (L123123) implements the endpoint/bridge role in <strong>software</strong></p>
+<p>  (BHI load, MHI slave, QRTR v1, WLFW stub) for the free replacement,</p>
+<p>  confirming the role split: the real "bridge" is partly kernel</p>
+<p>  emulation, partly blob firmware.</p>
+<ul>
+<li>[PUBLIC] Issue #56's own capture shows <code>lspci</code> enumerating the</li>
+</ul>
+<p>  WCN6750 as a PCI device (Device 0x1105) — expected, because the</p>
+<p>  host kernel side presents a (fake) PCIe function; Android's "no PCIe</p>
+<p>  devices" premise in #37 matches: ICNSS2 is a platform driver that</p>
+<p>  emulates the PCIe attach for MHI.</p>
+<h2>2. Which file implements which piece (current state)</h2>
+<table>
+<tr>
+<th>piece</th>
+<th>location</th>
+<th>evidence class</th>
+</tr>
+<tr>
+<td>PCIe-style wake/doorbell semantics</td>
+<td>wpss image (b06 Hexagon dispatch segments; b07 RV32 QURT app)</td>
+<td>[LAB] F-8</td>
+</tr>
+<tr>
+<td>WMI command processing after transport</td>
+<td>wpss.b06 dispatch (registry of 225 records)</td>
+<td>[LAB] WMI paper</td>
+</tr>
+<tr>
+<td>"PCIe" host presentation + MHI</td>
+<td>kernel vendor ICNSS2/IPCI + MHI (public wlan module tree)</td>
+<td>[PUBLIC]</td>
+</tr>
+<tr>
+<td>Endpoint/MHI/QRTR re-implementation (free)</td>
+<td>PR #58 payload</td>
+<td>[PUBLIC]</td>
+</tr>
+<tr>
+<td>Exact segment that implements the endpoint emulator</td>
+<td><strong>[OPEN]</strong> — needs disassembly of b01/b02/b03/b05 Hexagon segments; binaries not on this box (see wants-matrix A-13 "blocked part")</td>
+<td>—</td>
+</tr>
+</table>
+<h2>3. What would close the [OPEN] cell (not runnable here)</h2>
+<ol>
+<li>Re-fetch the FP6 wpss segments (<code>modem/image/qca6750/wpss.b0*</code> from</li>
+</ol>
+<p>   the public nightly — sizes/hashes already in</p>
+<p>   <code>qualcomm-fp6/results/census.md</code>).</p>
+<ol>
+<li>Disassemble the four executable Hexagon segments with Ghidra</li>
+</ol>
+<p>   12.2's public Hexagon module (the lab's validated tool, F-28); look</p>
+<p>   for MHI/doorbell/WAKE register offsets and the QRTR/IPC buffer</p>
+<p>   handlers.</p>
+<ol>
+<li>Cross-check register offsets against the public ath11k MHI/BHI</li>
+</ol>
+<p>   register map (<code>drivers/net/wireless/ath/ath11k/mhi.c</code>, <code>bhie</code>,</p>
+<p>   <code>mhi</code> — mainline).</p>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>Upstream issues #37, #56 (bodies via Codeberg API), PR #58 thread</li>
+</ul>
+<p>  summary in <code>upstream-contribution/librephone-wants.md</code> rows D-1/A-24</p>
+<ul>
+<li>Commit <code>b75b158f</code> (cited in librephone-wants.md; fetched there</li>
+</ul>
+<p>  2026-11-15)</p>
+<ul>
+<li>Lab: <code>qualcomm-fp6/docs/fp6-architecture-census.md</code>,</li>
+</ul>
+<p>  <code>wpss-qurt-rtos.md</code>, <code>papers/wmi-dispatch-architecture.md</code>,</p>
+<p>  <code>results/census.md</code></p>
+<p><strong>Clean-room statement:</strong> identification is stated only where</p>
+<p>committed evidence exists; the segment-level pin is marked open, not</p>
+<p>guessed.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 (enchilada) — GPU firmware family — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 (enchilada) — GPU firmware family</h1><p>**Evidence class: census** (payload extracted, files hashed; no ISA decode this session).</p><p>Evidence: none</p>
+<h1>OnePlus 6 (enchilada) — GPU firmware family</h1>
+<p><strong>Evidence class: census</strong> (payload extracted, files hashed; no ISA decode this session).</p>
+<p>Source: LineageOS 22.2 nightly 2026-11-11 for enchilada, payload partition <code>vendor</code></p>
+<p>(<code>/vendor/firmware</code>, mount root <code>/firmware</code>), extracted 2026-11-16; sha256 per file in</p>
+<p><a href="../../../../tools/fleet/phase1_build.py">tools/fleet/phase1_build.py</a>.</p>
+<h2>Container layout</h2>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>magic</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>a630_gmu.bin</code></td>
+<td>32,768</td>
+<td>raw</td>
+<td>Adreno 630 GMU microcode</td>
+</tr>
+<tr>
+<td><code>a630_sqe.fw</code></td>
+<td>32,136</td>
+<td>raw</td>
+<td>Adreno 630 SQE microcode</td>
+</tr>
+<tr>
+<td><code>a630_zap.b00</code></td>
+<td>148</td>
+<td>elf32-le</td>
+<td>zap shader MDT segment 0</td>
+</tr>
+<tr>
+<td><code>a630_zap.b01</code></td>
+<td>6,536</td>
+<td>elf32-le</td>
+<td>zap MDT segment 1</td>
+</tr>
+<tr>
+<td><code>a630_zap.b02</code></td>
+<td>1,968</td>
+<td>elf32-le</td>
+<td>zap MDT segment 2</td>
+</tr>
+<tr>
+<td><code>a630_zap.mdt</code></td>
+<td>6,684</td>
+<td>elf32-le</td>
+<td>zap MDT ELF header</td>
+</tr>
+<tr>
+<td><code>a630_zap.elf</code></td>
+<td>14,256</td>
+<td>elf32-le</td>
+<td>zap monolithic ELF</td>
+</tr>
+</table>
+<p>The MDT/bNN split matches the lab's FP6 boot-chain census pattern</p>
+<p>(<a href="research/qualcomm/docs/bootchain-census.html">qualcomm-fp6/docs/bootchain-census.md</a>):</p>
+<p>one ELF header (<code>.mdt</code>) plus numbered segment payloads (<code>.bNN</code>), here for the</p>
+<p>zap shader rather than the boot chain.</p>
+<h2>Leverage link (top-20)</h2>
+<p><code>a630_gmu.bin</code> 32,768 B and <code>a630_sqe.fw</code> 32,136 B are the identical</p>
+<p>filename+size classes of recon.md top-20 entries #10 (a619_gmu, ×24) and</p>
+<p>#18 (a630_sqe.fw, ×19). Whether the OnePlus 6 build's bytes equal the</p>
+<p>fleet-shared md5s is checked by joining this census's sha256 against the</p>
+<p>matrix md5 in a future pass (the upstream DB lists md5 only; conversion</p>
+<p>requires payload access per device — open item).</p>
+<h2>ISA/proof status</h2>
+<p>Not decoded this session. Public context: Adreno microcode ISA is</p>
+<p>undocumented; SQE/GMU analysis exists nowhere public at decode level</p>
+<p>(RULE 0 search 2026-11-16: `"bm2n" bin adsp firmware reverse engineering</p>
+<p>qualcomm` and the GPU-adjacent results — linux-msm/hexagon-dsp-binaries,</p>
+<p>TR25, SRLabs — cover DSP <code>.bXX</code> split bins, not GPU microcode).</p>
+<h2>Interface facts</h2>
+<p>Consumer: mainline <code>drivers/gpu/drm/msm/adreno</code> loads <code>a630_zap</code> via</p>
+<p><code>zap_shader</code> and the GMU microcode via the GMU boot path</p>
+<p>(<code>a6xx_gmu</code> code, public kernel — file names <code>a630_gmu.bin</code>/<code>a630_sqe.fw</code></p>
+<p>are its load table entries). No per-blob interface doc committed yet.</p>
+<h2>Open questions</h2>
+<ul>
+<li>sha256 ↔ fleet md5 join (needs the same LineageOS build family extracted</li>
+</ul>
+<p>  for the 16-24 other a630/a619-carrying devices in the half)</p>
+<ul>
+<li>GMU/SQE microcode ISA (Hexagon-family micro-ISA, undocumented)</li>
+<li>zap shader ISA (RV32? a630-generation zap is Hexagon QDSP6 per public</li>
+</ul>
+<p>  msm driver comments — unverified here)</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

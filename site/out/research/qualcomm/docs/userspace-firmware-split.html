@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User space vs loaded firmware (Fairphone FP6) — for upstream issue #19 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>User space vs loaded firmware (Fairphone FP6) — for upstream issue #19</h1><p>Answer to [upstream issue #19](https://codeberg.org/rsavoye/librephone/issues/19)</p><p>Evidence: none</p>
+<h1>User space vs loaded firmware (Fairphone FP6) — for upstream issue #19</h1>
+<p>Answer to <a href="https://codeberg.org/rsavoye/librephone/issues/19">upstream issue #19</a></p>
+<p>("Identify what code is run in user space vs loaded firmware", High</p>
+<p>Priority): the split table of <strong>which function lives where</strong> for every</p>
+<p>firmware family on the FP6, from the lab's committed censuses + public</p>
+<p>kernel sources. Written 2026-11-16.</p>
+<p><strong>Legend:</strong> [PUBLIC] = public-kernel fact, source cited; [LAB] =</p>
+<p>lab-derived fact from committed censuses (all in <code>qualcomm-fp6/docs/</code> +</p>
+<p><code>results/</code>); [OPEN] = not establishable from data available here.</p>
+<h2>1. The issue's assumption, answered first</h2>
+<p>The issue assumes "the AARCH64 executable in the modem.img blob is</p>
+<p>potentially the user space part". <strong>It is not.</strong> The AArch64</p>
+<p>executables inside <code>modem/image/</code> (soter64, smplap64, focal64,</p>
+<p>hdcp1/2p2, evautil64, the UUID-named TAs, ...) are **QSEE trusted</p>
+<p>applications — TrustZone-side firmware**, loaded through</p>
+<p><code>qseecom</code>/SCM, not through the kernel's PIL path and not by the</p>
+<p>Android user session:</p>
+<ul>
+<li>[LAB] The trustzone census identifies them by string inventory as</li>
+</ul>
+<p>  TAs (QSEE/GlobalPlatform vocabulary, <code>.mdt+.bXX</code> splits), size/hash</p>
+<p>  rows in <code>qualcomm-fp6/results/census.md</code>.</p>
+<ul>
+<li>[PUBLIC] Mainline's <code>drivers/tee/qcom/qseecom.c</code> loads QSEE app</li>
+</ul>
+<p>  images via SCM calls — TA images are the userspace side of that ABI</p>
+<p>  in the sense of <em>client</em>, but the code itself executes in the secure</p>
+<p>  world, never as Android user-space code.</p>
+<ul>
+<li>Consistent with the maintainer's own finding on issue #33</li>
+</ul>
+<p>  (2026-07-22): these files "never get loaded at boot time" by an</p>
+<p>  instrumented <code>mdt_loader.c</code> — because their loader is qseecom, not</p>
+<p>  the PIL remoteproc loader.</p>
+<p><strong>The actual user space</strong> vendor code on this device lives in</p>
+<p><code>vendor.img</code>/<code>system</code> (HAL executables and <code>.so</code>s, e.g.</p>
+<p><code>vendor.qti.bluetooth@1.x</code>), which is a separate partition family from</p>
+<p>the firmware images — and is <em>also</em> proprietary on the stock device.</p>
+<p>The kernel-side drivers are the free, mainline-able middle layer.</p>
+<h2>2. The split table, per firmware family</h2>
+<table>
+<tr>
+<th>family</th>
+<th>user space (what runs there)</th>
+<th>kernel (mainline-able drivers)</th>
+<th>loaded firmware (the blob)</th>
+<th>driver↔blob boundary</th>
+</tr>
+<tr>
+<td>Bluetooth</td>
+<td>free: BlueZ/btuserland; stock: Qualcomm vendor BT HAL (patch download + chipset tables) [LAB]</td>
+<td><code>hci_uart</code>/<code>hci_qca</code> + <code>btqca</code> — fully mainline, free [PUBLIC]</td>
+<td>WCN6750 ROM + rampatch msbtfw11/12 (<strong>ARM32 Thumb</strong>) + EVROS family mainline cannot name [LAB]</td>
+<td>UART HCI + EDL download opcodes 0xFC00/0xFC48; IBS sleep 0xFE/0xFD/0xFC — see <a href="research/qualcomm/docs/interface-bt.html">interface-bt.md</a></td>
+</tr>
+<tr>
+<td>WiFi</td>
+<td>wpa_supplicant (free) + Android HAL [PUBLIC]</td>
+<td><code>ath11k</code> (mainline, WCN6750_HW10 supported) or vendor qcacld LKM [PUBLIC]</td>
+<td>wpss image: Hexagon (DSP6) code segments + one embedded ELF32 <strong>RV32 QURT</strong> app (wpss.b07) [LAB]</td>
+<td>IPCI/ICNSS2 PCIe-style platform + MHI + WMI/HTT/CE; the WMI dispatch spec is the lab's papers/wmi-dispatch-architecture.md</td>
+</tr>
+<tr>
+<td>Modem (cellular)</td>
+<td>RIL daemon (stock proprietary; free alternative = oFono/ModemManager speaking QRTR/QMI) [PUBLIC]</td>
+<td><code>mdt_loader</code> + <code>qcom_q6v5_mss</code> + GLINK/rpmsg + <code>qrtr</code> + QMI + <code>rmnet</code> — all mainline [PUBLIC]</td>
+<td>modem.mdt + modem.b00–b30 (<strong>Hexagon</strong>, e_machine 164) + milos/qdsp6m.qdb + per-carrier mcfg payloads [LAB]</td>
+<td>PAS authentication via SCM; GLINK/SMEM channels → QRTR → QMI — see <a href="research/qualcomm/docs/interface-cellular.html">interface-cellular.md</a></td>
+</tr>
+<tr>
+<td>TrustZone / TAs</td>
+<td>TEE client libraries only (KeyMint/gatekeeper HALs talk to TAs, never execute their code) [PUBLIC]</td>
+<td><code>drivers/tee/qcom/qseecom.c</code> (mainline since v6.8-era) [PUBLIC]</td>
+<td>tz.img (QTEE OS, AArch64, 45 phdrs), hyp.img (QHEE, PIE entry 0x80000000), keymaster/devcfg/uefisecapp/featenabler (AArch64 PIE), modem/image UUID TAs [LAB]</td>
+<td>SCM call interface via qseecom ioctl; census-only policy per trustzone-census.md</td>
+</tr>
+<tr>
+<td>DSPs (adsp/cdsp)</td>
+<td>FastRPC user libraries (stock proprietary <code>.so</code>s) [PUBLIC]</td>
+<td><code>fastrpc</code> char devices + <code>qcom_q6v5_pas</code> remoteproc — mainline [PUBLIC]</td>
+<td>adsp.img / cdsp.img (<strong>Hexagon</strong>) + bm2nXX-region payloads in <code>vendor/lib/rfsa/adsp</code> [LAB]</td>
+<td>FastRPC ioctls (compute offload), PAS auth (load)</td>
+</tr>
+<tr>
+<td>Boot chain</td>
+<td>none — runs before any OS [LAB]</td>
+<td>none (kernel is itself loaded by this chain) [LAB]</td>
+<td>xbl (3-ELF container: RV32 + AArch64), xbl_config, shrm/aop/aop_config/cpucp (<strong>RV32</strong>), qupfw (<strong>Hexagon per header</strong>), uefi (AArch64 FV), abl (ARM32), xbl_ramdump (AArch64) [LAB]</td>
+<td>PBL → XBL → UEFI → ABL → Linux; AVB verification from vbmeta down (bootchain-census.md)</td>
+</tr>
+<tr>
+<td>AVB / verified boot</td>
+<td>avbctl/userspace verity toggles; LineageOS userdebug sets vbmeta flags=3 (hashtree + verification disabled) [LAB]</td>
+<td>dm-verity + <code>qcom,rmtfs</code> style helpers [PUBLIC]</td>
+<td>vbmeta.img + vbmeta_system.img (SHA256_RSA4096 descriptors; rollback_index = security-patch epoch date) [LAB]</td>
+<td>vbmeta descriptors → partition hashes; OEM signing chain ends at Fairphone's "T2MO OEM Key" [LAB]</td>
+</tr>
+<tr>
+<td>Protected VMs</td>
+<td>crosvm/pVM framework (Android 16 side) [PUBLIC]</td>
+<td>Gunyah drivers: only <code>gunyah_wdt.c</code> in mainline; VM lifecycle stack ships with vendor kernels [PUBLIC]</td>
+<td>pvmfw.img (raw AArch64 machine code, AVB-verified via vbmeta_system descriptor) [LAB]</td>
+<td>Gunyah SMCCC calls; see <a href="research/qualcomm/docs/interface-gunyah.html">interface-gunyah.md</a></td>
+</tr>
+<tr>
+<td>NFC</td>
+<td>NFC HAL (<code>libnfc-nci</code>) [PUBLIC]</td>
+<td><code>drivers/nfc/*</code> (in-kernel) [PUBLIC]</td>
+<td>firmware inside the NFC controller (no image file in the censused partitions) [LAB]</td>
+<td>NCI + vendor fw-download opcodes — see <a href="research/qualcomm/docs/interface-nfc.html">interface-nfc.md</a></td>
+</tr>
+</table>
+<h2>3. The three-layer rule this table instantiates</h2>
+<p>For every family on this platform the same shape holds — worth stating</p>
+<p>as the answer's headline:</p>
+<ol>
+<li><strong>User space</strong> = Android HALs/vendor daemons (proprietary on stock,</li>
+</ol>
+<p>   replaceable by free equivalents <em>that speak the kernel interface</em> —</p>
+<p>   BlueZ, wpa_supplicant, oFono/ModemManager over QRTR). None of the</p>
+<p>   firmware images' code runs here.</p>
+<ol>
+<li><strong>Kernel</strong> = load/auth/transport drivers, all mainline or</li>
+</ol>
+<p>   mainline-able (mdt_loader/PAS, qseecom, hci_qca/btqca, ath11k,</p>
+<p>   fastrpc, qrtr). This layer is the stable, documentation-able</p>
+<p>   surface — the part librephone's doc set (wifi-driver-interface.md,</p>
+<p>   the planned BT/NFC/cellular docs) already targets.</p>
+<ol>
+<li><strong>Firmware</strong> = the signed images: user-space-vs-firmware is not one</li>
+</ol>
+<p>   binary split but one per remote processor, each with its own loader</p>
+<p>   (PIL/mdt_loader for Hexagon/PIL processors, qseecom for TAs,</p>
+<p>   hci_qca EDL for BT, ICNSS2/MHI for wpss, UEFI/XBL for the boot</p>
+<p>   chain). The ISA map (who executes what) is the lab's</p>
+<p>   fp6-architecture-census.md + bootchain-census.md: Hexagon (modem,</p>
+<p>   adsp, cdsp, qupfw, wpss code segments), RV32 (wpss.b07, shrm, aop,</p>
+<p>   aop_config, cpucp, xbl-inner), ARM32 (BT rampatch, abl),</p>
+<p>   AArch64 (QTEE/QHEE/TAs, uefi, xbl core).</p>
+<p>[OPEN] The modem's own internal user/kernel-ish split (Hexagon-side</p>
+<p>QURT processes vs the "AARCH64 executable" the issue hypothesized)</p>
+<p>needs Hexagon disassembly capacity — stated as open in</p>
+<p>interface-cellular.md rather than guessed.</p>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>Lab committed censuses: <code>qualcomm-fp6/docs/{bt-firmware-census,bootchain-census,trustzone-census,fp6-architecture-census,interface-cellular,interface-bt,interface-nfc,interface-gunyah}.md</code>, <code>qualcomm-fp6/results/census.md</code> (665-file census), <code>results/bootchain-census.json</code>, <code>results/bt-tz-census.json</code></li>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/remoteproc/qcom_q6v5_pas.c (fetched 2026-11-16 — PAS processor list incl. <code>qcom,milos-*-pas</code>)</li>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/tee/qcom/ (qseecom; existence per the trustzone census kernel cross-reference)</li>
+<li>Issue #33 thread (maintainer's own mdt_loader instrumentation, 2026-07-22) — the negative evidence the TAs never pass through PIL</li>
+</ul>
+<p><strong>Clean-room statement:</strong> lab census facts + public-kernel facts only;</p>
+<p>no proprietary content, no disassembly beyond committed entry-sanity</p>
+<p>checks, no key material.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

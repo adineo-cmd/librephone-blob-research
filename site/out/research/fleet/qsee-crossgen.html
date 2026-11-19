@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QSEE cross-generation analysis: tz.img (SDM845 vs SM8250), fastrpc embedded-ELF validation, a660 GMU table — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>QSEE cross-generation analysis: tz.img (SDM845 vs SM8250), fastrpc embedded-ELF validation, a660 GMU table</h1><p>Workorder: WORKORDER-001 (desktop fleet RE). Analysis date: 2026-11-18.</p><p>Evidence: none</p>
+<h1>QSEE cross-generation analysis: tz.img (SDM845 vs SM8250), fastrpc embedded-ELF validation, a660 GMU table</h1>
+<p>Workorder: WORKORDER-001 (desktop fleet RE). Analysis date: 2026-11-18.</p>
+<p>Prior evidence: <code>blob-matrix/desktop/fleet-re/dsp-tz-map.md</code> (OP6 tz.img seg table, dsp.img census).</p>
+<p>Machine-readable evidence: <code>analysis/out/qsee-crossgen.json</code> (+ <code>qsee-map-enchilada.json</code>, <code>qsee-map-instantnoodle.json</code>, <code>qsee-meta-enchilada.json</code>, <code>qsee-meta-instantnoodle.json</code>, <code>qsee-meta-regions-*.json</code>, <code>fastrpc-embedded-elf.json</code>).</p>
+<p>Scripts: <code>analysis/tools/qsee_tz_map.py</code>, <code>qsee_metadata_decode.py</code>, <code>qsee_meta_probe.py</code>, <code>fastrpc_embedded_check.py</code>, <code>gmu_block_parse.py</code>, <code>qsee_crossgen_build.py</code>.</p>
+<p>Evidence classes: <strong>F</strong> = measured fact, <strong>I</strong> = interpretation, <strong>H</strong> = hypothesis, <strong>N</strong> = negative.</p>
+<p>Inputs (sha256, F):</p>
+<table>
+<tr>
+<th>file</th>
+<th>size</th>
+<th>sha256</th>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/tz.img</code> (OnePlus 6, SDM845)</td>
+<td>2,056,192</td>
+<td><code>2d133bda...d16baca</code></td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/tz.img</code> (OnePlus 8, SM8250)</td>
+<td>3,194,880</td>
+<td><code>c75d2bd2...7018603</code></td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/dsp.img</code></td>
+<td>33,554,432</td>
+<td><code>ed96e09f...dd666019</code></td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/larry/tree-vendor/firmware/a660_gmu.bin</code></td>
+<td>55,256</td>
+<td><code>6bb9360a...40c94e2b</code></td>
+</tr>
+</table>
+<p>Both tz.img are from official LineageOS nightlies (enchilada 2026-11-11; instantnoodle <code>lineage-24.0-20261117-nightly-instantnoodle-signed.zip</code>).</p>
+<h2>1. instantnoodle tz.img — full ELF map (F)</h2>
+<p>ELF64 LSB <strong>ET_EXEC</strong>, <code>e_machine</code> 183 (AArch64), <code>e_entry</code> <strong>0x14680000</strong> (identical to OP6), phoff 64, phentsize 56, <strong>phnum 23</strong>, no section headers (e_shoff 0). <code>e_entry</code> == seg[3].p_vaddr.</p>
+<p>seg[0] PT_NULL filesz 1,352 = exactly 64 + 23x56 (ehdr + phdrs, same pattern as OP6's 1,016 = 64 + 17x56).</p>
+<table>
+<tr>
+<th>#</th>
+<th>type</th>
+<th>flags</th>
+<th>offset</th>
+<th>vaddr</th>
+<th>filesz</th>
+<th>memsz</th>
+<th>nonzero B</th>
+<th>entropy</th>
+</tr>
+<tr>
+<td>0</td>
+<td>PT_NULL</td>
+<td>---</td>
+<td>0x0</td>
+<td>0x0</td>
+<td>1352</td>
+<td>0</td>
+<td>326</td>
+<td>2.056</td>
+</tr>
+<tr>
+<td>1</td>
+<td>PT_NULL</td>
+<td>---</td>
+<td>0x1000</td>
+<td>0x1c3d6000</td>
+<td>20800</td>
+<td>24576</td>
+<td>20385</td>
+<td>3.961</td>
+</tr>
+<tr>
+<td>2</td>
+<td>PT_LOAD</td>
+<td>---</td>
+<td>0x7000</td>
+<td>0x0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>3</td>
+<td>PT_LOAD</td>
+<td>RWX</td>
+<td>0x7000</td>
+<td>0x14680000</td>
+<td>51380</td>
+<td>51380</td>
+<td>37198</td>
+<td>5.871</td>
+</tr>
+<tr>
+<td>4</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x14000</td>
+<td>0x1468d000</td>
+<td>8836</td>
+<td>8836</td>
+<td>131</td>
+<td>0.171</td>
+</tr>
+<tr>
+<td>5</td>
+<td>PT_LOAD</td>
+<td>RWX</td>
+<td>0x17000</td>
+<td>0x14690000</td>
+<td>6088</td>
+<td>6088</td>
+<td>3510</td>
+<td>4.690</td>
+</tr>
+<tr>
+<td>6</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x19000</td>
+<td>0x14692000</td>
+<td>6552</td>
+<td>6552</td>
+<td>5</td>
+<td>0.011</td>
+</tr>
+<tr>
+<td>7</td>
+<td>PT_LOAD</td>
+<td>R-X</td>
+<td>0x1b000</td>
+<td>0x1c018000</td>
+<td>39936</td>
+<td>39936</td>
+<td>31577</td>
+<td>6.244</td>
+</tr>
+<tr>
+<td>8</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x25000</td>
+<td>0x1c022000</td>
+<td>51584</td>
+<td>51584</td>
+<td>1172</td>
+<td>0.284</td>
+</tr>
+<tr>
+<td>9</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x32000</td>
+<td>0x1c02f000</td>
+<td>41088</td>
+<td>41088</td>
+<td>10686</td>
+<td>2.022</td>
+</tr>
+<tr>
+<td>10</td>
+<td>PT_LOAD</td>
+<td>RWX</td>
+<td>0x3d000</td>
+<td>0x1c03b000</td>
+<td>915988</td>
+<td>915988</td>
+<td>812790</td>
+<td>6.612</td>
+</tr>
+<tr>
+<td>11</td>
+<td>PT_LOAD</td>
+<td>R--</td>
+<td>0x11d000</td>
+<td>0x1c11b000</td>
+<td>215760</td>
+<td>215760</td>
+<td>79646</td>
+<td>3.565</td>
+</tr>
+<tr>
+<td>12</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x152000</td>
+<td>0x1c150000</td>
+<td>721664</td>
+<td>721664</td>
+<td>78119</td>
+<td>0.962</td>
+</tr>
+<tr>
+<td>13</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x203000</td>
+<td>0x1c281000</td>
+<td>74296</td>
+<td>380928</td>
+<td>30648</td>
+<td>3.265</td>
+</tr>
+<tr>
+<td>14</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x216000</td>
+<td>0x1c2de000</td>
+<td>65536</td>
+<td>65536</td>
+<td>27554</td>
+<td>2.817</td>
+</tr>
+<tr>
+<td>15</td>
+<td>PT_LOAD</td>
+<td>R--</td>
+<td>0x226000</td>
+<td>0x1c2ee000</td>
+<td>65536</td>
+<td>65536</td>
+<td>20824</td>
+<td>2.184</td>
+</tr>
+<tr>
+<td>16</td>
+<td>PT_LOAD</td>
+<td>R--</td>
+<td>0x236000</td>
+<td>0x1c300000</td>
+<td>197</td>
+<td>197</td>
+<td>170</td>
+<td>5.400</td>
+</tr>
+<tr>
+<td>17</td>
+<td>PT_LOAD</td>
+<td>R-X</td>
+<td>0x237000</td>
+<td>0x1c301000</td>
+<td>347220</td>
+<td>347220</td>
+<td>320932</td>
+<td>7.133</td>
+</tr>
+<tr>
+<td>18</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x28c000</td>
+<td>0x1c356000</td>
+<td>2968</td>
+<td>2968</td>
+<td>1200</td>
+<td>3.410</td>
+</tr>
+<tr>
+<td>19</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x28d000</td>
+<td>0x1c357000</td>
+<td>23744</td>
+<td>23744</td>
+<td>15022</td>
+<td>4.776</td>
+</tr>
+<tr>
+<td>20</td>
+<td>PT_LOAD</td>
+<td>R-X</td>
+<td>0x293000</td>
+<td>0x1c35d000</td>
+<td>447232</td>
+<td>447232</td>
+<td>399347</td>
+<td>6.854</td>
+</tr>
+<tr>
+<td>21</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x301000</td>
+<td>0x1c3cb000</td>
+<td>5136</td>
+<td>5136</td>
+<td>1220</td>
+<td>2.216</td>
+</tr>
+<tr>
+<td>22</td>
+<td>PT_LOAD</td>
+<td>RW-</td>
+<td>0x303000</td>
+<td>0x1c3cd000</td>
+<td>32832</td>
+<td>32832</td>
+<td>16368</td>
+<td>4.080</td>
+</tr>
+</table>
+<p>Two-region structure (F): same shape as OP6 — <strong>0x14680000</strong> (segs 3-6, entry region) + <strong>0x1c018000-0x1c3d6000</strong> (segs 7-22 + metadata seg[1] at the end, vaddr 0x1c3d6000).</p>
+<p>seg[1] = QSEE metadata segment: PT_NULL, filesz 20,800 B at file offset 0x1000, memsz 24,576.</p>
+<p>Version strings (F), located in seg[12] (RW @0x1c150000, same segment role as OP6):</p>
+<ul>
+<li>file offset 1,471,832: <code>QC_IMAGE_VERSION_STRING=TZ.XF.5.8-00274</code></li>
+<li>file offset 1,471,872: <code>IMAGE_VARIANT_STRING=DARAANAAA</code></li>
+<li>file offset 1,471,903: <code>OEM_IMAGE_VERSION_STRING=CRM</code></li>
+</ul>
+<p><strong>SM8250 TZ version triple: TZ.XF.5.8-00274 / DARAANAAA / CRM</strong> (vs SDM845: TZ.XF.5.0.1.C5-00083.1 / WAXAANAAA / CRM).</p>
+<h2>2. Cross-generation QSEE container table (F unless noted)</h2>
+<table>
+<tr>
+<th>property</th>
+<th>OP6 enchilada (SDM845)</th>
+<th>OP8 instantnoodle (SM8250)</th>
+<th>shared?</th>
+</tr>
+<tr>
+<td>e_type / e_machine</td>
+<td>ET_EXEC / AArch64</td>
+<td>ET_EXEC / AArch64</td>
+<td>shared</td>
+</tr>
+<tr>
+<td>e_entry</td>
+<td>0x14680000</td>
+<td>0x14680000</td>
+<td><strong>shared (identical)</strong></td>
+</tr>
+<tr>
+<td>phnum</td>
+<td>17</td>
+<td>23</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>seg[0] (ehdr+phdrs, PT_NULL)</td>
+<td>1,016 B</td>
+<td>1,352 B</td>
+<td>shared pattern (64 + phnum*56)</td>
+</tr>
+<tr>
+<td>seg[1] metadata (PT_NULL)</td>
+<td>19,992 B filesz / 20,480 memsz @0x1c1e8000</td>
+<td>20,800 B filesz / 24,576 memsz @0x1c3d6000</td>
+<td>shared pattern</td>
+</tr>
+<tr>
+<td>vaddr regions</td>
+<td>0x14680000 + 0x1c000000-0x1c1e8000</td>
+<td>0x14680000 + 0x1c018000-0x1c3d6000</td>
+<td>shared layout, different extents</td>
+</tr>
+<tr>
+<td>entry-region segs</td>
+<td>3-6 (RX,RW,RWX,RW)</td>
+<td>3-6 (RWX,RW,RWX,RW)</td>
+<td>shared</td>
+</tr>
+<tr>
+<td>R-- (PF_R only) segments</td>
+<td>none</td>
+<td>segs 11, 15, 16, 17</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>RWX segments</td>
+<td>seg 5 only</td>
+<td>segs 3, 5, 10</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>real BSS (memsz &gt; filesz)</td>
+<td>seg 16 (0/8,192) only</td>
+<td>seg 13 (74,296/380,928)</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>version strings segment</td>
+<td>seg[12] RW</td>
+<td>seg[12] RW</td>
+<td>shared</td>
+</tr>
+<tr>
+<td>version triple</td>
+<td>TZ.XF.5.0.1.C5-00083.1 / WAXAANAAA / CRM</td>
+<td>TZ.XF.5.8-00274 / DARAANAAA / CRM</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>metadata hash algo</td>
+<td>SHA-256 (32-byte slots)</td>
+<td><strong>SHA-384 (48-byte slots)</strong></td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>hash slots</td>
+<td>17 = phnum</td>
+<td>23 = phnum</td>
+<td>shared pattern</td>
+</tr>
+<tr>
+<td>metadata header size</td>
+<td>40 B</td>
+<td>288 B</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>secboot sig blocks</td>
+<td>2 x 256 B RSA-2048</td>
+<td>2 x 256 B RSA-2048</td>
+<td>shared</td>
+</tr>
+<tr>
+<td>cert chains</td>
+<td>2 groups x 3 certs</td>
+<td>2 groups x 3 certs</td>
+<td>shared pattern</td>
+</tr>
+<tr>
+<td>production root CA</td>
+<td>QSEE Attestation Root CA (self-signed, valid 2015-10-02 to 2045-10-01)</td>
+<td><strong>QSEE Attestation Root CA 2</strong> (self-signed, valid 2017-06-09 to 2047-06-08)</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>production leaf CN</td>
+<td>CASS - CSMS 2.0</td>
+<td>CASS - SBL3</td>
+<td>gen-specific</td>
+</tr>
+<tr>
+<td>test root CA</td>
+<td>QCT Root CA 1, OU "General Use Test Key (for testing 13 only)", O=QUALCOMM</td>
+<td>QCT Root CA 1, OU "General Use Key", <strong>O=OEM</strong></td>
+<td>gen-specific (OEM-owned test root on SM8250)</td>
+</tr>
+<tr>
+<td>test leaf</td>
+<td>SecTools Test User</td>
+<td>SecTools Test User</td>
+<td>shared</td>
+</tr>
+</table>
+<p>Interpretation (I): the container format is stable across the two generations; the metadata internal hash width upgraded SHA-256 -&gt; SHA-384 between SDM845 and SM8250, and SM8250 adds read-only data segments plus an extended 288-byte metadata header.</p>
+<h2>3. QSEE metadata segment layout — decoded (F; first public per our knowledge)</h2>
+<p>Both images' seg[1] decode to the same 8-part structure (offsets are metadata-relative):</p>
+<pre><code>
+[header][hash table][SIG_A 256 B][chainA: 3 X.509 certs][0xFF pad][SIG_B 256 B][chainB: 3 X.509 certs][0xFF pad]
+</code></pre>
+<h3>3.1 Header (F)</h3>
+<p>OP6 (40 B = 10 u32le words): <code>[25, 5, 256, 6144, 19744, 544, 0xFFFFFFFF, 256, 0xFFFFFFFF, 12288]</code></p>
+<p>SM8250 (288 B = 72 u32le words): words 0-11 = <code>[0, 6, 256, 6144, 20304, 1104, 0xFFFFFFFF, 256, 0xFFFFFFFF, 12288, 120, 120]</code>, word 14-20 = <code>[7, 0, 1, 0, 0, 10, 24584]</code>, word 44-50 = <code>[7, 0, 1, 0, 0, 266, 24584]</code>, all other words zero.</p>
+<p>Validated field roles (F, both gens): word[2] = word[7] = 256 = signature block size; word[5] = hash table byte length (544 = 17x32 on OP6; 1,104 = 23x48 on SM8250 — exact); word[4] = word[5] + 19,200 (exact in both). Word[3]=6,144 and word[9]=12,288 are constants across gens (role unknown, H: per-chain size caps). Word[0]/word[1] differ per gen (25/5 vs 0/6, H: secboot metadata version pair). SM8250-only words 10/11 = 120/120 and the two <code>[7,0,1,0,0,X,24584]</code> descriptors are unassigned-role facts; 24,584 = memsz (24,576) + 8.</p>
+<h3>3.2 Hash table — per-phdr SHA slots, fully mapped (F)</h3>
+<ul>
+<li>OP6: table at metadata offset <strong>40</strong>, 17 slots x 32 B, slot[i] = SHA-256 of phdr[i] file content (<code>data[p_offset : p_offset + p_filesz]</code>). Hits measured for phdr 0 and phdrs 3-15 at offsets 40 + 32i. Slots 1 (metadata segment itself), 2 (filesz 0/memsz 0) and 16 (filesz 0, memsz 8,192) are <strong>all-zero</strong>. Hit offsets: 40, 136, 168, ..., 520 (stride 32).</li>
+<li>SM8250: table at metadata offset <strong>288</strong>, 23 slots x 48 B, slot[i] = <strong>SHA-384</strong> of phdr[i] file content. Hits measured for phdr 0 and phdrs 3-22 (21 of 23 slots) at offsets 288 + 48i. Slots 1 (self) and 2 (filesz 0/memsz 0) all-zero.</li>
+</ul>
+<p>Slot count == phdr count in both generations; segments with filesz 0 are stored as zero slots rather than hash-of-zeros (F). sha256/sha384 of the empty string do not appear anywhere in the metadata (N for those variants).</p>
+<p>This is a <strong>first public decode of the QSEE metadata hash-slot mapping</strong>: the table is a per-program-header digest array indexed by phdr index, digest width = 32 B (SHA-256, SDM845) or 48 B (SHA-384, SM8250), byte length recorded in metadata header word[5].</p>
+<h3>3.3 Signature blocks (F for geometry and key binding, I for full-coverage claim)</h3>
+<p>Exactly two 256-byte high-entropy blocks per image, each sitting <strong>immediately before</strong> a cert chain:</p>
+<ul>
+<li>OP6: SIG_A @584 (entropy 7.071) before chainA; SIG_B @6984 (255 non-0xFF bytes + 1 embedded 0xFF byte) before chainB; rest of the two sig regions is 0xFF padding (regions 4,378-7,240 and 10,850-19,992 are 0xFF except the sig bytes; trailing 9,142 B of the segment are pure 0xFF).</li>
+<li>SM8250: SIG_A @1392, SIG_B @7792; trailing 9,531 B pure 0xFF.</li>
+</ul>
+<p>RSA structural check (F): RSA public keys extracted from the leaf certs (2048-bit, e=65537). Decrypting each 256-B block (s^65537 mod n) yields an encoded message whose <strong>last byte is 0xBC</strong> in all four sig/leaf pairings — the RSASSA-PSS encoded-message terminator:</p>
+<table>
+<tr>
+<th>image</th>
+<th>sig</th>
+<th>verified against</th>
+<th>EM tail</th>
+<th>PSS shape</th>
+</tr>
+<tr>
+<td>OP6</td>
+<td>@584</td>
+<td>leaf@840 (CASS - CSMS 2.0)</td>
+<td>0xBC</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>OP6</td>
+<td>@6984</td>
+<td>leaf@7240 (SecTools Test User)</td>
+<td>0xBC</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>OP8</td>
+<td>@1392</td>
+<td>leaf@1648 (CASS - SBL3)</td>
+<td>0xBC</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>OP8</td>
+<td>@7792</td>
+<td>leaf@8048 (SecTools Test User)</td>
+<td>0xBC</td>
+<td>yes</td>
+</tr>
+</table>
+<p>Cross-key controls (wrong leaf key): EM tails 0xE0/0x06/0xB5/0x2E — no 0xBC (F, 4/4 negative controls). So each 256-B block is an RSA-2048 signature bound to the paired chain's leaf key; PSS parameters/salt prevent recovering the signed message bytes, so which exact byte range is signed is (I), not proven. Interpretation: SIG_A = metadata (header+hash table) signature for the production chain, SIG_B = same for the test chain.</p>
+<h3>3.4 X.509 chains (F; DER facts)</h3>
+<p>All six DER units per image parse as complete X.509 certificates (SEQUENCE of tbs+sigalg+sig); all use sigalg OID 2a864886f70d01010a (RSASSA-PSS) and 2,048-bit RSA keys (SPKI keybits 2,168 = DER bit-string overhead included).</p>
+<p>OP6 chainA (production): leaf@840 (1,387 B, valid 190801141737Z-210801141737Z, subject CN "CASS - CSMS 2.0", carries QSEE policy OUs <code>15 0001 OEM_ID_INDEPENDENT</code>, <code>14 0000 USE_SERIAL_NUMBER_IN_SIGNING</code>, <code>13 0001 IN_USE_SOC_HW_VERSION</code>, <code>07 0001 SHA256</code>, <code>06 0000 MODEL_ID</code>, <code>05 00000020 SW_SIZE</code>, <code>04 0001 OEM_ID</code>, <code>03 ... DEBUG</code>, <code>02 6000000000010000 HW_ID</code>, <code>01 ... SW_ID</code>) &lt;- SubCA@2227 (1,096 B, 160304000001Z-260304000001Z, CN "QSEE Attestation Root SubCA 1") &lt;- root@3323 (1,055 B, 151002000001Z-451001235959Z, self-signed "QSEE Attestation Root CA").</p>
+<p>OP6 chainB (test): leaf@7240 (1,320 B, 211125155112Z-411120155112Z, "SecTools Test User" with the same OU policy set, SW_SIZE <code>05 00000248</code>) &lt;- intermediate@8560 (1,137 B, 171222100313Z-371217100313Z, "QUALCOMM Attestation CA") &lt;- root@9697 (1,153 B, 171222100111Z-371217100111Z, self-signed "QCT Root CA 1", OU "General Use Test Key (for testing 13 only)").</p>
+<p>SM8250 chainA (production): leaf@1648 (1,059 B, 211102185026Z-231102185026Z, subject CN "CASS - SBL3", O=QUALCOMM, no policy OUs in subject) &lt;- SubCA@2707 (1,104 B, 170609000001Z-270608235959Z, "QSEE Attestation Root CA 2 SubCA 1") &lt;- root@3811 (1,060 B, 170609000001Z-470608235959Z, self-signed "QSEE Attestation Root CA 2").</p>
+<p>SM8250 chainB (test): leaf@8048 (1,037 B, 240611135825Z-440606135825Z, "SecTools Test User", no policy OUs) &lt;- intermediate@9085 (1,095 B, 191024151003Z-391019151003Z, "OEM Attestation CA", O=OEM) &lt;- root@10180 (1,089 B, 191024150934Z-391019150934Z, self-signed "QCT Root CA 1", OU "General Use Key", <strong>O=OEM</strong> — an OEM-owned test root, vs Qualcomm's own test root on SDM845).</p>
+<p>Issuer/subject CN matching forms a consistent leaf&lt;-intermediate&lt;-root ordering in all four chains (F). SHA-256 of each cert DER does not occur elsewhere in the metadata (N, checked).</p>
+<h2>4. fastrpc embedded ELF magics — verdict: false positive (N)</h2>
+<p>Re-extracted <code>/tmp/dsp-ext4x</code> from <code>data-fetch/enchilada/dsp.img</code> via <code>debugfs -R 'rdump / /tmp/dsp-ext4x'</code> (md5s of all three shells match the prior census). Each shell contains exactly one extra <code>\x7fELF</code> beyond offset 0:</p>
+<table>
+<tr>
+<th>shell</th>
+<th>size</th>
+<th>magic at file offset</th>
+<th>dsp.img abs offset</th>
+<th>implied data start (4K-aligned)</th>
+</tr>
+<tr>
+<td>adsp/fastrpc_shell_0</td>
+<td>873,128</td>
+<td>689,841 (0xa86b1)</td>
+<td>0x6fc6b1</td>
+<td>0x654000</td>
+</tr>
+<tr>
+<td>cdsp/fastrpc_shell_3</td>
+<td>878,584</td>
+<td>694,060</td>
+<td>0x8e572c</td>
+<td>0x83c000</td>
+</tr>
+<tr>
+<td>sdsp/fastrpc_shell_2</td>
+<td>857,208</td>
+<td>677,345</td>
+<td>0x12845e1</td>
+<td>0x11df000</td>
+</tr>
+</table>
+<p>Byte check (F): <code>dsp.img</code> bytes at each briefed abs offset are identical to the shell file bytes at the relative offset (3/3 true).</p>
+<p>Decode (F): the 16 bytes at each magic are <code>7f 45 4c 46 00</code> followed by ASCII <code>bad elf mag...</code> — i.e. the loader's 4-byte ELF magic constant stored as data (<code>\x7fELF\0</code>), immediately followed by its own error string <code>bad elf magic in %s</code> (next string: <code>wrong ELF class %d expected %d in %s</code>). The 512 bytes at the three offsets are byte-identical across all three shells (sha256 prefix <code>7f1351b6...</code>).</p>
+<p><strong>Verdict (N): none of the three briefed magics is a standalone ELF header.</strong> They are the QDSP6 fastrpc loader's ELF-magic compare constant + error-message rodata. No inner/appended images exist in the OP6 fastrpc shells. This closes the open item from dsp-tz-map.md section 6.</p>
+<h2>5. a660_gmu.bin leading table vs public driver (F + I)</h2>
+<p>Public loader (GPL, fetched 2026-11-18, both URLs recorded):</p>
+<ul>
+<li><code>https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/drivers/gpu/drm/msm/adreno/a6xx_gmu.c</code> (70,934 B)</li>
+<li><code>.../adreno/a6xx_gmu.xml.h</code> (8,862 B)</li>
+</ul>
+<p>What the mainline loader expects at offset 0 of the GMU fw (non-legacy path, <code>a6xx_gmu_fw_load</code>):</p>
+<pre><code class="language-c">
+struct block_header {
+	u32 addr;
+	u32 size;
+	u32 type;
+	u32 value;
+	u32 data[];
+};
+</code></pre>
+<p>Iteration from offset 0, stride 16+size (<code>NEXT_BLK</code>); <code>size == 0</code> blocks are skipped; <code>size &gt; 0</code> blocks are routed: addr in [0,16K) -&gt; ITCM (REG_A6XX_GMU_CM3_ITCM_START), addr in [dtcm_base, +16K) -&gt; DTCM (dtcm_base = 0x10004000 for a650 family incl. a660), else <code>fw_block_mem</code> into icache/dcache/dummy BOs (a660: icache iova 0x04000 size 16M-16K; dummy iova 0x60000000 size 16K; debug BO 0x60400000 28K exists but is not in the fw_block_mem list). <code>gmu-&gt;legacy</code> (raw bulk copy &lt;= 0x8000) is set only for a630 family. The type/value fields of data blocks are <strong>not consumed</strong> by mainline. "RS64" appears <strong>0 times</strong> in both fetched files — the public driver has no RS64-specific struct; the a660 fw format is the block-header chain (N for an RS64-named header).</p>
+<p>Test of <code>data-fetch/second-device/larry/tree-vendor/firmware/a660_gmu.bin</code> (55,256 B) against that format — <strong>exact match (F)</strong>:</p>
+<ul>
+<li>15 blocks; the chain ends at exactly 55,256 (chain_exact_end true, no overflow).</li>
+<li>Leading 8 u32-LE pairs from the briefing = the first <strong>4</strong> of <strong>11 zero-size block_headers</strong> (the briefing's "section table" hypothesis is confirmed with a refinement: they are prealloc requests, see below).</li>
+<li>11 zero-size blocks <code>{addr, size=0, type, value=requested_bytes}</code>:</li>
+</ul>
+<table>
+<tr>
+<th>#</th>
+<th>offset</th>
+<th>addr</th>
+<th>type</th>
+<th>value (bytes)</th>
+<th>mainline region containing it</th>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0x0</td>
+<td>1</td>
+<td>476 (0x1dc)</td>
+<td>ITCM [0,0x4000)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>16</td>
+<td>0x4000</td>
+<td>1</td>
+<td>54,476 (0xd4cc)</td>
+<td>icache [0x4000, 0x1004000)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>32</td>
+<td>0x200</td>
+<td>1</td>
+<td>14,948 (0x3a64)</td>
+<td>ITCM</td>
+</tr>
+<tr>
+<td>4</td>
+<td>48</td>
+<td>0x100000</td>
+<td>1</td>
+<td>34,228 (0x85b4)</td>
+<td>icache</td>
+</tr>
+<tr>
+<td>5</td>
+<td>64</td>
+<td>0x200000</td>
+<td>1</td>
+<td>76,416 (0x12a80)</td>
+<td>icache</td>
+</tr>
+<tr>
+<td>6</td>
+<td>80</td>
+<td>0x300000</td>
+<td>1</td>
+<td>28,768 (0x7060)</td>
+<td>icache</td>
+</tr>
+<tr>
+<td>7</td>
+<td>96</td>
+<td>0x10004000</td>
+<td>1</td>
+<td>12,064 (0x2f20)</td>
+<td>DTCM [0x10004000, 0x10008000)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>112</td>
+<td>0x10007000</td>
+<td>1</td>
+<td>3,972 (0xf84)</td>
+<td>DTCM</td>
+</tr>
+<tr>
+<td>9</td>
+<td>128</td>
+<td>0x10007fdc</td>
+<td>1</td>
+<td>24 (0x18)</td>
+<td>DTCM</td>
+</tr>
+<tr>
+<td>10</td>
+<td>144</td>
+<td>0x60000000</td>
+<td>7</td>
+<td>4,096</td>
+<td>dummy [0x60000000, +16K)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>160</td>
+<td>0x60001000</td>
+<td>7</td>
+<td>4,096</td>
+<td>dummy</td>
+</tr>
+</table>
+<ul>
+<li>4 data blocks with <code>{addr, size, 0xEFBEADDE, 0xEFBEADDE}</code> — both type and value are the Qualcomm DEADBEEF sentinel (bytes de ad be ef):</li>
+</ul>
+<table>
+<tr>
+<th>offset</th>
+<th>addr</th>
+<th>size</th>
+<th>data at</th>
+<th>mainline routing</th>
+</tr>
+<tr>
+<td>176</td>
+<td>0x0</td>
+<td>476</td>
+<td>192</td>
+<td>ITCM</td>
+</tr>
+<tr>
+<td>668</td>
+<td>0x4000</td>
+<td>54,476</td>
+<td>684</td>
+<td>icache</td>
+</tr>
+<tr>
+<td>55,160</td>
+<td>0x10007f98</td>
+<td>40</td>
+<td>55,176</td>
+<td>DTCM</td>
+</tr>
+<tr>
+<td>55,216</td>
+<td>0x10007fdc</td>
+<td>24</td>
+<td>55,232</td>
+<td>DTCM</td>
+</tr>
+</table>
+<ul>
+<li>Mapping TOC&lt;-&gt;data: prealloc request sizes equal the corresponding data block sizes for addr 0x0 (476), 0x4000 (54,476) and 0x10007fdc (24); the remaining eight requests have no data block — they are pure preallocation requests (I). Every request range [addr, addr+value) fits inside mainline's hardcoded a660 allocations (F, 11/11), consistent with the mainline comment at a6xx_gmu.c:2364: "A660 now requires handling 'prealloc requests' in GMU firmware. For now just hardcode allocations based on the known firmware."</li>
+</ul>
+<p>Interpretation (I): the briefing's "8 u32-LE pairs as a section table" is decoded as the a660 GMU firmware's <strong>prealloc-request TOC</strong> — zero-size <code>block_header</code>s whose <code>addr</code> is the requested region base and whose <code>value</code> is the requested byte count, followed by DEADBEEF-tagged data blocks loaded ITCM/icache/DTCM. This is the structure the public loader consumes (except it ignores the TOC and hardcodes the allocations).</p>
+<p>Contrast (F): <code>a619_gmu.bin</code> in the same firmware dir is 32,768 B and does <strong>not</strong> parse as a block chain (garbage headers from byte 0) — it is a raw legacy-format image (<code>fw_image-&gt;size &lt;= 0x8000</code> legacy path), showing the block-header format is fw-generation-specific.</p>
+<h2>6. Open items</h2>
+<ul>
+<li>Metadata header word[0]/word[1] semantics (25/5 vs 0/6) and the SM8250-only words (120,120; descriptors <code>[7,0,1,0,0,10,24584]</code> / <code>[7,0,1,0,0,266,24584]</code>) — H: secboot version pair and per-chain descriptors; needs a downstream secimage reference to settle.</li>
+<li>Exact byte range covered by SIG_A/SIG_B (PSS salt prevents message recovery; would need dynamic or downstream-source evidence).</li>
+<li>Word[4] = hash_size + 19,200 (constant 19,200 both gens) — role unknown.</li>
+<li>Same decode should be re-run on other PIL images (cmnlib/keymaster/devcfg from instantnoodle) to check whether the SHA-384 metadata is TZ-specific or SM8250-wide.</li>
+</ul>
+<h2>7. Honest negatives</h2>
+<ul>
+<li>The three briefed fastrpc-shell embedded ELF magics are NOT ELFs — loader magic constant + error string rodata (false positives, 0/3 valid).</li>
+<li>No sha256(empty), hash-of-zero-memsz, or self-hash-with-zeroed-table variants occur in either metadata (5+ variants tested per image).</li>
+<li>Cert DER hashes do not occur elsewhere in the metadata; the 256-byte sig blocks do not verify under the root keys (they verify only under the paired leaf keys).</li>
+<li>No "RS64" string or RS64-specific structure exists in the fetched public driver (0 mentions); the a660 GMU fw format is the block_header chain.</li>
+<li>a619_gmu.bin is a raw legacy image, not a block chain (chain parse invalid by design).</li>
+<li>OP6 metadata contains no strings beyond the cert subjects/extension text; SM8250 metadata contains zero ASCII runs &gt;= 8 chars outside certs (both checked).</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

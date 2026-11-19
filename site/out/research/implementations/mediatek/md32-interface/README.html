@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/mediatek/md32-interface — clean-room MD32 interface-layer parser — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/mediatek/md32-interface — clean-room MD32 interface-layer parser</h1><p>The **spec&#x27;d subset** of the MT6785 md1dsp image interface (the workorder&#x27;s</p><p>Evidence: none</p>
+<h1>implementations/mediatek/md32-interface — clean-room MD32 interface-layer parser</h1>
+<p>The <strong>spec'd subset</strong> of the MT6785 md1dsp image interface (the workorder's</p>
+<p>"MD32 spec-derived interface stubs"): everything the lab's published</p>
+<p>documents pin about the md1dsp container/interface layer, and — explicitly —</p>
+<p>nothing about the MD32 <em>instruction encoding</em>, which is an open gap</p>
+<p>(F-45; ROADMAP M-1/I-4).</p>
+<p>CLEAN-ROOM STATEMENT: written from <code>mediatek/docs/md1dsp-decode.md</code> (F-36),</p>
+<p><code>mediatek/docs/md32-gap.md</code> (F-45) + <code>mediatek/results/md32-gap.json</code>, and</p>
+<p><code>mediatek/rosemary-census.md</code> on <strong>2026-11-16</strong>; no proprietary material</p>
+<p>accessed during development.</p>
+<h2>What it parses (<code>python3 -I md32_interface.py &lt;md1dsp-file&gt; [--json out.json] [--no-crc]</code>)</h2>
+<ul>
+<li><strong>GFH MMM prefix</strong> — records from 0x0 up to the DSP! magic, with the</li>
+</ul>
+<p>  F-36-documented md1dsp FILE_INFO values (sig_type=0, load_addr=</p>
+<p>  0xFFFFFFFF, total_size=0x678000). Full GFH field decode lives in</p>
+<p>  <code>implementations/mediatek/container/</code>.</p>
+<ul>
+<li><strong>DSP! image header</strong> — magic re-verified at 0x118, size 0x678000 @0x124,</li>
+</ul>
+<p>  version 1 @0x128, marker 0x12345678, chip "MT6785", "DEFAULT_ASIC",</p>
+<p>  build "MOLY.LR13.R1.MP.V89.6.P79". The marker/chip offsets are read under</p>
+<p>  <strong>both</strong> documented maps (F-36 relative +0x18/+0x1C vs F-45 absolute</p>
+<p>  0x134/0x138 — a 4-byte documented internal conflict) and the parser</p>
+<p>  reports which matched; it never guesses.</p>
+<ul>
+<li><strong>Descriptor table @0x248</strong> — three 16-B records; shape + documented</li>
+</ul>
+<p>  values verified, <code>off/len</code> semantics left opaque (F-45's own honest</p>
+<p>  negative).</p>
+<ul>
+<li><strong>USIP @0x274/0x278</strong> — record shape parsed up to the RAKE tag; record</li>
+</ul>
+<p>  count/termination and field semantics explicitly NOT pinned (F-45:</p>
+<p>  "records_partially_parsed"); the two documented sample records are matched.</p>
+<ul>
+<li><strong>RAKE chain @0x4b4</strong> — six 16-B records <code>(w0 opaque, off, len, crc32)</code></li>
+</ul>
+<p>  per the results-JSON field order; verifies the documented window</p>
+<p>  0x58c814 → 0x60a9d0, sorted non-overlapping offsets, per-record match</p>
+<p>  against the documented values, and — the F-45 "named next lever" —</p>
+<p>  <strong>per-region crc32 against file content</strong> when a real image is supplied.</p>
+<p>This directly implements F-45's next lever 2 ("Parse the DSP! section</p>
+<p>descriptors end-to-end and check per-section crc32 against file content —</p>
+<p>proves which sections are stored vs packed"), so a future pass holding</p>
+<p><code>06_md1dsp.bin</code> can run it as-is.</p>
+<h2>The ISA gap (TODO, kept open)</h2>
+<p>The module docstring carries the standing TODO: no public spec pins the</p>
+<p>LR13-era MD32 instruction encoding (Ghidra's stock module is a stalled WIP</p>
+<p>for the older ADI-heritage core; F-45's 6-language decode pass found no</p>
+<p>coherent control flow anywhere). Any future coverage number must be judged</p>
+<p>on mnemonic coherence, not percentage (F-45's artifact note).</p>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>md32_interface.py</code></td>
+<td>parser + CLI (clean-room header)</td>
+</tr>
+<tr>
+<td><code>make_fixture.py</code></td>
+<td>synthetic-fixture generator incl. a GF(2) crc32-forge helper</td>
+</tr>
+<tr>
+<td><code>fixtures/md1dsp_header_fixture.bin</code></td>
+<td>generated 1,408-byte self-made fixture — regenerable byte-exactly (<code>python3 -I make_fixture.py</code>); the repo <code>.gitignore</code> excludes <code>*.bin</code>, so it is a working-tree artifact verified by the test suite</td>
+</tr>
+<tr>
+<td><code>test_md32_interface.py</code></td>
+<td>14 tests; the full-layout fixture (0x60a9d0 B, with the documented RAKE crc32 constants forged into real content) is generated into scratch at test time and NOT committed</td>
+</tr>
+</table>
+<h2>Fixture honesty</h2>
+<p>No md1dsp image exists on this machine (checked 2026-11-16), so the</p>
+<p>fixtures are self-made bytes from the documented layout. The full fixture's</p>
+<p>RAKE regions carry the <strong>documented F-45 crc32 constants</strong> — obtained by</p>
+<p>forging 4 suffix bytes per region (crc32 is GF(2)-affine in the message</p>
+<p>bits) — which proves the crc-verification path against the real constants</p>
+<p>without any proprietary bytes.</p>
+<h2>RULE 0 note</h2>
+<p>GitHub code search for public tools handling md1dsp's GFH type 260 or the</p>
+<p>DSP! header returned 0 relevant hits (checked 2026-11-16, query `gfh</p>
+<p>"0x104"` and the container component's searches); the lab census (F-36,</p>
+<p>2026-11-13) states the md1dsp loader format "is publicly undecoded". This</p>
+<p>component implements the lab's own documented spec — no equivalent public</p>
+<p>tool exists to our knowledge.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

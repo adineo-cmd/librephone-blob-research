@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wmi/tlv — WMI TLV framing and command-frame builder — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>wmi/tlv — WMI TLV framing and command-frame builder</h1><p>Spec facts (public ath11k `wmi.h`, linux master, fetched 2026-11-16, GPL):</p><p>Evidence: none</p>
+<h1>wmi/tlv — WMI TLV framing and command-frame builder</h1>
+<p>Spec facts (public ath11k <code>wmi.h</code>, linux master, fetched 2026-11-16, GPL):</p>
+<p><code>struct wmi_tlv { u32 header; u8 value[] } __packed</code>;</p>
+<p><code>WMI_TLV_TAG GENMASK(31,16)</code>; <code>WMI_TLV_LEN GENMASK(15,0)</code>;</p>
+<p><code>TLV_HDR_SIZE = 4</code>; <code>struct wmi_cmd_hdr { u32 cmd_id } __packed</code>;</p>
+<p><code>WMI_CMD_HDR_CMD_ID GENMASK(23,0)</code>. ID construction <code>grp&lt;&lt;12|cmd</code> per the</p>
+<p>lab dispatch paper section 1 (ath11k <code>WMI_TLV_CMD</code>).</p>
+<p>Implements: header pack/unpack (tag/len), 4-byte alignment padding, stream</p>
+<p>builder with overflow detection, cursor walk with truncation detection,</p>
+<p>command-frame builder (4-byte <code>wmi_cmd_hdr</code> + TLV stream).</p>
+<p>Files: <a href="wmi_tlv.h">wmi_tlv.h</a>, <a href="wmi_tlv.c">wmi_tlv.c</a>, <a href="test_tlv.c">test_tlv.c</a>.</p>
+<p>Build &amp; run:</p>
+<pre><code>
+gcc -std=c99 -Wall -Wextra -O2 -o wmi_tlv_test test_tlv.c wmi_tlv.c
+./wmi_tlv_test
+</code></pre>
+<p>Result: ALL SELFTESTS PASSED (36 checks; two initial failures were test-vector</p>
+<p>arithmetic errors — 3 TLVs not 2, LE byte order of the tag check — fixed in</p>
+<p>the test, implementation unchanged).</p>
+<p>Clean-room statement: spec-only derivation (public GPL kernel facts + lab</p>
+<p>paper), no proprietary access.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fairphone FP2 — real-payload blob census + RE (2026-11-18) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Fairphone FP2 — real-payload blob census + RE (2026-11-18)</h1><p>The historic-device program&#x27;s **first content-level RE**: the Fairphone FP2</p><p>Evidence: none</p>
+<h1>Fairphone FP2 — real-payload blob census + RE (2026-11-18)</h1>
+<p>The historic-device program's <strong>first content-level RE</strong>: the Fairphone FP2</p>
+<p>(MSM8974AB-v2, the free-software flagship that is absent from the upstream</p>
+<p>249) had every obtainable firmware blob located in public repositories,</p>
+<p>fetched, hash-verified against an independent pin (postmarketOS pmaports),</p>
+<p>and run through the lab's new clean-room parsers (<code>mdt_probe.py</code> for the</p>
+<p>split-peripheral-image family, <code>prima_nv_probe.py</code> for the WCNSS NVRAM).</p>
+<p>This file documents what the real bytes actually contain, per parsed byte</p>
+<p>range. No payload bytes are committed here — payload files live only in</p>
+<p><code>/tmp/astro_w/payloads/</code> (regeneratable via the route log below); everything</p>
+<p>below is derived structural fact.</p>
+<p>Clean-room statement: <code>mdt_probe.py</code> was written from GPL kernel sources</p>
+<p>only (<code>drivers/soc/qcom/mdt_loader.c</code> + <code>include/linux/soc/qcom/mdt_loader.h</code></p>
+<p>@ torvalds/linux master); <code>prima_nv_probe.py</code> from the prima driver's GPL</p>
+<p>sources (<code>drivers/staging/prima/CORE/VOSS/src/wlan_nv_parser.c</code>,</p>
+<p><code>wlan_nv_stream_read.c</code>, <code>CORE/VOSS/inc/wlan_nv_template_internal.h</code>,</p>
+<p><code>riva/inc/wlan_nv.h</code> @ CyanogenMod/android_kernel_oppo_msm8974 cm-12.1 /</p>
+<p>android_kernel_motorola_msm8916). Both carry full CLEAN-ROOM STATEMENT</p>
+<p>headers; synthetic fixtures + 28 tests in <code>fixtures/</code> + <code>test_parsers.py</code></p>
+<p>pass on this session's code.</p>
+<h2>1. Provenance and verification</h2>
+<p>FP2 firmware is <strong>not</strong> in the LineageOS vendor tree (TheMuppets</p>
+<p><code>proprietary_vendor_fairphone</code> FP2 ships only venus/adreno/cpp firmware +</p>
+<p>userspace libs — the modem/WCNSS/ADSP images are absent there), and <strong>not</strong></p>
+<p>in the Fairphone opensource GitHub org (<code>user:Fairphone</code> search returns only</p>
+<p>FP5-era repos; no <code>WW-FP2</code> repo exists — route tried, see §1.2). The</p>
+<p>obtainable public source is a community extraction repo pinned by</p>
+<p>postmarketOS:</p>
+<h3>1.1 The pmaports-pinned tarball (84 of 90 files)</h3>
+<p><code>device/testing/firmware-fairphone-fp2</code> APKBUILD (fetched from</p>
+<p>gitlab.postmarketos.org, 2026-11-18) pins:</p>
+<table>
+<tr>
+<th>artifact</th>
+<th>pin</th>
+<th>result</th>
+</tr>
+<tr>
+<td><code>FP2-firmware-17.09.3.tar.gz</code> @ <code>github.com/FairBlobs/FP2-firmware</code> tag <code>17.09.3</code></td>
+<td>sha512 <code>f4af05a7…681</code> (full pin in the APKBUILD)</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>WCNSS_cfg.dat</code>, <code>WCNSS_qcom_cfg.ini</code>, <code>WCNSS_qcom_wlan_nv.bin</code> @ <code>LineageOS/android_device_fairphone_FP2</code> @ commit <code>67850874…a1d</code>, <code>wifi/</code></td>
+<td>3 sha512 pins in the same APKBUILD</td>
+<td><strong>3/3 MATCH</strong></td>
+</tr>
+</table>
+<p>The tarball (32,193,375 B) contains 81 files: <code>modem.mdt</code>+<code>modem.b00…b25</code></p>
+<p>(20 segment files; the modem partition split image), <code>mba.mdt</code>+<code>mba.b00</code>,</p>
+<p><code>wcnss.mdt</code>+<code>wcnss.b00…b09</code> (8 segment files), <code>adsp.mdt</code>+<code>adsp.b00…b12</code></p>
+<p>(13 files), and the trustzone set (<code>cmnlib</code>, <code>isdbtmm</code>, <code>keymaste</code>, <code>mc_v2</code>,</p>
+<p><code>playread</code>, <code>tqs</code>, <code>widevine</code> — each <code>.b00…bNN</code>+<code>.mdt</code>). md5 census of all</p>
+<p>81 + the 3 wifi files: <code>scratch /tmp/astro_w/analysis/fp2_md5_census.txt</code></p>
+<p>(87 lines).</p>
+<p>Route: git clone of the tag kept failing (`fetch-pack: unexpected</p>
+<p>disconnect` × 3), the <strong>codeload tarball</strong> route succeeded and is the one</p>
+<p>pmaports itself uses — recorded as the reproducible route.</p>
+<h3>1.2 The venus set (6 files, TheMuppets)</h3>
+<p><code>FP2/proprietary/vendor/firmware/venus.{mdt,b00…b04}</code> were fetched from</p>
+<p><code>TheMuppets/proprietary_vendor_fairphone</code> @ <code>lineage-18.1</code> via the</p>
+<p>authenticated git-blob API (6/6 sizes match the tree listing).</p>
+<h3>1.3 Route log (RULE 0, all probes 2026-11-18)</h3>
+<ol>
+<li><code>gh api search/repositories?q=org:Fairphone+FP2</code> → 0 hits; <code>q=user:Fairphone</code></li>
+</ol>
+<p>   → <code>android_device_fairphone_FP5</code>, <code>fairphone-moments</code>,</p>
+<p>   <code>fairphone-switch-button-settings</code> only. **No FP2 vendor/firmware repo in</p>
+<p>   the Fairphone org** (the task-context hint <code>github.com/fairphone/WW-FP2?</code></p>
+<p>   resolves to nothing public — recorded as a negative route).</p>
+<ol>
+<li>TheMuppets <code>proprietary_vendor_fairphone</code> FP2 tree enumerated on 5</li>
+</ol>
+<p>   branches (cm-14.1 … lineage-18.1): 353-366 files each, firmware = venus +</p>
+<p>   a330 + cpp only. Negative: no wcnss/modem payloads in any LineageOS FP2</p>
+<p>   vendor branch.</p>
+<ol>
+<li>pmaports is the bridge: <code>device-fairphone-fp2</code> APKBUILD depends on</li>
+</ol>
+<p>   <code>firmware-fairphone-fp2-{wcnss,adsp,modem}</code> → <code>firmware-fairphone-fp2</code></p>
+<p>   APKBUILD → FairBlobs tarball + LineageOS wifi files (this is how pmOS</p>
+<p>   mainline FP2 gets its blobs; the wiki itself is Anubis-gated, the GitLab</p>
+<p>   API is the route, as in the queue file §2).</p>
+<ol>
+<li>postmarketOS wiki (<code>wiki.postmarketos.org</code>) not retried this session</li>
+</ol>
+<p>   (queue file already recorded the Anubis gate); pmaports GitLab used</p>
+<p>   directly.</p>
+<h2>2. The split-image (MDT) family — structure verified on 4 FP2 images</h2>
+<p><code>mdt_probe.py</code> (clean-room from <code>mdt_loader.c</code>) parses <code>modem</code>, <code>wcnss</code>,</p>
+<p><code>adsp</code>, <code>venus</code>, <code>mba</code>. Exit 0 (no error-class diagnostics) on all; every</p>
+<p>phdr with nonzero <code>p_filesz</code> has a sibling <code>.bNN</code> file whose size equals the</p>
+<p>declared size exactly (loader-fragment arithmetic holds byte-perfectly).</p>
+<h3>2.1 New structural fact: <code>.mdt</code> == <code>.b00</code> ‖ <code>.b01</code></h3>
+<p>Verified byte-for-byte on FP2 <code>modem</code> (1820 = 916+904), FP2 <code>wcnss</code></p>
+<p>(732 = 372+360) and hammerhead <code>modem</code> (8156 = 884+7272, §hammerhead doc):</p>
+<ul>
+<li><code>.b00</code> = the ELF32 header (52 B) + the program-header table</li>
+</ul>
+<p>  (<code>e_phentsize</code> = 32 = <code>sizeof(elf32_phdr)</code>, <code>e_phnum</code> phdrs) — exactly the</p>
+<p>  extent of phdr[0], whose <code>p_flags</code> type-bits are 7 (0x07000000);</p>
+<ul>
+<li><code>.b01</code> = the hash/metadata segment (phdr[1], PT_NULL with</li>
+</ul>
+<p>  <code>QCOM_MDT_TYPE_HASH</code> type-bits 0x02000000, <code>p_memsz</code> = 4096);</p>
+<ul>
+<li>the <code>.mdt</code> file is the concatenation of the two. The kernel's</li>
+</ul>
+<p>  <code>qcom_mdt_read_metadata</code> consumes precisely these bytes for the</p>
+<p>  TrustZone authentication handshake; the modern</p>
+<p>  "split iff ehdr+hash==file" rule (<code>mdt_loader.c</code>) resolves to</p>
+<p>  <code>ehdr+phdr0.filesz</code> vs the mdt — the FP2-era images store BOTH the</p>
+<p>  phdr-table extent AND the hash segment as separate <code>bNN</code> files</p>
+<p>  (phdr[0].filesz == 52+32·phnum here), a cleaner invariant than the</p>
+<p>  modern check assumes.</p>
+<h3>2.2 modem.mdt — the MPSS 8974 image, per-byte-range map</h3>
+<p>machine = 164 (EM_QDSP6), entry 0x08000000, <strong>not relocatable</strong>, memory</p>
+<p>range 0x08000000–0x0d100000. 27 phdrs: 2 metadata + 25 PT_LOAD. Build ID</p>
+<p>string inside <code>modem.b13/b14</code> (factual metadata): </p>
+<p><code>QC_IMAGE_VERSION_STRING=MPSS.DI.4.0.1-00190</code> /</p>
+<p><code>MPSS.DI.4.0.1-00190-M8974AAAAANAZM-1.101722.1.104161.1</code></p>
+<p>(CRM build stamp 2016-02-09).</p>
+<table>
+<tr>
+<th>file</th>
+<th>flags</th>
+<th>filesz</th>
+<th>memsz</th>
+<th>paddr</th>
+<th>class</th>
+</tr>
+<tr>
+<td>b00</td>
+<td>0x07000000</td>
+<td>916</td>
+<td>0</td>
+<td>—</td>
+<td>header+phdr table (metadata)</td>
+</tr>
+<tr>
+<td>b01</td>
+<td>0x02200000</td>
+<td>904</td>
+<td>4096</td>
+<td>0x0d100000</td>
+<td>hash segment (signature/metadata)</td>
+</tr>
+<tr>
+<td>b02</td>
+<td>5</td>
+<td>4,052</td>
+<td>4,052</td>
+<td>0x08000000</td>
+<td>RX</td>
+</tr>
+<tr>
+<td>b03</td>
+<td>7</td>
+<td>81,920</td>
+<td>81,920</td>
+<td>0x08010000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b06</td>
+<td>7</td>
+<td>176,224</td>
+<td>176,224</td>
+<td>0x08024000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b08</td>
+<td>7</td>
+<td>48,688</td>
+<td>124,392</td>
+<td>0x08054000</td>
+<td>RXW (+BSS tail)</td>
+</tr>
+<tr>
+<td>b09</td>
+<td>7</td>
+<td>46,568</td>
+<td>46,568</td>
+<td>0x08078000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b11</td>
+<td>7</td>
+<td>99,508</td>
+<td>99,508</td>
+<td>0x08088000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b12</td>
+<td>5</td>
+<td>115,764</td>
+<td>115,764</td>
+<td>0x080a8000</td>
+<td>RX</td>
+</tr>
+<tr>
+<td>b13</td>
+<td>5</td>
+<td>1,699,496</td>
+<td>1,699,496</td>
+<td>0x080d0000</td>
+<td>RX</td>
+</tr>
+<tr>
+<td>b14</td>
+<td>5</td>
+<td>19,333,136</td>
+<td>19,333,136</td>
+<td>0x0826f000</td>
+<td>RX — the main modem code segment</td>
+</tr>
+<tr>
+<td>b15</td>
+<td>6</td>
+<td>663,520</td>
+<td>663,520</td>
+<td>0x09500000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b16</td>
+<td>6</td>
+<td>139,264</td>
+<td>139,264</td>
+<td>0x095a4000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b17</td>
+<td>6</td>
+<td>5,376</td>
+<td>5,376</td>
+<td>0x095c8000</td>
+<td>RW — <strong>5,376 zero bytes</strong> (see §2.5)</td>
+</tr>
+<tr>
+<td>b18</td>
+<td>4</td>
+<td>8,757,872</td>
+<td>8,757,872</td>
+<td>0x09600000</td>
+<td>R — the second big code segment</td>
+</tr>
+<tr>
+<td>b19</td>
+<td>6</td>
+<td>2,990,128</td>
+<td>2,990,128</td>
+<td>0x09e5c000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b20</td>
+<td>6</td>
+<td>0</td>
+<td>1,459,752</td>
+<td>0x0a137000</td>
+<td>pure BSS (no file)</td>
+</tr>
+<tr>
+<td>b21</td>
+<td>6</td>
+<td>0</td>
+<td>34,163,456</td>
+<td>0x0a29c000</td>
+<td>pure BSS (no file) — 32.6 MB heap</td>
+</tr>
+<tr>
+<td>b22</td>
+<td>6</td>
+<td>75,584</td>
+<td>75,584</td>
+<td>0x0c331000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b23</td>
+<td>4</td>
+<td>425,078</td>
+<td>425,078</td>
+<td>0x0c344000</td>
+<td>R</td>
+</tr>
+<tr>
+<td>b24</td>
+<td>4</td>
+<td>7,249,212</td>
+<td>7,249,212</td>
+<td>0x0c3ac000</td>
+<td>R</td>
+</tr>
+<tr>
+<td>b25</td>
+<td>6</td>
+<td>1,052,652</td>
+<td>1,052,652</td>
+<td>0x0ca96000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b26</td>
+<td>6</td>
+<td>0</td>
+<td>5,672,960</td>
+<td>0x0cb97000</td>
+<td>pure BSS</td>
+</tr>
+</table>
+<p>phdr indexes 4,5,7,10 are zero-everything placeholders (paddr 0, all sizes</p>
+<p>0, flags 0) — the vendor image generator emits them rather than compacting</p>
+<p>the table. On-disk payload total 42,965,862 B == Σ p_filesz (probe-verified);</p>
+<p>BSS adds 41,374,148 B at load time. <code>mba.mdt</code>: 1 phdr, PT_LOAD,</p>
+<p>0x0d100000–0x0d148310, right after the modem's memory range (the Modem Boot</p>
+<p>Authenticator the 8974 boot chain runs before MPSS).</p>
+<h3>2.3 wcnss.mdt — the PRIMA (WCN3680) image</h3>
+<p>machine = 40 (EM_ARM — the Pronto's Riva/ARM side, vs the modem's QDSP6),</p>
+<p>entry 0x0d201a70, <strong>relocatable</strong> (QCOM_MDT_RELOCATABLE bit set on the</p>
+<p>loadable segments), range 0x0d200000–0x0d7af9e0, 10 phdrs, 8 segment files:</p>
+<table>
+<tr>
+<th>file</th>
+<th>flags</th>
+<th>filesz</th>
+<th>memsz</th>
+<th>paddr</th>
+</tr>
+<tr>
+<td>b02</td>
+<td>0x88000007</td>
+<td>14,180</td>
+<td>14,504</td>
+<td>0x0d200000</td>
+</tr>
+<tr>
+<td>b03</td>
+<td>0x08000006</td>
+<td>0</td>
+<td>32,768</td>
+<td>0x0d204000 (pure BSS)</td>
+</tr>
+<tr>
+<td>b04</td>
+<td>0x08000006</td>
+<td>61,440</td>
+<td>61,440</td>
+<td>0x0d20c000</td>
+</tr>
+<tr>
+<td>b05</td>
+<td>0x08000006</td>
+<td>0</td>
+<td>57,344</td>
+<td>0x0d21b000 (pure BSS)</td>
+</tr>
+<tr>
+<td>b06</td>
+<td>0x88000007</td>
+<td><strong>2,823,520</strong></td>
+<td>4,923,744</td>
+<td>0x0d229000 — the main prima WLAN/BT/FM firmware</td>
+</tr>
+<tr>
+<td>b07</td>
+<td>0x08000006</td>
+<td>60</td>
+<td>368</td>
+<td>0x0d6e0000</td>
+</tr>
+<tr>
+<td>b08</td>
+<td>0x08000006</td>
+<td>786,432</td>
+<td>786,432</td>
+<td>0x0d6e1000</td>
+</tr>
+<tr>
+<td>b09</td>
+<td>0x08000007</td>
+<td>43,272</td>
+<td>59,872</td>
+<td>0x0d7a1000</td>
+</tr>
+</table>
+<p>b06's strings identify the payload as the prima image:</p>
+<p><code>dpd_fxdpnt_SW_PRIMA.c</code>, and the WCNSS-CTRL NV runtime protocol:</p>
+<p><code>WCNSSCTRL_ProcessNVDownloadReq</code> / <code>SendNVDownloadReply</code> /</p>
+<p><code>SendCalDataDownloadReply</code> — i.e. the firmware itself implements the SMD</p>
+<p>service through which the host pushes <code>WCNSS_qcom_wlan_nv.bin</code> and cal data</p>
+<p>at runtime. Free-reimplementation note: a free WCNSS stack must speak that</p>
+<p>NV/CalData exchange, not merely load the NV file to disk.</p>
+<h3>2.4 adsp.mdt / venus.mdt</h3>
+<ul>
+<li>adsp: machine 164 (QDSP6), 14 phdrs, 13 segment files on disk, relocatable,</li>
+</ul>
+<p>  0x0dc00000–0x0f000000, Σ filesz 9,292,835 B (+10.7 MB BSS).</p>
+<ul>
+<li>venus: machine 164, 5 phdrs, 5 files, relocatable, 0x0f500000–0x0f9ff020,</li>
+</ul>
+<p>  Σ filesz 995,852 B (+4.2 MB BSS).</p>
+<h3>2.5 Cross-device segment census: FP2 modem vs hammerhead modem</h3>
+<p>Both are MPSS 8974 images (§hammerhead doc): FP2 <code>MPSS.DI.4.0.1-00190</code></p>
+<p>(2016-02) vs hammerhead <code>MPSS.DI.2.0.C5-00024</code> (2014-09). Per-index phdr</p>
+<p>comparison: 12/26 identical paddr, 8/26 identical filesz — same firmware</p>
+<p>architecture, different builds. <strong>Byte-identical segments: exactly one</strong> —</p>
+<p><code>modem.b17</code> (5,376 B, md5 <code>c4ca1e4b64dadd773d546a6e920e56ec</code>) which is</p>
+<p><strong>100% zero bytes</strong> (all-zero RW segment, shipped as a file in both</p>
+<p>builds; loaded at different addresses). I.e. aside from the mandated</p>
+<p>zero-fill segment, the two 8974 modem builds share nothing at the byte</p>
+<p>level — each device fleet needs its own build's bytes, while the container</p>
+<p>format (§2.1) and loader protocol are the free-specification part.</p>
+<h2>3. The WCNSS NVRAM (<code>WCNSS_qcom_wlan_nv.bin</code>) — NV2 raw struct</h2>
+<p><code>prima_nv_probe.py</code> classifies the FP2 file (29,816 B, from the LineageOS</p>
+<p>FP2 device tree, pmaports-sha512-verified) as the <strong>NV2 raw packed-struct</strong></p>
+<p>format (<code>vos_nvitem.c</code> decision tree: bytes [4,8) ≠ 0xCAFEBABE ⇒ raw image,</p>
+<p>size must equal 4 + packed <code>sHalNvV2</code>):</p>
+<table>
+<tr>
+<th>byte range</th>
+<th>field</th>
+<th>value</th>
+</tr>
+<tr>
+<td>[0,4)</td>
+<td>nvValidityBitmap</td>
+<td>0xFFFFFFFF (every field valid)</td>
+</tr>
+<tr>
+<td>[4,6)</td>
+<td>productId</td>
+<td>0</td>
+</tr>
+<tr>
+<td>[6]</td>
+<td>productBands</td>
+<td>1 = 11A/B/G</td>
+</tr>
+<tr>
+<td>[7]</td>
+<td>wlanNvRevId</td>
+<td>2 = WCN36xx class (0=WCN1312, 1=WCN1314, 2=WCN3660/3680)</td>
+</tr>
+<tr>
+<td>[8,10)</td>
+<td>chains</td>
+<td>1 TX / 1 RX</td>
+</tr>
+<tr>
+<td>[10,16) etc.</td>
+<td>macAddr1..4</td>
+<td>4 distinct 6-byte values (sha1-12 fingerprints <code>772274…</code>, <code>91f04f…</code>, <code>bdc765…</code>, <code>ec9df5…</code> — not reproduced)</td>
+</tr>
+<tr>
+<td>[34,74)</td>
+<td>mfgSN[40]</td>
+<td>all zero (no serial in this file)</td>
+</tr>
+<tr>
+<td>[74]</td>
+<td>couplerType</td>
+<td>48 (0x30) — <strong>out of the 0/1 INTERNAL/EXTERNAL domain</strong> [OPEN]</td>
+</tr>
+<tr>
+<td>[75]</td>
+<td>nvVersion</td>
+<td>2 = NV_VERSION_LPDC_FW_CONFIG — matches the WCN_PRONTO driver's <code>WLAN_NV_VERSION</code> expectation</td>
+</tr>
+<tr>
+<td>[76,29816)</td>
+<td>sNvTables</td>
+<td>29,740 B RF-calibration/regulatory tables (opaque here)</td>
+</tr>
+</table>
+<p>The <strong>NV3 template-stream format</strong> (magic 0xCAFEBABE, then</p>
+<p>[u16-len][stream] chains of table/enum/data streams per</p>
+<p><code>wlan_nv_parser.c</code>) is implemented and tested in the same probe but is NOT</p>
+<p>what FP2 ships — FP2 is NV2. Prior art (RULE 0): <code>WCNSS_Binary_Maker</code></p>
+<p>(codeberg.org/LogicalErzor/WCNSS_Binary_Maker) is an existing full</p>
+<p>parser/builder for this format family (55 pmOS device configs) — the lab</p>
+<p>does not rebuild it; the delta here is the per-device census above, the</p>
+<p>NV2/NV3 disambiguation written from kernel sources only, and a</p>
+<p>cross-checkable probe.</p>
+<p>The prima firmware container is <strong>not QCA-TLV</strong>: the WCN36xx-era BT/WLAN</p>
+<p>patch/NVM TLV fleet (<code>crbtfw*/crnv*</code>) belongs to WCN399x+ chips (Mission 1</p>
+<p>fleet-analysis.md); the 8974-era WCNSS firmware is a PIL split-ELF image</p>
+<p>and its NV is the NV2 struct above — <code>qca_tlv.py</code> does not apply to either</p>
+<p>container. Honest classification; no parser extension was needed.</p>
+<h2>4. What the FP2 blob set means for a free reimplementation</h2>
+<p>Fully specified by public sources + this census (writable today with zero</p>
+<p>proprietary bytes):</p>
+<ul>
+<li><strong>Container/loader</strong>: the PIL split-image format (ELF32 header + bNN</li>
+</ul>
+<p>  segments + hash metadata segment), the loadable-segment rules, the</p>
+<p>  relocatable-base arithmetic (already documented for FP6 in</p>
+<p>  <code>qualcomm-fp6/docs/interface-mdtloader-vs-readelf.md</code>; the 8974-era</p>
+<p>  images here are the non-8996 predecessors and follow the same rules —</p>
+<p>  probe-verified). A free loader is a solved problem; what remains is</p>
+<p>  synthesizing firmware content, not parsing it.</p>
+<ul>
+<li><strong>NV handling</strong>: the NV2/NV3 container formats (probe + tests in this</li>
+</ul>
+<p>  directory) and the NV validity-bitmap semantics; per-device fields</p>
+<p>  (MACs, serial) are provisioned values, RF tables are calibration data.</p>
+<ul>
+<li><strong>Host protocols</strong>: WCNSS-CTRL NV/CalData download (SMD service, names</li>
+</ul>
+<p>  pinned from the firmware's own strings), the WCN36xx mainline driver's</p>
+<p>  expectations (kernel.org wcn36xx docs, Linaro LVC21 talk), the modem</p>
+<p>  userspace via pmOS <code>msm-modem</code> (QMI/RIL stack).</p>
+<p>Opaque content (needs synthesis or further RE — every one now pinned to an</p>
+<p>exact file/range):</p>
+<ul>
+<li><code>wcnss.b06</code> (2.82 MB) — the prima WLAN/BT/FM code. A free replacement</li>
+</ul>
+<p>  would mean a from-scratch Pronto firmware OR running the WCN36xx chips in</p>
+<p>  ROM mode where supported; [OPEN].</p>
+<ul>
+<li><code>modem.b14/b18/b24/b13/b19</code> (~38.6 MB combined) — the MPSS 8974 modem</li>
+</ul>
+<p>  code. Same class of problem as every Qualcomm modem; the lab's modem-RE</p>
+<p>  methodology (md1rom-taskmap for MTK; the FP6 modem docs) transfers</p>
+<p>  structurally (ELF phdr map is above).</p>
+<ul>
+<li>Hash segment (<code>b01</code>, 904 B) + TrustZone-signed boot chain — the</li>
+</ul>
+<p>  signature/synthesis question, same as the QCA-TLV 256-byte tail [OPEN]</p>
+<p>  (fleet-analysis.md §3.3).</p>
+<ul>
+<li><code>couplerType=48</code> semantics [OPEN] (§3).</li>
+</ul>
+<h2>5. Existing effort (RULE 0) + status corrections this session</h2>
+<ul>
+<li>pmOS: <code>device-fairphone-fp2</code> (testing) + <code>firmware-fairphone-fp2</code> — the</li>
+</ul>
+<p>  provenance source for everything above; mainline kernel</p>
+<p>  <code>linux-postmarketos-qcom-msm8974</code> with wcn36xx + lk2nd.</p>
+<ul>
+<li>FSF/Replicant status: the queue file's "Replicant 6.0 supported" for FP2</li>
+</ul>
+<p>  could not be re-confirmed from primary sources this session — the current</p>
+<p>  Replicant wiki Devices index (redmine.replicant.us, fetched 2026-11-18)</p>
+<p>  contains <strong>no FP2 page</strong> ( GalaxyNexus/GalaxyS*/Tab2/… only), and</p>
+<p>  <code>ryf.fsf.org</code>'s product index contains <strong>no Fairphone entry</strong> (5-page</p>
+<p>  probe, routes logged). Secondary sources repeatedly claim FP2+Replicant</p>
+<p>  was RYF-certified; the primary page is [OPEN]. What is primary-verified:</p>
+<p>  pmOS testing support, UBports official (queue file S4), LineageOS device</p>
+<p>  tree, Fairphone's own opensource kernel releases.</p>
+<ul>
+<li>Combo-chip pin: FP2 = WCN3680 (WCNSS PRIMA) for WLAN <strong>and</strong> BT/FM —</li>
+</ul>
+<p>  confirmed by the wcnss image itself (single Pronto image, prima strings)</p>
+<p>  and pmOS's wcnss firmware package. No separate BT firmware file exists</p>
+<p>  for FP2 — unlike hammerhead (see that doc), which is Broadcom.</p>
+<ul>
+<li>The task-context phrase "Replicant's documentation of the XMM modem" for</li>
+</ul>
+<p>  FP2 is a misattribution: FP2's modem is Qualcomm MPSS 8974 (documented</p>
+<p>  here); the XMM/Samsung-IPC lineage belongs to the Exynos devices (see</p>
+<p>  <code>implementations/historic/m0/analysis.md</code>).</p>
+<h2>6. Files created (this directory)</h2>
+<ul>
+<li><code>fleet-analysis.md</code> (this file)</li>
+<li><code>mdt_probe.py</code> — clean-room split-image parser/verifier (fixture-tested)</li>
+<li><code>prima_nv_probe.py</code> — clean-room NV2/NV3 NVRAM probe (fixture-tested)</li>
+<li><code>fixtures/make_fixture.py</code> + generated synthetic fixtures (no real bytes)</li>
+<li><code>test_parsers.py</code> — 28 tests, all passing</li>
+<li><code>fp2-blob-census.csv</code> — per-file md5 census (facts only)</li>
+</ul>
+<p>Scratch (regeneratable): <code>/tmp/astro_w/payloads/{fp2,fp2_wifi}/</code>,</p>
+<p><code>/tmp/astro_w/analysis/fp2_*.json</code>, <code>/tmp/astro_w/web/fp2_*</code> (APKBUILDs,</p>
+<p>tree listings). Payload bytes are NOT committed per program rules.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

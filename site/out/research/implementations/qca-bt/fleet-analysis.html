@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fleet analysis — real-payload RE of the QCA BT leverage fleet (2026-11-17) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Fleet analysis — real-payload RE of the QCA BT leverage fleet (2026-11-17)</h1><p>The program&#x27;s **first content-level RE**: the six top-20 leverage blobs</p><p>Evidence: none</p>
+<h1>Fleet analysis — real-payload RE of the QCA BT leverage fleet (2026-11-17)</h1>
+<p>The program's <strong>first content-level RE</strong>: the six top-20 leverage blobs</p>
+<p>(recon.md rows 1-6, <code>crbtfw20.tlv</code> / <code>apbtfw10.tlv</code> / <code>crbtfw11.tlv</code> /</p>
+<p><code>crnv20.bin</code> / <code>crnv11.bin</code> / <code>apnv10.bin</code> — 29 devices each in the upstream</p>
+<p>DB) were located in public repositories, fetched, **md5-verified byte-exact</p>
+<p>against the upstream database (6/6 MATCH)**, and run through the lab's</p>
+<p>clean-room parser (<code>qca_tlv.py</code>, 30/30 fixtures). This file documents what</p>
+<p>the real bytes actually contain, per parsed byte range. No payload bytes are</p>
+<p>committed here — payload files live only in <code>/tmp/astro_s/payloads/</code></p>
+<p>(regeneratable via the route log below); everything below is derived</p>
+<p>structural fact.</p>
+<p>Clean-room statement: <code>qca_tlv.py</code> was written from GPL kernel sources only;</p>
+<p>this session added <em>data</em> (real payloads) on top of that parser. The parser</p>
+<p>file itself was not modified.</p>
+<h2>1. Provenance and md5 verification (all six MATCH)</h2>
+<p>Upstream md5s from <code>upstream-contribution/blob-database/coverage-matrix.csv</code></p>
+<p>(each filename maps to exactly one md5 across all 29 device rows — checked</p>
+<p>before fetching). Fetches 2026-11-17.</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>DB md5</th>
+<th>fetched md5</th>
+<th>status</th>
+</tr>
+<tr>
+<td><code>crbtfw20.tlv</code></td>
+<td>56,180</td>
+<td><code>16077492405d178c5198b86b3cec7eef</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>apbtfw10.tlv</code></td>
+<td>56,052</td>
+<td><code>42a31bb8b2afa5b805dfda78cb1ed4c6</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>crbtfw11.tlv</code></td>
+<td>29,368</td>
+<td><code>eae2d0a1fa6690a9eac392a1cef28092</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>crnv20.bin</code></td>
+<td>3,936</td>
+<td><code>bb6ca169095f116ce20029238b4ca4c1</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>crnv11.bin</code></td>
+<td>2,798</td>
+<td><code>7c0db76f1a434d20b3ce3e261b2d00c6</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>apnv10.bin</code></td>
+<td>1,243</td>
+<td><code>4905d516ca6ff77eee8f9f82a17a14ff</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+</table>
+<p>sha256 of the verified bytes (recorded for future re-download cross-checks):</p>
+<table>
+<tr>
+<th>file</th>
+<th>sha256</th>
+</tr>
+<tr>
+<td>crbtfw20.tlv</td>
+<td><code>d9afa5d9facd528f437e83bcc8147681afd432296ebbba5e77904c13fab28209</code></td>
+</tr>
+<tr>
+<td>apbtfw10.tlv</td>
+<td><code>07f0f45cff57347a73ada68bf2bd564e17998383388ef27bd2e9de5269c1986f</code></td>
+</tr>
+<tr>
+<td>crbtfw11.tlv</td>
+<td><code>d6532b99875890fb7969874ff6e904939ca0d6f2d2bd1e1fd3ae86470bebc9f5</code></td>
+</tr>
+<tr>
+<td>crnv20.bin</td>
+<td><code>6c96fe067860a79813b466a1d4644dc2748a4191b21a986a44d2cc0fe6ccaca7</code></td>
+</tr>
+<tr>
+<td>crnv11.bin</td>
+<td><code>206deb651dcfd187d1fd39f1f064af20324d1b4e28dcd72f5ed23bb8ef605d00</code></td>
+</tr>
+<tr>
+<td>apnv10.bin</td>
+<td><code>4cb35fec741a3294f5c64d41aefba45cf899c42cc4c00800bba7029cca5919d9</code></td>
+</tr>
+</table>
+<h3>Sources per file (public, individually fetchable — no 1.3 GB package)</h3>
+<table>
+<tr>
+<th>file</th>
+<th>source(s) that fetched byte-exact</th>
+</tr>
+<tr>
+<td>crbtfw20.tlv</td>
+<td><code>commaai/vamOS</code> @ <code>master</code>, <code>kernel/firmware/qca/</code> (Git-LFS; via <code>media.githubusercontent.com/media/...</code>) <strong>and</strong> <code>TheMuppets/proprietary_vendor_essential_mata</code> @ <code>lineage-22.2</code>, <code>proprietary/vendor/firmware/</code> (raw) — mata = Essential PH-1, which is <strong>outside</strong> the DB's 29-carrier set (no mata row in <code>coverage-matrix.csv</code> for crbtfw20.tlv) yet ships the byte-identical blob: the real-world carrier set of these fleet files exceeds the DB's device attribution</td>
+</tr>
+<tr>
+<td>crbtfw11.tlv</td>
+<td><code>commaai/vamOS</code> @ <code>master</code> (LFS); also listed in mata's tree (not fetched)</td>
+</tr>
+<tr>
+<td>crnv20.bin</td>
+<td><code>commaai/vamOS</code> @ <code>master</code> (LFS) <strong>and</strong> TheMuppets mata (raw) — both byte-exact</td>
+</tr>
+<tr>
+<td>crnv11.bin</td>
+<td><code>commaai/vamOS</code> @ <code>master</code> (LFS)</td>
+</tr>
+<tr>
+<td>apbtfw10.tlv</td>
+<td><code>kernel.org linux-firmware</code> <code>qca/apbtfw10.tlv</code> (plain blob) <strong>and</strong> <code>Rentz412/Ubuntu_For_Xiaomi5_Gemini</code> @ <code>main</code>, <code>firmware/qca/</code> (LFS) — the device copy and the linux-firmware copy are byte-identical</td>
+</tr>
+<tr>
+<td>apnv10.bin</td>
+<td>same two sources as apbtfw10.tlv, both byte-exact</td>
+</tr>
+</table>
+<h3>F-74 confirmed (linux-firmware absence)</h3>
+<p>The kernel.org <code>qca/</code> directory listing (fetched 2026-11-17) contains</p>
+<p><code>apbtfw10/11.tlv</code>, <code>apnv10/11.bin</code>, <code>crbtfw21/32.tlv</code>, <code>crnv21/32.bin</code>,</p>
+<p><code>hmtbtfw20</code>, <code>hpbtfw10/21</code>, <code>htbtfw20</code> and the old ath3k <code>rampatch_*</code>/</p>
+<p><code>nvram_*</code> files — but **no <code>crbtfw20.tlv</code>, <code>crbtfw11.tlv</code>, <code>crnv20.bin</code>,</p>
+<p><code>crnv11.bin</code>**. Those four ship only inside device/vendor packages, exactly</p>
+<p>as the F-74 fleet finding recorded. Bonus counterexample for the general</p>
+<p>"linux-firmware has it" assumption: mata also ships <code>crbtfw21.tlv</code></p>
+<p>(119,720 B, md5 <code>3e7167ba14a2d00f9765007e8c561562</code>) which is a **different</p>
+<p>build** from linux-firmware's same-named <code>crbtfw21.tlv</code> (177,060 B, md5</p>
+<p><code>4fceacf111c621d93666aaeafc1eaf56</code>) — same filename, different bytes.</p>
+<h3>Route log (RULE 0, all probes 2026-11-17)</h3>
+<ol>
+<li>Unauthenticated GitHub code search API (<code>/search/code</code>) → 401</li>
+</ol>
+<p>   "Requires authentication" (expected). Authenticated <code>gh api</code> search used</p>
+<p>   instead.</p>
+<ol>
+<li><code>q=&lt;name&gt; in:path</code> code search: <code>crbtfw20.tlv</code> → 1 hit</li>
+</ol>
+<p>   (<code>commaai/vamOS kernel/firmware/qca/</code>); <code>apbtfw10.tlv</code> → 2 hits</p>
+<p>   (<code>Rentz412/Ubuntu_For_Xiaomi5_Gemini firmware/qca/</code>,</p>
+<p>   <code>microscaler/talos-dgx-spark .../linux-firmware/qca/apbtfw10.tlv.zst</code> —</p>
+<p>   a compressed linux-firmware copy); <code>crbtfw11.tlv</code> / <code>crnv20.bin</code> /</p>
+<p>   <code>crnv11.bin</code> → <code>commaai/vamOS</code> each.</p>
+<ol>
+<li>kernel.org <code>linux-firmware</code> <code>qca/</code> tree listing → ap pair present, cr/cn</li>
+</ol>
+<p>   quartet absent (F-74 confirmed); both ap files fetched plain, byte-exact.</p>
+<ol>
+<li>First raw fetch from <code>commaai/vamOS</code> and the Mi 5 repo returned 130-byte</li>
+</ol>
+<p>   <strong>Git-LFS pointer files</strong> — refetched via</p>
+<p>   <code>media.githubusercontent.com/media/&lt;owner&gt;/&lt;repo&gt;/&lt;ref&gt;/&lt;path&gt;</code>, which</p>
+<p>   yields the real content for LFS-hosted files. 6/6 md5-match.</p>
+<ol>
+<li><code>q=crbtfw20.tlv in:file</code> search (162 hits) surfaced device trees listing</li>
+</ol>
+<p>   the blob (<code>LineageOS/android_device_essential_mata proprietary-files.txt</code>,</p>
+<p>   omnirom oneplus6, HTC ocn, asus X00T…) → TheMuppets mata vendor repo.</p>
+<p>   <code>media.githubusercontent.com</code> returned 0 bytes for mata (its blobs are</p>
+<p>   plain git objects, not LFS); <code>raw.githubusercontent.com</code> worked → mata</p>
+<p>   crbtfw20.tlv + crnv20.bin byte-exact (direct device-tree corroboration).</p>
+<ol>
+<li>Negatives: postmarketOS wiki behind an Anubis anti-bot challenge</li>
+</ol>
+<p>   (unrelated to this mission); no other fleet-file public source needed —</p>
+<p>   every file had ≥1 byte-exact source before moving on.</p>
+<h2>2. Parser runs on real payloads</h2>
+<pre><code>
+python3 -I implementations/qca-bt/qca_tlv.py &lt;file&gt; --json out.json --brief
+</code></pre>
+<p>Exit status <strong>0 (no error-class diagnostics) for all six files</strong> — the</p>
+<p>container chain, record bounds, tag stride arithmetic and declared-length</p>
+<p>consistency the kernel relies on all hold on the real fleet bytes. The only</p>
+<p>diagnostics are the parser's info class:</p>
+<ul>
+<li>patch files: <code>data-length-note</code> (header <code>data_length</code> ≠ bytes-after-header)</li>
+</ul>
+<p>  and <code>total-size-note</code> (header <code>total_size</code> ≠ file size) — both expected;</p>
+<p>  the kernel never validates either field (see §3 — the real explanation is</p>
+<p>  the 256-byte tail).</p>
+<ul>
+<li>NVM files: <code>trailing-bytes</code> (947/447/947) — explained below (§5): the</li>
+</ul>
+<p>  trailing bytes are a further TLV record, not garbage.</p>
+<p>Family annotations from the canonical-name re-run (offset-correct):</p>
+<table>
+<tr>
+<th>file</th>
+<th>prefix</th>
+<th>kernel chip family</th>
+<th>rom_ver derived from <code>rom_build</code></th>
+<th>parser-expected name</th>
+<th>ships as</th>
+</tr>
+<tr>
+<td>crbtfw20.tlv</td>
+<td>cr</td>
+<td>WCN3990/3991/3998</td>
+<td>0x20</td>
+<td><code>qca/crbtfw20.tlv</code></td>
+<td>same ✓</td>
+</tr>
+<tr>
+<td>apbtfw10.tlv</td>
+<td>ap</td>
+<td>WCN3988</td>
+<td>0x20 (default formula)</td>
+<td><code>qca/apbtfw20.tlv</code></td>
+<td><code>apbtfw10.tlv</code> ✗ (see §4)</td>
+</tr>
+<tr>
+<td>crbtfw11.tlv</td>
+<td>cr</td>
+<td>WCN3990/3991/3998</td>
+<td>0x11</td>
+<td><code>qca/crbtfw11.tlv</code></td>
+<td>same ✓</td>
+</tr>
+</table>
+<h2>3. Patch files: record layout and the 256-byte tail</h2>
+<p>All three rampatches are <code>TLV_TYPE_PATCH</code> (1) containers:</p>
+<pre><code>
+[0, 4)    tlv_type_hdr       type_len word: type=1 low byte, length = file-4
+[4, 28)   tlv_type_patch     24 bytes (btqca.h offsets, verified sane)
+[28, 28+data_length)         patch body (opaque, §3.2)
+[28+data_length, file)       256-byte tail (opaque, §3.3)
+</code></pre>
+<h3>3.1 Header fields, all three files</h3>
+<table>
+<tr>
+<th>field (offset in header)</th>
+<th>crbtfw20.tlv</th>
+<th>apbtfw10.tlv</th>
+<th>crbtfw11.tlv</th>
+</tr>
+<tr>
+<td>container length_field [0,4) = file−4</td>
+<td>56,176</td>
+<td>56,048</td>
+<td>29,364</td>
+</tr>
+<tr>
+<td>total_size [+0]</td>
+<td>55,920</td>
+<td>55,792</td>
+<td>29,108</td>
+</tr>
+<tr>
+<td>data_length [+4]</td>
+<td>55,896</td>
+<td>55,768</td>
+<td>29,084</td>
+</tr>
+<tr>
+<td>format_version [+8]</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>signature_algorithm [+9]</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>download_mode [+10]</td>
+<td>3 = SKIP_EVT_VSE_CC</td>
+<td>3 = SKIP_EVT_VSE_CC</td>
+<td>0 = SKIP_EVT_NONE</td>
+</tr>
+<tr>
+<td>reserved1 [+11]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>product_id [+12]</td>
+<td>10</td>
+<td>10</td>
+<td>10</td>
+</tr>
+<tr>
+<td>rom_build [+14]</td>
+<td>0x0200</td>
+<td>0x0200</td>
+<td>0x0101</td>
+</tr>
+<tr>
+<td>patch_version [+16]</td>
+<td>0x0002</td>
+<td>0x0002</td>
+<td>0x0002</td>
+</tr>
+<tr>
+<td>reserved2 [+18]</td>
+<td>0x8000</td>
+<td>0x8000</td>
+<td>0x8000</td>
+</tr>
+<tr>
+<td>entry [+20]</td>
+<td>0x0001b0e0</td>
+<td>0x0001b0e0</td>
+<td>0x0001b15c</td>
+</tr>
+<tr>
+<td>segments (243 B each, whole file)</td>
+<td>232 (last 47 B)</td>
+<td>231 (last 162 B)</td>
+<td>121 (last 208 B)</td>
+</tr>
+</table>
+<p><strong>Structural invariants (hold in all three, error-free):</strong></p>
+<ol>
+<li>container <code>length_field == file_size − 4</code> (holds in all six fleet files).</li>
+<li><code>total_size == data_length + 24</code> — the header's own idea of the file is</li>
+</ol>
+<p>   "24-byte header + data_length bytes". The real file is larger by a</p>
+<p>   <strong>constant 256-byte tail</strong> in every patch file:</p>
+<p>   <code>file = 4 + 24 + data_length + 256</code>.</p>
+<ol>
+<li><code>product_id = 10</code>, <code>format_version = 1</code>, <code>signature_algorithm = 2</code>,</li>
+</ol>
+<p>   <code>reserved2 = 0x8000</code>, <code>patch_version = 0x0002</code> across all three — i.e.</p>
+<p>   <code>patch_version</code> does <strong>not</strong> encode the 1.0/1.1/2.0 in the filename (that</p>
+<p>   digit is the ROM build targeted, §4).</p>
+<ol>
+<li><code>download_mode</code> tracks the ROM generation: both <code>rom_build 0x0200</code> files</li>
+</ol>
+<p>   use SKIP_EVT_VSE_CC (send-only + synthetic completion); the <code>0x0101</code></p>
+<p>   file uses SKIP_EVT_NONE (every segment acked).</p>
+<ol>
+<li>The upstream 24-byte header decodes sanely on these files (plausible RAM</li>
+</ol>
+<p>   entry point, coherent size arithmetic) — the parser's</p>
+<p>   "32-byte-vendor-header" alternative hypothesis (its size_note, from the</p>
+<p>   FP6 msbtfw/evr census) is not needed for this fleet.</p>
+<h3>3.2 Patch body [28, file−256)</h3>
+<ul>
+<li>Entropy 6.85-6.91 bits/byte, 8.7-8.8% zero bytes, &lt;1% 0xFF — dense</li>
+</ul>
+<p>  machine-code-like content, no compression markers observed at the range</p>
+<p>  boundaries.</p>
+<ul>
+<li>Most-common little-endian 4-byte words are shared across all three files:</li>
+</ul>
+<p>  <code>0x4801b403</code> ×133/133/104 and <code>0xbd019001</code> ×133/133/104 (crbtfw20/apbtfw10/</p>
+<p>  crbtfw11). As little-endian 16-bit instruction words these are <code>b403 4801</code></p>
+<p>  (<code>push {r0,r1}</code>; <code>ldr r0,[pc,#4]</code>) and <code>9001 bd01</code> (<code>str r0,[sp,#4]</code>;</p>
+<p>  <code>pop {r0,r1}</code>) — classic ARM Thumb stack-veneer pairs; <code>0x47886809</code> =</p>
+<p>  <code>6809 4788</code> (<code>ldr r1,[r1,#8]</code>; <code>blx r3</code>). <strong>Interpretation [OPEN]:</strong> the</p>
+<p>  patch bodies are ARM Thumb machine code for the controller's ARM core,</p>
+<p>  with the repeating pattern being patch-entry veneers. Every claim above is</p>
+<p>  tied to the parsed word histogram over [28, file−256); no disassembly was</p>
+<p>  performed and no code was interpreted beyond these statistics.</p>
+<ul>
+<li>crbtfw20 vs apbtfw10 (same <code>rom_build</code>, same <code>entry</code>, same everything but</li>
+</ul>
+<p>  the size fields): <strong>43.69% of bytes identical at the same offsets</strong></p>
+<p>  (24,487/56,052). 1,257 differing runs; 821 of them are &lt;16 bytes</p>
+<p>  (instruction-word-level edits, 3,733 bytes total); the rest coalesce into</p>
+<p>  140 regions (≥8-byte gap), dominated by two wholesale blocks: [24,160,</p>
+<p>  22,804 B) and [47,918, 8,134 B) (to end of common range). So the two</p>
+<p>  chip-variant patches share one overlay base (~24 KB) with chip-specific</p>
+<p>  blocks swapped in — <strong>one RE pass informs both families</strong>.</p>
+<ul>
+<li>crbtfw20 vs crbtfw11 (different <code>rom_build</code>): 2.60% same-offset equality,</li>
+</ul>
+<p>  10/1,818 shared 16-byte blocks — <strong>wholly different builds</strong>, consistent</p>
+<p>  with the different entry point and download mode.</p>
+<h3>3.3 The 256-byte tail [file−256, file)</h3>
+<p>Exactly 256 bytes beyond <code>28 + data_length</code> in every patch file — the file</p>
+<p>region the header's own arithmetic does not account for. Entropy 7.13-7.18</p>
+<p>bits/byte (higher than the body), near-zero runs of 0x00/0xFF. Size and</p>
+<p>statistics are consistent with an RSA-2048 signature block, but **content</p>
+<p>semantics [OPEN]** — the kernel never inspects them, yet streams them to the</p>
+<p>chip (whole-file segmentation), so the controller evidently consumes them.</p>
+<p>Tails differ between crbtfw20 and apbtfw10 (different sha1) even though 44%</p>
+<p>of their bodies match.</p>
+<h2>4. What "1.0 / 1.1 / 2.0" actually mean (the version story)</h2>
+<p>The filename digit is the <strong>ROM build the patch targets</strong>, recovered through</p>
+<p>the kernel's chip-specific formula — not a linear patch release number:</p>
+<ul>
+<li><code>crbtfw20.tlv</code>: <code>rom_build 0x0200</code>, default formula → rom_ver 0x20 → "20".</li>
+<li><code>crbtfw11.tlv</code>: <code>rom_build 0x0101</code> → rom_ver 0x11 → "11".</li>
+<li><code>apbtfw10.tlv</code>: <code>rom_build 0x0200</code> — <strong>the same ROM build as crbtfw20</strong> —</li>
+</ul>
+<p>  but WCN3988's chip-specific shift (<code>(soc&amp;0xf00)&gt;&gt;5 | soc&amp;0xf</code>) maps it to</p>
+<p>  rom_ver 0x10 → "10". The parser (default formula) expected</p>
+<p>  <code>apbtfw20.tlv</code>; the shipped name is the WCN3988-specific resolution. This</p>
+<p>  resolves the parser's <code>[OPEN]</code> formula note with real data: same 32-bit</p>
+<p>  ROM-build field, different per-chip shift, different filename digit.</p>
+<p>Consequences:</p>
+<ul>
+<li><code>apbtfw10.tlv</code> (WCN3988) and <code>crbtfw20.tlv</code> (WCN399x) are patches against</li>
+</ul>
+<p>  the <strong>same ROM build</strong> and share 44% body content with identical entry</p>
+<p>  points — the WCN3988/WCN399x BT cores are one patch-generation apart.</p>
+<ul>
+<li><code>crbtfw11.tlv</code> targets an older ROM build (0x0101) and shares nothing</li>
+</ul>
+<p>  with the 0x0200-generation files — "1.1" is <em>not</em> an intermediate of</p>
+<p>  crbtfw20's codebase.</p>
+<ul>
+<li><code>patch_version 0x0002</code> is constant everywhere → it is the patch <em>format</em></li>
+</ul>
+<p>  revision, not the ROM generation.</p>
+<h2>5. NVM files: full tag map + the kernel-ignored type-3 record</h2>
+<p>All three NVRAMs are <strong>type-4 multi-NVM containers</strong> (<code>MULTI_NVM_ENCLOSING</code></p>
+<p>enclosing header at [0,4), first set header at [4,8)):</p>
+<pre><code>
+[0, 4)    type-4 enclosing header   (length = file-4)
+[4, 8)    type-2 set header         (length = declared set bytes)
+[8, 8+set)  tlv_type_nvm tags, 12-byte prefix each (tag_id u16, tag_len u16,
+            reserve1 u32, reserve2 u32), back-to-back, zero padding
+[8+set, file)  a type-3 TLV record the mainline parser never reads
+</code></pre>
+<h3>5.1 The type-3 record — new structural fact</h3>
+<p>The trailing region flagged as <code>trailing-bytes</code> by the parser is a **further</p>
+<p>TLV record<strong>: its first word decodes as type </strong>3** with length exactly</p>
+<p><code>trailing − 4</code>, in all three files:</p>
+<table>
+<tr>
+<th>file</th>
+<th>record offset</th>
+<th>first word</th>
+<th>type-3 declared len</th>
+<th>consistency</th>
+</tr>
+<tr>
+<td>crnv20.bin</td>
+<td>2,989</td>
+<td>0x0003af03</td>
+<td>943</td>
+<td>declared = actual ✓</td>
+</tr>
+<tr>
+<td>crnv11.bin</td>
+<td>2,351</td>
+<td>0x0001bb03</td>
+<td>443</td>
+<td>declared = actual ✓</td>
+</tr>
+<tr>
+<td>apnv10.bin</td>
+<td>296</td>
+<td>0x0003af03</td>
+<td>943</td>
+<td>declared = actual ✓</td>
+</tr>
+</table>
+<ul>
+<li><strong>crnv20.bin's and apnv10.bin's type-3 records are byte-identical</strong></li>
+</ul>
+<p>  (947 B, sha1 <code>71de3a2841065e88…</code>) — the same record ships inside the NVRAM</p>
+<p>  of two different chip families.</p>
+<ul>
+<li>crnv11.bin's is a different 447-byte record (sha1 <code>4adfca24587d0acd…</code>).</li>
+<li>The kernel parses only the first type-2 set ("only parse the first set</li>
+</ul>
+<p>  when it has type 2 for now") and ignores this record entirely, but streams</p>
+<p>  it to the chip like every other byte. Vendor-consumed semantics <strong>[OPEN]</strong>.</p>
+<p>  Note this is a counterexample to the parser docstring's claim that type 3</p>
+<p>  is "never a container type byte on disk" — on these files it <em>is</em> on disk,</p>
+<p>  as an NVM-internal record type. (<code>qca_tlv.py</code> deliberately left</p>
+<p>  unmodified; its NVM scan path handles the observation correctly as</p>
+<p>  info-level.)</p>
+<ul>
+<li>Trailing-region statistics: entropy 3.40/4.35/3.40 bits/byte (far below</li>
+</ul>
+<p>  the patch tail — table-like content), 54.7%/42.7%/54.7% zero bytes,</p>
+<p>  12.6%/0.9%/12.6% 0xFF; crnv20/apnv10 show a repeating 16-byte-block</p>
+<p>  structure (59 blocks, 39 distinct, most-common block repeats 14×).</p>
+<h3>5.2 Full tag tables (offsets are file offsets; tag data NOT reproduced —</h3>
+<p>sha1 prefixes only)</p>
+<p><strong>crnv20.bin — 33 tags, set [8, 2989), consumed 2,981/2,981, zero padding</strong></p>
+<table>
+<tr>
+<th>off</th>
+<th>tag</th>
+<th>len</th>
+<th>sha1-12</th>
+<th>off</th>
+<th>tag</th>
+<th>len</th>
+<th>sha1-12</th>
+</tr>
+<tr>
+<td>8</td>
+<td>2 BD_ADDR</td>
+<td>6</td>
+<td>dabb72163cfd</td>
+<td>1283</td>
+<td>83</td>
+<td>8</td>
+<td>0e0cddbc8105</td>
+</tr>
+<tr>
+<td>26</td>
+<td>17 HCI</td>
+<td>9</td>
+<td>e11b08b702f6</td>
+<td>1379</td>
+<td>85</td>
+<td>124</td>
+<td>ab0a5a373fe9</td>
+</tr>
+<tr>
+<td>47</td>
+<td>22</td>
+<td>60</td>
+<td>c8315263d15e</td>
+<td>1515</td>
+<td>86</td>
+<td>16</td>
+<td>9c5784d4a951</td>
+</tr>
+<tr>
+<td>119</td>
+<td>27 DEEP_SLEEP</td>
+<td>1</td>
+<td>bf8b4530d8d2</td>
+<td>1543</td>
+<td>87</td>
+<td>16</td>
+<td>cf688d8a9cad</td>
+</tr>
+<tr>
+<td>132</td>
+<td>35</td>
+<td>68</td>
+<td>968c5e1981f7</td>
+<td>1571</td>
+<td>88</td>
+<td>144</td>
+<td>4a814a1a6625</td>
+</tr>
+<tr>
+<td>212</td>
+<td>36</td>
+<td>16</td>
+<td>9b43f463ae67</td>
+<td>1727</td>
+<td>89</td>
+<td>196</td>
+<td>a3cf9f345367</td>
+</tr>
+<tr>
+<td>240</td>
+<td>37</td>
+<td>32</td>
+<td>594ea1952110</td>
+<td>1935</td>
+<td>90</td>
+<td>8</td>
+<td>2b299c192d25</td>
+</tr>
+<tr>
+<td>284</td>
+<td>38</td>
+<td>55</td>
+<td>cbe511870d77</td>
+<td>1955</td>
+<td>91</td>
+<td>188</td>
+<td>39fb0071eafe</td>
+</tr>
+<tr>
+<td>351</td>
+<td>39</td>
+<td>4</td>
+<td>61e4653de420</td>
+<td>2155</td>
+<td>92</td>
+<td>64</td>
+<td>6b48ea23532b</td>
+</tr>
+<tr>
+<td>367</td>
+<td>41</td>
+<td>180</td>
+<td>1af48383f114</td>
+<td>2231</td>
+<td>95</td>
+<td>100</td>
+<td>24a72a91ce35</td>
+</tr>
+<tr>
+<td>559</td>
+<td>50</td>
+<td>222</td>
+<td>509692e62d96</td>
+<td>2343</td>
+<td>111</td>
+<td>204</td>
+<td>6788f95b50f1</td>
+</tr>
+<tr>
+<td>793</td>
+<td>51</td>
+<td>48</td>
+<td>10c6c1564c32</td>
+<td>2559</td>
+<td>112</td>
+<td>232</td>
+<td>7f734d70372d</td>
+</tr>
+<tr>
+<td>853</td>
+<td>60</td>
+<td>129</td>
+<td>fa6095298884</td>
+<td>2803</td>
+<td>114</td>
+<td>132</td>
+<td>ea3314e3ac4a</td>
+</tr>
+<tr>
+<td>994</td>
+<td>64</td>
+<td>88</td>
+<td>9d236b029009</td>
+<td>2947</td>
+<td>150</td>
+<td>30</td>
+<td>656fa199d455</td>
+</tr>
+<tr>
+<td>1094</td>
+<td>65</td>
+<td>22</td>
+<td>7c0cb8f29f1b</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1128</td>
+<td>73</td>
+<td>1</td>
+<td>356a192b7913</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1141</td>
+<td>79</td>
+<td>82</td>
+<td>f61ebddf8d40</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1235</td>
+<td>80</td>
+<td>16</td>
+<td>04d1467a4d5f</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<p><strong>crnv11.bin — 27 tags, set [8, 2351), consumed 2,343/2,343, zero padding</strong></p>
+<table>
+<tr>
+<th>off</th>
+<th>tag</th>
+<th>len</th>
+<th>sha1-12</th>
+<th>off</th>
+<th>tag</th>
+<th>len</th>
+<th>sha1-12</th>
+</tr>
+<tr>
+<td>8</td>
+<td>2 BD_ADDR</td>
+<td>6</td>
+<td>9e4093c0b241</td>
+<td>999</td>
+<td>84</td>
+<td>56</td>
+<td>04d52349bd73</td>
+</tr>
+<tr>
+<td>26</td>
+<td>17 HCI</td>
+<td>8</td>
+<td>2c7c06e240c4</td>
+<td>1067</td>
+<td>85</td>
+<td>124</td>
+<td>f45fff4b57c8</td>
+</tr>
+<tr>
+<td>46</td>
+<td>27 DEEP_SLEEP</td>
+<td>1</td>
+<td>bf8b4530d8d2</td>
+<td>1203</td>
+<td>86</td>
+<td>16</td>
+<td>c8d39550e5c3</td>
+</tr>
+<tr>
+<td>59</td>
+<td>28</td>
+<td>20</td>
+<td>c6e7cf0e895c</td>
+<td>1231</td>
+<td>87</td>
+<td>16</td>
+<td>e129f27c5103</td>
+</tr>
+<tr>
+<td>91</td>
+<td>35</td>
+<td>168</td>
+<td>a0f9815376c0</td>
+<td>1259</td>
+<td>88</td>
+<td>144</td>
+<td>ec334c9191f3</td>
+</tr>
+<tr>
+<td>271</td>
+<td>38</td>
+<td>45</td>
+<td>202b33ba9097</td>
+<td>1415</td>
+<td>91</td>
+<td>148</td>
+<td>e9f664058eca</td>
+</tr>
+<tr>
+<td>328</td>
+<td>39</td>
+<td>4</td>
+<td>b0449d8ebb02</td>
+<td>1575</td>
+<td>92</td>
+<td>64</td>
+<td>6b48ea23532b</td>
+</tr>
+<tr>
+<td>344</td>
+<td>41</td>
+<td>116</td>
+<td>94b2661bd4e4</td>
+<td>1651</td>
+<td>95</td>
+<td>98</td>
+<td>c76d03f758ef</td>
+</tr>
+<tr>
+<td>472</td>
+<td>45</td>
+<td>132</td>
+<td>5f0fed37a231</td>
+<td>1761</td>
+<td>111</td>
+<td>204</td>
+<td>189e923b367c</td>
+</tr>
+<tr>
+<td>616</td>
+<td>60</td>
+<td>101</td>
+<td>ad1f0f4c6514</td>
+<td>1977</td>
+<td>112</td>
+<td>232</td>
+<td>2eccb1e12461</td>
+</tr>
+<tr>
+<td>729</td>
+<td>64</td>
+<td>82</td>
+<td>d36657af08be</td>
+<td>2221</td>
+<td>114</td>
+<td>84</td>
+<td>5a22075714b0</td>
+</tr>
+<tr>
+<td>823</td>
+<td>65</td>
+<td>22</td>
+<td>7c0cb8f29f1b</td>
+<td>2317</td>
+<td>150</td>
+<td>22</td>
+<td>dde7ff3b8d21</td>
+</tr>
+<tr>
+<td>857</td>
+<td>79</td>
+<td>82</td>
+<td>f61ebddf8d40</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>951</td>
+<td>80</td>
+<td>16</td>
+<td>04d1467a4d5f</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>979</td>
+<td>83</td>
+<td>8</td>
+<td>0e0cddbc8105</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<p><strong>apnv10.bin — 9 tags, set [8, 296), consumed 288/288, zero padding</strong></p>
+<table>
+<tr>
+<th>off</th>
+<th>tag</th>
+<th>len</th>
+<th>sha1-12</th>
+</tr>
+<tr>
+<td>8</td>
+<td>2 BD_ADDR</td>
+<td>6</td>
+<td>eb1861258b7c</td>
+</tr>
+<tr>
+<td>26</td>
+<td>17 HCI</td>
+<td>9</td>
+<td>e11b08b702f6</td>
+</tr>
+<tr>
+<td>47</td>
+<td>22</td>
+<td>60</td>
+<td>d7cb00ab36e7</td>
+</tr>
+<tr>
+<td>119</td>
+<td>27 DEEP_SLEEP</td>
+<td>1</td>
+<td>bf8b4530d8d2</td>
+</tr>
+<tr>
+<td>132</td>
+<td>37</td>
+<td>32</td>
+<td>1cc8b9d6bdae</td>
+</tr>
+<tr>
+<td>176</td>
+<td>38</td>
+<td>55</td>
+<td>cbe511870d77</td>
+</tr>
+<tr>
+<td>243</td>
+<td>39</td>
+<td>4</td>
+<td>96760d655a51</td>
+</tr>
+<tr>
+<td>259</td>
+<td>41</td>
+<td>12</td>
+<td>e1c9ea677c5c</td>
+</tr>
+<tr>
+<td>283</td>
+<td>73</td>
+<td>1</td>
+<td>356a192b7913</td>
+</tr>
+</table>
+<h3>5.3 Cross-file tag findings (content identity via sha1 — not bytes)</h3>
+<ul>
+<li><strong>Byte-identical tag content across chip families:</strong> tag 27 (1 B, all</li>
+</ul>
+<p>  three files), 65 (22 B, crnv20+crnv11), 73 (1 B, crnv20+apnv10), 79</p>
+<p>  (82 B, crnv20+crnv11), 80 (16 B, crnv20+crnv11), 83 (8 B, crnv20+crnv11),</p>
+<p>  92 (64 B, crnv20+crnv11). Also crnv20↔apnv10: tag 17 (9 B) and tag 38</p>
+<p>  (55 B) identical. These are family-level constants, not per-device tuning.</p>
+<ul>
+<li>Tag 2 (BD_ADDR): 6 B in all three, content differs pairwise (shared</li>
+</ul>
+<p>  leading bytes: crnv20/crnv11 = 1, others = 0) — per-chip default address</p>
+<p>  templates, not shared.</p>
+<ul>
+<li>Tag census progression: crnv20 = 33 tags/2,981 B; crnv11 = 27/2,343;</li>
+</ul>
+<p>  apnv10 = 9/288. apnv10's set is a strict subset by count (its tags are a</p>
+<p>  reduced bring-up set); crnv20-only tags: 36, 50, 51, 89, 90; crnv11-only:</p>
+<p>  28, 45; tag 22 present in crnv20+apnv10 but not crnv11.</p>
+<ul>
+<li>The two kernel in-flight mutations are <strong>already pre-applied</strong> in all</li>
+</ul>
+<p>  three files: tag 17 data[0] bit 7 (inband-sleep) is set, and tag 27</p>
+<p>  data[0] bit 0 (sleep-enable) is set — the kernel's ORs are idempotent</p>
+<p>  no-ops on these bytes. The baud-rate byte the kernel writes into tag 17</p>
+<p>  (data[1] for WCN3991+, data[2] otherwise) is not verifiable from the file</p>
+<p>  alone; tag 17 lens are 9 (crnv20, apnv10) and 8 (crnv11).</p>
+<ul>
+<li>No tag overruns, no BD_ADDR length violations (kernel's tag-2 <code>==6</code></li>
+</ul>
+<p>  check passes), zero padding inside sets — the vendor NVM generator emits</p>
+<p>  perfectly packed 12-byte-prefix records.</p>
+<h2>6. What this means for a free reimplementation</h2>
+<p><strong>Fully specified, writable today with zero proprietary bytes</strong> (GPL kernel</p>
+<p>code + the range map above, now verified on real files):</p>
+<ul>
+<li>Container framing, patch header field semantics, NVM set/tag framing,</li>
+</ul>
+<p>  the type-4 enclosing unwrap, the download protocol (VSC 0xFC00 /</p>
+<p>  sub-command 0x1E, 243-byte segments, last-segment-ack rule, synthetic</p>
+<p>  completion for VSE-skipping modes), and the tag-17/tag-27 in-flight</p>
+<p>  mutations. The lab's parser already implements all of it and passed on</p>
+<p>  all six real files — a free <em>loader</em> is the next step, not new RE.</p>
+<ul>
+<li>NVM structure: a free NVM generator can emit the same record framing;</li>
+</ul>
+<p>  tag payloads are chip-tuning values (RF/calibration), of which seven</p>
+<p>  tag contents are provably family-constant (§5.3) and could be carried</p>
+<p>  as shared constants; per-device tags (BD_ADDR tag 2) must be provisioned</p>
+<p>  at generation time.</p>
+<p><strong>Opaque content — needs synthesis or further RE, not byte-copying:</strong></p>
+<ul>
+<li>Patch body [28, file−256): ARM Thumb-consistent machine code overlay</li>
+</ul>
+<p>  (~6.9 bits/byte). A free replacement means generating an equivalent</p>
+<p>  overlay (or determining the controller can run unpatched ROM with</p>
+<p>  reduced features); the 44% crbtfw20↔apbtfw10 overlap shows the overlay</p>
+<p>  base is shared and the chip-specific deltas are localized to two large</p>
+<p>  blocks.</p>
+<ul>
+<li>256-byte patch tail: signature-class content [OPEN] — a free build must</li>
+</ul>
+<p>  either satisfy the chip's verification or find the chip's unsigned</p>
+<p>  download mode.</p>
+<ul>
+<li>Type-3 NVM record: kernel-ignored, chip-consumed, family-shared between</li>
+</ul>
+<p>  crnv20 and apnv10 [OPEN].</p>
+<p><strong>Program-level:</strong> the fleet is six small files (1.2-56 KB), fetchable</p>
+<p>individually from public repos (no 1.3 GB package), md5-stable across the</p>
+<p>entire 29-device fleet (one md5 per filename), and structurally identical</p>
+<p>under the lab's parser. Every remaining unknown is now pinned to an exact</p>
+<p>byte range with [OPEN] labels — the RE surface went from "six opaque</p>
+<p>binaries" to "two opaque regions per patch + one record per NVM".</p>
+<h2>7. Scratch artifacts (regeneratable)</h2>
+<ul>
+<li><code>/tmp/astro_s/payloads/</code> — verified payload bytes (canonical copies in</li>
+</ul>
+<p>  <code>canonical/</code>, plus per-source copies: <code>vamos_*</code>, <code>mi5_*</code>, <code>mata_*</code>,</p>
+<p>  <code>linuxfw_*</code>).</p>
+<ul>
+<li><code>/tmp/astro_s/analysis/</code> — parser JSON per file (<code>*_parsed.json</code>),</li>
+</ul>
+<p>  brief/diag outputs, <code>fleet_struct.py</code> (the statistics script; all numbers</p>
+<p>  in this document come from its runs or the parser JSONs).</p>
+<ul>
+<li>Payload bytes are NOT committed to the repo per program rules.</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

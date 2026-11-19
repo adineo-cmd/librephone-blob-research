@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nexus 5 hammerhead — real-payload blob census + RE (2026-11-18) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Nexus 5 hammerhead — real-payload blob census + RE (2026-11-18)</h1><p>Second historic-device RE pass: the Nexus 5 (MSM8974, the most-flashed</p><p>Evidence: none</p>
+<h1>Nexus 5 hammerhead — real-payload blob census + RE (2026-11-18)</h1>
+<p>Second historic-device RE pass: the Nexus 5 (MSM8974, the most-flashed</p>
+<p>8974 device, ABSENT from the upstream 249). Every obtainable firmware blob</p>
+<p>was located from public, <strong>independently hash-pinned</strong> sources (postmarketOS</p>
+<p>pmaports pins), fetched, verified, and run through the lab's clean-room</p>
+<p><code>mdt_probe.py</code> (<code>implementations/historic/fp2/mdt_probe.py</code> — same parser,</p>
+<p>fixture-tested). This file documents the real bytes per parsed byte range;</p>
+<p>payloads stay in <code>/tmp/astro_w/payloads/hh/</code> only.</p>
+<p><strong>Combo-chip correction (the session's headline finding):</strong> the queue file</p>
+<p>(<code>historic-devices/historic-devices-queue.md</code>, §queue row + §App B) pins</p>
+<p>hammerhead's combo as "WCN3680 prima". That is <strong>wrong</strong> — verified against</p>
+<p>three primary sources on 2026-11-18:</p>
+<ol>
+<li><code>CyanogenMod/android_device_lge_hammerhead</code> <code>BoardConfig.mk</code> (cm-13.0):</li>
+</ol>
+<p>   <code>BOARD_WLAN_DEVICE := bcmdhd</code>, driver fw paths <code>/vendor/firmware/fw_bcmdhd.bin</code></p>
+<p>   — the stock WiFi is Broadcom, driven by bcmdhd;</p>
+<ol>
+<li>Google's own public driver package <code>broadcom-hammerhead-m4b30z-*.tgz</code></li>
+</ol>
+<p>   (the stock extraction, pmOS-pinned) ships <code>bcm4335c0.hcd</code> (Bluetooth) +</p>
+<p>   <code>bcm2079x-b5_firmware.ncd</code> (NFC) — Broadcom BT/NFC;</p>
+<ol>
+<li>pmOS <code>firmware-lg-hammerhead</code> ships <code>brcmfmac4339-sdio.txt</code> (BCM4339</li>
+</ol>
+<p>   srom nvram, "for 4339 iPA/eLNA / AARDVARK_6_30_271") — the mainline WiFi</p>
+<p>   is <strong>brcmfmac4339</strong>, i.e. Broadcom BCM4339 WiFi.</p>
+<p>hammerhead has <strong>no WCNSS/prima firmware at all</strong>: its radio partition</p>
+<p>contains only modem + mba (verified — the fetched modem archive has 22</p>
+<p>files, none named wcnss/WCNSS; the AOSP-era extraction lists no prima</p>
+<p>files either). The FP2, not the Nexus 5, is the WCN3680-prima representative</p>
+<p>of the MSM8974 fleet (see <code>implementations/historic/fp2/fleet-analysis.md</code>).</p>
+<h2>1. Provenance and verification (all pmOS-pinned, all MATCH)</h2>
+<p>pmaports <code>device/testing/firmware-lg-hammerhead</code> APKBUILD (fetched from the</p>
+<p>GitLab API 2026-11-18) pins four sources; each was fetched and</p>
+<p>sha512-verified byte-exact:</p>
+<table>
+<tr>
+<th>source</th>
+<th>pmOS sha512 pin</th>
+<th>result</th>
+</tr>
+<tr>
+<td><code>gitlab.com/JuniorJPDJ/hammerhead-modem</code> @ <code>d0565ebb…</code> (<code>hammerhead-modem-*.tar.gz</code> — extracted radio modem partition, <code>image/</code>)</td>
+<td><code>a63a0fad…8a</code></td>
+<td><strong>MATCH</strong> (22,416,262 B)</td>
+</tr>
+<tr>
+<td><code>dl.google.com/dl/android/aosp/qcom-hammerhead-m4b30z-d6c0fe26.tgz</code> (Google's public qcom driver package)</td>
+<td><code>a421b547…df2</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>dl.google.com/dl/android/aosp/broadcom-hammerhead-m4b30z-21cf8433.tgz</code> (Google's public broadcom driver package)</td>
+<td><code>003502ff…ed0</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>brcmfmac4339-sdio.txt</code> (committed in the pmaports package itself)</td>
+<td><code>59baf815…345</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+</table>
+<p>Negatives (routes tried, recorded per RULE 0):</p>
+<ul>
+<li>TheMuppets <code>proprietary_vendor_lge</code> @ lineage-15.1/16.0/17.1</li>
+</ul>
+<p>  <code>hammerhead/</code> tree (506 files enumerated): **no modem/wcnss/WCNSS NV</p>
+<p>  firmware** — only adsp/venus/cmnlib/keymaster/widevine/discretix images +</p>
+<p>  userspace libs. hammerhead firmware comes from the radio partition, not</p>
+<p>  the vendor tree (the CM <code>extract-files.sh</code> extracts from adb, i.e. a</p>
+<p>  provisioned device).</p>
+<ul>
+<li><code>LineageOS/android_device_lge_hammerhead</code> tree: no wlan/prima files, no</li>
+</ul>
+<p>  root/firmware dir (device-side only).</p>
+<ul>
+<li>linux-firmware <code>brcm/</code> directory listing (kernel.org cgit, fetched</li>
+</ul>
+<p>  2026-11-18): contains <code>brcmfmac4330-sdio.bin</code> but **no</p>
+<p>  <code>brcmfmac4339-sdio.bin</code>** — the hammerhead WiFi chip's firmware bin is</p>
+<p>  not in linux-firmware; only the nvram txt is pinned by pmOS (the .bin</p>
+<p>  must come from device trees/vendor OTA <code>fw_bcmdhd.bin</code> — same chip image</p>
+<p>  family as the 4330/4335). [OPEN] route for a clean bin source.</p>
+<h2>2. modem.mdt — MPSS.DI.2.0.C5 image, per-byte-range map</h2>
+<p>Same container family as FP2 (machine 164 = EM_QDSP6, entry 0x08000000,</p>
+<p>not relocatable, 0x08000000–0x0d100000, <code>.mdt == .b00‖.b01</code> duplication —</p>
+<p>verified byte-for-byte here: 8156 = 884 + 7272). Build ID strings (factual</p>
+<p>metadata) from <code>modem.b13/b18</code>:</p>
+<p><code>QC_IMAGE_VERSION_STRING=MPSS.DI.2.0.C5-00024</code>, carrier build</p>
+<p><code>VU_MODEM_FW_LTE_MPSS_DI_2_0_C5.02.06.52.04.04</code>, CRM build stamp</p>
+<p>2014-09-03.</p>
+<table>
+<tr>
+<th>file</th>
+<th>flags</th>
+<th>filesz</th>
+<th>memsz</th>
+<th>paddr</th>
+<th>note</th>
+</tr>
+<tr>
+<td>b00</td>
+<td>0x07000000</td>
+<td>884</td>
+<td>0</td>
+<td>—</td>
+<td>ehdr + 26 phdrs (52+832)</td>
+</tr>
+<tr>
+<td>b01</td>
+<td>0x02200000</td>
+<td>7,272</td>
+<td>8,192</td>
+<td>0x0d100000</td>
+<td>hash segment</td>
+</tr>
+<tr>
+<td>b02</td>
+<td>5</td>
+<td>3,284</td>
+<td>3,284</td>
+<td>0x08000000</td>
+<td>RX</td>
+</tr>
+<tr>
+<td>b03</td>
+<td>7</td>
+<td>81,920</td>
+<td>81,920</td>
+<td>0x08010000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b06</td>
+<td>7</td>
+<td>179,305</td>
+<td>179,305</td>
+<td>0x08024000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b08</td>
+<td>7</td>
+<td>47,860</td>
+<td>122,984</td>
+<td>0x08054000</td>
+<td>RXW+BSS</td>
+</tr>
+<tr>
+<td>b09</td>
+<td>7</td>
+<td>50,884</td>
+<td>50,884</td>
+<td>0x08078000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b11</td>
+<td>7</td>
+<td>106,488</td>
+<td>106,488</td>
+<td>0x0808c000</td>
+<td>RXW</td>
+</tr>
+<tr>
+<td>b12</td>
+<td>5</td>
+<td>104,856</td>
+<td>104,856</td>
+<td>0x080ac000</td>
+<td>RX</td>
+</tr>
+<tr>
+<td>b13</td>
+<td>5</td>
+<td>1,381,296</td>
+<td>1,381,296</td>
+<td>0x080d0000</td>
+<td>RX</td>
+</tr>
+<tr>
+<td>b14</td>
+<td>5</td>
+<td><strong>30,721,712</strong></td>
+<td>30,721,712</td>
+<td>0x08222000</td>
+<td>main code (larger than FP2's 19.3 MB)</td>
+</tr>
+<tr>
+<td>b15</td>
+<td>6</td>
+<td>663,456</td>
+<td>663,456</td>
+<td>0x09f80000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b16</td>
+<td>6</td>
+<td>73,728</td>
+<td>73,728</td>
+<td>0x0a024000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b17</td>
+<td>6</td>
+<td>5,376</td>
+<td>5,376</td>
+<td>0x0a038000</td>
+<td>all-zero RW (md5 <code>c4ca1e4b…</code> = FP2's b17, §FP2 doc 2.5)</td>
+</tr>
+<tr>
+<td>b18</td>
+<td>4</td>
+<td>7,504,488</td>
+<td>7,504,488</td>
+<td>0x0a040000</td>
+<td>R</td>
+</tr>
+<tr>
+<td>b19</td>
+<td>6</td>
+<td>3,762,568</td>
+<td>3,762,568</td>
+<td>0x0a76a000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b20</td>
+<td>6</td>
+<td>0</td>
+<td>1,375,972</td>
+<td>0x0ab01000</td>
+<td>pure BSS</td>
+</tr>
+<tr>
+<td>b21</td>
+<td>6</td>
+<td>0</td>
+<td>35,040,448</td>
+<td>0x0ac52000</td>
+<td>pure BSS</td>
+</tr>
+<tr>
+<td>b22</td>
+<td>6</td>
+<td>270,840</td>
+<td>270,840</td>
+<td>0x0cdbd000</td>
+<td>RW</td>
+</tr>
+<tr>
+<td>b23</td>
+<td>4</td>
+<td>736,468</td>
+<td>736,468</td>
+<td>0x0ce00000</td>
+<td>R</td>
+</tr>
+<tr>
+<td>b24</td>
+<td>4</td>
+<td>378,600</td>
+<td>378,600</td>
+<td>0x0ceb4000</td>
+<td>R</td>
+</tr>
+<tr>
+<td>b25</td>
+<td>4</td>
+<td>0</td>
+<td>2,027,520</td>
+<td>0x0cf11000</td>
+<td>pure BSS</td>
+</tr>
+</table>
+<p>Σ p_filesz 46,081,285 B on disk (probe-verified == segment files), +38.5 MB</p>
+<p>BSS. phdr 4,5,7,10 are zero placeholders (as in FP2). <code>mba.mdt</code>: 1 phdr,</p>
+<p>PT_LOAD 0x0d800000–0x0d839b70 (MBA at a different offset than FP2's</p>
+<p>0x0d100000 — the boot-allocator address differs per board).</p>
+<p>FP2-vs-hammerhead modem comparison: 12/26 identical paddr, 8/26 identical</p>
+<p>filesz; byte-identical segments = the all-zero b17 only. Two 8974 builds,</p>
+<p>zero shared code bytes — the free-specification delta is the container +</p>
+<p>loader (done) and the per-build synthesis question [OPEN].</p>
+<h2>3. adsp.mdt (from Google's qcom package)</h2>
+<p>machine 164, 14 phdrs, entry 0x0dc00000, <strong>not relocatable</strong> (vs FP2's</p>
+<p>relocatable adsp — per-chip/brand difference), range 0x0dc00000–0x0f000000,</p>
+<p>13 segment files on disk, Σ filesz 9,296,139 B, +10.7 MB BSS. b03 = the</p>
+<p>5,039,216 B main segment. Notable: b02 is a 1-byte PT_LOAD with R flag at</p>
+<p>0x0e3424f0 and b08 a 120-byte RW blob — tiny segments the loader streams</p>
+<p>like any other.</p>
+<h2>4. Broadcom BT/NFC (from Google's broadcom package)</h2>
+<ul>
+<li><code>bcm4335c0.hcd</code> — 72,299 B, md5 <code>d39b8d63936ca939d01f2d5f6d9d545f</code>: the</li>
+</ul>
+<p>  BCM4335C0 Bluetooth HCD patchram. HCD = Broadcom's patchram format</p>
+<p>  (documented publicly in btusb/brcm patchram sources); class = H4</p>
+<p>  patchram download, NOT QCA-TLV.</p>
+<ul>
+<li><code>bcm2079x-b5_firmware.ncd</code> (10,101 B) + <code>_pre_firmware.ncd</code> (571 B) —</li>
+</ul>
+<p>  the Broadcom NFC controller firmware.</p>
+<p>These confirm the third Broadcom family member of the historic fleet</p>
+<p>(BCM4330 = m0-era, BCM4334 = m0 per pmOS, BCM4335/4339 = hammerhead, cf.</p>
+<p><code>implementations/historic/m0/analysis.md</code>).</p>
+<h2>5. What this means for a free reimplementation</h2>
+<ul>
+<li>Same conclusions as FP2 §4 for the modem: container/loader fully</li>
+</ul>
+<p>  specified and machine-verified here; modem code synthesis [OPEN]; the</p>
+<p>  hash-segment signature question [OPEN].</p>
+<ul>
+<li>WiFi mainline path is ALREADY free on the host side (brcmfmac4339) — the</li>
+</ul>
+<p>  remaining blob is the BCM4339 firmware bin itself (not in linux-firmware,</p>
+<p>  see negative route above) and the nvram txt (pmOS-committed, fetched).</p>
+<ul>
+<li>BT mainline path (btusb + bcm4335c0.hcd) is the same Broadcom patchram</li>
+</ul>
+<p>  class as m0's bcm4334.hcd — one clean-room HCD tool could serve the</p>
+<p>  whole Broadcom BT historic fleet [OPEN as parser target].</p>
+<h2>6. Files created (this directory)</h2>
+<ul>
+<li><code>fleet-analysis.md</code> (this file)</li>
+<li><code>hammerhead-blob-census.csv</code> — 56 firmware files with md5 + source</li>
+<li>(parsers shared with <code>implementations/historic/fp2/</code>: <code>mdt_probe.py</code>,</li>
+</ul>
+<p>  fixtures, tests)</p>
+<p>Scratch (regeneratable): <code>/tmp/astro_w/payloads/hh/</code> (modem archive,</p>
+<p>qcom/broadcom packages, nvram), <code>/tmp/astro_w/analysis/hh_*.json</code>,</p>
+<p><code>/tmp/astro_w/web/muppets_hh_tree.txt</code>. Payload bytes NOT committed.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

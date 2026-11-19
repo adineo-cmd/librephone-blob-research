@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Filing checklist — LibrePhone upstream PRs — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Filing checklist — LibrePhone upstream PRs</h1><p>Companion to [README.md](README.md), which holds the full paste-ready PR</p><p>Evidence: none</p>
+<h1>Filing checklist — LibrePhone upstream PRs</h1>
+<p>Companion to <a href="research/upstream/README.html">README.md</a>, which holds the full paste-ready PR</p>
+<p>descriptions and doc texts. Upstream repo:</p>
+<p>https://codeberg.org/rsavoye/librephone (Gitea/Forgejo — "New Pull</p>
+<p>Request" from the fork, base branch <code>main</code>).</p>
+<h2>Prerequisites (owner actions)</h2>
+<ul>
+<li>[ ] <strong>Log in to codeberg.org</strong> — the lab holds no Codeberg credentials;</li>
+</ul>
+<p>      every PR below is filed manually from a logged-in browser.</p>
+<ul>
+<li>[ ] Fork <code>rsavoye/librephone</code> under the filing account.</li>
+<li>[ ] <strong>Reconcile against live upstream docs at filing time.</strong> The</li>
+</ul>
+<p>      "current upstream text" quotes in README.md were fetched</p>
+<p>      2026-11-12 (<code>wireless.md</code>, <code>wpss.b06/07/08/09/10/12.md</code>, <code>files.md</code>).</p>
+<p>      If upstream changed since, re-diff and adjust the patch text.</p>
+<ul>
+<li>[ ] Optional: mention the #librephone IRC channel in the PRs for</li>
+</ul>
+<p>      follow-up (per the original draft's submission checklist).</p>
+<h2>Submission order</h2>
+<table>
+<tr>
+<th>#</th>
+<th>PR title</th>
+<th>Branch</th>
+<th>Target file(s)</th>
+<th>Commit title</th>
+<th>Depends on</th>
+</tr>
+<tr>
+<td>PR-1</td>
+<td>docs/wireless.md: replace the AVR guess with the verified RISC-V identification</td>
+<td><code>docs/wpss-riscv-architecture</code></td>
+<td><code>docs/wireless.md</code></td>
+<td>Fix wireless.md processor description</td>
+<td>none</td>
+</tr>
+<tr>
+<td>PR-2</td>
+<td>add docs/wmi-dispatch.md: the wpss WMI dispatch architecture (registry + Hexagon dispatchers), decoded</td>
+<td><code>docs/wmi-dispatch</code></td>
+<td><code>docs/wmi-dispatch.md</code> (new)</td>
+<td>Add docs/wmi-dispatch.md</td>
+<td>none</td>
+</tr>
+<tr>
+<td>PR-3</td>
+<td>correct the per-segment wpss docs (b06/b07/b08/b09/b10; b12 cross-check)</td>
+<td><code>docs/wpss-segments</code></td>
+<td><code>docs/wpss.b06.md</code>, <code>docs/wpss.b07.md</code>, <code>docs/wpss.b08.md</code>, <code>docs/wpss.b09.md</code>, <code>docs/wpss.b10.md</code>, <code>docs/wpss.b12.md</code></td>
+<td>Correct the per-segment wpss docs</td>
+<td>file after PR-2 (b06/b09 text links to <code>docs/wmi-dispatch.md</code>)</td>
+</tr>
+<tr>
+<td>PR-4</td>
+<td>docs/files.md: bluetooth partition firmware and boot-chain image facts</td>
+<td><code>docs/files-bt-bootchain</code></td>
+<td><code>docs/files.md</code></td>
+<td>Document the bluetooth partition and boot-chain images</td>
+<td>none (optional; last)</td>
+</tr>
+</table>
+<h2>Per-PR one-liners (full text in README.md)</h2>
+<ul>
+<li><strong>PR-1</strong> — one-paragraph fix: wireless.md's "8 bit ATMel AVR" guess is</li>
+</ul>
+<p>  replaced by the verified RV32 identification (e_machine=243, entry</p>
+<p>  0x404000 machine-mode startup, QURT strings, <code>dog_hal_moselle_riscv.c</code>)</p>
+<p>  plus the junk-.bXX-header caveat.</p>
+<ul>
+<li><strong>PR-2</strong> — new per-segment-facts doc: b09 registry</li>
+</ul>
+<p>  (<code>[ptr, grp&lt;&lt;12|cmdID, 0]</code>, 12-byte stride, 225 records / 149 IDs,</p>
+<p>  anchor 0xc0691080), b06 Hexagon dispatchers (PDEV 0xc02cd9cc decoded;</p>
+<p>  jump tables 0xc056423c / 0xc05641fc; 61 events mapped), registry-head</p>
+<p>  tie-in, open items. Corrects the ISA assumptions of the per-segment</p>
+<p>  docs (b06 is Hexagon, not "unknown").</p>
+<ul>
+<li><strong>PR-3</strong> — six files: b06 rewritten (Hexagon code, not data), b09</li>
+</ul>
+<p>  rewritten (the registry, not a PSX image), b07/b08/b10 updates</p>
+<p>  appended, b12 cross-check appended (CC-BY-SA-4.0 doc — append only).</p>
+<ul>
+<li><strong>PR-4</strong> — files.md: bluetooth.img FAT16 facts (Moselle 1.1/1.2 + EVROS</li>
+</ul>
+<p>  product_id 29, ARM Thumb rampatches, rom_build→filename math,</p>
+<p>  linux-firmware gaps) + boot-chain block (xbl multi-ELF container;</p>
+<p>  shrm/aop/cpucp RV32; Fairphone OEM signing chain).</p>
+<h2>Filing mechanics (Forgejo)</h2>
+<ol>
+<li>On the fork: create the branch from <code>main</code> (names in the table).</li>
+<li>Apply the doc text from README.md (commit titles in the table;</li>
+</ol>
+<p>   one commit per PR keeps review simple).</p>
+<ol>
+<li>Open the PR against <code>rsavoye/librephone</code> <code>main</code>; paste the PR</li>
+</ol>
+<p>   description block from README.md.</p>
+<ol>
+<li>PR-3 note: if PR-2 has not merged yet, keep its link line</li>
+</ol>
+<p>   (<code>docs/wmi-dispatch.md</code>) — Forgejo links resolve once PR-2 merges;</p>
+<p>   mention "follow-up to the docs/wmi-dispatch.md PR" in the PR-3</p>
+<p>   description's first line if filing out of order.</p>
+<h2>Content rules observed by this package</h2>
+<ul>
+<li>Facts only: every number traces to a committed lab finding</li>
+</ul>
+<p>  (<code>papers/wmi-dispatch-architecture.md</code> Appendix A commit map).</p>
+<ul>
+<li>No blob content redistributed; addresses/structures/strings only.</li>
+<li>No new speculation in upstream-facing text; open items are marked</li>
+</ul>
+<p>  unresolved in the upstream doc itself (wmi-dispatch.md).</p>
+<ul>
+<li>Upstream voice: short factual notes matching their existing per-file</li>
+</ul>
+<p>  docs; original observations are preserved and extended, not replaced.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

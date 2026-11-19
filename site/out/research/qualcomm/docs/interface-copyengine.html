@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CopyEngine (CE) API — ath11k&#x27;s DMA path to the WCN6750 blob — for upstream issue #26 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>CopyEngine (CE) API — ath11k&#x27;s DMA path to the WCN6750 blob — for upstream issue #26</h1><p>One-page interface note from **public data only**</p><p>Evidence: none</p>
+<h1>CopyEngine (CE) API — ath11k's DMA path to the WCN6750 blob — for upstream issue #26</h1>
+<p>One-page interface note from <strong>public data only</strong></p>
+<p>(<a href="https://codeberg.org/rsavoye/librephone/issues/26">upstream issue #26</a>:</p>
+<p>"ring of 8 buffers used to contain the commands from the HIF/HTT layer</p>
+<p>to the binary blob"). Written 2026-11-16. Issue text points at the</p>
+<p>public FP6 tree</p>
+<p><code>kernel/fairphone/sm7635-modules/qcom/opensource/wlan/</code> — mirrored at</p>
+<p><code>github.com/LineageOS/android_kernel_fairphone_sm7635-modules</code></p>
+<p>(accessed 2026-11-16, path verified).</p>
+<p><strong>Legend:</strong> [PUBLIC] = mainline kernel / public tree fact; [LAB] =</p>
+<p>lab-derived fact; [OPEN] = needs data not available here.</p>
+<h2>1. What the CopyEngine is</h2>
+<ul>
+<li>[PUBLIC] The CopyEngine is the WLAN subsystem's DMA engine: fixed</li>
+</ul>
+<p>  number of pipes (mainline <code>CE_COUNT_MAX = 12</code>), each pipe a</p>
+<p>  <strong>descriptor ring</strong> (not a flat 8-buffer FIFO) with a source ring</p>
+<p>  and/or destination ring per service —</p>
+<p>  <code>drivers/net/wireless/ath/ath11k/ce.h</code> (PIPEDIR_NONE/IN/OUT/INOUT).</p>
+<ul>
+<li>[PUBLIC] The per-target host-side ring table defines each pipe's</li>
+</ul>
+<p>  shape. For <code>ipq8074</code> (same CE service model; fetched 2026-11-16):</p>
+<p>  CE0 host→target HTC control (16 src, 2048 max), CE1 target→host HTT</p>
+<p>  + HTC (512 dest), CE2 target→host WMI (512), CE3 host→target WMI</p>
+<p>  mac0 (32 src), CE4 host→target HTT (2048 src, 256 max, interrupts</p>
+<p>  disabled), CE5 target→host pktlog (512), CE6/CE8 autonomous</p>
+<p>  hif_memcpy, CE7/CE9 WMI mac1/mac2, CE10 target→host HTT (512), CE11</p>
+<p>  unused — <code>drivers/net/wireless/ath/ath11k/ce.c</code></p>
+<p>  (<code>ath11k_host_ce_config_ipq8074/qca6390/qcn9074</code>). [OPEN] the</p>
+<p>  WCN6750-specific table lives in the vendor <code>wlan</code> module (public</p>
+<p>  tree above); mainline maps wcn6750 hw params in</p>
+<p>  <code>drivers/net/wireless/ath/ath11k/hw.c</code> (ring masks, tcl2wbm maps).</p>
+<ul>
+<li>[PUBLIC] The <strong>shared host↔target pipe contract</strong> is literally a</li>
+</ul>
+<p>  struct in mainline, with the in-source note *"Structure is shared</p>
+<p>  between Host software and Target firmware!"*: `struct ce_pipe_config</p>
+<p>  { pipenum; pipedir; nentries; nbytes_max; flags; reserved }`, passed</p>
+<p>  to the target <strong>through a QMI message during startup, one per CE</strong> —</p>
+<p>  <code>drivers/net/wireless/ath/ath11k/hw.c</code></p>
+<p>  (<code>ath11k_target_ce_config_wlan_*</code>). This is the anchor for any</p>
+<p>  re-implementation: the blob learns its CE configuration at boot from</p>
+<p>  these 24-byte descriptors.</p>
+<ul>
+<li>[PUBLIC] Service→pipe mapping (<code>struct service_to_pipe</code>) ties each</li>
+</ul>
+<p>  service (HTC/HTT/WMI/...) to (src CE, dst CE) pairs; send path</p>
+<p>  <code>ath11k_ce_send(ab, skb, pipe_id, transfer_id)</code>; per-pipe callbacks</p>
+<p>  <code>send_cb</code>/<code>recv_cb</code> in <code>struct ce_attr</code> — <code>ce.h</code>/<code>ce.c</code>.</p>
+<h2>2. Command flow HIF/HTT → blob</h2>
+<ol>
+<li>[PUBLIC] HTT/WMI layer hands an skb to HIF → <code>ath11k_ce_send</code> on</li>
+</ol>
+<p>   the service's src ring; descriptor written, doorbell register</p>
+<p>   updated; completion via interrupt/polling (<code>send_cb</code>).</p>
+<ol>
+<li>[PUBLIC] Target→host: dest ring pre-posted with receive buffers</li>
+</ol>
+<p>   (src_nentries = 0, dest_nentries = N in the config table);</p>
+<p>   <code>recv_cb</code> delivers each completed buffer to HTC/HTT/WMI.</p>
+<ol>
+<li>[LAB] On the blob side, the same WMI events/registry the lab</li>
+</ol>
+<p>   decoded in the WMI dispatch paper apply: the WCN6750 image's</p>
+<p>   dispatch layer routes the CE-delivered WMI commands —</p>
+<p>   <code>papers/wmi-dispatch-architecture.md</code> (225-record registry, 149</p>
+<p>   IDs, 61 decoded events; first public WMI dispatch spec for this</p>
+<p>   firmware).</p>
+<ol>
+<li>[PUBLIC] The vendor tree implementing this for FP6:</li>
+</ol>
+<p>   <code>qcom/opensource/wlan/</code> → qcacld-3.0 <code>core/hif/src/ce/</code> and</p>
+<p>   qca-wifi-host-cmn — public, same struct layouts.</p>
+<h2>3. Test-suite hooks</h2>
+<ol>
+<li>Encode/decode <code>ce_pipe_config</code> + <code>service_to_pipe</code> tables and</li>
+</ol>
+<p>   compare against the vendor table for wcn6750 (public tree) — pure</p>
+<p>   struct-level, no hardware.</p>
+<ol>
+<li>Ring arithmetic: wraparound via `CE_RING_IDX_INCR(nentries_mask,</li>
+</ol>
+<p>   idx)` semantics; descriptor size/format from</p>
+<p>   <code>ath11k_ce_ring</code> usage.</p>
+<ol>
+<li>Emulated blob: a userspace process that speaks the CE service</li>
+</ol>
+<p>   model (QMI-shaped startup config + HTC/HTT/WMI frames on the</p>
+<p>   mapped pipes) — the exact shape of upstream PR #58's payload</p>
+<p>   approach (which deliberately stops short of CE/WMI/HTT — the gap</p>
+<p>   this doc + the WMI paper fill).</p>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>mainline: <code>drivers/net/wireless/ath/ath11k/ce.c</code> (fetched, 1079</li>
+</ul>
+<p>  lines), <code>ce.h</code> (fetched), <code>hw.c</code> (fetched; quoted note verbatim)</p>
+<ul>
+<li>public FP6 vendor tree:</li>
+</ul>
+<p>  <code>github.com/LineageOS/android_kernel_fairphone_sm7635-modules</code> path</p>
+<p>  <code>qcom/opensource/wlan</code> (exists; FTM sibling files fetched OK)</p>
+<ul>
+<li>lab: <code>papers/wmi-dispatch-architecture.md</code> (lab-original spec)</li>
+</ul>
+<p><strong>Clean-room statement:</strong> public-kernel struct/service facts +</p>
+<p>lab-derived WMI registry facts. No decompiled blob code.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

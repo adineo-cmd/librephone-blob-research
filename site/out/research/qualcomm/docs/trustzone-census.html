@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrustZone firmware census — Fairphone FP6 (QCM6490) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>TrustZone firmware census — Fairphone FP6 (QCM6490)</h1><p>**Claim:** First public census (versions, ELF/segment structure, hashes,</p><p>Evidence: none</p>
+<h1>TrustZone firmware census — Fairphone FP6 (QCM6490)</h1>
+<p><strong>Claim:</strong> First public census (versions, ELF/segment structure, hashes,</p>
+<p>string inventory) of the FP6's TrustZone firmware family. On this device the</p>
+<p>TrustZone stack ships as **monolithic AArch64 ELF partition images — no</p>
+<p><code>.mdt</code>/<code>.bXX</code> split at all**: the QTEE OS (<code>tz</code> partition, 4,034,560 B, 45</p>
+<p>program headers), the QHEE hypervisor (<code>hyp</code>, entry 0x80000000), the</p>
+<p>KeyMaster TA (<code>keymaster</code>), the device-config blob (<code>devcfg</code>) and the</p>
+<p>QSEE TAs <code>uefisecapp</code>, <code>multiimgoem</code>, <code>featenabler</code>. QTEE and QHEE are one</p>
+<p>build: <code>TZ.XF.5.28.0-00021-LANAIAAAAANAZT-1</code> (git <code>be6181077ac3</code>) — the same</p>
+<p>build ID already visible (as a raw string) in a public Redmi device dump of</p>
+<p>the same Lanai/QCM6490 family, but never documented or analyzed.</p>
+<p><strong>Prior art checked (2026-11-10):</strong> GitHub code search `LANAIAAAAANAZT OR</p>
+<p>TZ.XF.5.28<code> (18 hits — **all** </code>board-info.txt` files in Xiaomi-family device</p>
+<p>dumps: ChkDumps/redmi_flute_dump, redmi_malachite_dump, poco_peridot_dump,</p>
+<p>nothing_asteroids_dump, … — raw build IDs, zero analysis); earlier lab</p>
+<p>searches (fp6-architecture-census, 2026-11-09) found no ELF-header analysis</p>
+<p>of any QCM6490 image. Public TrustZone literature (QSEE reverse-engineering</p>
+<p>papers, kernel qseecom work) documents the <em>protocol</em>, not any of these</p>
+<p>images' structure. **No public segment table, entry point, or hash inventory</p>
+<p>of an FP6/Lanai QTEE/QHEE/KeyMaster image exists.**</p>
+<h2>Policy boundary (hard rule for this doc)</h2>
+<p>This is a <strong>census-only</strong> document: file identity, versions, ELF/segment</p>
+<p>tables, hashes, and build-string inventory. **No disassembly, no code-level</p>
+<p>reverse engineering of TrustZone internals, no key/DRM material, no bypass</p>
+<p>content** — the same clean-room rule the lab applies to DRM. Everything below</p>
+<p>is derivable with <code>readelf</code>-level tooling from a public OTA.</p>
+<h2>Method</h2>
+<ol>
+<li>The TrustZone family was missing from the extracted trees (the lab's</li>
+</ol>
+<p>   census covered modem/vendor/dsp only). <code>tools/payload_manifest.py</code> lists</p>
+<p>   all 37 OTA partitions; <code>tools/payload_dump.py</code> dumps them (validated</p>
+<p>   byte-identical against the reference <code>modem.img</code> extraction — see</p>
+<p>   [[bt-firmware-census]]).</p>
+<ol>
+<li>Dumped partitions: <code>tz</code> (4,034,560 B), <code>hyp</code> (1,683,456 B), <code>keymaster</code></li>
+</ol>
+<p>   (442,368 B), <code>devcfg</code> (49,152 B), <code>uefisecapp</code> (200,704 B), <code>multiimgoem</code></p>
+<p>   (12,288 B), <code>featenabler</code> (106,496 B).</p>
+<ol>
+<li>Census + strings via <code>tools/census.py</code> / <code>tools/bt_tz_analyze.py</code>;</li>
+</ol>
+<p>   hashes and full segment tables in <code>results/bt-tz-census.json</code>.</p>
+<h2>Results</h2>
+<h3>The images are plain ELFs (a format change worth documenting)</h3>
+<p>Modern QSEE images on this platform are <strong>single ELF64 files</strong>, not the</p>
+<p><code>.mdt + .bXX</code> PIL split the older images (and most public tooling) expect:</p>
+<table>
+<tr>
+<th>partition image</th>
+<th>bytes</th>
+<th>sha256 (16)</th>
+<th>ELF</th>
+<th>e_type</th>
+<th>entry</th>
+<th>phnum</th>
+</tr>
+<tr>
+<td>tz.img (QTEE)</td>
+<td>4,034,560</td>
+<td>(JSON)</td>
+<td>AArch64</td>
+<td>EXEC</td>
+<td><strong>0x14693000</strong></td>
+<td><strong>45</strong></td>
+</tr>
+<tr>
+<td>hyp.img (QHEE)</td>
+<td>1,683,456</td>
+<td>"</td>
+<td>AArch64</td>
+<td>DYN (PIE)</td>
+<td><strong>0x80000000</strong></td>
+<td>7</td>
+</tr>
+<tr>
+<td>keymaster.img</td>
+<td>442,368</td>
+<td>"</td>
+<td>AArch64</td>
+<td>DYN (PIE)</td>
+<td>0x0</td>
+<td>9</td>
+</tr>
+<tr>
+<td>devcfg.img</td>
+<td>49,152</td>
+<td>"</td>
+<td>AArch64</td>
+<td>EXEC</td>
+<td><strong>0x1c000000</strong></td>
+<td>4</td>
+</tr>
+<tr>
+<td>uefisecapp.img</td>
+<td>200,704</td>
+<td>"</td>
+<td>AArch64</td>
+<td>DYN</td>
+<td>0x0</td>
+<td>9</td>
+</tr>
+<tr>
+<td>multiimgoem.img</td>
+<td>12,288</td>
+<td>"</td>
+<td><strong>ELF32 ARM</strong></td>
+<td><strong>0 (junk, per F-7)</strong></td>
+<td>0x149fd000</td>
+<td>3</td>
+</tr>
+<tr>
+<td>featenabler.img</td>
+<td>106,496</td>
+<td>"</td>
+<td>AArch64</td>
+<td>DYN</td>
+<td>0x0</td>
+<td>9</td>
+</tr>
+</table>
+<p>Segment highlights (full tables in the results JSON):</p>
+<ul>
+<li><strong>tz.img</strong>: 45 phdrs, two load regions — <code>0x1469xxxx–0x158e9xxx</code></li>
+</ul>
+<p>  (code+data, entry region) and <code>0x1c0xxxxx–0x1c44xxxx</code> (a second RWX/XR</p>
+<p>  region; devcfg's entry 0x1c000000 targets the same 0x1c region, i.e.</p>
+<p>  devcfg data lives adjacent to QTEE's secondary region).</p>
+<ul>
+<li><strong>hyp.img</strong>: PIE with entry 0x80000000 — the long-documented QHEE load</li>
+</ul>
+<p>  base — plus DYNAMIC/TLS segments; read-only data at vaddr 0xe00000.</p>
+<ul>
+<li><strong>keymaster.img / uefisecapp.img / featenabler.img</strong>: classic PIE TA</li>
+</ul>
+<p>  layouts (XR text LOAD at vaddr 0 + WR data LOADs + GNU_RELRO).</p>
+<ul>
+<li><strong>multiimgoem.img</strong>: ELF32 ARM with e_type = 0 (ET_NONE) and flag-less</li>
+</ul>
+<p>  LOAD at 0x149fd000 — another instance of the junk-header rule (F-7): the</p>
+<p>  census "ELF32 ARM" reading is real, but the header is not fully sane.</p>
+<h3>Versions and build identity</h3>
+<ul>
+<li><code>QC_IMAGE_VERSION_STRING=TZ.XF.5.28.0-00021-LANAIAAAAANAZT-1</code> +</li>
+</ul>
+<p>  <code>OEM_IMAGE_VERSION_STRING=be6181077ac3</code> in <strong>both</strong> tz.img and hyp.img —</p>
+<p>  one TZ build ships the OS and the hypervisor. <code>LANAI</code> = QCM6490-family</p>
+<p>  target name (also visible in <code>LPAIDSP.HT.1.0-01090-LANAI-1</code> etc. in the</p>
+<p>  Redmi flute verinfo); <code>LANAIAAAAANAZT</code> is the TZ-specific target variant.</p>
+<ul>
+<li>The same QTEE build ID string is already public in device dumps'</li>
+</ul>
+<p>  board-info/verinfo files (18 GitHub repos) — as opaque strings. This</p>
+<p>  census is the first to tie it to the actual ELF images, segment layout,</p>
+<p>  and hashes.</p>
+<ul>
+<li>keymaster.img: no QC build-ID string; identity is <code>keymaster64</code> (string)</li>
+</ul>
+<p>  + command-name table (<code>KEYMASTER_SPU_INIT</code>, <code>KEYMASTER_PROVISION_ATTEST_KEY_NEW</code>,</p>
+<p>  <code>KEYMASTER_SET_VBH</code>, <code>KEYMASTER_SPU_SSR</code>, <code>Keymaster Pre Shared Secret</code>,</p>
+<p>  …) — an attestation/SPU-capable KeyMaster TA. Android-keymaster version</p>
+<p>  fields (<code>osVersion</code>, <code>OS_VERSION</code>, <code>system_version</code>) present.</p>
+<ul>
+<li>tz.img embeds <code>KeymasterLite_*</code> (an in-OS keymaster-lite module) and a</li>
+</ul>
+<p>  dense <code>tzbsp_*</code> (TrustZone BSP) + <code>qsee_*</code> vocabulary</p>
+<p>  (<code>TZ_QSEE_LOG</code>, <code>qsee_open</code>, <code>qsee_prng_getdata</code>…).</p>
+<h3>In-tree TrustZone users (from modem/image, family "other" in census)</h3>
+<ul>
+<li><strong>soter64</strong> (61,408 B payload, <code>.mdt+.b00-.b08</code> split — MDT format lives</li>
+</ul>
+<p>  on for TAs shipped inside the modem tree): SOTER device-attestation TA</p>
+<p>  (<code>construct_soter_sign_data</code>, <code>/persist/data/soter/</code>, <code>SOTER_CE</code>).</p>
+<ul>
+<li><strong>smplap64</strong> (1,653,528 B payload): Qualcomm's <strong>"sample app"</strong> (smplap)</li>
+</ul>
+<p>  crypto/test TA — <code>tz_app_crypto_aes_*</code>, <code>qsee_malloc</code> — a development</p>
+<p>  sample shipping in a production device.</p>
+<ul>
+<li><strong>UUID-named TAs</strong> <code>05B04A44-…</code>, <code>FD719D50-…</code>: secure-element service TAs</li>
+</ul>
+<p>  (<code>CESEService_*</code>, <code>GPQESE_Open/Transceive</code> — GlobalPlatform SE API);</p>
+<p>  <code>32552B22-…</code>: no strings ≥8 chars.</p>
+<ul>
+<li><strong>featenabler</strong> appears <strong>twice</strong>: as its own <code>featenabler</code> partition</li>
+</ul>
+<p>  (merged ELF, 9 phdrs) and split (<code>featenabler.mdt + .b00–.b08</code>) in</p>
+<p>  modem/image. The 9-segment vaddr/filesize tables match exactly and</p>
+<p>  spot-checked segments are byte-identical — same TA, two packaging forms.</p>
+<p>  Function: per-SoC feature licensing (<code>soc_hw_version</code>, <code>FeatureEnabler_*</code>,</p>
+<p>  RPMB-backed).</p>
+<ul>
+<li>No <code>gatekeeper</code> image exists anywhere in this payload; keystore-related</li>
+</ul>
+<p>  functions live in keymaster.img + QTEE's KeymasterLite.</p>
+<h2>Kernel-side cross-reference</h2>
+<ul>
+<li>Upstream Linux gained Qualcomm QSEECOM support (drivers/tee/qcom,</li>
+</ul>
+<p>  <code>qseecom.c</code>, merged in the v6.8 era per public kernel history) that</p>
+<p>  loads/calls QSEE apps via the <code>qsee</code> interface — the TA images documented</p>
+<p>  here are the userspace side of that ABI. No upstream code parses the</p>
+<p>  images themselves; nothing in the kernel tree describes their ELF layout.</p>
+<ul>
+<li>The QSEE <code>.mdt</code>-split TA format is the one the older qseecom (Caf)</li>
+</ul>
+<p>  sources handled; the modern <strong>monolithic-ELF</strong> partition images above are</p>
+<p>  loaded by the bootloader/UEFI stage, not the kernel — which is why no</p>
+<p>  kernel-side naming exists for them (nothing to xref against; stated as a</p>
+<p>  checked negative).</p>
+<h2>Policy-sensitivity note</h2>
+<p>Widevine/DRM (<code>widevine.mbn</code>, <code>hdcp*</code>) are <strong>excluded from scope here</strong></p>
+<p>(census rows exist in <code>results/census.json</code> under family <code>drm</code>; the lab's DRM</p>
+<p>work is docs-only per the track table). This document contains no</p>
+<p>TrustZone code analysis, no keys, no bypass guidance.</p>
+<h2>Negatives / limitations</h2>
+<ul>
+<li>tz.img has 45 phdrs; the census JSON lists the first 32 (census.py</li>
+</ul>
+<p>  <code>max_phdrs=32</code> cap) — remaining 13 are same-region WR/XR segments, not</p>
+<p>  re-run for this pass (queued).</p>
+<ul>
+<li>No version string in devcfg.img / uefisecapp.img / featenabler.img /</li>
+</ul>
+<p>  multiimgoem.img beyond function names — build IDs for the TAs are</p>
+<p>  apparently not carried in-image.</p>
+<ul>
+<li>EVROS/BT companion doc: [[bt-firmware-census]].</li>
+<li>Not yet dumped (out of this pass's scope, flagged for the queue):</li>
+</ul>
+<p>  <code>pvmfw</code> (protected-VM firmware), <code>uefi</code>, <code>xbl*</code>, <code>shrm</code>, <code>cpucp</code>,</p>
+<p>  <code>imagefv</code>, <code>aop*</code> — boot/TZ-adjacent families with the same monolithic</p>
+<p>  ELF pattern expected.</p>
+<h2>Reproduce</h2>
+<pre><code class="language-bash">
+python3 tools/payload_manifest.py payload.bin
+python3 tools/payload_dump.py payload.bin tz tz.img      # + hyp keymaster devcfg uefisecapp multiimgoem featenabler
+python3 tools/census.py trees-tzbt --out census-tzbt.json
+python3 tools/bt_tz_analyze.py trees-tzbt trees-tzbt/census-tzbt.json
+</code></pre>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

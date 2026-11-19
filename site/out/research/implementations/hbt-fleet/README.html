@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hbt-fleet — the h-prefix (Hastings-class) QCA Bluetooth fleet — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>hbt-fleet — the h-prefix (Hastings-class) QCA Bluetooth fleet</h1><p>Fleet-level RE of the `hpbtfw20.tlv` / `hpnv20*` Bluetooth files — the</p><p>Evidence: none</p>
+<h1>hbt-fleet — the h-prefix (Hastings-class) QCA Bluetooth fleet</h1>
+<p>Fleet-level RE of the <code>hpbtfw20.tlv</code> / <code>hpnv20*</code> Bluetooth files — the</p>
+<p>QCA2066/Hastings-generation rampatch + NVM pair the mainline <code>btqca.c</code></p>
+<p>loads (and the sibling of the F-75 cr/ap fleet in</p>
+<p><code>implementations/qca-bt/</code>). Method: fetch individually from public vendor</p>
+<p>trees → md5-verify against `upstream-contribution/blob-database/</p>
+<p>coverage-matrix.csv` → parse with the unmodified lab parser</p>
+<p>(<code>qca-bt/qca_tlv.py</code>) plus <code>fleet_diff.py</code> (this dir) → document per byte</p>
+<p>range with [OPEN] markers. No payload bytes are committed.</p>
+<h2>Contents</h2>
+<ul>
+<li><code>hpbtfw20-analysis.md</code> — rampatch: header fields, 44-byte footer format,</li>
+</ul>
+<p>  body statistics, chip-identity resolution (QCA2066/Hastings), md5 table,</p>
+<p>  route log.</p>
+<ul>
+<li><code>hpnv20-analysis.md</code> — NVM: bare type-2 layout, full 61-tag map of the</li>
+</ul>
+<p>  DB build, cross-generation tag diff vs cr/ap, cross-build identity</p>
+<p>  (44/61 shared tag contents), bXX board variants, the GlobalFoundries</p>
+<p>  <code>g</code> variant.</p>
+<ul>
+<li><code>devices.csv</code> — the laptop-half carrier devices (10), their vendors,</li>
+</ul>
+<p>  codenames, SoCs, md5s, bXX variant counts.</p>
+<ul>
+<li><code>fleet_diff.py</code> — structural diff tool (patch footer classes, NVM</li>
+</ul>
+<p>  layout/tag census, cross-file tag identity). Fixtures-tested.</p>
+<ul>
+<li><code>make_fixture.py</code> + <code>test_hbt_fleet.py</code> — synthetic fixtures built from</li>
+</ul>
+<p>  the documented structures only; run <code>python3 -I test_hbt_fleet.py</code>.</p>
+<h2>md5 status (2026-11-18)</h2>
+<p>hpbtfw20.tlv common build (<code>92247344…</code>, 9 devices) <strong>MATCH</strong> via cupid</p>
+<p>bluetooth partition image (XiaomiFirmwareUpdater firmware zip →</p>
+<p><code>bluetooth.img</code> → <code>/image/hpbtfw20.tlv</code>); hpnv20.bin (<code>5de36001…</code>) and</p>
+<p>hpnv20g.bin (<code>12cd1ff0…</code>) <strong>MATCH</strong> from the same image. FP5's own builds</p>
+<p>(184,740 / 6,307 B) remain provenance-[OPEN] — Fairphone's stock OTA</p>
+<p>carries the bluetooth partition but no public tree hosts it yet.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

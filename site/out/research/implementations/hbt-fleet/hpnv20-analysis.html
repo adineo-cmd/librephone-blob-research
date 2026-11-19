@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hpnv20.bin — the h-generation (Hastings-class) QCA BT NVM, parsed — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>hpnv20.bin — the h-generation (Hastings-class) QCA BT NVM, parsed</h1><p>Companion to `hpbtfw20-analysis.md` (same session, same method). This file</p><p>Evidence: none</p>
+<h1>hpnv20.bin — the h-generation (Hastings-class) QCA BT NVM, parsed</h1>
+<p>Companion to <code>hpbtfw20-analysis.md</code> (same session, same method). This file</p>
+<p>documents the NVM side: tag census, layout change vs the F-75 cr/ap</p>
+<p>generation, board-variant naming, and the cross-build content identity</p>
+<p>that makes a free NVM generator tractable. No payload bytes committed —</p>
+<p>payloads live in <code>/tmp/astro_v/payload/</code> and <code>/tmp/astro_v/btimg/</code>.</p>
+<h2>0. Prior art (RULE 0, 2026-11-18)</h2>
+<ul>
+<li>The unumS22linux QCA6490 gate doc (cited in hpbtfw20-analysis.md §0)</li>
+</ul>
+<p>  documents the QTI HAL's <code>UpdateHastingNvm</code> and the <code>hpnv21g.bab</code> board</p>
+<p>  question but parses no NVM bytes.</p>
+<ul>
+<li><code>qca_get_nvm_name_by_board</code> in mainline btqca.c (GPL) gives the naming</li>
+</ul>
+<p>  rules; it is the <em>only</em> public source that touches the bXX/g names.</p>
+<ul>
+<li>linux-firmware ships the <code>hpnv21*</code>/<code>hpnv21g.*</code> families but **no</li>
+</ul>
+<p>  hpnv20.bin** (checked 2026-11-18; the F-74-style absence for the</p>
+<p>  h-20 NVM generation).</p>
+<ul>
+<li>No published tag map of any hpnv20 build exists (GitHub code search</li>
+</ul>
+<p>  <code>q=hpnv20</code>, web search — queries logged in hpbtfw20-analysis.md §0).</p>
+<p>  The tag tables below are the delta.</p>
+<h2>1. Provenance and md5 verification</h2>
+<table>
+<tr>
+<th>build</th>
+<th>bytes</th>
+<th>DB md5</th>
+<th>fetched md5</th>
+<th>status</th>
+<th>source</th>
+</tr>
+<tr>
+<td>common (9 laptop-half devices)</td>
+<td>6,319</td>
+<td><code>5de36001f431a4d60c641d494a75bb60</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+<td>cupid <code>bluetooth</code> partition image, <code>/image/hpnv20.bin</code></td>
+</tr>
+<tr>
+<td>hpnv20g.bin (8 laptop-half devices)</td>
+<td>6,329</td>
+<td><code>12cd1ff0c316e02d0c6a6d8264184f0e</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+<td>same partition, <code>/image/hpnv20g.bin</code></td>
+</tr>
+<tr>
+<td>FP5 build</td>
+<td>6,307</td>
+<td><code>a90468d77f1202d912fb18d4e74a3e48</code></td>
+<td>—</td>
+<td>[OPEN: no public source found]</td>
+<td>FP5 stock vendor/bluetooth/image (LineageOS does not extract it)</td>
+</tr>
+<tr>
+<td>Samsung r0s build</td>
+<td>6,203</td>
+<td>— (no DB row carries md5 <code>6631b312ca661d1a12c978082a859238</code>)</td>
+<td><code>6631b312ca661d1a12c978082a859238</code></td>
+<td><strong>NOT database-identical</strong> (third build; structurally same generation)</td>
+<td>TheMuppets/proprietary_vendor_samsung_r0s @ lineage-24.0</td>
+</tr>
+<tr>
+<td>hpnv21.bab / hpnv21g.bab (r0s)</td>
+<td>7,023 / 6,863</td>
+<td>—</td>
+<td><code>ed2759b4…</code> / <code>d7f39ed0…</code></td>
+<td>n/a (context)</td>
+<td>same r0s repo</td>
+</tr>
+</table>
+<p>All parses by the unmodified <code>implementations/qca-bt/qca_tlv.py</code> (exit 0)</p>
+<p>plus <code>implementations/hbt-fleet/fleet_diff.py</code> (new).</p>
+<h2>2. Layout: the h-generation NVM is a bare type-2 record</h2>
+<p>cr/ap generation (F-75 §5): `[0,4) type-4 enclosing | [4,8) type-2 set</p>
+<p>header | tags | type-3 trailing record (kernel-ignored)`.</p>
+<p>h generation (all four h-NVMs parsed):</p>
+<pre><code>
+[0, 4)     type-2 set header {type=2, len = file−4}
+[4, 4+len) tlv_type_nvm tags, 12-byte prefix each, perfectly packed
+[4+len, file)  — nothing (zero trailing bytes, zero padding)
+</code></pre>
+<table>
+<tr>
+<th>file</th>
+<th>tags</th>
+<th>set consumed/declared</th>
+<th>trailing</th>
+</tr>
+<tr>
+<td>hpnv20.bin (DB)</td>
+<td>61</td>
+<td>6,315/6,315</td>
+<td>0</td>
+</tr>
+<tr>
+<td>hpnv20g.bin (DB)</td>
+<td>61</td>
+<td>6,325/6,325</td>
+<td>0</td>
+</tr>
+<tr>
+<td>hpnv20.bin (r0s)</td>
+<td>60</td>
+<td>6,199/6,199</td>
+<td>0</td>
+</tr>
+<tr>
+<td>hpnv21.bab (r0s)</td>
+<td>75</td>
+<td>7,019/7,019</td>
+<td>0</td>
+</tr>
+<tr>
+<td>hpnv21g.bab (r0s)</td>
+<td>73</td>
+<td>6,859/6,859</td>
+<td>0</td>
+</tr>
+</table>
+<p>The type-4 enclosing wrapper AND the type-3 trailing record of the cr/ap</p>
+<p>generation are <strong>gone</strong> — a wholesale layout simplification. (The</p>
+<p>mainline parser handles both layouts; its NVM scan emits no diagnostics</p>
+<p>on either.)</p>
+<h2>3. hpnv20.bin (DB build) — full tag map</h2>
+<p>Offsets are file offsets; <code>sha1</code> is the first 12 hex of the tag BODY</p>
+<p>(12-byte prefix excluded). "kernel-known" tags per btqca.h: 2 = BD_ADDR,</p>
+<p>17 = HCI, 27 = DEEP_SLEEP. <code>qca_get_nvm_name_by_board</code> is the only other</p>
+<p>kernel consumer context (board-id naming). Everything else is</p>
+<p>chip-consumed [OPEN semantics].</p>
+<table>
+<tr>
+<th>off</th>
+<th>tag</th>
+<th>len</th>
+<th>sha1-12</th>
+<th>off</th>
+<th>tag</th>
+<th>len</th>
+<th>sha1-12</th>
+</tr>
+<tr>
+<td>4</td>
+<td>2 BD_ADDR</td>
+<td>6</td>
+<td>a43ddfc409e4</td>
+<td>3017</td>
+<td>91</td>
+<td>248</td>
+<td>379abb56c244</td>
+</tr>
+<tr>
+<td>22</td>
+<td>8</td>
+<td>8</td>
+<td>b9a3f0f4c216</td>
+<td>3277</td>
+<td>92</td>
+<td>196</td>
+<td>a2a60f3f26d2</td>
+</tr>
+<tr>
+<td>42</td>
+<td>10</td>
+<td>5</td>
+<td>928852de071e</td>
+<td>3485</td>
+<td>95</td>
+<td>168</td>
+<td>38f42e7937f4</td>
+</tr>
+<tr>
+<td>59</td>
+<td>17 HCI</td>
+<td>6</td>
+<td>0b55c9b2deb3</td>
+<td>3665</td>
+<td>111</td>
+<td>218</td>
+<td>02f7e9d849c0</td>
+</tr>
+<tr>
+<td>77</td>
+<td>22</td>
+<td>112</td>
+<td>162c7ac7ca28</td>
+<td>3895</td>
+<td>112</td>
+<td>218</td>
+<td>02f7e9d849c0</td>
+</tr>
+<tr>
+<td>201</td>
+<td>27 DEEP_SLEEP</td>
+<td>9</td>
+<td>8129d19acc85</td>
+<td>4125</td>
+<td>113</td>
+<td>200</td>
+<td>d7643af7a8a7</td>
+</tr>
+<tr>
+<td>222</td>
+<td>28</td>
+<td>20</td>
+<td>6379f6605032</td>
+<td>4337</td>
+<td>114</td>
+<td>52</td>
+<td>137137536f88</td>
+</tr>
+<tr>
+<td>254</td>
+<td>31</td>
+<td>2</td>
+<td>f3e84b722399</td>
+<td>4401</td>
+<td>116</td>
+<td>38</td>
+<td>582eeeb1b5ba</td>
+</tr>
+<tr>
+<td>268</td>
+<td>32</td>
+<td>2</td>
+<td>c5fb09de08e0</td>
+<td>4451</td>
+<td>150</td>
+<td>30</td>
+<td>0ebe4cbc65d6</td>
+</tr>
+<tr>
+<td>282</td>
+<td>35</td>
+<td>120</td>
+<td>381b0d3e3657</td>
+<td>4493</td>
+<td>151</td>
+<td>24</td>
+<td>9c99d89d586e</td>
+</tr>
+<tr>
+<td>414</td>
+<td>36</td>
+<td>48</td>
+<td>f36ec10972c3</td>
+<td>4529</td>
+<td>153</td>
+<td>152</td>
+<td>70732663d893</td>
+</tr>
+<tr>
+<td>474</td>
+<td>37</td>
+<td>44</td>
+<td>bdfaa219b5b2</td>
+<td>4693</td>
+<td>154</td>
+<td>252</td>
+<td>41dd19c6d0ce</td>
+</tr>
+<tr>
+<td>530</td>
+<td>38</td>
+<td>140</td>
+<td>4747f878a7b4</td>
+<td>4957</td>
+<td>155</td>
+<td>16</td>
+<td>d08ab67e8d08</td>
+</tr>
+<tr>
+<td>682</td>
+<td>39</td>
+<td>60</td>
+<td>077a95c87e67</td>
+<td>4985</td>
+<td>161</td>
+<td>124</td>
+<td>248682eb3774</td>
+</tr>
+<tr>
+<td>754</td>
+<td>40</td>
+<td>18</td>
+<td>b0c3b4a56bba</td>
+<td>5121</td>
+<td>162</td>
+<td>80</td>
+<td>e8fdc6b1e46c</td>
+</tr>
+<tr>
+<td>784</td>
+<td>42</td>
+<td>56</td>
+<td>252acd404d16</td>
+<td>5213</td>
+<td>174</td>
+<td>158</td>
+<td>ab0302ef3a51</td>
+</tr>
+<tr>
+<td>852</td>
+<td>43</td>
+<td>234</td>
+<td>0b420088f53b</td>
+<td>5383</td>
+<td>176</td>
+<td>68</td>
+<td>044f26257eb3</td>
+</tr>
+<tr>
+<td>1098</td>
+<td>44</td>
+<td>64</td>
+<td>65069c9a9b9f</td>
+<td>5463</td>
+<td>177</td>
+<td>108</td>
+<td>549200b906d3</td>
+</tr>
+<tr>
+<td>1174</td>
+<td>50</td>
+<td>232</td>
+<td>813b0fce3353</td>
+<td>5583</td>
+<td>178</td>
+<td>132</td>
+<td>bc86c9a826f4</td>
+</tr>
+<tr>
+<td>1418</td>
+<td>51</td>
+<td>236</td>
+<td>3194faa6db6f</td>
+<td>5727</td>
+<td>179</td>
+<td>14</td>
+<td>9d5406e47350</td>
+</tr>
+<tr>
+<td>1666</td>
+<td>57</td>
+<td>56</td>
+<td>c5a9bfb252b0</td>
+<td>5753</td>
+<td>180</td>
+<td>68</td>
+<td>cb2643af9754</td>
+</tr>
+<tr>
+<td>1734</td>
+<td>62</td>
+<td>48</td>
+<td>b2c61ad4c260</td>
+<td>5833</td>
+<td>196</td>
+<td>228</td>
+<td>e141f6b1e9e5</td>
+</tr>
+<tr>
+<td>1794</td>
+<td>64</td>
+<td>244</td>
+<td>376a051c8940</td>
+<td>6073</td>
+<td>197</td>
+<td>176</td>
+<td>851e7592051c</td>
+</tr>
+<tr>
+<td>2050</td>
+<td>65</td>
+<td>44</td>
+<td>ea2af7f7f328</td>
+<td>6261</td>
+<td>199</td>
+<td>6</td>
+<td>271d5073279b</td>
+</tr>
+<tr>
+<td>2106</td>
+<td>72</td>
+<td>65</td>
+<td>6cd92a3cb73a</td>
+<td>6279</td>
+<td>200</td>
+<td>28</td>
+<td>d924046878b4</td>
+</tr>
+<tr>
+<td>2183</td>
+<td>73</td>
+<td>5</td>
+<td>30ca9a3b4c98</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2200</td>
+<td>78</td>
+<td>2</td>
+<td>528f35403f03</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2214</td>
+<td>79</td>
+<td>107</td>
+<td>cb5f25454c49</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2333</td>
+<td>80</td>
+<td>24</td>
+<td>98da7f6b807c</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2369</td>
+<td>83</td>
+<td>8</td>
+<td>6c1c41f5396a</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2389</td>
+<td>84</td>
+<td>112</td>
+<td>86487110fbb8</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2513</td>
+<td>85</td>
+<td>116</td>
+<td>27360574e641</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2641</td>
+<td>86</td>
+<td>56</td>
+<td>ba02ac838161</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2709</td>
+<td>87</td>
+<td>80</td>
+<td>7dfe5645ef66</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2801</td>
+<td>88</td>
+<td>184</td>
+<td>b97071d428b9</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2997</td>
+<td>90</td>
+<td>8</td>
+<td>2dcdc28ae76a</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<p>Note tag 111 and 112 carry IDENTICAL content (same sha1, 218 B each) in</p>
+<p>both the DB and r0s builds — a duplicated tuning block.</p>
+<h2>4. Cross-generation diff vs the F-75 cr/ap NVMs</h2>
+<ul>
+<li>Tag-id census: hpnv20 (DB) has 61 tags vs crnv20's 33, crnv11's 27,</li>
+</ul>
+<p>  apnv10's 9. IDs extend to 200 (hpnv21 family reaches 261); the cr/ap</p>
+<p>  files stop at 150. hpnv20-only ids: 8, 10, 28, 31, 32, 40, 42, 43, 44,</p>
+<p>  57, 62, 72, 78, 113, 151, 153–155, 157, 161, 174, 176–180, 196, 197,</p>
+<p>  199, 200, 206; crnv20-only: 41, 60, 73, 89.</p>
+<ul>
+<li>Kernel-known tags changed length: tag 17 (HCI) 6 B (was 9/8);</li>
+</ul>
+<p>  tag 27 (DEEP_SLEEP) 9 B (was 1). The kernel's in-flight mutations</p>
+<p>  (tag 17 <code>data[0]|=0x80</code>, tag 27 <code>data[0]|=0x01</code>) still land inside</p>
+<p>  these records.</p>
+<ul>
+<li><strong>Tag content identity across generations: ZERO.</strong> No (len,sha1) pair</li>
+</ul>
+<p>  is shared between any h-NVM and any cr/ap NVM — the tag-content base is</p>
+<p>  wholly new (contrast F-75 §5.3 where 7 tag contents were family-shared</p>
+<p>  inside the cr/ap generation).</p>
+<h2>5. Cross-BUILD identity (the tractable part)</h2>
+<p>The r0s (Samsung) build and the cupid (DB) build differ in md5 and size</p>
+<p>(6,203 vs 6,319) but share the same tag-id census and **44 of 60/61 tag</p>
+<p>contents byte-identical** (same len+sha1). The varying 16–17 tags are the</p>
+<p>per-build/per-device set (includes BD_ADDR tag 2 — the DB build's tag-2</p>
+<p>sha1 <code>a43ddfc409e4</code> is in fact shared across ALL hp builds parsed, i.e.</p>
+<p>it is a fleet-default address template, not a per-device value).</p>
+<p>hpnv20g.bin vs hpnv20.bin (cupid partition, same generation): same 61-tag</p>
+<p>census, <strong>56/61 contents identical</strong>; only tags 32, 42, 113, 176 (len</p>
+<p>68→78) and 197 differ — a minimal GlobalFoundries-fab tuning delta on top</p>
+<p>of the shared base. (btqca.c: the <code>g</code> suffix is selected when the chip's</p>
+<p>SoC-id matches <code>QCA_HSP_GF_SOC_ID</code> — "manufactured by GlobalFoundries".)</p>
+<p>bXX board variants: <code>hpnv20.b2f … b90</code> (10 files on the cupid partition,</p>
+<p>matching the DB's 10 per-device variant names; FP5 ships 64). The mainline</p>
+<p>naming rule <code>hpnv20.&lt;prefix&gt;&lt;board-id&gt;</code> (prefix "b", board id from the</p>
+<p><code>qca_read_fw_board_id</code> VSC) explains the names; the DB's md5 census shows</p>
+<p>most bXX files collapse to a handful of distinct contents (FP5's 64 → 5</p>
+<p>distinct md5s; the 10-variant block → the same few groups), i.e. boards</p>
+<p>share NVM content and only the board-id byte in the name changes. Which</p>
+<p>tags the board byte influences [OPEN].</p>
+<h2>6. Free-reimplementation consequences</h2>
+<ul>
+<li>Layout: fully specified (bare type-2, packed 12-byte prefixes) — a free</li>
+</ul>
+<p>  NVM generator can emit this framing today; <code>fleet_diff.py</code> +</p>
+<p>  <code>make_fixture.py</code> already produce and verify it.</p>
+<ul>
+<li>Content: the 44/61 shared tag base across builds is evidence the</li>
+</ul>
+<p>  majority of the NVM is family-level tuning constants, but the values</p>
+<p>  themselves are chip-tuning [OPEN semantics] — same honesty line as</p>
+<p>  F-75 §6.</p>
+<ul>
+<li>The kernel's loader path (VSC 0xFC00 sub 0x1E, TLV_TYPE_NVM) already</li>
+</ul>
+<p>  works unmodified for these files.</p>
+<h2>7. Freed-device value</h2>
+<p>hpnv20.bin: <strong>10 laptop-half devices</strong> (FP5 own build + 9 common-build</p>
+<p>devices, 8 of which also carry hpnv20g.bin); whole-DB fleet 13 devices.</p>
+<p>Both common-build files (hpnv20.bin + hpnv20g.bin) are now md5-verified</p>
+<p>from a public source and fully tag-mapped; FP5's build remains provenance</p>
+<p>[OPEN] (honest routes logged in hpbtfw20-analysis.md §7).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

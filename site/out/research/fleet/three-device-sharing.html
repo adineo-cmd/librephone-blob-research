@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three-Device Blob Sharing — OnePlus 6 / Nord CE 3 Lite / OnePlus 8 — fragmentation vs leverage quantified — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Three-Device Blob Sharing — OnePlus 6 / Nord CE 3 Lite / OnePlus 8 — fragmentation vs leverage quantified</h1><p>WORKORDER-001 desktop session, 2026-11-18. First cross-SoC-generation identity analysis over three fully-populated official LineageOS censuses: OnePlus 6 (`OnePlus_6`, SDM845, 22.2 nightly), OnePlus Nord CE 3 Lite (`Nord_CE3`, SM6375, 24.0 nightly), OnePlus 8 (`OnePlus_8`, SM8250, 24.0 nightly).…</p><p>Evidence: <span class="evidence" data-evidence="f">F</span> <span class="evidence" data-evidence="h">H</span> <span class="evidence" data-evidence="i">I</span> <span class="evidence" data-evidence="n">N</span></p>
+<h1>Three-Device Blob Sharing — OnePlus 6 / Nord CE 3 Lite / OnePlus 8 — fragmentation vs leverage quantified</h1>
+<p>WORKORDER-001 desktop session, 2026-11-18. First cross-SoC-generation identity analysis over three fully-populated official LineageOS censuses: OnePlus 6 (<code>OnePlus_6</code>, SDM845, 22.2 nightly), OnePlus Nord CE 3 Lite (<code>Nord_CE3</code>, SM6375, 24.0 nightly), OnePlus 8 (<code>OnePlus_8</code>, SM8250, 24.0 nightly). Every number below comes from <code>analysis/out/three-device-sharing.json</code>, produced by <code>python3 -I analysis/tools/three_device_sharing.py</code>. No payload bytes were written anywhere; only counts, names, sizes and hashes.</p>
+<p><strong>Evidence classes:</strong> <code>[F]</code> fact (directly measured) · <code>[I]</code> inference (strong, derived from measurements) · <code>[H]</code> hypothesis (plausible, unverified) · <code>[N]</code> honest negative (probed, not found).</p>
+<h2>1. Headline sharing matrix <code>[F]</code></h2>
+<table>
+<tr>
+<th>content identity (md5)</th>
+<th>devices carrying it</th>
+<th>count</th>
+</tr>
+<tr>
+<td>on all 3 devices</td>
+<td>OnePlus_6 + Nord_CE3 + OnePlus_8</td>
+<td>4</td>
+</tr>
+<tr>
+<td>on exactly 2</td>
+<td>any pair</td>
+<td>17</td>
+</tr>
+<tr>
+<td>on exactly 1 (device-unique)</td>
+<td>single device</td>
+<td>2488</td>
+</tr>
+<tr>
+<td>distinct md5 total across the 3 censuses</td>
+<td></td>
+<td>2509</td>
+</tr>
+</table>
+<p>Per family (grouping = <code>(family, md5)</code>):</p>
+<table>
+<tr>
+<th>family</th>
+<th>distinct (family,md5)</th>
+<th>all 3</th>
+<th>exactly 2</th>
+<th>exactly 1</th>
+</tr>
+<tr>
+<td>other</td>
+<td>1313</td>
+<td>2</td>
+<td>7</td>
+<td>1304</td>
+</tr>
+<tr>
+<td>modem</td>
+<td>914</td>
+<td>2</td>
+<td>13</td>
+<td>899</td>
+</tr>
+<tr>
+<td>adsp</td>
+<td>137</td>
+<td>2</td>
+<td>3</td>
+<td>132</td>
+</tr>
+<tr>
+<td>cdsp</td>
+<td>40</td>
+<td>0</td>
+<td>0</td>
+<td>40</td>
+</tr>
+<tr>
+<td>wifi</td>
+<td>40</td>
+<td>0</td>
+<td>1</td>
+<td>39</td>
+</tr>
+<tr>
+<td>gpu</td>
+<td>38</td>
+<td>0</td>
+<td>0</td>
+<td>38</td>
+</tr>
+<tr>
+<td>tz</td>
+<td>16</td>
+<td>0</td>
+<td>0</td>
+<td>16</td>
+</tr>
+<tr>
+<td>radio</td>
+<td>11</td>
+<td>0</td>
+<td>0</td>
+<td>11</td>
+</tr>
+<tr>
+<td>bt</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+</tr>
+<tr>
+<td>camera</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</table>
+<h2>2. Per-device unique vs shared surface <code>[F]</code></h2>
+<table>
+<tr>
+<th>device</th>
+<th>shared files</th>
+<th>shared bytes</th>
+<th>of which zero-byte</th>
+<th>shared non-zero files</th>
+<th>unique files</th>
+<th>unique bytes</th>
+</tr>
+<tr>
+<td>OnePlus_6</td>
+<td>13</td>
+<td>69,197</td>
+<td>2</td>
+<td>11</td>
+<td>447</td>
+<td>279,365,433</td>
+</tr>
+<tr>
+<td>Nord_CE3</td>
+<td>58</td>
+<td>943,932</td>
+<td>32</td>
+<td>26</td>
+<td>241</td>
+<td>73,586,339</td>
+</tr>
+<tr>
+<td>OnePlus_8</td>
+<td>24</td>
+<td>962,305</td>
+<td>0</td>
+<td>24</td>
+<td>2083</td>
+<td>798,495,845</td>
+</tr>
+</table>
+<p>Unique-content share by bytes (incl. zero-byte rows in shared): OnePlus_6 99.98%, Nord_CE3 98.73%, OnePlus_8 99.88% — fragmentation dominates; cross-generation leverage concentrates in a handful of tiny files <code>[I]</code>.</p>
+<p>Per-family breakdown for each device is in the JSON (<code>per_device_family_stats</code>). Zero-byte <code>d41d8cd…</code> rows are split out as <code>shared_zero_byte_files</code> — they are degenerate empty-file matches, not real blob leverage (see caveats).</p>
+<h2>3. Biggest cross-device shared blobs <code>[F]</code></h2>
+<p>Top blobs carried by all three devices (md5-identical content):</p>
+<table>
+<tr>
+<th>md5</th>
+<th>bytes</th>
+<th>names</th>
+<th>fleet matrix rows / devices</th>
+</tr>
+<tr>
+<td><code>0d902878dccc9911af8e3983f384c588</code></td>
+<td>29,628</td>
+<td>Nord_CE3: lib/rfsa/adsp/libsns_low_lat_stream_skel.so; OnePlus_6: lib/rfsa/adsp/libsns_low_lat_stream_skel.so; OnePlus_8: lib/rfsa/adsp/libsns_low_lat_stream_skel.so</td>
+<td>0 / 0</td>
+</tr>
+<tr>
+<td><code>544980e9c1c7e640f7e00ef36627bbb4</code></td>
+<td>20,824</td>
+<td>Nord_CE3: lib/rfsa/adsp/libsns_device_mode_skel.so; OnePlus_6: lib/rfsa/adsp/libsns_device_mode_skel.so; OnePlus_8: lib/rfsa/adsp/libsns_device_mode_skel.so</td>
+<td>0 / 0</td>
+</tr>
+<tr>
+<td><code>f012db03ebbde9ce8650993112ee430b</code></td>
+<td>128</td>
+<td>Nord_CE3: firmware/ipa_fws.b03; OnePlus_6: firmware/ipa_fws.b03; OnePlus_8: firmware/ipa_fws.b03</td>
+<td>53 / 42</td>
+</tr>
+<tr>
+<td><code>0d68af0904dd698b16ffc9cd28b9b0c8</code></td>
+<td>32</td>
+<td>Nord_CE3: firmware/vpu20_1v.b19, firmware/vpu20_2v.b19, firmware/vpu20_4v.b19; OnePlus_6: &lt;modem-fat:IMAGE/venus.b04&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/OQYQXB~2.B19&gt;</td>
+<td>34 / 34</td>
+</tr>
+</table>
+<p>Of the 4 all-3 blobs, 2 also exist in the upstream coverage matrix (<code>md5_db</code> join) — they are fleet blobs, not local accidents <code>[F]</code>. The two <code>libsns_*_skel.so</code> blobs are carried by all three generations yet are <strong>absent from the 123-device matrix</strong> — a matrix coverage gap on real fleet blobs, verified by direct <code>md5_db</code> lookup (<code>[F]</code>, honest negative for the matrix).</p>
+<p>Exactly-2 pairs (17 md5s, all listed in JSON <code>shared_blobs_exactly2_top</code>): 13 of 17 are fleet blobs in the matrix. Largest pair blob: <code>lib/rfsa/adsp/libcamera_nn_skel.so</code> (809,688 B, Nord_CE3+OnePlus_8 — <code>0e9f604c59103a2c86bbd6b80e2724d6</code>), <strong>not in the matrix</strong>; the SM6375+SM8250 pair also share <code>libapps_mem_heap.so</code> (58,412 B) and <code>libdsp_streamer_binning.so</code> (20,736 B), also absent from the matrix <code>[F]</code>.</p>
+<p>Top content-alias groups (same md5, different names across devices):</p>
+<table>
+<tr>
+<th>md5</th>
+<th>bytes</th>
+<th>distinct paths</th>
+<th>devices</th>
+<th>names</th>
+<th>fleet</th>
+</tr>
+<tr>
+<td><code>ce338fe6899778aacfc28414f2d9498b</code></td>
+<td>16,384</td>
+<td>2</td>
+<td>OnePlus_6+OnePlus_8</td>
+<td>OnePlus_6: &lt;modem-fat:IMAGE/modem_pr_mcfg_configs_mcfg_hw_mbn_hw.txt&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/WMLSPW~2/CCASGL~2/YI7XVO~2/KBNBN6~2/PJYYG4~2.TXT&gt;</td>
+<td>0 rows / 0 devices</td>
+</tr>
+<tr>
+<td><code>620f0b67a91f7f74151bc5be745b7110</code></td>
+<td>4,096</td>
+<td>2</td>
+<td>Nord_CE3+OnePlus_8</td>
+<td>Nord_CE3: firmware/evass.b19; OnePlus_8: &lt;modem-fat:PCAFUI~2/UVYW7S~2.B19&gt;</td>
+<td>15 rows / 15 devices</td>
+</tr>
+<tr>
+<td><code>d0bd5030a03f631c9af5060a5645d02e</code></td>
+<td>555</td>
+<td>2</td>
+<td>OnePlus_6+OnePlus_8</td>
+<td>OnePlus_6: &lt;modem-fat:IMAGE/adspua.jsn&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/4K5XTO~2.JSN&gt;</td>
+<td>30 rows / 30 devices</td>
+</tr>
+<tr>
+<td><code>0039483ebd20685728df72c12d13fee4</code></td>
+<td>405</td>
+<td>2</td>
+<td>OnePlus_6+OnePlus_8</td>
+<td>OnePlus_6: &lt;modem-fat:IMAGE/slpius.jsn&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/H54GTB~2.JSN&gt;</td>
+<td>6 rows / 6 devices</td>
+</tr>
+<tr>
+<td><code>40d6edf129dec063ca3fe6cb6837488f</code></td>
+<td>403</td>
+<td>2</td>
+<td>OnePlus_6+OnePlus_8</td>
+<td>OnePlus_6: &lt;modem-fat:IMAGE/adspr.jsn&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/WNORW3~2.JSN&gt;</td>
+<td>30 rows / 30 devices</td>
+</tr>
+<tr>
+<td><code>f2bd80d5f0b19b5b0d36d28383948149</code></td>
+<td>403</td>
+<td>2</td>
+<td>OnePlus_6+OnePlus_8</td>
+<td>OnePlus_6: &lt;modem-fat:IMAGE/cdspr.jsn&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/AV7H26~2.JSN&gt;</td>
+<td>30 rows / 30 devices</td>
+</tr>
+<tr>
+<td><code>2439d6872b39e9c1282c572b266665f0</code></td>
+<td>403</td>
+<td>2</td>
+<td>OnePlus_6+OnePlus_8</td>
+<td>OnePlus_6: &lt;modem-fat:IMAGE/slpir.jsn&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/S4RWSX~2.JSN&gt;</td>
+<td>6 rows / 6 devices</td>
+</tr>
+<tr>
+<td><code>0d68af0904dd698b16ffc9cd28b9b0c8</code></td>
+<td>32</td>
+<td>5</td>
+<td>Nord_CE3+OnePlus_6+OnePlus_8</td>
+<td>Nord_CE3: firmware/vpu20_1v.b19, firmware/vpu20_2v.b19, firmware/vpu20_4v.b19; OnePlus_6: &lt;modem-fat:IMAGE/venus.b04&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/OQYQXB~2.B19&gt;</td>
+<td>34 rows / 34 devices</td>
+</tr>
+<tr>
+<td><code>5dd97594c3def03756451e6408954491</code></td>
+<td>32</td>
+<td>2</td>
+<td>OnePlus_6+OnePlus_8</td>
+<td>OnePlus_6: &lt;modem-fat:IMAGE/modem_pr_mcfg_configs_mcfg_hw_mbn_hw.dig&gt;; OnePlus_8: &lt;modem-fat:PCAFUI~2/WMLSPW~2/CCASGL~2/YI7XVO~2/KBNBN6~2/VLDE6D~2.DIG&gt;</td>
+<td>7 rows / 7 devices</td>
+</tr>
+<tr>
+<td><code>eb667b725e1602ba8b9300293a4a2272</code></td>
+<td>24</td>
+<td>6</td>
+<td>Nord_CE3+OnePlus_8</td>
+<td>Nord_CE3: firmware/evass.b07, firmware/vpu20_1v.b07, firmware/vpu20_2v.b07, firmware/vpu20_4v.b07; OnePlus_8: &lt;modem-fat:PCAFUI~2/6NAYYT~2.B07&gt;, &lt;modem-fat:PCAFUI~2/WHKSWD~2.B07&gt;</td>
+<td>35 rows / 30 devices</td>
+</tr>
+<tr>
+<td><code>d81a5c71adbe6aae61e4b4a8e121e446</code></td>
+<td>20</td>
+<td>5</td>
+<td>Nord_CE3+OnePlus_8</td>
+<td>Nord_CE3: firmware/vpu20_1v.b06, firmware/vpu20_2v.b06, firmware/vpu20_4v.b06; OnePlus_8: &lt;modem-fat:PCAFUI~2/HQKKA5~2.B06&gt;, &lt;modem-fat:PCAFUI~2/VSDWCB~2.B06&gt;</td>
+<td>34 rows / 30 devices</td>
+</tr>
+<tr>
+<td><code>cb24261b83d97279f0dbfa45c42c01c2</code></td>
+<td>20</td>
+<td>4</td>
+<td>Nord_CE3+OnePlus_8</td>
+<td>Nord_CE3: firmware/vpu20_1v.b03, firmware/vpu20_2v.b03, firmware/vpu20_4v.b03; OnePlus_8: &lt;modem-fat:PCAFUI~2/VA37H6~2.B03&gt;</td>
+<td>7 rows / 7 devices</td>
+</tr>
+<tr>
+<td><code>f05c4f03a9283589091c31be065c6fed</code></td>
+<td>20</td>
+<td>4</td>
+<td>Nord_CE3+OnePlus_8</td>
+<td>Nord_CE3: firmware/vpu20_1v.b05, firmware/vpu20_2v.b05, firmware/vpu20_4v.b05; OnePlus_8: &lt;modem-fat:PCAFUI~2/KK77H3~2.B05&gt;</td>
+<td>30 rows / 30 devices</td>
+</tr>
+<tr>
+<td><code>ec2d6ced2030acafa2b680b83eb3ab63</code></td>
+<td>16</td>
+<td>6</td>
+<td>Nord_CE3+OnePlus_8</td>
+<td>Nord_CE3: firmware/vpu20_1v.b08, firmware/vpu20_2v.b08, firmware/vpu20_4v.b08; OnePlus_8: &lt;modem-fat:PCAFUI~2/6QLSMJ~2.B08&gt;, &lt;modem-fat:PCAFUI~2/TTU5RS~2.B04&gt;, &lt;modem-fat:PCAFUI~2/XT2HFG~2.B08&gt;</td>
+<td>38 rows / 30 devices</td>
+</tr>
+<tr>
+<td><code>d41d8cd98f00b204e9800998ecf8427e</code></td>
+<td>0</td>
+<td>34</td>
+<td>Nord_CE3+OnePlus_6</td>
+<td>Nord_CE3: firmware/evass.b11..b18, firmware/vpu20_1v.b11..b18, vpu20_2v.b11..b18, vpu20_4v.b11..b18 (32 rows); OnePlus_6: firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini, firmware/wlan/qca_cld/wlan_mac.bin (2 rows)</td>
+<td>57 rows / 34 devices</td>
+</tr>
+</table>
+<h2>4. Fleet coverage — the "three devices vs the 15,091" number <code>[F]</code></h2>
+<table>
+<tr>
+<th>metric</th>
+<th>value</th>
+</tr>
+<tr>
+<td>coverage-matrix rows / devices / distinct <code>md5_db</code></td>
+<td>33,917 / 123 / 15,091</td>
+</tr>
+<tr>
+<td>distinct md5s across the three censuses</td>
+<td>2,509</td>
+</tr>
+<tr>
+<td>of those, fleet blobs present in the matrix</td>
+<td><strong>574 (3.80% of 15,091)</strong></td>
+</tr>
+<tr>
+<td>three-device md5s with no matrix row</td>
+<td>1,935</td>
+</tr>
+<tr>
+<td>per-device distinct md5 (OnePlus_6 / Nord_CE3 / OnePlus_8)</td>
+<td>413 / 196 / 1,925</td>
+</tr>
+<tr>
+<td>per-device matrix hits (OnePlus_6 / Nord_CE3 / OnePlus_8)</td>
+<td>19 / 118 / 454</td>
+</tr>
+</table>
+<h2>5. OP6 <code>modem.img</code> FAT-entry delta — RESOLVED <code>[F]</code></h2>
+<p>Raw FAT16 walk of <code>data-fetch/enchilada/modem.img</code> (119,820,288 bytes), re-derived from the BPB: bytes/sector 4096, sectors/cluster 4, reserved 1, FATs 2 × 4 sectors, root dir at sector 9 (byte offset 36,864), 512 root slots. OEM name <code>MSDOS5.0</code>.</p>
+<table>
+<tr>
+<th>entry class</th>
+<th>count</th>
+</tr>
+<tr>
+<td>allocated_files</td>
+<td>404</td>
+</tr>
+<tr>
+<td>subdir_entries</td>
+<td>118</td>
+</tr>
+<tr>
+<td>dot_entries</td>
+<td>236</td>
+</tr>
+<tr>
+<td>volume_labels</td>
+<td>0</td>
+</tr>
+<tr>
+<td>deleted</td>
+<td>0</td>
+</tr>
+<tr>
+<td>lfn</td>
+<td>0</td>
+</tr>
+<tr>
+<td>end_markers</td>
+<td>119</td>
+</tr>
+</table>
+<p><strong>Resolution:</strong> volume labels: (none); deleted entries: 0. Subdirectory entries: 118 total — at root level: <code>IMAGE</code>, <code>VERINFO</code> (full tree in JSON <code>fat_walk.subdirs</code>). The 403-row census and <code>analysis/out/modem-fat-census.json</code> cover exactly the 403 allocated files under <code>IMAGE/</code>; the walk finds <strong>404 allocated files / 113,443,924 bytes</strong>. File(s) walked but absent from the census: <code>IMAGE/MODEM_PR/MCFG/CONFIGS/MCFG_HW/MBN_HW.TXT</code> (0 bytes declared, md5 <code>d41d8cd98f00b204e9800998ecf8427e</code>, first_cluster 6363); <code>VERINFO/VER_INFO.TXT</code> (1,201 bytes, md5 <code>624973d80f73a1c0a6670ee87afdd08c</code>, first_cluster 7311). All 402 walked file md5s that exist in <code>modem-fat-census.json</code> match it exactly; the remaining walked file (<code>IMAGE/.../MBN_HW.TXT</code>) is present in the census but with the chain-hash md5 documented in caveats (<code>[F]</code>).</p>
+<p>Consequence: the OP6 census is missing one 8.3-named file (<code>VERINFO/VER_INFO.TXT</code>, 1,201 B); the modem.img directory-entry-true content total is <strong>113,443,924 bytes across 404 files</strong>, not 403 / 113,460,308 B. Reconciliation: the previously-published 113,460,308 B figure = this total + 16,384 — i.e. it counted VER_INFO.TXT and also charged MBN_HW.TXT at its 16,384 B chain size instead of its declared size 0 <code>[F]</code>.</p>
+<h2>6. Method / provenance</h2>
+<ul>
+<li>Censuses deduped on <code>(device,file)</code> keep-last: raw rows OnePlus_6 462, Nord_CE3 299, OnePlus_8 2107. Dedupe events: OnePlus_6 2 (the 0-byte <code>firmware/wlan/qca_cld/</code> duplicate rows, content-identical re-walk); Nord_CE3 0; OnePlus_8 0 (<code>[F]</code>).</li>
+<li>OnePlus_6 md5 provenance: 403 modem-FAT rows from <code>analysis/out/modem-fat-census.json</code> (bytes + notes cross-checked, 0 mismatches); 59 vendor rows recomputed from local files, accepted only when local sha256 equals the census sha256 (<code>[F]</code>).</li>
+<li>Nord_CE3 and OnePlus_8 md5s from their census <code>md5</code> columns (sha256-verified at population time) <code>[F]</code>.</li>
+<li>Matrix join key <code>md5_db</code>, 33,917 rows × 123 devices, 15,091 distinct values, 0 empty <code>[F]</code>. 11 md5s carry different family labels across devices — normalization needed <code>[F]</code>.</li>
+</ul>
+<h2>7. Honest negatives <code>[N]</code></h2>
+<ul>
+<li>No deleted FAT16 entries, no volume labels, no LFN entries in modem.img (0/0/0) — the delta is not a deleted-entry artifact.</li>
+<li>No md5 with conflicting byte sizes across devices.</li>
+<li>No md5-based cross-device identity for OnePlus_6 vendor rows beyond local recomputation (the enchilada census carries no <code>md5</code> column).</li>
+<li>Entries after the first end-of-dir marker: 0.</li>
+<li>The brief's example alias pair (OP6 <code>image_wlanmdsp.mbn</code> vs larry <code>wlanmdsp.otaupdate</code>) does not exist: Nord_CE3 has no wlanmdsp row; OP6's <code>wlanmdsp.mbn</code> (3,035,876 B) matches no md5 on either other device.</li>
+<li>No zero-byte rows on OnePlus_8; the degenerate zero-byte group exists only between OP6 (2 rows) and Nord_CE3 (32 rows).</li>
+</ul>
+<h2>8. Caveats</h2>
+<ul>
+<li>OP6 modem-FAT row MBN_HW.TXT: FAT directory entry declares size 0 (true content = empty) but the census recorded 16,384 bytes with md5 ce338fe6… (full cluster-chain hash) — the recorded OP6+OP8 pairing on that md5 reflects chain bytes, not declared content.</li>
+<li>The zero-byte md5 groups 34 census rows and is itself carried by 57 matrix rows — all zero-byte 'shared' counts are degenerate, split out separately.</li>
+<li>Census scope limits cross-device conclusions: the OP6 census has no odm/ tree, so the VOOC pair (proven on Nord_CE3 and OnePlus_8) cannot appear for OnePlus_6 — a scope fact, not a content fact.</li>
+</ul>
+<h2>9. Open items</h2>
+<ul>
+<li>Append <code>VERINFO/VER_INFO.TXT</code> as the 404th modem-FAT row (one-line append; census owner per write discipline).</li>
+<li>Correct the <code>MBN_HW.TXT</code> row (declared size 0).</li>
+<li>Family-label normalization for identical content across devices (11 md5s) before fleet-wide roll-up.</li>
+<li>Extend the identity matrix to more of the 123 matrix devices to turn the 3-device leverage numbers into a fleet curve.</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

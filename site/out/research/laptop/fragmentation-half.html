@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Device fragmentation — LAPTOP half (rows 119–236 of the 236-device LibrePhone list) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Device fragmentation — LAPTOP half (rows 119–236 of the 236-device LibrePhone list)</h1><p>**2026-11-16 · merge-ready for the lead.** Derived entirely from metadata:</p><p>Evidence: none</p>
+<h1>Device fragmentation — LAPTOP half (rows 119–236 of the 236-device LibrePhone list)</h1>
+<p><strong>2026-11-16 · merge-ready for the lead.</strong> Derived entirely from metadata:</p>
+<p><code>/tmp/lpdb/split.json</code> (<code>laptop_half</code>, 118 devices parsed from codeberg</p>
+<p>rsavoye/librephone <code>data/devices.sql.bz2</code>, codepoint-sorted</p>
+<p><code>lower(vendor),lower(model),lower(build)</code>; the LAPTOP machine owns rows</p>
+<p>119–236) joined against the master family taxonomy in</p>
+<p><code>upstream-contribution/blob-database/coverage-matrix.csv</code>. Generator:</p>
+<p><code>build_fragmentation_half.py</code> (this directory; re-runnable); machine-readable</p>
+<p>clusters: <code>sharing-clusters.csv</code> (7,042 rows = every distinct md5 in the</p>
+<p>half, shared clusters first then singletons); raw summary:</p>
+<p><code>fragmentation-summary.json</code>. No payload bytes were fetched; nothing here is</p>
+<p>proprietary material.</p>
+<p>Headline: **16,883 blob rows over 118 devices, 31.92 GB (29.73 GiB),</p>
+<p>7,042 distinct md5s — 2,684 of them shared by &gt;1 device in the half, and</p>
+<p>10,510 of the 16,883 rows (62.3 %) are instances of a shared blob.** The</p>
+<p>half's blob inventory is dominated by 62 blob-populated devices across</p>
+<p>oneplus/samsung/sony/xiaomi (+2 realme, 1 zte); 72 devices carry zero blob</p>
+<p>rows.</p>
+<h2>1. The extracted-vs-not picture (and a semantics finding)</h2>
+<p>The upstream <code>extracts</code> column does <strong>not</strong> track blob presence (verify</p>
+<p>against the pre-built <code>devices-half.csv</code> — 0 mismatches found between the</p>
+<p>two artifacts, but both inherit the same upstream flag):</p>
+<table>
+<tr>
+<th>combination</th>
+<th>devices</th>
+</tr>
+<tr>
+<td><code>extracts</code> true <strong>and</strong> blob rows present</td>
+<td>31</td>
+</tr>
+<tr>
+<td><code>extracts</code> true, <strong>zero</strong> blob rows</td>
+<td>15 (razer cheryl/aura, shift axolotl, solana ingot, sony akari/akatsuki/aurora/xz2c, xiaomi thyme/lisa/renoir/haydn/zizhan/alioth/munch)</td>
+</tr>
+<tr>
+<td>blob rows present, <code>extracts</code> <strong>false</strong></td>
+<td>31 (all remaining oneplus/samsung/sony/xiaomi populated devices)</td>
+</tr>
+<tr>
+<td>neither</td>
+<td>41</td>
+</tr>
+</table>
+<p>So the "46/118 extracted" figure (31+15) is the flag count, while the real</p>
+<p><strong>blob-populated set is 62/118</strong>. For leverage purposes the 62 are the</p>
+<p>addressable devices this half contributes to the full picture.</p>
+<h2>2. SoC generations</h2>
+<p>The <code>soc</code> column is populated for only 28 of 118 devices — **7 distinct</p>
+<p>strings, all Qualcomm**:</p>
+<table>
+<tr>
+<th>SoC (as recorded)</th>
+<th>devices</th>
+</tr>
+<tr>
+<td>Qualcomm SDM845 Snapdragon 845</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Qualcomm SM6375 Snapdragon 695</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Qualcomm SM8250 Snapdragon 865</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Qualcomm SM8350 Snapdragon 888</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Qualcomm SM8150-AC Snapdragon 855</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Qualcomm SM8475 Snapdragon 8+ Gen 1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Qualcomm SDM636 Snapdragon 636</td>
+<td>1</td>
+</tr>
+<tr>
+<td><em>(no SoC recorded — <code>\N</code>)</em></td>
+<td><strong>90</strong></td>
+</tr>
+</table>
+<p>Data-quality finding (extends recon.md's "builds.csv SOC blank for ~122</p>
+<p>devices" to this half): **both of the half's MediaTek devices carry a blank</p>
+<p>SoC** — <code>xiaomi/Redmi_10S (rosemary)</code> (proven MT6785 Helio G95 by the lab's</p>
+<p>own <code>mediatek/rosemary-census.md</code>) and <code>xiaomi/Poco_12C (earth)</code> — as do all</p>
+<p>4 <code>radxa</code> Zero boards (unpopulated, soc blank). Every SoC actually recorded</p>
+<p>in this half is Qualcomm; the recorded-SoC subset is 28/118 vs the master</p>
+<p>DB's ~124/246 — consistent under-representation. (Flagship Xiaomi</p>
+<p>Snapdragon 8-Gen-1/2/3 devices — cupid, vermeer, mondrian, nuwa, … — are</p>
+<p>all <code>\N</code> too.)</p>
+<h2>3. Family distribution (master-matrix taxonomy, reused verbatim)</h2>
+<table>
+<tr>
+<th>family</th>
+<th>rows</th>
+<th>bytes</th>
+<th>devices</th>
+<th>note</th>
+</tr>
+<tr>
+<td>boot</td>
+<td>487</td>
+<td>13.66 GB</td>
+<td>62</td>
+<td>incl. <code>boot.img</code>/<code>vendor_boot</code>/<code>vm-bootsys.img</code> — largely the FREE kernel images (recon's caveat), not blobs</td>
+</tr>
+<tr>
+<td>modem</td>
+<td>814</td>
+<td>8.68 GB</td>
+<td>50</td>
+<td><code>modem.img</code> + MDT segments (<code>modem.bNN</code>)</td>
+</tr>
+<tr>
+<td>other</td>
+<td>8,574</td>
+<td>6.46 GB</td>
+<td>59</td>
+<td>long tail incl. camera/<code>UNKNOWN</code>-typed rows</td>
+</tr>
+<tr>
+<td>adsp</td>
+<td>1,435</td>
+<td>2.31 GB</td>
+<td>29</td>
+<td>incl. the <code>bm2nXX.bin</code> fleet</td>
+</tr>
+<tr>
+<td>wifi</td>
+<td>2,731</td>
+<td>0.39 GB</td>
+<td>50</td>
+<td>WCN/qca firmware + manifests</td>
+</tr>
+<tr>
+<td>tz</td>
+<td>2,115</td>
+<td>0.22 GB</td>
+<td>31</td>
+<td>TAs/keymaster/DRM + <code>.bNN</code> stubs</td>
+</tr>
+<tr>
+<td>cdsp</td>
+<td>402</td>
+<td>0.14 GB</td>
+<td>23</td>
+<td>compute DSP</td>
+</tr>
+<tr>
+<td>bt</td>
+<td>84</td>
+<td>42.1 MB</td>
+<td>31</td>
+<td>QCA BT patches + NVRAM</td>
+</tr>
+<tr>
+<td>gpu</td>
+<td>241</td>
+<td>6.4 MB</td>
+<td>47</td>
+<td>Adreno GMU/SQE microcode</td>
+</tr>
+</table>
+<p>Every laptop-half row inherited its family from the master matrix's own</p>
+<p>mapping (0 rows fell back to filename heuristics; 0 unmatched).</p>
+<h2>4. Top-15 shared-blob clusters (identical md5 across devices in this half)</h2>
+<p>Filtered to real firmware per recon.md's precedent (≥1 KB, no</p>
+<p><code>.jsn/.json/.xml/.txt</code> manifests). Full unfiltered list (incl. manifest</p>
+<p>clusters) is in <code>sharing-clusters.csv</code>.</p>
+<table>
+<tr>
+<th>#</th>
+<th>devices</th>
+<th>bytes</th>
+<th>family</th>
+<th>file</th>
+<th>md5</th>
+<th>devices (codenames)</th>
+</tr>
+<tr>
+<td>1</td>
+<td>12</td>
+<td>164,480</td>
+<td>adsp</td>
+<td><code>hrtf5c.bin</code></td>
+<td><code>2a47164e…b71a0</code></td>
+<td>cupid, diting, fuxi, marble, mayfly, mondrian, nuwa, socrates, thor, unicorn, vermeer, zeus</td>
+</tr>
+<tr>
+<td>2</td>
+<td>11</td>
+<td>473,648</td>
+<td>modem</td>
+<td><code>modem.b16</code></td>
+<td><code>30c22653…4ca7e</code></td>
+<td>cupid…zeus (11 Xiaomi flagship set)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>11</td>
+<td>201,560</td>
+<td>other*</td>
+<td><code>hpbtfw20.tlv</code></td>
+<td><code>92247344…9ffb7</code></td>
+<td>cupid, diting, lemonade(+p), marble, martini, mayfly, mondrian, thor, unicorn, zeus</td>
+</tr>
+<tr>
+<td>4</td>
+<td>11</td>
+<td>41,548</td>
+<td>gpu</td>
+<td><code>a650_gmu.bin</code></td>
+<td><code>a2b9504e…11e1a</code></td>
+<td>gta4l(lwifi), gts7l(lwifi), instantnoodle(+p), kebab, lemonades, pdx206, pdx215, r8q</td>
+</tr>
+<tr>
+<td>5</td>
+<td>11</td>
+<td>34,736</td>
+<td>other</td>
+<td><code>dax_param.bin</code></td>
+<td><code>70727b64…4bd3</code></td>
+<td>a21s, a71, beyond0/1/2lte, beyondx, f62, gta4l(lwifi), gta4xl(lwifi)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>11</td>
+<td>31,632</td>
+<td>gpu</td>
+<td><code>a650_sqe.fw</code></td>
+<td><code>353e247b…edc1</code></td>
+<td>same set as #4</td>
+</tr>
+<tr>
+<td>7–11</td>
+<td>11 ×5</td>
+<td>6,319</td>
+<td>other*</td>
+<td><code>hpnv20.bin</code> / <code>.b2f</code> / <code>.b3b</code> / <code>.b4b</code> / <code>.b8b</code></td>
+<td>(distinct md5s)</td>
+<td>11 devices each (cupid, diting, lemonades, mayfly, …)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>10</td>
+<td>11,458</td>
+<td>other</td>
+<td><code>plmn_delta.bin</code></td>
+<td><code>9df3aeb9…3aeb9</code></td>
+<td>samsung 2018-20 set + xiaomi Mi439</td>
+</tr>
+<tr>
+<td>13</td>
+<td>10</td>
+<td>4,096</td>
+<td>tz</td>
+<td><code>cpusys_vm.b03</code></td>
+<td><code>620f0b67…0b67</code></td>
+<td>samsung set</td>
+</tr>
+<tr>
+<td>14</td>
+<td>10</td>
+<td>2,126</td>
+<td>other</td>
+<td><code>CFR_OPlus_EF017_UW_snapshot.bin</code></td>
+<td><code>99593358…3dcbe</code></td>
+<td>erhai, lemonade(+p), luigi, martini, oscar — plus instantnoodle(+p) under its <code>CFR_para2_OnePlus_…</code> twin name</td>
+</tr>
+<tr>
+<td>15</td>
+<td>9</td>
+<td>788,436</td>
+<td>other</td>
+<td><code>sh.bin</code></td>
+<td><code>e0f9a9be…9a9be</code></td>
+<td>samsung/xiaomi set</td>
+</tr>
+</table>
+<p>\* <code>hpbtfw20.tlv</code>/<code>hpnv20*</code> sit in <code>bluetooth/image</code> and are QCA BT</p>
+<p>firmware — the master matrix types them <code>other</code>/<code>misc</code>; recon.md's own</p>
+<p>family table puts <code>.tlv</code> BT patches + NVRAM under <strong>bt</strong>. Candidate</p>
+<p>correction for the lead (not changed here — shared file, out of my</p>
+<p>file-wall).</p>
+<h2>5. Leverage notes (RE once, frees N devices)</h2>
+<ul>
+<li><strong>Device-count leverage in this half is the Xiaomi flagship block.</strong></li>
+</ul>
+<p>  <code>hrtf5c.bin</code> (ADSP HRTF data, 164 KB) ×12, <code>modem.b16</code> ×11, the</p>
+<p>  <code>hpnv20*</code> BT-NVRAM fleet ×11 ×5 variants, <code>hpbtfw20.tlv</code> ×11 — one RE</p>
+<p>  pass each covers 11–12 of the half's 62 populated devices. These are the</p>
+<p>  half's own additions on top of the recon global top-20 (which is</p>
+<p>  bt/adsp-weighted): the half's vendor mix (52 xiaomi) makes the</p>
+<p>  2021-2024 Xiaomi flagship set the densest sharing block.</p>
+<ul>
+<li><strong>Byte-weighted leverage</strong> (devices × bytes, top rows): <code>vm-bootsys.img</code></li>
+</ul>
+<p>  270 MB ×5 = <strong>1.35 GB</strong> (the Xiaomi flagship vm guest image — mayfly,</p>
+<p>  unicorn, thor, diting, mondrian, all SoC-blank in the DB); <code>dsp.img</code></p>
+<p>  64 MB ×5 = 335 MB; <code>night_align_lsc_tbl_*.bin</code> camera calibration 50 MB +</p>
+<p>  37 MB ×6 = 528 MB combined; <code>modem.img</code> ×2 at 220/187 MB. Full top-10 in</p>
+<p>  <code>fragmentation-summary.json</code>.</p>
+<ul>
+<li><strong>Cross-generation identical bytes</strong>: <code>a619_gmu.bin</code> (Adreno 619 GMU</li>
+</ul>
+<p>  microcode, 32,768 B) is md5-identical to <code>a618_gmu.bin</code> in 2 further</p>
+<p>  devices — one 32 KB RE pass covers Adreno 618 <strong>and</strong> 619 GMU. Same</p>
+<p>  pattern for the <code>CFR_OPlus…</code>/<code>CFR_para2_OnePlus…</code> camera-calibration pair</p>
+<p>  (§4 #14).</p>
+<ul>
+<li><strong>Nightly drift splits clusters</strong>: e.g. <code>bm2n12.bin</code> exists on 14 half</li>
+</ul>
+<p>  devices but as <strong>2 md5 clusters</strong> (8 + 6), <code>a630_sqe.fw</code> on 14 devices as</p>
+<p>  <strong>4 clusters</strong>, <code>unified_ksqs.bin</code> on 24 devices as <strong>5 clusters</strong>. Any</p>
+<p>  merged full-DB leverage ranking must therefore track BOTH metrics —</p>
+<p>  file-presence (RE coverage) and identical-md5 (byte-exact reuse) — which</p>
+<p>  <code>sharing-clusters.csv</code> + <code>fragmentation-summary.json</code> provide per cluster.</p>
+<ul>
+<li><strong>Degenerate cluster (data quality)</strong>: md5 <code>d41d8cd9…8427e</code> (the empty</li>
+</ul>
+<p>  string) spans 33 zero-byte rows across 21 devices</p>
+<p>  (<code>oem_hw_null.txt</code> ×12, <code>oem_sw_null.txt</code> ×12, <code>oem_hw.txt</code> ×8,</p>
+<p>  <code>eye_retouch_chinese.bin</code> ×1) — the upstream DB stores zero-byte files as</p>
+<p>  blob rows; excluded from the top-15 ranking, kept in the CSV for the</p>
+<p>  merge.</p>
+<h2>6. Recon.md top-20 cross-reference (expected vs computed)</h2>
+<p>All 20 recon top-20 blobs <strong>do</strong> occur in this half; the two metric flavors</p>
+<p>reconcile the workorder's expected counts with the computed md5 clusters:</p>
+<table>
+<tr>
+<th>file</th>
+<th>recon global devs</th>
+<th>half devices w/ file (any md5)</th>
+<th>half md5 clusters</th>
+<th>largest same-md5 cluster</th>
+</tr>
+<tr>
+<td><code>crbtfw20.tlv</code> / <code>apbtfw10.tlv</code> / <code>crbtfw11.tlv</code> / <code>crnv20.bin</code> / <code>crnv11.bin</code> / <code>apnv10.bin</code> (QCA BT fleet)</td>
+<td>29 each</td>
+<td><strong>4</strong> each</td>
+<td>1 each</td>
+<td><strong>4</strong> ✓ (expected ×4)</td>
+</tr>
+<tr>
+<td><code>bm2n12.bin</code> / <code>bm2n14.bin</code> / <code>bm2n15.bin</code> (ADSP fleet)</td>
+<td>26 each</td>
+<td><strong>14</strong> each ✓ (expected ×14)</td>
+<td>2 each</td>
+<td><strong>8</strong> (nightly drift)</td>
+</tr>
+<tr>
+<td><code>a619_gmu.bin</code></td>
+<td>26</td>
+<td><strong>5</strong> ✓ (expected ×5)</td>
+<td>1</td>
+<td><strong>7</strong> (5 as <code>a619_gmu.bin</code> + 2 as <code>a618_gmu.bin</code>, identical bytes)</td>
+</tr>
+<tr>
+<td><code>bm2n08.bin</code> / <code>bm2n06.bin</code></td>
+<td>25</td>
+<td>16</td>
+<td>3 / 2</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>bm2n13.bin</code></td>
+<td>25</td>
+<td>14</td>
+<td>2</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>unified_ksqs.bin</code> / <code>sequence_manifest.bin</code></td>
+<td>25</td>
+<td>24</td>
+<td>5</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>a660_sqe.fw</code></td>
+<td>21</td>
+<td>14</td>
+<td>2</td>
+<td>8 (size drifted 40,496 → 43,068 B between nightlies)</td>
+</tr>
+<tr>
+<td><code>a660_gmu.bin</code></td>
+<td>19</td>
+<td>6</td>
+<td>1</td>
+<td>6</td>
+</tr>
+<tr>
+<td><code>a630_sqe.fw</code></td>
+<td>19</td>
+<td>14</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>CFR_OPlus_EF017_UW_snapshot.bin</code></td>
+<td>19</td>
+<td>6</td>
+<td>1</td>
+<td>10 (twin <code>CFR_para2_…</code> name)</td>
+</tr>
+<tr>
+<td><code>aoa_cldb_falcon.bin</code></td>
+<td>17</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</table>
+<p>So: the workorder's expected "bm2n12/14/15 ×14, QCA BT ×4, a619_gmu ×5" are</p>
+<p><strong>file-presence counts and are verified exactly</strong>; the same-md5 cluster</p>
+<p>counts are smaller where nightly drift split a fleet (documented above) and</p>
+<p>larger where identical bytes shipped under a second filename (a619/a618).</p>
+<h2>7. Merge instructions (lead, laptop-half → full 236-device picture)</h2>
+<ol>
+<li><strong>Clusters</strong>: union on <code>md5</code> across <code>blob-matrix/desktop/</code>'s clusters and</li>
+</ol>
+<p>   <code>blob-matrix/laptop/sharing-clusters.csv</code>. Device sets are disjoint by</p>
+<p>   construction (the halves partition the device list), so the full-DB</p>
+<p>   device count of a cluster = desktop_count + laptop_count − 0; re-derive</p>
+<p>   family from the master matrix (both halves already inherit it, so no</p>
+<p>   re-mapping is needed).</p>
+<ol>
+<li><strong>Leverage ranking</strong>: recompute the full-DB top-20 as</li>
+</ol>
+<p>   <code>full_devices = sum of halves' file-presence counts</code> and keep the</p>
+<p>   identical-md5 decomposition per cluster (§5) — recon.md's global table</p>
+<p>   is file-presence-based and will reconcile exactly with the sum.</p>
+<ol>
+<li><strong>SoC table</strong>: merge §2 with the desktop's half; the "SoC recorded ⇒</li>
+</ol>
+<p>   Qualcomm-only in this half" finding and the two blank-SoC MediaTek</p>
+<p>   devices are global data-quality items (candidate corrections for the</p>
+<p>   master <code>device-inventory.csv</code>, lead-owned).</p>
+<ol>
+<li><strong>Semantics finding</strong> (§1) applies DB-wide; merge with recon.md's</li>
+</ol>
+<p>   "upstream data-quality findings" section (lead-owned file).</p>
+<ol>
+<li><strong>Totals reconciliation</strong>: this half = 16,883 rows / 31.92 GB /</li>
+</ol>
+<p>   7,042 distinct md5s; the master DB is 33,917 rows / 69.80 GB /</p>
+<p>   15,091 md5s, so the desktop half should carry ≈17,034 rows / 37.88 GB;</p>
+<p>   distinct-md5 subtraction needs the cross-half shared set (clusters that</p>
+<p>   span both halves), which the union in step 1 yields.</p>
+<ol>
+<li><strong>Rule-1 candidates found this pass</strong> (reported, not silently fixed):</li>
+</ol>
+<p>   <code>hpbtfw20.tlv</code>/<code>hpnv20*</code> family <code>other</code>→<code>bt</code> candidate (§4); the two</p>
+<p>   blank-SoC MTK devices (§2); <code>a660_sqe.fw</code> nightly size drift vs recon's</p>
+<p>   recorded bytes (§6).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

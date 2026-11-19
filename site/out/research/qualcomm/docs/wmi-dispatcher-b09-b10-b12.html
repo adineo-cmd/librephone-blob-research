@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WMI dispatcher search: the remaining wpss segments b09/b10/b12 — registry found, code segment identified — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>WMI dispatcher search: the remaining wpss segments b09/b10/b12 — registry found, code segment identified</h1><p>**Claim:** F-21 extends the F-20 search (linear-sweep RV32+C, construction-site</p><p>Evidence: none</p>
+<h1>WMI dispatcher search: the remaining wpss segments b09/b10/b12 — registry found, code segment identified</h1>
+<p><strong>Claim:</strong> F-21 extends the F-20 search (linear-sweep RV32+C, construction-site</p>
+<p>patterns, ID tables) to the last unchecked WCN6750 <code>wpss</code> segments b09/b10/b12</p>
+<p>and reaches a structural answer. **WMI message-ID handling IS present in the</p>
+<p>wpss image — but it is table-driven, not arithmetic.** <code>wpss.b09</code> is an RW data</p>
+<p>segment containing the firmware's <strong>message-ID registry</strong>: 148 <code>*EVENTID</code> /</p>
+<p><code>*CMDID</code> enum-name strings (44 <code>WHAL_*</code>, 44 <code>WAL_*</code>), a 12-byte-stride table of</p>
+<p><code>[b06-code-pointer, grp&lt;&lt;12|cmd ID, 0]</code> records (225 records in 16 runs, main</p>
+<p>run 69 records at file 0x2a080; 149 distinct IDs across WMI groups 3–13), and a</p>
+<p>clean <code>.eh_frame</code> block whose FDEs point into b06. <code>wpss.b10</code> (95.5% ASCII) is</p>
+<p>the format-string/trace table for the same code (11,244 strings, 66 naming WMI</p>
+<p>cmd/event IDs in <code>file.c:</code> error text) with zero ID tables. <code>wpss.b12</code> is the</p>
+<p>X.509 secure-boot certificate chain (PT_NULL region) — no code, closed. The mdt</p>
+<p>program headers settle the F-20 puzzle: <strong>b07/b08 are RW data segments</strong> (no</p>
+<p>PF_X) — the only executable LOADs are b01/b02/b03/b05/b06, with b06 (6.07 MB,</p>
+<p>RWX, 0xc0002000–0xc05bd111 (end-exclusive; canonical per filesz 6,074,641)) as the main code. F-20's "zero construction sites"</p>
+<p>is therefore fully explained: construction-site hunting was the wrong</p>
+<p>instrument for a table-driven dispatcher. Nothing about this registry exists in</p>
+<p>public literature (GitHub search, checked 2026-11-11, per F-20).</p>
+<h2>Method</h2>
+<ul>
+<li>Tool: <code>tools/wmi_b091012_scan.py</code> (this commit), reusing F-20's</li>
+</ul>
+<p>  <code>wmi_dispatch_scan.py</code> <code>sweep()</code> + <code>pattern_search()</code> verbatim (capstone</p>
+<p>  RV32+C, linear sweep with resync, constant propagation); ID values from</p>
+<p>  <code>xref_wmi.py</code> (605 ath11k IDs). Raw scan kept out of git (46 MB); curated</p>
+<p>  results in <code>results/wmi-dispatcher-b091012.json</code>.</p>
+<ul>
+<li><strong>Header ground truth from <code>wpss.mdt</code></strong> (the true ELF32, 13 phdrs):</li>
+</ul>
+<p>  mapped to <code>.bNN</code> payloads by exact file size. e_machine = 164 = EM_QDSP6</p>
+<p>  (Qualcomm Hexagon) — confirms F-7's junk-header finding.</p>
+<h2>Header check: what the headers claim vs content</h2>
+<table>
+<tr>
+<th>seg</th>
+<th>mdt phdr</th>
+<th>vaddr</th>
+<th>filesz</th>
+<th>memsz</th>
+<th>flags</th>
+<th>on-disk magic</th>
+<th>content</th>
+</tr>
+<tr>
+<td>b01</td>
+<td>PH1</td>
+<td>0xfe000000</td>
+<td>6,440</td>
+<td>8,192</td>
+<td>R-X</td>
+<td>—</td>
+<td>code (tiny)</td>
+</tr>
+<tr>
+<td>b02</td>
+<td>PH2</td>
+<td>0xfe002000</td>
+<td>461,049</td>
+<td>0x71000</td>
+<td>RWX</td>
+<td>—</td>
+<td>code</td>
+</tr>
+<tr>
+<td>b03</td>
+<td>PH3</td>
+<td>0xfe073000</td>
+<td>1,104</td>
+<td>4,096</td>
+<td>R-X</td>
+<td>—</td>
+<td>code (tiny)</td>
+</tr>
+<tr>
+<td>b04</td>
+<td>PH4</td>
+<td>0xc0000000</td>
+<td>256</td>
+<td>4,096</td>
+<td>R-X</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>b05</td>
+<td>PH5</td>
+<td>0xc0001000</td>
+<td>4,096</td>
+<td>4,096</td>
+<td>R-X</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>b06</td>
+<td>PH6</td>
+<td>0xc0002000</td>
+<td>6,074,641</td>
+<td>0x5cc000</td>
+<td>RWX</td>
+<td>—</td>
+<td><strong>main code</strong></td>
+</tr>
+<tr>
+<td>b07</td>
+<td>PH7</td>
+<td>0xc0600000</td>
+<td>139,316</td>
+<td>0x23000</td>
+<td><strong>RW-</strong></td>
+<td>\x7fELF</td>
+<td>data (F-20 swept it as code)</td>
+</tr>
+<tr>
+<td>b08</td>
+<td>PH8</td>
+<td>0xc0623000</td>
+<td>275,644</td>
+<td>0x44000</td>
+<td><strong>RW-</strong></td>
+<td>\x7fELF</td>
+<td>data (F-20)</td>
+</tr>
+<tr>
+<td><strong>b09</strong></td>
+<td>PH9</td>
+<td>0xc0667000</td>
+<td>360,960</td>
+<td><strong>14,835,712</strong></td>
+<td><strong>RW-</strong></td>
+<td>raw</td>
+<td>unwind + registry + pointers</td>
+</tr>
+<tr>
+<td><strong>b10</strong></td>
+<td>PH10</td>
+<td>0xc1500000</td>
+<td>909,398</td>
+<td>913,408</td>
+<td><strong>RW-</strong></td>
+<td>raw</td>
+<td><strong>strings</strong></td>
+</tr>
+<tr>
+<td><strong>b12</strong></td>
+<td>PH12 type <strong>PT_NULL</strong></td>
+<td>0</td>
+<td>4,376</td>
+<td>4,376</td>
+<td>R--</td>
+<td>raw</td>
+<td><strong>X.509 certs</strong></td>
+</tr>
+</table>
+<p>Key facts: (1) <strong>b09/b10/b12 are not ELFs on disk</strong> — raw segment payloads</p>
+<p>(unlike b07/b08, which are standalone ELFs); (2) **none of b07/b08/b09/b10 is</p>
+<p>executable** — F-20 swept data as code; (3) b09's memsz (14.8 MB) dwarfs its</p>
+<p>filesz (361 KB) — 60.9% zero bytes in-file, the rest BSS; (4) b12 is a PT_NULL</p>
+<p>hash/cert region, not a LOAD.</p>
+<h2>wpss.b09 — the message-ID registry (the find)</h2>
+<p>Three stacked roles in one RW segment:</p>
+<ol>
+<li><strong><code>.eh_frame</code> head</strong>: 1,072-byte clean u32-length chain (9 CIEs, 28 FDEs,</li>
+</ol>
+<p>   0 breaks, chain stops cleanly). FDE <code>pc_begin</code> (sdata4 pcrel) values decode</p>
+<p>   to ~0xC04E6BD0–0xC04E6CB0 — inside b06's executable range. Unwind info for</p>
+<p>   b06 code, stored in the data segment.</p>
+<ol>
+<li><strong>Enum-name table</strong>: 148 strings ending <code>EVENTID</code>/<code>CMDID</code> (44 <code>WHAL_</code>-, 44</li>
+</ol>
+<p>   <code>WAL_</code>-prefixed + others), from file ~0x1fc84 on:</p>
+<p>   <code>WHAL_HWSCH_POST_CMD_EVENTID</code>, <code>WHAL_HWSCH_RESET_EVENTID</code>,</p>
+<p>   <code>WAL_RX_FW_RX_REFILL_FREE_HOST1_ENTRIES_EVENTID</code>,</p>
+<p>   <code>SCHED_ALGO_MIGRATE_EVENTID</code>, <code>WHAL_TQM_PROCESS_GEN_MPDUS_STATUS_FLOW_EVENTID</code>…</p>
+<p>   Firmware-internal event names (not ath11k names — shared ID space, different</p>
+<p>   enums).</p>
+<ol>
+<li><strong>ID→pointer registry</strong>: 12-byte-stride records <code>[ptr, id, 0]</code> with ptr in</li>
+</ol>
+<p>   0xc0000000–0xc2000000 (b06 range) and id = grp&lt;&lt;12|cmd. 213 aligned ID-word</p>
+<p>   hits, 149 distinct IDs, groups present: 3/SCAN(7), 4/PDEV(49), 5/VDEV(35),</p>
+<p>   6/PEER(20), 7/MGMT(11), 8(5), 10(8), 11/ROAM(9), 13/OCE(5). 225 records in</p>
+<p>   16 stride-12 runs; main run 69 records at file 0x2a080–0x2a3b0 = **vaddr</p>
+<p>   0xc0691080–0xc06913b0**. Owner pointers cluster: 0xc02cd9cc (×44),</p>
+<p>   0xc031d8c8 (×34), 0xc02d94bc (×15), 0xc035d2e0 (×7), 0xc0377b5c (×5) — the</p>
+<p>   same pointer serves many IDs, i.e. a registry/list, not one-handler-per-ID.</p>
+<p>   Records also self-reference registry vaddrs (0xc0691080 — the main run</p>
+<p>   itself — 0xc0691f88, 0xc06913c0): linked-list/list-head structure.</p>
+<p>   Sample: <code>[0xc02cd9cc, 0x4001, 0]</code>, <code>[0xc02cd9cc, 0x4002, 0]</code>,</p>
+<p>   <code>[0xc037b6bc, 0x38005, 0]</code>.</p>
+<ol>
+<li><strong>Adjacent unidentified table</strong> (pages at file 0xd000–0xe0xx): 16-byte</li>
+</ol>
+<p>   stride, pairs WMI-shaped IDs (0x2001, 0x200a, 0x200b, 0x1005, 0x1008, 0x2115,</p>
+<p>   0x4011, 0x401a…) with random-looking 32-bit words (CRC-like), plus</p>
+<p>   non-WMI-group IDs (0x5104, 0x9221, 0xa200) — a broader message system</p>
+<p>   (diag/QuRT?). Honest unknown, not attributed.</p>
+<p>RV32 sweep of b09: 88.9% "decoded" but dominated by <code>c.unimp</code> (94,128 resync</p>
+<p>fillers) — data, not code; the 403 raw construction hits are the same noise</p>
+<p>class F-20 saw in rodata sweeps.</p>
+<h2>wpss.b10 — trace/format strings; wpss.b12 — certificates</h2>
+<ul>
+<li><strong>b10</strong> (909,398 B): 95.5% ASCII, 11,244 strings in QCA <code>file.c:format</code></li>
+</ul>
+<p>  style (<code>wal_*.c</code>, <code>whal_*.c</code>, <code>wmi_ftm_attach.c</code>, <code>memheap.c</code>,</p>
+<p>  <code>platform_diag_pmon.c</code>). Markers: wlan ×5203, wmi/WMI ×649, diag ×445,</p>
+<p>  qurt ×68, htt/HTT ×85, htc/HTC ×13. 66 strings name WMI cmd/event IDs in</p>
+<p>  error text (e.g. `wlan_dev.c:WMI_PDEV_CONFIG_VENDOR_OUI_ACTION_CMDID Error:</p>
+<p>  total_length (%d) &gt; %d`). <strong>Zero u32 ID hits; u16 hits are ASCII noise</strong></p>
+<p>  (top value 0x5020 = <code>" P"</code>, ×449). RV32 sweep 85.4% is <code>c.flw</code>/<code>c.lui</code></p>
+<p>  string noise; 42,278 raw construction hits = pure noise from sweeping text.</p>
+<ul>
+<li><strong>b12</strong> (4,376 B): DER <code>30 82</code> SEQUENCEs at 0x3f8/0x653/0x8f3; strings</li>
+</ul>
+<p>  <code>Generated OEM Root CA</code>, <code>Fairphone BV</code>, <code>T2MO OEM Key</code>, <code>Amsterdam</code>,</p>
+<p>  <code>SecTools</code>, validity 250305→450228. Independently confirms</p>
+<p>  librephone-upstream <code>docs/wpss.b12.md</code> (production cert chain). No code.</p>
+<h2>Verdict</h2>
+<ol>
+<li><strong>b12: closed.</strong> Certificates, PT_NULL, no WMI content.</li>
+<li><strong>b10: closed.</strong> String table; no ID data.</li>
+<li><strong>b09: registry found — no code, but the dispatch DATA lives here.</strong></li>
+</ol>
+<p>   ID values in the grp&lt;&lt;12|cmd space (groups 3–13), pointer records into b06,</p>
+<p>   enum names, unwind info.</p>
+<ol>
+<li><strong>The structural answer to F-20/F-19/F-9:</strong> the wpss image's WMI handling is</li>
+</ol>
+<p>   <strong>table-driven</strong>: static ID registry (b09) + handler code (b06) + trace</p>
+<p>   strings (b10). No <code>grp&lt;&lt;12|1</code> arithmetic construction sites exist anywhere</p>
+<p>   because no such computation is performed. F-20's zero is correct <strong>and</strong></p>
+<p>   fully explained by the header facts (b07/b08 are RW data).</p>
+<ol>
+<li><strong>Remaining unknown:</strong> which b06 code consumes the registry (cross-reference</li>
+</ol>
+<p>   of 0xc0691080+ from b06) — the natural F-22 target, now with a concrete</p>
+<p>   anchor.</p>
+<h2>Honest negatives</h2>
+<ul>
+<li>The semantic split of the registry's ptr column (owner component vs handler</li>
+</ul>
+<p>  entry) is undetermined; same-pointer-per-many-IDs argues for list nodes or a</p>
+<p>  shared handler, not individual dispatch stubs.</p>
+<ul>
+<li>The 0xd000–0xe0xx 16-byte-stride records are unidentified (shape reported,</li>
+</ul>
+<p>  protocol not attributed).</p>
+<ul>
+<li>No b06 code analysis in this finding (time-bound); the sweep-based noise</li>
+</ul>
+<p>  rates for b09/b10 are reported, not fully classified.</p>
+<ul>
+<li>e_machine=164 (EM_QDSP6) coexists with cleanly RV32+C-decodable b07 code</li>
+</ul>
+<p>  (F-20: 100.0% coverage on its code LOADs) — the junk-header question remains</p>
+<p>  open.</p>
+<h2>Prior art</h2>
+<p>None found (GitHub code/repo search 2026-11-11 per F-20). Extends F-20</p>
+<p>(<code>docs/wmi-dispatcher-search.md</code>), F-19 (no stored constants), F-9/F-7</p>
+<p>(header/junk-field deflations).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

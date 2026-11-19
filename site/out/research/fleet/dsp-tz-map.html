@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dsp.img + tz.img container map — OnePlus 6 (enchilada), LineageOS 22.2 nightly 2026-11-11 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>dsp.img + tz.img container map — OnePlus 6 (enchilada), LineageOS 22.2 nightly 2026-11-11</h1><p>Analysis date: 2026-11-17. Inputs: `data-fetch/enchilada/dsp.img` (33,554,432 B), `data-fetch/enchilada/tz.img` (2,056,192 B).</p><p>Evidence: none</p>
+<h1>dsp.img + tz.img container map — OnePlus 6 (enchilada), LineageOS 22.2 nightly 2026-11-11</h1>
+<p>Analysis date: 2026-11-17. Inputs: <code>data-fetch/enchilada/dsp.img</code> (33,554,432 B), <code>data-fetch/enchilada/tz.img</code> (2,056,192 B).</p>
+<p>Machine-readable evidence: <code>analysis/out/dsp-elf-census.json</code>. Scripts: <code>analysis/tools/dsp_tz_census.py</code>, <code>analysis/tools/dsp_ext4_extract.py</code>, <code>analysis/tools/tz_strings_entropy.py</code>, <code>analysis/tools/build_dsp_tz_draft.py</code>. Extracted ext4 files: <code>/tmp/dsp-ext4/</code> (62 files).</p>
+<h2>1. dsp.img — container is ext4 (briefing correction)</h2>
+<p>Whole image: md5 <code>ecdfc6320f043fe089addfff880cdc22</code>, sha256 <code>ed96e09f54bbb2c363bd9e6c04f22f20259750f1ba245fc9a739ea70dd666019</code>.</p>
+<p><code>file</code> identifies dsp.img as <strong>Linux rev 1.0 ext4 filesystem, volume name "dsp", extents, large files</strong> — not a raw concatenation and not FAT.</p>
+<table>
+<tr>
+<th>property</th>
+<th>value</th>
+</tr>
+<tr>
+<td>UUID</td>
+<td>af32c008-2a39-7e5b-a5dc-201456d93103</td>
+</tr>
+<tr>
+<td>block size / count</td>
+<td>4096 B / 8192 blocks (exactly 32 MiB)</td>
+</tr>
+<tr>
+<td>block groups</td>
+<td>1 (blocks-per-group 32768 &gt; total)</td>
+</tr>
+<tr>
+<td>inode table</td>
+<td>blocks 11-138</td>
+</tr>
+<tr>
+<td>journal</td>
+<td>inode 8, 4 MiB = blocks 139-1162, clean: only block 139 (journal superblock) nonzero</td>
+</tr>
+<tr>
+<td>resize inode (7)</td>
+<td>blocks 2-7 + 1163</td>
+</tr>
+</table>
+<p><strong>Briefing correction.</strong> "First ~4.7 MB zero" is inaccurate:</p>
+<ul>
+<li>14 nonzero 4K sectors exist below 0x48f000 (superblock @0x0, GDT @0x1000, bitmaps @0x9000/0xa000, inode table @0xb000-0x10000, journal superblock @0x8b000, resize inode @0x48b000, dir blocks @0x48c000-0x48f000).</li>
+<li>The ELFs start at 0x48f000 simply because ext4 places file data after metadata + journal; they are <strong>files inside the filesystem</strong>, not a raw stream.</li>
+<li>File data ends at 0x1cc7000; 0x1cc7000-0x2000000 (819 blocks, 3,355,648 B) is a zero tail.</li>
+</ul>
+<p>Directory tree (62 files):</p>
+<table>
+<tr>
+<th>dir</th>
+<th>files</th>
+<th>ELF</th>
+<th>non-ELF</th>
+</tr>
+<tr>
+<td>/adsp</td>
+<td>24</td>
+<td>22</td>
+<td>2</td>
+</tr>
+<tr>
+<td>/cdsp</td>
+<td>17</td>
+<td>16</td>
+<td>1</td>
+</tr>
+<tr>
+<td>/sdsp</td>
+<td>21</td>
+<td>19</td>
+<td>2</td>
+</tr>
+<tr>
+<td>/lost+found</td>
+<td>0</td>
+<td>0</td>
+<td>0 (empty; its block still holds stale dirent bytes)</td>
+</tr>
+</table>
+<h2>2. ELF census</h2>
+<p><code>\x7fELF</code> magic hits: <strong>60</strong> total = <strong>57 file-start ELFs</strong> + <strong>3 embedded</strong>:</p>
+<ul>
+<li>0x6fc6b1 — inside ELF payload of <code>adsp/fastrpc_shell_0</code> (md5 <code>b9ffea38e0f6787ee2f28337e6756c6d</code>); not validated as a standalone header</li>
+<li>0x8e572c — inside ELF payload of <code>cdsp/fastrpc_shell_3</code> (md5 <code>2d7756f3c676a4bc178035fa8494302b</code>); not validated as a standalone header</li>
+<li>0x12845e1 — inside ELF payload of <code>sdsp/fastrpc_shell_2</code> (md5 <code>053fca51499728c69d8479439134c724</code>); not validated as a standalone header</li>
+</ul>
+<p>All 57 ELFs share one shape: ELF32 LE, <code>e_machine</code> 164 (EM_QDSP6, Hexagon), <code>e_type</code> 3 (ET_DYN), <code>e_phnum</code> 3 (2 PT_LOAD + 1 PT_DYNAMIC), <code>e_entry</code> 0x0 or 0x94, section headers present at file end (<code>e_shnum</code> 17-36; file size == e_shoff + e_shnum*40 on every blob). Per-blob headers, all program headers, spans and hashes are in <code>dsp-elf-census.json</code> (<code>blobs[]</code>).</p>
+<p>Totals: 25,270,112 ELF bytes; largest file <code>sdsp/libFastRPC_UTF_Forward_800s_sdm845_skel.so</code> (6,821,248 B).</p>
+<p>Full file table (all 62 files, ext4-extracted, size/md5 verified against directory entries):</p>
+<table>
+<tr>
+<th>path</th>
+<th>size</th>
+<th>md5</th>
+</tr>
+<tr>
+<td><code>adsp/AlacDecoderModule.so.1</code></td>
+<td>25640</td>
+<td><code>c1c293db0348fc89a6e4a283f42fedd3</code></td>
+</tr>
+<tr>
+<td><code>adsp/ApeDecoderModule.so.1</code></td>
+<td>46768</td>
+<td><code>25759cbce95ed71f4e8995d0afab3907</code></td>
+</tr>
+<tr>
+<td><code>adsp/AudioContextDetection.so.1</code></td>
+<td>30824</td>
+<td><code>ad99bf7a11f2cf8ee66879676df596b4</code></td>
+</tr>
+<tr>
+<td><code>adsp/AudioSphereModule.so.1</code></td>
+<td>75472</td>
+<td><code>598b4849bb64c7d505e00fbdcfd0a4d5</code></td>
+</tr>
+<tr>
+<td><code>adsp/CFCMModule.so.1</code></td>
+<td>25640</td>
+<td><code>cb954c499a3551468d1f73d39df6ccbf</code></td>
+</tr>
+<tr>
+<td><code>adsp/EtsiAmrWbPlusDecModule.so.1</code></td>
+<td>191800</td>
+<td><code>36ec0a709f4335b933ae7022c48c1722</code></td>
+</tr>
+<tr>
+<td><code>adsp/EtsiEaacPlusEncAndCmnModule.so.1</code></td>
+<td>197232</td>
+<td><code>b03fc9af1d21a975962ff025dd83f19d</code></td>
+</tr>
+<tr>
+<td><code>adsp/FlacDecoderModule.so.1</code></td>
+<td>36752</td>
+<td><code>cfd9d8711a55916f1679f86ca73ee17e</code></td>
+</tr>
+<tr>
+<td><code>adsp/HeaacDecoderModule.so.1</code></td>
+<td>290192</td>
+<td><code>e76bbf7cbd43894455009c6431e96476</code></td>
+</tr>
+<tr>
+<td><code>adsp/LdacModule.so.1</code></td>
+<td>61368</td>
+<td><code>32d988eee180d52dbd7a006e3b85af66</code></td>
+</tr>
+<tr>
+<td><code>adsp/SAPlusCmnModule.so.1</code></td>
+<td>132080</td>
+<td><code>922a948032a2569fc2add51454515030</code></td>
+</tr>
+<tr>
+<td><code>adsp/SVACmnModule.so.1</code></td>
+<td>81872</td>
+<td><code>fd8b5aa584ed591768127342a7ce0ce3</code></td>
+</tr>
+<tr>
+<td><code>adsp/VoiceWakeup_V2_Module.so.1</code></td>
+<td>50984</td>
+<td><code>8662e342cbea9efacc2972c056b105f7</code></td>
+</tr>
+<tr>
+<td><code>adsp/VorbisDecoderModule.so.1</code></td>
+<td>83544</td>
+<td><code>c9a36b78ce68c9888bec34f3164e0420</code></td>
+</tr>
+<tr>
+<td><code>adsp/WmaProDecoderModule.so.1</code></td>
+<td>372088</td>
+<td><code>6cdd9a82efd2e38e6db09b4bef94589a</code></td>
+</tr>
+<tr>
+<td><code>adsp/WmaStdDecoderModule.so.1</code></td>
+<td>124184</td>
+<td><code>610f158b6f337e80423bb8e24f9cf700</code></td>
+</tr>
+<tr>
+<td><code>adsp/fastrpc_shell_0</code></td>
+<td>873128</td>
+<td><code>b9ffea38e0f6787ee2f28337e6756c6d</code></td>
+</tr>
+<tr>
+<td><code>adsp/fluence_voiceplus_module.so.1</code></td>
+<td>149232</td>
+<td><code>bf5cd466cafaf0b62553f648d2358532</code></td>
+</tr>
+<tr>
+<td><code>adsp/libstabilitydomain_skel.so</code></td>
+<td>75880</td>
+<td><code>d7a859df1a508352f3cbebef346776b5</code></td>
+</tr>
+<tr>
+<td><code>adsp/libsysmon_skel.so</code></td>
+<td>127952</td>
+<td><code>96b66cf6f34d8ac9f51e525958c13ad1</code></td>
+</tr>
+<tr>
+<td><code>adsp/libsysmondomain_skel.so</code></td>
+<td>176688</td>
+<td><code>60944282ab9105f6087063e5f4fccd84</code></td>
+</tr>
+<tr>
+<td><code>adsp/map_AVS_SHARED_LIBS_845.adsp.prodQ.txt</code></td>
+<td>1667</td>
+<td><code>473190560bcc8cb5de518621b905a672</code></td>
+</tr>
+<tr>
+<td><code>adsp/map_SHARED_LIBS_845.adsp.prodQ.txt</code></td>
+<td>332</td>
+<td><code>8bae239fcb81ad63f9962e38dba94477</code></td>
+</tr>
+<tr>
+<td><code>adsp/mmecns_module.so.1</code></td>
+<td>568760</td>
+<td><code>9b36a05ed7864e88c1bc59e9fa19510a</code></td>
+</tr>
+<tr>
+<td><code>cdsp/fastrpc_shell_3</code></td>
+<td>878584</td>
+<td><code>2d7756f3c676a4bc178035fa8494302b</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libbenchmark_skel.so</code></td>
+<td>253416</td>
+<td><code>4d6e953a92538e70c8c24c1e12438830</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libc++.so.1</code></td>
+<td>3043928</td>
+<td><code>a2be8f180755a51d362ea8ad8a1eb14e</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libc++abi.so.1</code></td>
+<td>1385368</td>
+<td><code>5a060c997ce78583cecd1ede7bfc0fdd</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libhcp_rpc_skel.so</code></td>
+<td>134136</td>
+<td><code>33704559eecfead04fb504acd5e4bc38</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libstabilitydomain_skel.so</code></td>
+<td>76104</td>
+<td><code>277025a86827a51a7a223700e6e93b4f</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libsysmon_skel.so</code></td>
+<td>187792</td>
+<td><code>a7ba843aacb75c6165b71510541b9a53</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libsysmondomain_skel.so</code></td>
+<td>236656</td>
+<td><code>44ee786e28c76e42c18965dad206f91e</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libvpp_aie.so</code></td>
+<td>106624</td>
+<td><code>d2c8db283bbd5fa15bcc06a0fdd6a2ec</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libvpp_diagtools.so</code></td>
+<td>478176</td>
+<td><code>65f9c50c4e5678d5dde12488dcf57ddd</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libvpp_frc.so</code></td>
+<td>922888</td>
+<td><code>262af4f81b849816e3f04cf01c9c68b5</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libvpp_mvp.so</code></td>
+<td>7560</td>
+<td><code>5190a3321b5c967d9416ed9947c4364d</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libvpp_nr.so</code></td>
+<td>7560</td>
+<td><code>27e81cc1ee9ca34813c4bd6889545b24</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libvpp_qbr.so</code></td>
+<td>7560</td>
+<td><code>f3e3ac668735b5491bddceb4c031825a</code></td>
+</tr>
+<tr>
+<td><code>cdsp/libvpp_svc_skel.so</code></td>
+<td>233136</td>
+<td><code>eb0780945ec43f0c81f16251c4cb9c26</code></td>
+</tr>
+<tr>
+<td><code>cdsp/map_SHARED_LIBS_845.cdsp.prodQ.txt</code></td>
+<td>1314</td>
+<td><code>5a49b39d584ed4789b75d67945399098</code></td>
+</tr>
+<tr>
+<td><code>cdsp/ubwcdma_dynlib.so</code></td>
+<td>114496</td>
+<td><code>28e92568e48dcb804ac5517708a03cb7</code></td>
+</tr>
+<tr>
+<td><code>sdsp/cellinfo_tools.so</code></td>
+<td>16968</td>
+<td><code>cc5168d44a9f9949ab30d79cd943bb42</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_app_coverage.so</code></td>
+<td>21656</td>
+<td><code>b94dec41eb67e33d7101031f0982959c</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_app_coverage2.so</code></td>
+<td>21600</td>
+<td><code>942e3bee65d0f3ba12bb2c78a6dd3e9e</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_app_oem.so</code></td>
+<td>20480</td>
+<td><code>9eb9beaa9af1ccdd653afce74504fcc0</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_app_sensor_cfg.so</code></td>
+<td>27568</td>
+<td><code>e59e978a67bc2d365478fb83ad2e7721</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_drv_bt.so</code></td>
+<td>113344</td>
+<td><code>ddb825852708d534f324c3e414dc410d</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_drv_gf.so</code></td>
+<td>800856</td>
+<td><code>1c7bb3ff468acd57696f54d398b38215</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_drv_loc.so</code></td>
+<td>544760</td>
+<td><code>961a3eba1e32bad90408ba2b56b1e0ef</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_drv_modem.so</code></td>
+<td>229312</td>
+<td><code>30829a824a4f2eebfc42bebe534a9d61</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_drv_wifi.so</code></td>
+<td>175424</td>
+<td><code>c36c7fec0440e9281b19f050f8f9436e</code></td>
+</tr>
+<tr>
+<td><code>sdsp/chre_pal.so</code></td>
+<td>9352</td>
+<td><code>1639cf74c49ea35d76426df846592f07</code></td>
+</tr>
+<tr>
+<td><code>sdsp/fastrpc_shell_2</code></td>
+<td>857208</td>
+<td><code>053fca51499728c69d8479439134c724</code></td>
+</tr>
+<tr>
+<td><code>sdsp/libFastRPC_UTF_Forward_800s_sdm845_skel.so</code></td>
+<td>6821248</td>
+<td><code>76b67d85d026accdeb6aa6f784564a27</code></td>
+</tr>
+<tr>
+<td><code>sdsp/libchre_slpi_skel.so</code></td>
+<td>2932720</td>
+<td><code>b4e5acef94d229816ac115ab29c76d5e</code></td>
+</tr>
+<tr>
+<td><code>sdsp/libstabilitydomain_skel.so</code></td>
+<td>74984</td>
+<td><code>04dfe735f860c70a8d604f6399526764</code></td>
+</tr>
+<tr>
+<td><code>sdsp/libsysmon_skel.so</code></td>
+<td>127088</td>
+<td><code>4a45f1c496132df78e2fc3ec46e21134</code></td>
+</tr>
+<tr>
+<td><code>sdsp/libsysmondomain_skel.so</code></td>
+<td>175824</td>
+<td><code>ceae2e21ee8deb49cd3a6d92bf472016</code></td>
+</tr>
+<tr>
+<td><code>sdsp/lowi_client.so</code></td>
+<td>401136</td>
+<td><code>f2e831f086d508680fdcd3a1d3fb0e8c</code></td>
+</tr>
+<tr>
+<td><code>sdsp/map_SHARED_LIBS_AAAAAAAAQ.txt</code></td>
+<td>1477</td>
+<td><code>cb83d908ba0327514293ad95d4dd779e</code></td>
+</tr>
+<tr>
+<td><code>sdsp/map_SSC_SLPI_USER_AAAAAAAAQ.txt</code></td>
+<td>0</td>
+<td><code>d41d8cd98f00b204e9800998ecf8427e</code></td>
+</tr>
+<tr>
+<td><code>sdsp/sensor_testapp_40.so</code></td>
+<td>26520</td>
+<td><code>e0601ce0abfba64f1550bdb0b8d1b90d</code></td>
+</tr>
+</table>
+<h2>3. Identity vs modem FAT <code>IMAGE_ADSP.*</code></h2>
+<p>FAT source: <code>/tmp/modem-fat/</code> (extracted from modem.img in a prior session). FAT 8.3 naming makes the names uppercase <code>IMAGE_ADSP.*</code> — the same set referenced as <code>IMAGE_image_adsp.*</code>. <code>IMAGE_ADSP.MDT</code> = ELF32 ET_EXEC, EM_QDSP6, e_entry 0x8c400000, 15 phdrs (phdr0 = header segment 532 B = ehdr+phdrs; phdr1 = 6920 B hash segment = B01; B02..B13 = phdr2..13 contents).</p>
+<p>Identity results — <strong>honest negative at all three levels</strong>:</p>
+<ol>
+<li>Whole-file md5: <strong>0 / 17</strong> FAT files match any dsp.img ext4 file.</li>
+<li>Raw containment: <strong>0</strong> exact byte-occurrences of any FAT file anywhere in the raw dsp.img.</li>
+<li>Segment level: <strong>0</strong> matches between any <code>IMAGE_ADSP.Bxx</code> content and any of the 57 dsp ELFs' program-header content slices (md5).</li>
+</ol>
+<p>Interpretation: the two artifacts are disjoint by design. The modem FAT <code>IMAGE_ADSP.*</code> split-bin is the boot-time PIL image; the dsp.img ext4 holds <strong>fastrpc user-PD process binaries</strong> (audio/cdsp/sensor modules, fastrpc shells, libc++), loaded at runtime through fastrpc, never through PIL. The identity check therefore confirms the lab's family split rather than exposing missing data.</p>
+<p>FAT file table (for the record):</p>
+<table>
+<tr>
+<th>FAT file</th>
+<th>size</th>
+<th>md5</th>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B00</code></td>
+<td>532</td>
+<td><code>d0ad580c79ec9e68e9eb3a7b34f15549</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B01</code></td>
+<td>6920</td>
+<td><code>9fe60f6300d43b2359284f3fcb9d47b1</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B02</code></td>
+<td>8408</td>
+<td><code>64822a245699c36e71987ac97d2bcc6e</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B03</code></td>
+<td>120932</td>
+<td><code>87e9dc26a6487b2b1cda79916e266e0d</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B04</code></td>
+<td>1849248</td>
+<td><code>2abaa227d7616b43b4bdc77a85db8834</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B05</code></td>
+<td>1144444</td>
+<td><code>185f923d03af95fb1942c20324926a78</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B06</code></td>
+<td>2880</td>
+<td><code>f46bbeb791df6606df8318965a116595</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B07</code></td>
+<td>34096</td>
+<td><code>e10d0c694831d34eb7b6d7b45dbfe72c</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B08</code></td>
+<td>313984</td>
+<td><code>285ac7f5b013f9a8c3d3077ff741e04d</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B09</code></td>
+<td>84</td>
+<td><code>17d3146bae7eb08e8106f265fd8ff967</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B10</code></td>
+<td>7131580</td>
+<td><code>10579c86ecf6b903365aceaf622e4469</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B11</code></td>
+<td>314312</td>
+<td><code>2b9e45694e1b6514b2ec58b691779f26</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B12</code></td>
+<td>2896</td>
+<td><code>6f15783ee39d49bcca3c48e72a310569</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.B13</code></td>
+<td>167848</td>
+<td><code>c5dbc34085ec4777ad032b1dd45fb3a9</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSP.MDT</code></td>
+<td>7452</td>
+<td><code>45d56da07aaa11bbaf4eb0b535977253</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSPR.JSN</code></td>
+<td>403</td>
+<td><code>40d6edf129dec063ca3fe6cb6837488f</code></td>
+</tr>
+<tr>
+<td><code>IMAGE_ADSPUA.JSN</code></td>
+<td>555</td>
+<td><code>d0bd5030a03f631c9af5060a5645d02e</code></td>
+</tr>
+</table>
+<h2>4. Non-ELF nonzero 4K-sector regions</h2>
+<p>6,150 of 8,192 sectors are nonzero. Outside ELF file data, 9 runs remain, all accounted for:</p>
+<table>
+<tr>
+<th>range</th>
+<th>bytes</th>
+<th>classification</th>
+</tr>
+<tr>
+<td>0x0 - 0x2000</td>
+<td>8192</td>
+<td>group_desc, primary_superblock</td>
+</tr>
+<tr>
+<td>0x9000 - 0x10000</td>
+<td>28672</td>
+<td>block_bitmap, inode_bitmap, inode_table</td>
+</tr>
+<tr>
+<td>0x8b000 - 0x8c000</td>
+<td>4096</td>
+<td>journal</td>
+</tr>
+<tr>
+<td>0x48b000 - 0x48f000</td>
+<td>16384</td>
+<td>dir_block(/), dir_block(/adsp), dir_block(/lost+found), resize_inode</td>
+</tr>
+<tr>
+<td>0x7ae000 - 0x7b0000</td>
+<td>8192</td>
+<td>non_elf_file:adsp/map_AVS_SHARED_LIBS_845.adsp.prodQ.txt, non_elf_file:adsp/map_SHARED_LIBS_845.adsp.prodQ.txt</td>
+</tr>
+<tr>
+<td>0x83b000 - 0x83c000</td>
+<td>4096</td>
+<td>dir_block(/cdsp)</td>
+</tr>
+<tr>
+<td>0xfd9000 - 0xfda000</td>
+<td>4096</td>
+<td>non_elf_file:cdsp/map_SHARED_LIBS_845.cdsp.prodQ.txt</td>
+</tr>
+<tr>
+<td>0xff6000 - 0xff7000</td>
+<td>4096</td>
+<td>dir_block(/sdsp)</td>
+</tr>
+<tr>
+<td>0x1cbf000 - 0x1cc0000</td>
+<td>4096</td>
+<td>non_elf_file:sdsp/map_SHARED_LIBS_AAAAAAAAQ.txt</td>
+</tr>
+</table>
+<p>No unexplained non-ELF data. (Dir blocks sit adjacent to each directory's first file: /adsp @0x48e000 -&gt; AlacDecoderModule @0x48f000, /cdsp @0x83b000 -&gt; fastrpc_shell_3 @0x83c000, /sdsp @0xff6000 -&gt; cellinfo_tools @0xff7000.)</p>
+<h2>5. tz.img — QSEE ELF64 segment map</h2>
+<p>Whole image: md5 <code>785583b96d12cb39cb3e64363863000e</code>, sha256 <code>2d133bdafc70122ff18c12766c855c8f8490c825bf91e1da95c6535d1d16baca</code>.</p>
+<p>ELF64 LSB <strong>ET_EXEC</strong>, <code>e_machine</code> 183 (AArch64), <code>e_entry</code> 0x14680000, phoff 64, phentsize 56, phnum 17, no section headers (e_shoff 0). <code>e_entry</code> equals seg[3] <code>p_vaddr</code> exactly.</p>
+<p>Per-segment sha256 is in <code>dsp-elf-census.json</code> (<code>tz.segments[]</code>); the table below adds entropy and role:</p>
+<table>
+<tr>
+<th>#</th>
+<th>type</th>
+<th>flags</th>
+<th>role</th>
+<th>offset</th>
+<th>vaddr</th>
+<th>filesz</th>
+<th>memsz</th>
+<th>nonzero B</th>
+<th>entropy B/byte</th>
+</tr>
+<tr>
+<td>0</td>
+<td>PT_NULL</td>
+<td>-</td>
+<td>??</td>
+<td>0x0</td>
+<td>0x0</td>
+<td>1016</td>
+<td>0</td>
+<td>231</td>
+<td>1.892</td>
+</tr>
+<tr>
+<td>1</td>
+<td>PT_NULL</td>
+<td>-</td>
+<td>??</td>
+<td>0x1000</td>
+<td>0x1c1e8000</td>
+<td>19992</td>
+<td>20480</td>
+<td>19815</td>
+<td>4.022</td>
+</tr>
+<tr>
+<td>2</td>
+<td>PT_LOAD</td>
+<td>-</td>
+<td>??</td>
+<td>0x6000</td>
+<td>0x0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>3</td>
+<td>PT_LOAD</td>
+<td>RX</td>
+<td>RX</td>
+<td>0x6000</td>
+<td>0x14680000</td>
+<td>36160</td>
+<td>36160</td>
+<td>26542</td>
+<td>5.969</td>
+</tr>
+<tr>
+<td>4</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0xf000</td>
+<td>0x14689000</td>
+<td>15624</td>
+<td>15624</td>
+<td>72</td>
+<td>0.058</td>
+</tr>
+<tr>
+<td>5</td>
+<td>PT_LOAD</td>
+<td>RWX</td>
+<td>RW</td>
+<td>0x13000</td>
+<td>0x1468e000</td>
+<td>4040</td>
+<td>4040</td>
+<td>2279</td>
+<td>4.483</td>
+</tr>
+<tr>
+<td>6</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x14000</td>
+<td>0x1468f000</td>
+<td>11376</td>
+<td>11376</td>
+<td>5</td>
+<td>0.007</td>
+</tr>
+<tr>
+<td>7</td>
+<td>PT_LOAD</td>
+<td>RX</td>
+<td>RX</td>
+<td>0x17000</td>
+<td>0x1c000000</td>
+<td>2432</td>
+<td>2432</td>
+<td>1980</td>
+<td>5.766</td>
+</tr>
+<tr>
+<td>8</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x18000</td>
+<td>0x1c001000</td>
+<td>28880</td>
+<td>28880</td>
+<td>4</td>
+<td>0.002</td>
+</tr>
+<tr>
+<td>9</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x20000</td>
+<td>0x1c009000</td>
+<td>45056</td>
+<td>45056</td>
+<td>11111</td>
+<td>1.898</td>
+</tr>
+<tr>
+<td>10</td>
+<td>PT_LOAD</td>
+<td>RX</td>
+<td>RX</td>
+<td>0x2b000</td>
+<td>0x1c017000</td>
+<td>782192</td>
+<td>782192</td>
+<td>688801</td>
+<td>6.640</td>
+</tr>
+<tr>
+<td>11</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0xea000</td>
+<td>0x1c0d6000</td>
+<td>132680</td>
+<td>132680</td>
+<td>86212</td>
+<td>5.594</td>
+</tr>
+<tr>
+<td>12</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x10b000</td>
+<td>0x1c0f7000</td>
+<td>713552</td>
+<td>713552</td>
+<td>68466</td>
+<td>0.921</td>
+</tr>
+<tr>
+<td>13</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x1ba000</td>
+<td>0x1c1aa000</td>
+<td>114688</td>
+<td>114688</td>
+<td>0</td>
+<td>-0.000</td>
+</tr>
+<tr>
+<td>14</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x1d6000</td>
+<td>0x1c1c6000</td>
+<td>65536</td>
+<td>65536</td>
+<td>25451</td>
+<td>2.449</td>
+</tr>
+<tr>
+<td>15</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x1e6000</td>
+<td>0x1c1d6000</td>
+<td>65536</td>
+<td>65536</td>
+<td>23767</td>
+<td>2.176</td>
+</tr>
+<tr>
+<td>16</td>
+<td>PT_LOAD</td>
+<td>RW</td>
+<td>RW</td>
+<td>0x1f6000</td>
+<td>0x1c1e6000</td>
+<td>0</td>
+<td>8192</td>
+<td>0</td>
+<td>0.000</td>
+</tr>
+</table>
+<p>Structure notes:</p>
+<ul>
+<li>Two virtual regions: <strong>0x14680000</strong> (segs 3-6: entry/RX code + RW data — QSEE root region) and <strong>0x1c000000-0x1c1e8000</strong> (segs 7-16 + metadata seg 1: main TZ image).</li>
+<li>seg[0] PT_NULL filesz 1016 = exactly ELF header + 17 phdrs (64 + 17x56); seg[1] PT_NULL filesz 19992 at vaddr 0x1c1e8000 = QSEE metadata (hash table + signing certificates).</li>
+<li>seg[2] and seg[16] are empty placeholders (seg[16] is pure BSS: filesz 0, memsz 8192); segs 4, 6, 8, 13 are file-backed but essentially zero-filled (BSS-like).</li>
+<li>seg[5] is the only RWX segment (4,040 B).</li>
+</ul>
+<h3>Strings</h3>
+<p>Briefing targets, honest negatives first:</p>
+<ul>
+<li>First 4 KB: <strong>0 strings</strong> — bytes 0-1016 are ELF header + phdrs, 1016-4096 is zero padding.</li>
+<li>First RO PT_LOAD (seg[3], RX @0x14680000, 36,160 B): <strong>8 hits, all binary noise</strong> (e.g. <code>6,x16,x16,...</code> immediates), no version/build strings.</li>
+</ul>
+<p>The version/build strings live elsewhere:</p>
+<ul>
+<li><strong>seg[12] RW @0x1c0f7000</strong> carries the image identity: at file offsets 0x112024/0x112053/0x112072 — <code>QC_IMAGE_VERSION_STRING=TZ.XF.5.0.1.C5-00083.1</code>, <code>IMAGE_VARIANT_STRING=WAXAANAAA</code>, <code>OEM_IMAGE_VERSION_STRING=CRM</code> (plus crypto strings <code>KS key derivation for aes [xts]</code>, <code>ssdksimg</code>).</li>
+<li><strong>seg[11] RW @0x1c0d6000</strong> (1,513 strings) = target-config symbol table (<code>DalEnv</code>, <code>TargetCfg</code>, <code>qupv3_*</code>, <code>TZ_CE_POLICY_MAP</code>, <code>tcsr_base</code>, <code>NOCError_Propdata</code>, <code>bam_tgt_config</code>, ...).</li>
+<li><strong>seg[1]</strong> (87 strings) = embedded X.509 chain: <code>QSEE Attestation Root CA</code> / <code>QSEE Attestation Root SubCA 1</code> (Qualcomm Cryptographic Operations; validity 190801-210801, 160304000001Z-260304000001Z, 151002000001Z-451001235959Z), <code>QCT Root CA 1</code> marked <code>General Use Test Key (for testing 13 only)</code>, extension text <code>OEM_ID_INDEPENDENT</code>, <code>USE_SERIAL_NUMBER_IN_SIGNING</code>, <code>IN_USE_SOC_HW_VERSION</code>, <code>SHA256</code>, <code>MODEL_ID</code>, <code>SW_SIZE</code>, <code>OEM_ID</code>, <code>DEBUG</code>, <code>HW_ID</code>, <code>SW_ID</code>, <code>San Diego</code>, <code>CASS - CSMS 2.00</code>.</li>
+</ul>
+<p>Whole-image scan (all 2,056,192 B): 1,851 ASCII runs &gt;=6 chars + 5 UTF-16LE runs; the UTF-16 hits are binary noise. seg[10] (main RX, 782,192 B, entropy 6.640) yields only noise hits — no plaintext strings in the main binary.</p>
+<h2>6. Open items</h2>
+<ul>
+<li>Validate the 3 embedded ELF magic offsets inside the fastrpc shells (0x6fc6b1 / 0x8e572c / 0x12845e1) — likely appended/inner images, not yet parsed.</li>
+<li>Decode seg[1] QSEE metadata layout (hash-table geometry vs phdr indices) and cert chain order.</li>
+<li>seg[10] entropy 6.640 with no strings: determine compressed-vs-dense-code (affects any future symbol recovery).</li>
+<li>Cross-link: check whether the same adsp/cdsp/sdsp modules exist in vendor.img (<code>/vendor/lib/rfsa/adsp</code> etc.) and extend the fleet md5 matrix with the 57 ELFs.</li>
+<li>lost+found block (0x48d000) holds stale dirent bytes — recoverable names not investigated (structural fact only).</li>
+</ul>
+<h2>7. Honest negatives</h2>
+<ul>
+<li>No <code>IMAGE_ADSP.*</code> identity match at whole-file, raw-containment, or segment-content level (0/17, 0, 0).</li>
+<li>No version strings in the briefing-specified tz regions (first 4 KB, first RO PT_LOAD).</li>
+<li>No unexplained nonzero region in dsp.img; every non-ELF nonzero run is ext4 metadata, dir blocks, journal, resize inode, or a non-ELF map .txt file.</li>
+<li><code>sdsp/map_SSC_SLPI_USER_AAAAAAAAQ.txt</code> is a genuine 0-byte file.</li>
+<li>tz.img carries no section headers; dsp ELFs do (17-36 sections each).</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

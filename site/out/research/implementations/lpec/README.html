@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/lpec — the lab&#x27;s LPEC (Sony DVF/MSV voice codec) bitstream decoder, as a standalone component — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/lpec — the lab&#x27;s LPEC (Sony DVF/MSV voice codec) bitstream decoder, as a standalone component</h1><p>Re-homed from the Open Discovery Lab evidence repo</p><p>Evidence: none</p>
+<h1>implementations/lpec — the lab's LPEC (Sony DVF/MSV voice codec) bitstream decoder, as a standalone component</h1>
+<p>Re-homed from the Open Discovery Lab evidence repo</p>
+<p>(<code>adineo-cmd/open-discovery-lab</code>,</p>
+<p><code>track-c-discovery-engine/results/format-re/lpec-census/</code>) so the decoders</p>
+<p>can be consumed as a component. Code is unchanged from the committed lab</p>
+<p>versions except the clean-room statement headers.</p>
+<p>CLEAN-ROOM STATEMENT: written from the lab's own published LPEC spec</p>
+<p>documents on <strong>2026-11-16</strong>; no proprietary material accessed during</p>
+<p>development. The codec facts behind these decoders were established by</p>
+<p>static analysis of the user-owned Sony reference DLLs and documented as</p>
+<p>derived facts only — no Sony binaries or decompiled code exist in either</p>
+<p>repo, and none were accessed during this re-home (F-48 policy, maintained).</p>
+<h2>Spec provenance (the F-chain)</h2>
+<table>
+<tr>
+<th>finding</th>
+<th>content</th>
+<th>artifact here</th>
+</tr>
+<tr>
+<td>F-47</td>
+<td>LPEC/TRC container census: 1024-B packets from 0x400 (0x800 after a 1 KB 0xFF annotation block), 10-B header, <code>bytes[4:6]</code> BE = payload bytes used; 48-B/384-bit LP frames at 6000 bps exact; no byte-identical silence frames</td>
+<td><code>extract_audio</code>/container model in <code>lpec_decoder.py</code></td>
+</tr>
+<tr>
+<td>F-48</td>
+<td>Sony reference DLLs obtained (DVE 3.3.01 CD-ROM) and statically analyzed; codec family confirmed CELP; per-mode codebook inventory (~15 tables/mode); LPEC.dll 329,064 B, sha256 <code>d0d8d888…ab50ce</code> (recorded in F-68)</td>
+<td>facts behind <code>LP_CFG</code>/<code>SP_CFG</code></td>
+</tr>
+<tr>
+<td>F-49</td>
+<td>bit pump confirmed MSB-first; SP mode resolved (128-B type-0 frames, 96/160-B type-1/2); SP:LP = 8:3; the <strong>pass-2 parser</strong></td>
+<td><code>lpec_decoder_pass2.py</code></td>
+</tr>
+<tr>
+<td>F-51</td>
+<td>LP bit layout RESOLVED from code: full field walk per type, per-type bit targets 384/288/480/384 (LP) and 1024/768/1280/1024 (SP), derived pulse budgets, byte-exact closure on both real samples (50,545 LP frames / 159 SP frames, 0 invalid, 6000.1/16000.0 bps); per-packet-reset container model REFUTED — the stream is continuous and frames straddle packet boundaries</td>
+<td><code>lpec_decoder.py</code> (the F-51 pass-3 parser)</td>
+</tr>
+<tr>
+<td>F-52</td>
+<td>synthesis path wired (LSP→LPC Chebyshev, interpolation, PCM16) — first open-source LPEC decoder producing audible audio; plausibility-validated, not sample-validated</td>
+<td>lives in the lab repo (<code>lpec_synthesis.py</code>); not re-homed in this pass</td>
+</tr>
+<tr>
+<td>F-58</td>
+<td>pulse-position generation extracted: bit-budget allocator, 4:2:1 class split, 8-bit codes = rows of 2/4/8 pulse values</td>
+<td>facts; allocator port lives in the lab repo</td>
+</tr>
+<tr>
+<td>F-68</td>
+<td>ROADMAP Q-1 resolved: per-slot weight calibration fully attributed — <strong>exact bit-economy closure 100.00 % on 94,600 LP and 100.00 % on 313 SP real subframes</strong> (vs F-58's 74.2 %/62.9 % raw-weight baseline)</td>
+<td>the closure the layout tables here implement</td>
+</tr>
+</table>
+<p>Note: F-59 is DiamondWare (a different format) — the LPEC chain is</p>
+<p>F-47 → F-48 → F-49 → F-51 → F-52 → F-58 → F-68.</p>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>lpec_decoder.py</code></td>
+<td>F-51 bit-exact frame parser: <code>BitReader</code>, <code>LP_CFG</code>/<code>SP_CFG</code>, <code>parse_frame</code> (types 0-3), <code>extract_audio</code> (packet container), <code>parse_stream</code>, byte-closure diagnostics</td>
+</tr>
+<tr>
+<td><code>lpec_decoder_pass2.py</code></td>
+<td>F-49 pass-2 parser: packet layer + per-packet-reset (LP) and continuous-straddle (SP) framing models</td>
+</tr>
+<tr>
+<td><code>test_lpec.py</code></td>
+<td>16 synthetic-fixture tests (self-made bitstreams from the documented layout — see below)</td>
+</tr>
+</table>
+<h2>Tests without Sony samples</h2>
+<p>The suite builds <strong>synthetic bitstreams</strong> from the documented layout only:</p>
+<p>MSB-first <code>BitWriter</code> frames for LP types 0/1/2/3 and SP type 0, asserting</p>
+<p>the parser consumes exactly the documented bit targets, returns the</p>
+<p>documented frame byte sizes (48/36/60/48, 128/96/160/128), produces the</p>
+<p>documented type-0 tail-pad signature (only {3, 9, 17}-bit pads; types</p>
+<p>1/2/3 pad exactly 0), and closes byte-exactly on multi-frame streams. The</p>
+<p>packet container tests reproduce the F-47/F-51 container semantics</p>
+<p>(including the 0xFF annotation block skip and full-1024 packet chunking),</p>
+<p>and the pass-2 straddle test demonstrates frames crossing packet</p>
+<p>boundaries. The invalid-path test exercises the documented</p>
+<p>pulse-budget guard via a synthetic config. Run:</p>
+<p><code>python3 -m unittest -v test_lpec</code>.</p>
+<h2>Honest scope</h2>
+<p>These parsers account for <strong>every transmitted bit</strong> (frame → fields →</p>
+<p>derived pulse budgets) but are not a sample-exact PCM decoder: the pulse</p>
+<p>intra-block split (F-58/F-68 allocator), excitation-page decode, LSP</p>
+<p>expansion and synthesis (F-52) live in the lab repo and are the next</p>
+<p>layers to re-home. TRC (dsp_trc.dll codec) is a different codec and</p>
+<p>intentionally out of scope (F-47/F-51).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

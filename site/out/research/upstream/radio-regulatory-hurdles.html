@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radio / regulatory hurdles to replacing radio firmware — the LibrePhone hurdle map — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Radio / regulatory hurdles to replacing radio firmware — the LibrePhone hurdle map</h1><p>**Status:** full documentation session (2026-11-16/17), expanding the stub in</p><p>Evidence: none</p>
+<h1>Radio / regulatory hurdles to replacing radio firmware — the LibrePhone hurdle map</h1>
+<p><strong>Status:</strong> full documentation session (2026-11-16/17), expanding the stub in</p>
+<p><a href="research/upstream-contribution/blob-database/recon.html">upstream-contribution/blob-database/recon.md</a> §"Radio /</p>
+<p>regulatory stub" (the stub's six enumerated dimensions are filled below, one</p>
+<p>section each, plus the queried sources).</p>
+<p><strong>⚠ This document is a hurdle map for the campaign, NOT legal advice.</strong></p>
+<p>Nothing here is a legal opinion or a legal conclusion; every statutory/rule</p>
+<p>question must go to qualified counsel before any action that depends on it.</p>
+<p>What this document does: assemble the primary texts, the precedent record,</p>
+<p>and the practical gate sequence, with citations and access dates, so the</p>
+<p>campaign (and any counsel engaged later) starts from facts.</p>
+<p>Method note: all primary texts below were fetched byte-exact on 2026-11-16</p>
+<p>(eCFR versioner API, EUR-Lex HTML, fsf.org/librephone.fsf.org HTML, kernel</p>
+<p>git trees); failures are recorded honestly in the RULE-0 query log at the</p>
+<p>end. Search queries are recorded verbatim per lab RULE 0.</p>
+<p>---</p>
+<h2>a. Type-approval per radio — what a firmware change re-opens</h2>
+<p>Every radio in a phone (modem/cellular, WiFi, BT, GNSS, NFC) is certified as</p>
+<p>part of a type-approved <strong>unit</strong>; radio firmware is inside the approved</p>
+<p>boundary. A free-software replacement of any radio firmware therefore</p>
+<p>re-opens the approval of the whole unit, in every jurisdiction where the</p>
+<p>device is marketed. Per-jurisdiction picture (access date for all: 2026-11-16):</p>
+<h3>FCC (US)</h3>
+<ul>
+<li><strong>Statutory/rule base:</strong> Part 15 rules for the unlicensed radios (WiFi/BT:</li>
+</ul>
+<p>  §15.247, §15.407), Parts 22/24/27 for cellular licensed radios, SAR rules</p>
+<p>  (§1.1307, §2.1093) (fetched: eCFR title 47, 2026-11-16).</p>
+<ul>
+<li><strong>What a firmware change triggers:</strong> equipment authorization is granted per</li>
+</ul>
+<p>  FCC ID; §2.933(a) — "A new application for certification shall be filed</p>
+<p>  whenever there is a change in the FCC Identifier for the equipment with or</p>
+<p>  without a change in design, circuitry or construction." Changes <em>within</em></p>
+<p>  the same FCC ID are governed by §2.1043 permissive changes (Class I = no</p>
+<p>  degradation of reported characteristics, Class II = requires FCC acceptance</p>
+<p>  <strong>before marketing</strong>, per KDB 178919 D01 Permissive Change Policy; guides:</p>
+<p>  &lt;https://www.fcc.gov/engineering-technology/laboratory-division/general/equipment-authorization&gt;,</p>
+<p>  &lt;https://www.metlabs.com/wireless/rf-product-modifications-may-be-eligible-for-an-fcc-permissive-change&gt;).</p>
+<ul>
+<li><strong>The killer detail (economic):</strong> a permissive change can only be filed by</li>
+</ul>
+<p>  the <strong>original grantee</strong> — for modular-approval radio modules</p>
+<p>  (§15.212: "Single modular transmitters consist of a completely</p>
+<p>  self-contained radiofrequency transmitter device …"), the module maker</p>
+<p>  (Qualcomm, etc.) holds the grant. A third party replacing the firmware</p>
+<p>  cannot file a permissive change on someone else's grant; its only routes</p>
+<p>  are (i) convincing the grantee, or (ii) a <strong>new</strong> certification under its</p>
+<p>  own FCC ID (full test sweep: RF conformance + SAR + EMC). Source query:</p>
+<p>  "FCC KDB 178919 permissive change Class II firmware change re-certification</p>
+<p>  modular approval" (2026-11-16; Spilma guide: only the original grantee can</p>
+<p>  request a permissive change on a certified modular transmitter).</p>
+<ul>
+<li><strong>SDR rule — the direct anti-free-radio-firmware rule:</strong> 47 CFR §2.944(a)</li>
+</ul>
+<p>  (fetched verbatim 2026-11-16): *"Manufacturers must take steps to ensure</p>
+<p>  that only software that has been approved with a software defined radio can</p>
+<p>  be loaded into the radio. The software must not allow the user to operate</p>
+<p>  the transmitter with operating frequencies, output power, modulation types</p>
+<p>  or other radio frequency parameters outside those that were approved."*</p>
+<p>  §2.944(b): *"Any radio in which the software is designed or expected to be</p>
+<p>  modified by a party other than the manufacturer and would affect the</p>
+<p>  operating parameters of frequency range, modulation type or maximum output</p>
+<p>  power … must comply with the requirements in paragraph (a) of this section</p>
+<p>  and must be certified as a software defined radio."* §2.944(c) requires a</p>
+<p>  high-level operational description/flow diagram of the radio-control</p>
+<p>  software in the application. I.e. the FCC <em>anticipates</em> third-party</p>
+<p>  modification and locks it out (and the grantee is the entity that must</p>
+<p>  implement the lock).</p>
+<ul>
+<li><strong>WiFi-specific hard lock:</strong> 47 CFR §15.407(f) Device Security (fetched</li>
+</ul>
+<p>  verbatim): *"All U-NII devices must contain security features to protect</p>
+<p>  against modification of software by unauthorized parties"* and</p>
+<p>  *"Manufacturers must implement security features in any digitally modulated</p>
+<p>  devices capable of operating in any of the U-NII bands, so that third</p>
+<p>  parties are not able to reprogram the device to operate outside the</p>
+<p>  parameters for which the device was certified."*</p>
+<ul>
+<li><strong>Free-software precedent path:</strong> none at the FCC. The SDR authorization</li>
+</ul>
+<p>  framework (FCC 05-57, First Report and Order on SDRs, 2005; codified in</p>
+<p>  §2.944) was designed to allow <em>grantee-controlled</em> software updates, never</p>
+<p>  user-modifiable radio parameters. No FCC grant has ever covered</p>
+<p>  user-replaceable radio firmware that changes RF parameters.</p>
+<h3>EU — Radio Equipment Directive 2014/53/EU (RED)</h3>
+<ul>
+<li><strong>Base text fetched</strong> (EUR-Lex CELEX:32014L0053, 2026-11-16). Essential</li>
+</ul>
+<p>  requirements Art 3(1)(a) safety, 3(1)(b) EMC, 3(2) spectrum (efficient use +</p>
+<p>  avoidance of harmful interference); conformity via internal production</p>
+<p>  control (Module A) <strong>where harmonised standards are applied</strong>, else</p>
+<p>  EU-type examination (Module B+C) with a notified body (Art 17, Annexes II-V).</p>
+<ul>
+<li><strong>Software recitals (verbatim, fetched 2026-11-16):</strong> recital (16): *"The</li>
+</ul>
+<p>  compliance of some categories of radio equipment with the essential</p>
+<p>  requirements set out in this Directive may be affected by the inclusion of</p>
+<p>  software or modification of its existing software. The user, the radio</p>
+<p>  equipment or a third party should only be able to load software into the</p>
+<p>  radio equipment where this does not compromise the subsequent compliance of</p>
+<p>  that radio equipment with the applicable essential requirements."*</p>
+<p>  Recital (19) is the free-software counterweight: *"Verification by radio</p>
+<p>  equipment of the compliance of its combination with software should not be</p>
+<p>  abused in order to prevent its use with software provided by independent</p>
+<p>  parties."* Art 10(8)-related text: where a delegated act requires it,</p>
+<p>  information shall "precisely identify the radio equipment and the software</p>
+<p>  which have been assessed, and it shall be continuously updated."</p>
+<ul>
+<li><strong>What a firmware change triggers:</strong> re-assessment of the declaration of</li>
+</ul>
+<p>  conformity (self-declared). The Commission's *Guide to the Radio Equipment</p>
+<p>  Directive 2014/53/EU* (2022 edition, first update since 2018 — adds a</p>
+<p>  dedicated software-updates chapter) states that an update modifying</p>
+<p>  hardware-software interaction or radio parameters may require renewed</p>
+<p>  conformity assessment, and where conformity can no longer be demonstrated</p>
+<p>  under harmonised standards, <strong>notified-body involvement</strong> becomes mandatory</p>
+<p>  (Guide §4.1.2.6; sources: &lt;https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/radio-equipment-directive-red_en&gt;;</p>
+<p>  "European Commission publishes updated Radio Equipment Directive guide,"</p>
+<p>  iotapproval.com, 2022). EN 300 328 (2.4 GHz WiFi/BT) is the relevant</p>
+<p>  harmonised standard for the BT fleet this lab targets first.</p>
+<ul>
+<li><strong>Economics:</strong> the EU is the cheapest regime for the campaign —</li>
+</ul>
+<p>  self-declaration against harmonised standards, no per-device filing fee —</p>
+<p>  but a third-party firmware replacement voids the OEM's DoC and puts the</p>
+<p>  <em>new</em> placing-on-market obligation on whoever re-markets the device.</p>
+<h3>UKCA</h3>
+<p>Radio Equipment Regulations 2017 (SI 2017/1206) mirror the RED essential</p>
+<p>requirements and modules (fetch of legislation.gov.uk failed twice this</p>
+<p>session — recorded below; the mirroring is the standard published summary,</p>
+<p>e.g. UK gov guidance page). Post-Brexit the UK accepts its own marking;</p>
+<p>regime economics are close to RED's.</p>
+<h3>India — TEC / MTCTE</h3>
+<ul>
+<li>Mandatory Testing and Certification of Telecom Equipment (TEC, DoT):</li>
+</ul>
+<p>  &lt;https://www.tec.gov.in/mandatory-testing-and-certification-of-telecom-equipments-mtcte&gt;</p>
+<p>  (fetched with SSL workaround 2026-11-16; the site's TLS chain fails</p>
+<p>  verification from this box — honest note), portal</p>
+<p>  &lt;https://eservices.dot.gov.in/mtcte&gt;. Mobile handsets are covered in phases;</p>
+<p>  Essential Requirements include EMI/EMC, safety, interface requirements and</p>
+<p>  <strong>SAR for mobile handsets</strong> (&lt;https://tec.gov.in/essential-requirements-2&gt;).</p>
+<ul>
+<li>A firmware change to a certified handset re-opens the MTCTE certificate;</li>
+</ul>
+<p>  testing happens at TEC-designated labs. Regime is per-device (no true</p>
+<p>  modular-approval path for handsets; radio modules are folded into the</p>
+<p>  product certificate).</p>
+<h3>Japan — TELEC / MIC</h3>
+<ul>
+<li>Radio Law technical-regulations conformance certification by **registered</li>
+</ul>
+<p>  certification bodies** (Art 38-4/38-5; specified radio equipment = low-power</p>
+<p>  stations get conformity certification; base stations get construction-type</p>
+<p>  approval). The Telecom Engineering Center (TELEC) is the largest such body:</p>
+<p>  &lt;https://www.telec.or.jp/eng/&gt; (fetched 2026-11-16 — page confirms the</p>
+<p>  registered-certification-body scheme for Specified Radio Equipment and the</p>
+<p>  "modified" module concepts). Certification is per-construction-type;</p>
+<p>  firmware is inside the certified type.</p>
+<h3>China — SRRC</h3>
+<ul>
+<li>State Radio Regulation Committee type approval under MIIT: radio</li>
+</ul>
+<p>  transmission equipment needs SRRC approval and a <strong>CMIIT ID</strong> printed on the</p>
+<p>  device (12-character code); mobile phones need SRRC alongside CCC</p>
+<p>  (overview: spilma.com SRRC/CMIIT guide, china-srrc.com; MIIT Order 57 /</p>
+<p>  Notice 129 govern limits; older certificates had a 2025 transition).</p>
+<p>  Per-device approval; a radio-firmware change requires a new SRRC filing</p>
+<p>  through an approved test house.</p>
+<h3>Brazil — ANATEL</h3>
+<ul>
+<li>Homologation under Federal Law 9472/97 (Art 58: certificate of conformity</li>
+</ul>
+<p>  issued by ANATEL at no charge once requirements are met, via an OCD —</p>
+<p>  Organismo de Certificação Designado). <strong>Act No. 77</strong> (5 Jan 2021) adds</p>
+<p>  cyber-security requirements for internet-connected terminal equipment</p>
+<p>  (CSA Group/IB-Lenhardt summaries; ANATEL publication 306743). Per-device</p>
+<p>  homologation; firmware change re-opens it.</p>
+<h3>Modular-approval vs per-device economics (cross-jurisdiction)</h3>
+<table>
+<tr>
+<th>Regime</th>
+<th>Module path</th>
+<th>Firmware-change consequence</th>
+</tr>
+<tr>
+<td>FCC</td>
+<td>§15.212 modular (shielded, self-contained, own regulation)</td>
+<td>permissive change <strong>grantee-only</strong>; third party = new full grant</td>
+</tr>
+<tr>
+<td>EU RED</td>
+<td>self-declaration per product against harmonised standards</td>
+<td>re-assess + re-DoC; NB only if harmonised-standard presumption lost</td>
+</tr>
+<tr>
+<td>UKCA</td>
+<td>mirror of RED</td>
+<td>same as RED</td>
+</tr>
+<tr>
+<td>India MTCTE</td>
+<td>per-device</td>
+<td>new certificate</td>
+</tr>
+<tr>
+<td>Japan TELEC</td>
+<td>per-construction-type (module certification exists for specified radio equipment)</td>
+<td>re-certification of the type</td>
+</tr>
+<tr>
+<td>China SRRC</td>
+<td>per-device</td>
+<td>new SRRC filing</td>
+</tr>
+<tr>
+<td>Brazil ANATEL</td>
+<td>per-device (OCD route)</td>
+<td>new homologation</td>
+</tr>
+</table>
+<p>The structural point for LibrePhone: **in every regime the approval-holder is</p>
+<p>the OEM or chip vendor, not the user.** Free-software radio firmware has no</p>
+<p>"post-approval modification" lane anywhere; the closest thing to one (FCC SDR</p>
+<p>§2.944) explicitly requires the grantee to prevent it.</p>
+<h3>The practical bring-up gate beyond legality (stub dimension 6)</h3>
+<p>Safety/EMC liability and spectrum coexistence: SAR re-test (regulatory SAR</p>
+<p>limits: FCC §1.1307/§2.1093; India ER-SAR; EU EN 62209 / EN 50566 path),</p>
+<p>EMC re-test per regime, and <strong>coexistence testing</strong> (WiFi/BT/modem antenna</p>
+<p>sharing — BT/WiFi coex behavior is largely *in the radio firmware and its</p>
+<p>NVRAM configuration*, which is exactly what the lab's QCA BT fleet patch</p>
+<p>files carry). Until those tests are re-run (hardware certification labs,</p>
+<p>Section f), a re-flashed device is a research object, not a product.</p>
+<p>---</p>
+<h2>b. Legality of RE-ing radio firmware (statutes and triennial exemptions)</h2>
+<h3>US — DMCA §1201</h3>
+<ul>
+<li>**Statutory interoperability exemption (no rulemaking needed),</li>
+</ul>
+<p>  17 USC §1201(f)** (fetched verbatim from Cornell LII,</p>
+<p>  &lt;https://www.law.cornell.edu/uscode/text/17/1201&gt;, 2026-11-16; the official</p>
+<p>  uscode.house.gov granule page 404'd during its "temporary format" state —</p>
+<p>  recorded in the log): §1201(f)(1): *"Notwithstanding the provisions of</p>
+<p>  subsection (a)(1)(A), a person who has lawfully obtained the right to use a</p>
+<p>  copy of a computer program may circumvent a technological measure that</p>
+<p>  effectively controls access to a particular portion of that program for the</p>
+<p>  sole purpose of identifying and analyzing those elements of the program</p>
+<p>  that are necessary to achieve interoperability of an independently created</p>
+<p>  computer program with other programs, and that have not previously been</p>
+<p>  readily available to the person engaging in the circumvention, to the</p>
+<p>  extent any such acts of identification and analysis do not constitute</p>
+<p>  infringement under this title."* §1201(f)(2) additionally permits</p>
+<p>  developing/employing circumvention means for that purpose; §1201(f)(3)</p>
+<p>  permits making the acquired information available to others **solely for</p>
+<p>  interoperability**; §1201(f)(4) defines interoperability ("the ability of</p>
+<p>  computer programs to exchange information, and of such programs mutually to</p>
+<p>  use the information which has been exchanged").</p>
+<ul>
+<li><strong>Encryption research:</strong> §1201(g) (fetched verbatim) permits circumvention</li>
+</ul>
+<p>  in good-faith encryption research subject to factors (dissemination mode,</p>
+<p>  expertise, etc.).</p>
+<ul>
+<li><strong>Triennial rulemaking exemptions, 37 CFR §201.40(b)</strong> (fetched verbatim via</li>
+</ul>
+<p>  eCFR versioner API, issue date 2026-10-26, on 2026-11-16):</p>
+<p>  - <strong>(b)(8) wireless devices:</strong> *"Computer programs that enable wireless</p>
+<p>    devices to connect to a wireless telecommunications network, when</p>
+<p>    circumvention is undertaken solely in order to connect to a wireless</p>
+<p>    telecommunications network and such connection is authorized by the</p>
+<p>    operator of such network."* — this is the current form of the</p>
+<p>    <strong>wireless-device unlocking</strong> exemption carried through the 2015 (80 FR</p>
+<p>    65961, Oct. 28, 2015), 2018 (83 FR 54028, Oct. 26, 2018) and 2021 (86 FR</p>
+<p>    59637, Oct. 28, 2021) rulemakings, current as of the 2024 rule (89 FR</p>
+<p>    85446, Oct. 28, 2024). Its scope is **connection to a network,</p>
+<p>    grantee/operator-authorized*<em> — it does </em>not* reach firmware</p>
+<p>    reverse-engineering for replacement.</p>
+<p>  - <strong>(b)(9) smartphone app interoperability:</strong> *"Computer programs that</p>
+<p>    enable smartphones and portable all-purpose mobile computing devices to</p>
+<p>    execute lawfully obtained software applications, where circumvention is</p>
+<p>    accomplished for the sole purpose of enabling interoperability of such</p>
+<p>    applications with computer programs on the smartphone or device, or to</p>
+<p>    permit removal of software from the smartphone or device."* —</p>
+<p>    user-level, not firmware.</p>
+<p>  - <strong>(b)(18) good-faith security research:</strong> circumvention *"solely for the</p>
+<p>    purpose of good-faith testing, investigation, and/or correction of a</p>
+<p>    security flaw or vulnerability,"* in an environment designed to avoid</p>
+<p>    harm, with information used primarily to promote security of the class of</p>
+<p>    devices — this is the exemption under which modem-security RE</p>
+<p>    (e.g. the Project Zero Exynos work, Section e) is regularly conducted.</p>
+<p>  - <strong>(b)(22) FOSS-investigation (2024 rule):</strong> *"Computer programs, solely</p>
+<p>    for the purpose of investigating a potential infringement of free and</p>
+<p>    open source computer programs where: (i) The circumvention is undertaken</p>
+<p>    on a lawfully acquired device or machine other than a video game console</p>
+<p>    …"* — directly relevant to a lab investigating whether a blob embeds</p>
+<p>    GPL-covered code.</p>
+<ul>
+<li><strong>Honest scope note:</strong> the <em>statutory</em> §1201(f) interoperability exemption</li>
+</ul>
+<p>  covers RE of a lawfully-used program to interoperate — the natural home for</p>
+<p>  RE-ing a radio chip's firmware <strong>interface</strong> (what btqca.c does). Whether</p>
+<p>  wholesale firmware <em>replacement</em> ("interoperate with" what — the host</p>
+<p>  stack? the network?) stays inside §1201(f) is a counsel question, not a</p>
+<p>  doc conclusion. Also note §1201(a)(2)/(b) anti-trafficking is not lifted by</p>
+<p>  the (b)(1) rulemaking exemptions — distribution of circumvention tools is</p>
+<p>  a separate line.</p>
+<h3>EU — Software Directive 2009/24/EC Art 6 (fetched verbatim, EUR-Lex,</h3>
+<p>2026-11-16)</p>
+<p>*"The authorisation of the rightholder shall not be required where</p>
+<p>reproduction of the code and translation of its form within the meaning of</p>
+<p>points (a) and (b) of Article 4(1) are indispensable to obtain the</p>
+<p>information necessary to achieve the interoperability of an independently</p>
+<p>created computer program with other programs, provided that the following</p>
+<p>conditions are met: (a) those acts are performed by the licensee or by</p>
+<p>another person having a right to use a copy of a program, or on their behalf</p>
+<p>by a person authorised to do so; (b) the information necessary to achieve</p>
+<p>interoperability has not previously been readily available to the persons</p>
+<p>referred to in point (a); and (c) those acts are confined to the parts of the</p>
+<p>original program which are necessary in order to achieve interoperability."*</p>
+<p>Art 6(2) restricts use of the obtained information to interoperability goals;</p>
+<p>Art 6(3) Berne-proportionality. The <strong>InfoSoc/DRM layer</strong> (Art 6 of Directive</p>
+<p>2001/29, mirrored by member-state implementations) is the open flank: decomp</p>
+<p>rights do not automatically override TPMs — a counsel question per member</p>
+<p>state.</p>
+<h3>UK</h3>
+<p>Copyright, Designs and Patents Act 1988 s.50B (decompilation for</p>
+<p>interoperability — the direct UK mirror of the EU Art 6 conditions, enacted</p>
+<p>post-Software-Directive 2009/24 implementation) and s.50C (observation and</p>
+<p>study); the DRM counterweight is s.296 (as amended, incl. s.296ZE public-interest</p>
+<p>exception). <strong>Fetch failure, recorded honestly:</strong> legislation.gov.uk returned</p>
+<p>zero-byte responses to both curl attempts and an empty body to WebFetch on</p>
+<p>2026-11-16, so the verbatim statutory text is NOT quoted here; the s.50B</p>
+<p>conditions-parity with EU Art 6 is from secondary sources and should be</p>
+<p>re-verified from the primary text when legislation.gov.uk is reachable.</p>
+<h3>India</h3>
+<p>Copyright Act 1957, s.65A (inserted by the 2012 amendment) criminalizes</p>
+<p>circumvention of effective TPMs <em>intended to infringe</em>; s.65A(2) carve-outs</p>
+<p>(legal 500/JGU summaries; CIS analysis) cover personal use, education,</p>
+<p>research, security testing, encryption research — i.e. RE for study or</p>
+<p>security sits in carve-out territory, while s.52 fair dealing itself is <em>not</em></p>
+<p>fully incorporated into the TPM exceptions (documented tension in the CIS and</p>
+<p>IJIRL analyses). A firmware-RE-for-replacement program in India needs a</p>
+<p>jurisdiction-specific reading by counsel.</p>
+<h3>GCF / PTCRB — the non-statutory hurdle</h3>
+<p>GCF (globalcertificationforum.org) and PTCRB (ptcrb.com) certification is</p>
+<p><strong>contract-based</strong>, not statutory: 3GPP conformance test campaigns (GCF-CC;</p>
+<p>PTCRB NAPRD03 — test plan PDFs fetched-indexed 2026-11-16), executed at</p>
+<p>authorized ITLs on locked-down test platforms; test cases and platform access</p>
+<p>are member/NDA-gated (the contractual texts sit behind the GCF member portal</p>
+<p>— the search could not and did not retrieve their clauses). For the campaign</p>
+<p>the practical meaning: a modified modem firmware invalidates the certification</p>
+<p>file behind the device, carriers reference PTCRB/GCF certification in purchase</p>
+<p>requirements (see e.g. Verizon Open Development certification process, PDF</p>
+<p>v39), and re-certification requires membership + ITL bookings. This is an</p>
+<p>economics/contract layer on top of statutory law, and it is where the</p>
+<p><em>carrier</em> approvals (not just state approvals) bite.</p>
+<p>---</p>
+<h2>c. Export controls — crypto in modem firmware, RE tooling, published specs</h2>
+<ul>
+<li><strong>The controlled items:</strong> EAR Category 5, Part 2 ("information security")</li>
+</ul>
+<p>  — ECCNs 5A002/5D002 for cryptographic commodities/software; since the 2016</p>
+<p>  Wassenaar restructuring, <strong>cryptanalytic functionality</strong> (defeating crypto,</p>
+<p>  extracting keys/credentials) sits in separate entries (5A004/5D004</p>
+<p>  territory) and cannot be mass-market-exempted (BIS encryption-controls</p>
+<p>  overview, &lt;https://www.bis.gov/learn-support/encryption-controls&gt;; Venable</p>
+<p>  and Steptoe analyses of the 2016 Cat 5 Pt 2 restructuring, 2026-11-16</p>
+<p>  search). Wassenaar Arrangement Cat 5 Pt 2 is the origin list; EU</p>
+<p>  <strong>Regulation 2021/1080</strong> (dual-use recast, Annex I Category 5 Part 2;</p>
+<p>  fetched: EUR-Lex CELEX:32021R1080, 2026-11-16 — note the EUR-Lex HTML</p>
+<p>  fetch carries the regulation body, not the full Annex I list text; item</p>
+<p>  numbers cited from the BIS/analysis sources above).</p>
+<ul>
+<li><strong>The release valve the lab actually publishes under:</strong> EAR §734.7(a)</li>
+</ul>
+<p>  (fetched verbatim): *"unclassified 'technology' or 'software' is</p>
+<p>  'published,' and is thus not 'technology' or 'software' subject to the EAR,</p>
+<p>  when it has been made available to the public without restrictions upon its</p>
+<p>  further dissemination … (4) Public dissemination (i.e., unlimited</p>
+<p>  distribution) in any form …, including posting on the Internet on sites</p>
+<p>  available to the public."* Mass-market crypto: §740.17(b)(1) (fetched</p>
+<p>  verbatim): *"Mass market encryption software that would be considered</p>
+<p>  publicly available under § 734.3(b)(3) of the EAR, and is authorized for</p>
+<p>  export under this paragraph (b), remains subject to the EAR until all</p>
+<p>  applicable classification or self-classification requirements set forth in</p>
+<p>  this section are fulfilled"* (self-classification report per §740.17(e)(3);</p>
+<p>  Note 3 "mass market" items → 5A992/5D992, removed from EI/NS controls).</p>
+<ul>
+<li><strong>As applied to the lab's targets:</strong> the GSM/GPRS A5/3 cipher (KASUMI) is</li>
+</ul>
+<p>  publicly specified and published by 3GPP/GSMA (TS 35.202 et seq.) —</p>
+<p>  published-algorithm status is the <em>input</em> to §734.7 publishing analysis,</p>
+<p>  not something the lab must keep secret; SIM/network-auth RSA/ECDH usage is</p>
+<p>  likewise public protocol (3GPP TS 33.102/33.402 families). What would cross</p>
+<p>  into 5A004/5D004 territory: tooling whose <em>function</em> is defeating crypto or</p>
+<p>  extracting key material from devices.</p>
+<ul>
+<li><strong>Charter intersection (lab F-14 policy note):</strong> the lab's no-keys / no-</li>
+</ul>
+<p>  bypass charter — publish structure and protocol facts, never key material,</p>
+<p>  never working bypass — keeps lab outputs on the "published interoperability</p>
+<p>  specification" side of the line and out of the cryptanalytic-functionality</p>
+<p>  entries. The RE of <em>file structure</em> (Stream B: QCA TLV container walking)</p>
+<p>  is pure format documentation, the least-controlled category imaginable;</p>
+<p>  the modem's own firmware bytes (as shipped, e.g. the .tlv patch payloads)</p>
+<p>  are published-spec-adjacent analysis, but the charter forbids shipping</p>
+<p>  anything that functions as an auth bypass.</p>
+<p>---</p>
+<h2>d. The FSF's own position (exact citations, fetched 2026-11-16)</h2>
+<ol>
+<li><strong>librephone.fsf.org/freedom</strong> ("Phones and Your Freedom"; fetched,</li>
+</ol>
+<p>   48,904 B):</p>
+<p>   - *"Librephone is the FSF's project to close this 'last gap' in the stack,</p>
+<p>     reverse-engineering the necessary system components to bring cell phones</p>
+<p>     into the free world."*</p>
+<p>   - *"While it is possible to run a fully free distribution of Android</p>
+<p>     called Replicant, doing so means sacrificing critical functionality:</p>
+<p>     placing calls, taking photos, and connecting to the internet."* — i.e.</p>
+<p>     the FSF itself frames the radio stack as the reason a "fully free"</p>
+<p>     Android loses phone functionality.</p>
+<p>   - *"reverse-engineering the blobs on even one of these devices is an</p>
+<p>     enormous task"<em> and the project is limiting scope to </em>"one or two</p>
+<p>     devices that need the least amount of work to be fully free."*</p>
+<ol>
+<li><strong>librephone.fsf.org/faq</strong> (fetched, 39,697 B):</li>
+</ol>
+<p>   - *"…documenting how these proprietary blobs get used by the kernel Linux,</p>
+<p>     in order to understand what it would take to legally reverse-engineer</p>
+<p>     them using clean room techniques."* — the FAQ's own phrase: <strong>legally</strong></p>
+<p>     RE, <strong>clean room</strong> techniques.</p>
+<p>   - *"Once there is sufficient interest and funding, a detailed</p>
+<p>     specification will be written so that programmers who are not bound by</p>
+<p>     the DMCA can code free implementations."* — the FSF treats the DMCA as</p>
+<p>     the named legal hurdle and jurisdiction-shifting (non-US programmers /</p>
+<p>     clean-room isolation) as the response.</p>
+<ol>
+<li><strong>fsf.org/campaigns</strong> (fetched, 70,986 B): *"LibrePhone is an FSF</li>
+</ol>
+<p>   initiative to research and reverse-engineer proprietary firmware used by</p>
+<p>   common Android devices. LibrePhone's goal is not a new Android</p>
+<p>   distribution, but a long-term project to understand and write free</p>
+<p>   implementations for the binary blobs used in virtually all mobile phones</p>
+<p>   today."*</p>
+<ol>
+<li><strong>RYF certification criteria</strong> (&lt;https://ryf.fsf.org/about/criteria&gt;;</li>
+</ol>
+<p>   fetched verbatim 2026-11-16 — the old</p>
+<p>   fsf.org/resources/hw-endorsement/criteria URL now 404s, recorded in log):</p>
+<p>   - The secondary-processor exception, verbatim: *"However, there is one</p>
+<p>     exception for secondary embedded processors. The exception applies to</p>
+<p>     software delivered inside auxiliary and low-level processors and FPGAs,</p>
+<p>     within which software installation is not intended after the user</p>
+<p>     obtains the product. This can include, for instance, microcode inside a</p>
+<p>     processor, firmware built into an I/O device, or the gate pattern of an</p>
+<p>     FPGA. The software in such secondary processors does not count as</p>
+<p>     product software."*</p>
+<p>   - The sunset clause: *"If and when free software becomes available for use</p>
+<p>     on a certain secondary processor, we will expect certified products to</p>
+<p>     adopt it within a reasonable period of time. … If this is not done, we</p>
+<p>     will eventually withdraw the certification."*</p>
+<p>   - The BIOS line: *"The BIOS of a PC runs on the CPU, not on a separate</p>
+<p>     secondary processor, so this exception does not apply to the BIOS."*</p>
+<p>   - <strong>Mapping to radio firmware:</strong> a BT/WiFi/modem chip is a genuine</p>
+<p>     secondary processor — under RYF as written, nonfree radio firmware does</p>
+<p>     not bar certification, <em>but</em> the moment a free implementation exists,</p>
+<p>     products are expected to adopt it and certification eventually</p>
+<p>     withdraws. RYF has never certified a phone with free radio firmware —</p>
+<p>     there is no precedent product on either side of the line.</p>
+<ol>
+<li><strong>Radio firmware as the acknowledged hard case:</strong> the freedom page's</li>
+</ol>
+<p>   "last gap" + Replicant-sacrifices-calls framing (item 1) is the FSF's</p>
+<p>   standing acknowledgment that the radio stack is the component that has</p>
+<p>   never been freed at scale. The campaign texts commit to RE-and-replace of</p>
+<p>   "the necessary system components" without naming the regulatory stack</p>
+<p>   above — which is precisely the gap this document maps.</p>
+<p>---</p>
+<h2>e. Precedents survey</h2>
+<h3>Openmoko / TI Calypso — the only fully-free modem attempt (achieved, stalled)</h3>
+<ul>
+<li>OsmocomBB (&lt;https://osmocom.org/projects/baseband/wiki&gt;, fetched</li>
+</ul>
+<p>  2026-11-16): free-software GSM Layer 1 firmware for phones built on TI's</p>
+<p>  Calypso chipset (Motorola C123/C139/C155 class, Openmoko Neo1973/GTA01</p>
+<p>  era); side result CalypsoBTS (a phone as micro GSM basestation). The lab's</p>
+<p>  own fetch of the wiki plus the recorded project history: layer1 firmware +</p>
+<p>  L2/3 host stack, running on 2006-era 2G silicon.</p>
+<ul>
+<li>FreeCalypso (&lt;https://www.freecalypso.org/&gt;, fetched 2026-11-16) continues</li>
+</ul>
+<p>  the line (FCDEV3B board; firmware derived from TI reference sources).</p>
+<ul>
+<li><strong>Why it stopped:</strong> the Calypso is GSM/2G-only by hardware; the silicon is</li>
+</ul>
+<p>  discontinued; OsmocomBB mainline firmware work stagnated (items stalled on</p>
+<p>  the tracker; FreeCalypso's FCDEV3B documentation notes mainline OsmocomBB</p>
+<p>  does not properly support that board); and operators are shutting 2G down,</p>
+<p>  so there is no network to run on. No Calypso path to 3G/4G/5G exists.</p>
+<p>  (Search 2026-11-16: "OsmocomBB Calypso free GSM layer1 firmware Openmoko</p>
+<p>  status why stopped 2G only FreeCalypso".)</p>
+<ul>
+<li><strong>Lesson for LibrePhone:</strong> a fully-free modem is <em>proven possible</em> — but</li>
+</ul>
+<p>  only on a self-contained, obsolete, single-protocol baseband. Modern</p>
+<p>  Qualcomm/MediaTek modems are 100× the scope; nobody has publicly attempted</p>
+<p>  them, which is exactly the recon.md point.</p>
+<h3>Replicant — free host, nonfree modem (the honest current state)</h3>
+<ul>
+<li>Replicant's modem strategy is free-software <strong>around</strong> the modem, not</li>
+</ul>
+<p>  replacing it: <code>libsamsung-ipc</code> (free implementation of the Samsung modem</p>
+<p>  IPC protocol) + <code>libsamsung-ril</code> (free RIL) talk to the <strong>nonfree</strong> modem</p>
+<p>  firmware that ships on the device</p>
+<p>  (redmine.replicant.us wiki: Samsung-ipc, Libsamsung-ril, ModemDisable</p>
+<p>  pages; direct wiki fetch was blocked by an Anubis anti-bot challenge on</p>
+<p>  2026-11-16 — content per the indexed pages and the 2019 contributors-meeting</p>
+<p>  deck "Replicant and modems — Samsung IPC"). The ModemDisable page itself</p>
+<p>  notes that even with the modem "disabled", the nonfree firmware keeps</p>
+<p>  running.</p>
+<ul>
+<li>The 2014 FSF blog entry ("Replicant developers find and close Samsung</li>
+</ul>
+<p>  Galaxy backdoor") is the concrete demonstration of why free host + nonfree</p>
+<p>  modem matters: the free RIL simply did not implement the modem's remote</p>
+<p>  file-access backdoor.</p>
+<h3>Qualcomm mainline split — ath11k/ath10k: board data vs firmware blob</h3>
+<ul>
+<li>linux-firmware WHENCE (kernel.org linux-firmware tree, fetched 2026-11-16):</li>
+</ul>
+<p>  ath11k firmware ships as <strong>separate files per chip dir</strong> —</p>
+<p>  <code>ath11k/WCN6855/hw2.0/{regdb.bin, board-2.bin, amss.bin, m3.bin}</code> — i.e.</p>
+<p>  the <em>regulatory database</em> (regdb), the <em>board calibration data</em> (BDF), and</p>
+<p>  the <em>firmware proper</em> (amss + m3) are separate artifacts, and only the</p>
+<p>  last are truly opaque code; the board/regdb parts are data the host</p>
+<p>  driver (ath11k, GPL) feeds over QMI. The WCN6750 (the FP6's WiFi chip)</p>
+<p>  follows the same layout, and this lab has already built the free host-side</p>
+<p>  counterparts (implementations/ wmi/tlv, ce/service-model, htc/frame-layer —</p>
+<p>  see implementations/README.md).</p>
+<ul>
+<li><strong>What is precedent-setting for LibrePhone:</strong> the industry already accepts</li>
+</ul>
+<p>  a split where the <em>device-specific, non-executable</em> parts of the radio</p>
+<p>  configuration are freely-visible data and the executable blob is separate.</p>
+<p>  A free-BT-firmware strategy can inherit that split: ROM on chip, patch</p>
+<p>  TLV, NVRAM config are three layers, and the third (NVRAM) is data, not</p>
+<p>  code.</p>
+<h3>MediaTek MOLY</h3>
+<ul>
+<li>Public RE state: NCC Group / Fox-IT released a Ghidra loader for</li>
+</ul>
+<p>  MediaTek modem images (<code>nccgroup/mtk_bp</code>, Kaitai format defs for</p>
+<p>  md1img; MOLY main firmware runs on nanoMIPS cores, paired with their</p>
+<p>  nanoMIPS Ghidra processor extension); TASZK "BugTales" documents CSN.1</p>
+<p>  bug-hunting tooling for Helio basebands; <code>cyrozap/mediatek-lte-baseband-re</code></p>
+<p>  holds earlier LTE baseband notes (search 2026-11-16: "MediaTek MOLY modem</p>
+<p>  firmware reverse engineering md1img open source"). Nobody publishes a free</p>
+<p>  MOLY replacement.</p>
+<ul>
+<li>Cross-reference to the lab's own work: the rosemary census (mediatek/</li>
+</ul>
+<p>  rosemary-census.md, F-31) identified the md1img container + MIPS32</p>
+<p>  LE/MIPS16e modem regions on MT6785 — consistent with the NCC tooling's</p>
+<p>  target family, and <code>implementations/mediatek/md1rom-taskmap</code> +</p>
+<p>  <code>md32-interface</code> are the lab's structural counterparts.</p>
+<h3>Google Tensor — Samsung Exynos modem (the cautionary tale)</h3>
+<ul>
+<li>Pixel 6/7 Tensor phones carry Samsung Exynos modems (Exynos 5120/5300</li>
+</ul>
+<p>  family). Google Project Zero, March 2023: 18 vulnerabilities in Samsung</p>
+<p>  Exynos chipsets, including <strong>four internet-to-baseband RCE</strong> flaws</p>
+<p>  (CVE-2023-26072/73/74/75 et al.) exploitable with no user interaction —</p>
+<p>  attacker needs only the victim's phone number; tested on Pixel 7</p>
+<p>  (&lt;https://projectzero.google/2023/03/multiple-internet-to-baseband-remote-rce.html&gt;,</p>
+<p>  search 2026-11-16). Google's interim mitigation was to turn off the</p>
+<p>  vulnerable radio paths (VoLTE/WiFi-calling off) — "shut in radio" is the</p>
+<p>  phrase this program uses for the modem being sealed off from user repair.</p>
+<ul>
+<li>Aftermath: Google is reported to be moving Tensor modems off Samsung</li>
+</ul>
+<p>  silicon (MediaTek-derived) starting Pixel 11-era (2026-11-16 search).</p>
+<ul>
+<li><strong>Lesson:</strong> the opaque, vendor-sealed modem is both the security worst</li>
+</ul>
+<p>  case and the component users cannot fix — the strongest campaign framing</p>
+<p>  for why the RE work matters, and simultaneously the strongest regulator</p>
+<p>  framing for why they want firmware locked.</p>
+<p>---</p>
+<h2>f. Pragmatic close — what the lab can do, in what order</h2>
+<p><strong>What the lab CAN document (now, legally benign, no counsel needed):</strong></p>
+<ul>
+<li>File/container <strong>structure</strong> and driver↔blob <strong>interface</strong> facts from GPL</li>
+</ul>
+<p>  sources + device metadata: exactly what <code>implementations/qca-bt/</code></p>
+<p>  (shipped this session, next to this doc) does for the six-file QCA BT</p>
+<p>  patch/NVRAM fleet (29 devices per file), what <code>implementations/mediatek/</code></p>
+<p>  did for MTK containers, what <code>qualcomm-fp6/docs/bt-firmware-census.md</code></p>
+<p>  did for the FP6 BT partition.</p>
+<ul>
+<li>Negative results, coverage matrices, protocol tables (btqca.c's documented</li>
+</ul>
+<p>  download protocol is GPL-published fact, not lab RE).</p>
+<ul>
+<li>Everything above is published-interoperability-specification activity</li>
+</ul>
+<p>  (§734.7 "published" analysis, Section c) and clean-room per the FSF's own</p>
+<p>  stated method (Section d).</p>
+<p><strong>What needs legal counsel (before action, not before documentation):</strong></p>
+<ul>
+<li>The exact reach of 17 USC 1201(f) for firmware <em>replacement</em> vs</li>
+</ul>
+<p>  <em>interface interoperability</em> (Section b scope note) and any §1201</p>
+<p>  anti-trafficking exposure for distributing tools.</p>
+<ul>
+<li>EU member-state TPM-vs-decompilation interactions; India s.65A carve-out</li>
+</ul>
+<p>  applicability; UK s.50B primary-text verification (fetch failed this</p>
+<p>  session).</p>
+<ul>
+<li>GCF/PTCRB contractual terms if the campaign ever seeks certification.</li>
+<li>Any jurisdiction where the campaign would <em>distribute flashed devices</em></li>
+</ul>
+<p>  (that is where RED/UKCA/MTCTE/SRRC/ANATEL/FCC per-device duties attach to</p>
+<p>  the campaign as a "placing on market" actor).</p>
+<p><strong>What needs hardware certification labs (not law, not documentation):</strong></p>
+<ul>
+<li>SAR re-test (FCC §2.1093 path / India ER-SAR / EU EN 62209), EMC re-test,</li>
+</ul>
+<p>  RF conformance (GCF/PTCRB campaigns at ITLs), WiFi/BT/modem coexistence</p>
+<p>  regression — the BT coex behavior partly <em>lives in</em> the NVRAM files the</p>
+<p>  lab parses, so this is also the technical risk point for any free</p>
+<p>  replacement.</p>
+<p>**Recommended order of operations for LibrePhone (lowest regulatory heat</p>
+<p>first):**</p>
+<ol>
+<li><strong>Bluetooth (the fleet this session targets).</strong> Short-range, unlicensed</li>
+</ol>
+<p>   band (Part 15 / EN 300 328), no network-auth crypto, the *download</p>
+<p>   protocol and file structure are already public* in btqca.c/h (GPL), and</p>
+<p>   one RE pass frees up to 29 devices (recon.md top-20 rows 1-6). Regulatory</p>
+<p>   path even for a flashed device is the lightest of all radios.</p>
+<ol>
+<li><strong>WiFi.</strong> Precedent split exists (ath11k BDF/regdb vs amss); free host</li>
+</ol>
+<p>   stacks are mature; but U-NII device-security rules (§15.407(f)) and DFS</p>
+<p>   make firmware replacement the first place the anti-modification rules</p>
+<p>   bite — document structure first, replacement later.</p>
+<ol>
+<li><strong>GNSS</strong> (receive-only, minimal approval burden) and <strong>NFC</strong>.</li>
+<li><strong>Cellular modem — last.</strong> Every wall above stacks here: per-device</li>
+</ol>
+<p>   re-approval in 7+ regimes, GCF/PTCRB contracts, the SDR lock, network</p>
+<p>   crypto, safety/coex testing. The campaign documents structure and</p>
+<p>   security (the P0-style findings are the public-interest case) while the</p>
+<p>   replacement question goes to counsel + certification partners.</p>
+<p><strong>One-paragraph status for the campaign:</strong> the legal permission structure</p>
+<p>for <em>documenting</em> radio firmware (US §1201(f), EU Art 6, India carve-outs)</p>
+<p>is in decent shape; the permission structure for <em>shipping replacements</em> is</p>
+<p>essentially absent, because every type-approval regime is built on</p>
+<p>grantee-held authorizations with firmware inside the approved envelope; and</p>
+<p>the FSF's own campaign acknowledges this by targeting RE/clean-room</p>
+<p>specification first, with implementations to follow "once there is</p>
+<p>sufficient interest and funding." The lab's charter (structure-only,</p>
+<p>no-keys/no-bypass) is exactly on the documented-now side of every line</p>
+<p>mapped above.</p>
+<p>---</p>
+<h2>RULE 0 — query log (all 2026-11-16, with outcomes)</h2>
+<p>Web/code searches (recorded verbatim):</p>
+<ol>
+<li><code>"crbtfw" OR "apbtfw" parser</code> (GitHub code search) → 84 hits; the only</li>
+</ol>
+<p>   content-parsing prior art is CrimsonGlory/wairz <code>bt_firmware_banner.py</code> +</p>
+<p>   <code>bt_qca_codenames.yaml</code> (banner/codename extraction, filename-prefix →</p>
+<p>   CHE/APA/CMC mapping, banner-at-end finding); the rest is packaging</p>
+<p>   manifests (vendor.mk/proprietary-files.txt) and a kernel backport patch.</p>
+<p>   Delta built in implementations/qca-bt/ (structural TLV walking — no</p>
+<p>   public structural parser exists).</p>
+<ol>
+<li><code>"radio firmware reverse engineering DMCA exemption"</code> (framing query for</li>
+</ol>
+<p>   this doc; informed Sections a/b).</p>
+<ol>
+<li><code>"RED 2014/53/EU software update re-certification"</code> → RED Guide 2022</li>
+</ol>
+<p>   software chapter (§4.1.2.6) located; Section a EU part.</p>
+<ol>
+<li>`"FCC KDB 178919 permissive change Class II firmware change</li>
+</ol>
+<p>   re-certification modular approval"` → grantee-only finding; Section a.</p>
+<ol>
+<li>`"TEC MTCTE essential requirements mobile phone certification India</li>
+</ol>
+<p>   procedure phases"` → Section a India.</p>
+<ol>
+<li><code>"China SRRC type approval CMIIT ID … Brazil ANATEL homologation Act 77"</code></li>
+</ol>
+<p>   → Section a China/Brazil.</p>
+<ol>
+<li>`"RED Guide 2022 software updates conformity assessment … EN 300 328</li>
+</ol>
+<p>   notified body"` → Section a EU.</p>
+<ol>
+<li>`"GCF certification agreement NDA test platform PTCRB certification terms</li>
+</ol>
+<p>   contract restrictions 3GPP conformance"` → Section b (contract texts</p>
+<p>   themselves not publicly retrievable — stated as such).</p>
+<ol>
+<li>`"Replicant modem status wiki samsung-ipc RIL modem firmware nonfree</li>
+</ol>
+<p>   redmine"` → Section e.</p>
+<ol>
+<li>`"OsmocomBB Calypso free GSM layer1 firmware Openmoko status why stopped</li>
+</ol>
+<p>    2G only FreeCalypso"` → Section e.</p>
+<ol>
+<li><code>"MediaTek MOLY modem firmware reverse engineering md1img open source"</code></li>
+</ol>
+<p>    → Section e (nccgroup/mtk_bp et al.).</p>
+<ol>
+<li>`"Google Project Zero Exynos baseband vulnerability 2023 Pixel Tensor</li>
+</ol>
+<p>    Samsung modem shut in radio"` → Section e.</p>
+<ol>
+<li>`"ECCN 5A002 cryptanalysis Wassenaar category 5 part 2 cryptanalytic</li>
+</ol>
+<p>    functionality item"` → Section c (5A004/5D004 separation).</p>
+<ol>
+<li>`"India Copyright Act section 65A technological protection measures</li>
+</ol>
+<p>    circumvention exceptions 2012 amendment fair dealing section 52"` →</p>
+<p>    Section b India.</p>
+<ol>
+<li>`"RYF Respects Your Freedom certification criteria firmware secondary</li>
+</ol>
+<p>    processors site:fsf.org"` → located the moved criteria page</p>
+<p>    (ryf.fsf.org/about/criteria); Section d.</p>
+<p>Primary-source fetches (byte-exact, 2026-11-16): eCFR versioner API</p>
+<p>(37 CFR 201.40; 47 CFR 2.933/2.944/15.212/15.407; 15 CFR 740.17/734.7);</p>
+<p>EUR-Lex (2009/24/EC, 2014/53/EU, 2021/1080); Cornell LII (17 USC 1201);</p>
+<p>fsf.org/campaigns; librephone.fsf.org/{freedom,faq}; ryf.fsf.org/about/criteria;</p>
+<p>osmocom.org/projects/baseband/wiki; freecalypso.org; telec.or.jp/eng/;</p>
+<p>tec.gov.in/mtcte (TLS verification failed; fetched with certificate check</p>
+<p>disabled — content used for scheme description only); kernel btqca.h/btqca.c/</p>
+<p>hci_qca.c (raw.githubusercontent torvalds/linux master); linux-firmware</p>
+<p>WHENCE (git.kernel.org) incl. qca/ and ath11k/ entries.</p>
+<p>Fetch failures / workarounds, recorded honestly:</p>
+<ul>
+<li>librephone.fsf.org: WebFetch timed out twice; recovered with curl</li>
+</ul>
+<p>  --retry 3 (bytes match the recon.md route-table sizes 48,904/39,697).</p>
+<ul>
+<li>legislation.gov.uk (CDPA s.50B, SI 2017/1206): zero-byte responses ×2</li>
+</ul>
+<p>  (curl) and empty WebFetch body — UK statutory text NOT quoted verbatim;</p>
+<p>  flagged for re-fetch.</p>
+<ul>
+<li>uscode.house.gov granule URL 404 (site "temporary format"); Cornell LII</li>
+</ul>
+<p>  used as the fetched source instead.</p>
+<ul>
+<li>redmine.replicant.us: Anubis proof-of-work anti-bot challenge blocks</li>
+</ul>
+<p>  non-JS fetches; content cited from indexed pages, flagged for manual</p>
+<p>  re-verification.</p>
+<ul>
+<li>tec.gov.in: SSL certificate verification failure; fetched with <code>-k</code> for</li>
+</ul>
+<p>  scheme description only.</p>
+<ul>
+<li>linux-firmware: <code>firmware/WHENCE</code> 404 in the linux tree; fetched from the</li>
+</ul>
+<p>  linux-firmware git (git.kernel.org plain). kvalo/ath11k-firmware readme</p>
+<p>  API 404 (repo moved/renamed) — WHENCE ath11k entries used instead.</p>
+<ul>
+<li>ath11k.rst: three candidate Documentation paths 404'd (doc moved across</li>
+</ul>
+<p>  kernel versions); linux-firmware WHENCE per-chip file listing used as the</p>
+<p>  fetched evidence of the split.</p>
+<h2>Improvements to prior work (Rule 1)</h2>
+<ul>
+<li>recon.md §"Radio / regulatory stub" — added a pointer to this document</li>
+</ul>
+<p>  (the stub's flag said "dedicated documentation session required"; the</p>
+<p>  session now exists).</p>
+<ul>
+<li>implementations/README.md — qca-bt row added to the component table when</li>
+</ul>
+<p>  the parser lands (see the stream-B README for its RULE-0 delta record).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

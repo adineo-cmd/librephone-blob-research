@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WORKORDER-002 — LAPTOP agent program (v3) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>WORKORDER-002 — LAPTOP agent program (v3)</h1><p>**Machine:** LAPTOP · **Agent budget:** ~300M tokens · **Repo:** `librephone-blob-research` (this clone)</p><p>Evidence: none</p>
+<h1>WORKORDER-002 — LAPTOP agent program (v3)</h1>
+<p><strong>Machine:</strong> LAPTOP · <strong>Agent budget:</strong> ~300M tokens · <strong>Repo:</strong> <code>librephone-blob-research</code> (this clone)</p>
+<p><strong>Issued:</strong> 2026-11-16 (v3) by the Open Discovery Lab lead · <strong>Duration:</strong> one full agent session</p>
+<p><strong>Repo roles (standing):</strong></p>
+<ul>
+<li><code>librephone-blob-research</code> — LibrePhone work. <strong>PRIORITY 1 on BOTH machines.</strong></li>
+<li><code>open-research-lab</code> — mathematics and other fields. PRIORITY 2.</li>
+<li><code>open-discovery-lab</code> — the NOTEBOOK (findings from any repo; lead-merged).</li>
+</ul>
+<p><strong>THE DEVICE SPLIT (owner directive: divide the 444 listed devices evenly):</strong></p>
+<p>Fetch <code>https://codeberg.org/rsavoye/librephone/raw/branch/main/data/devices.csv</code>, sort by</p>
+<p>device name (plain codepoint sort — BOTH machines use the same sort so halves never overlap),</p>
+<p>then:</p>
+<ul>
+<li>DESKTOP owns <strong>rows 1–222</strong> (see WORKORDER-001-desktop.md).</li>
+<li><strong>LAPTOP owns rows 223–444.</strong></li>
+</ul>
+<p>Each machine runs the SAME four-phase program on its half. The lead merges the two halves.</p>
+<p><strong>THE FOUR WORK TYPES:</strong> deep RE · blob families documented · clean-room implementation ·</p>
+<p>device fragmentation.</p>
+<p><strong>Discipline:</strong> commit locally per phase; push at phase end; write</p>
+<p><code>workorders/inbox/STATUS-LAPTOP.md</code> when done and after any halt. Read <code>AGENTS.md</code> first.</p>
+<p>Facts-not-blobs. Clean-room rule (owner directive 2026-11-16, amending RULE 3): you MAY write</p>
+<p>implementations, but ONLY from the lab's published spec documents — never from proprietary</p>
+<p>material; every implementation file carries the clean-room statement header.</p>
+<h2>PHASE 1 — DEEP RE (metadata-first, per device in rows 223–444)</h2>
+<p>Identical to the desktop's Phase 1 (WORKORDER-001-desktop.md — read it for the full spec).</p>
+<p><strong>UPDATED 2026-11-16 (F-71):</strong> the coverage matrix already exists —</p>
+<p><code>upstream-contribution/blob-database/coverage-matrix.csv</code> (33,917 blob rows × 123</p>
+<p>blob-populated devices; the published upstream "database" is metadata-only, payloads are not</p>
+<p>published anywhere — see <code>blob-database/recon.md</code>). Your job: map your half (rows 223-444)</p>
+<p>against the matrix, LEVERAGE-FIRST (the top-20 list in recon.md — the bm2nXX.bin ADSP fleet</p>
+<p>and image-level sharing like abl.img ×75 / devcfg.img ×76 fall where they fall; whichever of</p>
+<p>the QCA BT fleet / ADSP fleet sits in your half is your Phase 2/3 headline), attempt</p>
+<p>population of your half's not-populated devices from public LineageOS packages per-device as</p>
+<p>needed, and extend the matrix rows for your half.</p>
+<p>Output: <code>blob-matrix/laptop/devices-223-444.csv</code> + <code>blob-matrix/laptop/deep-re-notes.md</code>.</p>
+<h2>PHASE 2 — BLOB FAMILIES DOCUMENTED (per device/family in rows 223–444)</h2>
+<p>Family docs from the FP6/MT6785 exemplar templates, evidence-classed</p>
+<p>(census/ISA-identified/spec-complete). Output: <code>docs/devices/&lt;device&gt;/&lt;family&gt;.md</code>.</p>
+<h2>PHASE 3 — CLEAN-ROOM IMPLEMENTATION (from published specs ONLY)</h2>
+<p>Same rules as the desktop's Phase 3; your assignment is the <strong>MediaTek side</strong> (the lab's</p>
+<p>MT6785 ISA maps are the spec corpus — the desktop takes the Qualcomm side):</p>
+<ol>
+<li><strong>MediaTek implementations from the committed specs</strong> (<code>mediatek/docs/</code>): the md1rom</li>
+</ol>
+<p>   task-interface components, the MD32 spec-derived interface stubs (the MD32 ISA gap is</p>
+<p>   named in ROADMAP M-1/I-4 — implement only what the specs actually pin), the container/</p>
+<p>   signed-record-chain walkers (the container format is documented byte-for-byte).</p>
+<ol>
+<li>Where a spec is incomplete: implement the spec'd subset, file the gap as an open item —</li>
+</ol>
+<p>   never guess beyond the spec.</p>
+<ol>
+<li>Output: <code>implementations/&lt;family&gt;/&lt;component&gt;/</code> with clean-room statement headers.</li>
+</ol>
+<h2>PHASE 4 — DEVICE FRAGMENTATION (your half, merge-ready)</h2>
+<p>Fragmentation analysis for rows 223–444 (SoC generations, family sharing, leverage ranking),</p>
+<p>merge-ready for the lead: <code>blob-matrix/laptop/fragmentation-half.md</code> + CSV.</p>
+<h2>FALLBACK (Priority 2 — after all four phases)</h2>
+<p><code>open-research-lab</code>: Track C frontier — mine the file-formats wiki successor</p>
+<p>(https://fileformats.archiveteam.org; Wayback snapshots work when direct fails) for</p>
+<p>undocumented formats with obtainable samples (dexvert corpus:</p>
+<p>https://github.com/Sembiance/dexvert), build the top-20 target queue</p>
+<p>(<code>discovery-engine/format-targets-2026-11.md</code>), then execute ONE full format RE end-to-end</p>
+<p>(census → decode attempt → spec doc; honest negatives are valid). RULE-0: dwm, lpec, igs, nt,</p>
+<p>pvd, aik, clarion, professional-draw, psion-aik are already taken.</p>
+<h2>Do NOT touch</h2>
+<p><code>workorders/WORKORDER-001-desktop.md</code>, the desktop's files (rows 1-222 outputs),</p>
+<p>open-discovery-lab (the notebook is the lead's).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

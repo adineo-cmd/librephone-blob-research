@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WORKORDER-001 — DESKTOP agent program (v3) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>WORKORDER-001 — DESKTOP agent program (v3)</h1><p>**Machine:** DESKTOP · **Agent budget:** ~300M tokens · **Repo:** `librephone-blob-research` (this clone)</p><p>Evidence: none</p>
+<h1>WORKORDER-001 — DESKTOP agent program (v3)</h1>
+<p><strong>Machine:</strong> DESKTOP · <strong>Agent budget:</strong> ~300M tokens · <strong>Repo:</strong> <code>librephone-blob-research</code> (this clone)</p>
+<p><strong>Issued:</strong> 2026-11-16 (v3) by the Open Discovery Lab lead · <strong>Duration:</strong> one full agent session</p>
+<p><strong>Repo roles (standing):</strong></p>
+<ul>
+<li><code>librephone-blob-research</code> — LibrePhone work. <strong>PRIORITY 1 on BOTH machines.</strong></li>
+<li><code>open-research-lab</code> — mathematics and other fields. PRIORITY 2.</li>
+<li><code>open-discovery-lab</code> — the NOTEBOOK (findings from any repo; lead-merged).</li>
+</ul>
+<p><strong>THE DEVICE SPLIT (authoritative 236-device list — F-71 corrected; the "444" was the audit's miscount of the file-centric CSV):</strong></p>
+<p>Fetch <code>https://codeberg.org/rsavoye/librephone/raw/branch/main/data/devices.sql.bz2</code> (pg_dump,</p>
+<p>fetched byte-exact 2026-11-16), parse the devices COPY block, sort by lower(vendor), lower(model),</p>
+<p>lower(build) — codepoint, both machines identical. Script-verified split:</p>
+<ul>
+<li><strong>DESKTOP owns rows 1–118.</strong></li>
+<li><strong>LAPTOP owns rows 119–236</strong> (see WORKORDER-002-laptop.md) — 118 devices, 46 extracted,</li>
+</ul>
+<p>  holding the ADSP bm2nXX leverage fleet (bm2n12/14/15.bin ×14 devices each) plus 6 QCA BT</p>
+<p>  files (×4 devices) and a619_gmu.bin (×5). Pre-built inventory:</p>
+<p>  <code>blob-matrix/laptop/devices-half.csv</code>.</p>
+<p>Each machine runs the SAME four-phase program on its half. The lead merges the two halves into</p>
+<p>the full 236-device picture.</p>
+<p><strong>THE FOUR WORK TYPES (owner directive — every phase runs on your device half):</strong></p>
+<p>deep RE · blob families documented · clean-room implementation · device fragmentation.</p>
+<p><strong>Discipline:</strong> commit locally per phase; push at phase end; write</p>
+<p><code>workorders/inbox/STATUS-DESKTOP.md</code> when done and after any halt. Read <code>AGENTS.md</code> first</p>
+<p>(RULE 0 prior-art search, RULE 1 improve previous work). Facts-not-blobs: no proprietary</p>
+<p>payload ever committed. Clean-room rule (owner directive 2026-11-16, amending RULE 3): you</p>
+<p>MAY write implementations, but ONLY from the lab's published spec documents — an implementer</p>
+<p>never reads proprietary code, headers, or strings; every implementation file carries a</p>
+<p>clean-room statement header (spec-only derivation, no proprietary access).</p>
+<h2>PHASE 1 — DEEP RE (metadata-first, per device in rows 1–222)</h2>
+<p><strong>UPDATED 2026-11-16 (F-71): the coverage matrix already EXISTS.</strong></p>
+<p><code>upstream-contribution/blob-database/coverage-matrix.csv</code> holds 33,917 blob rows × 123</p>
+<p>blob-populated devices (distilled from the upstream PostgreSQL/CSV metadata — the published</p>
+<p>"database" is metadata-only; the payload corpus lives on the maintainer's machine at</p>
+<p>/work/Lineage-images/ and is published nowhere; full findings in</p>
+<p><code>blob-database/recon.md</code>). Your Phase 1 therefore starts from that matrix:</p>
+<p>(a) map your half (rows 1–222) against it — which of your devices are among the 123</p>
+<p>extracted, which fall in the 113 listed-not-populated;</p>
+<p>(b) LEVERAGE-FIRST ordering: check your half against the top-20 leverage list in recon.md</p>
+<p>(the QCA BT patch fleet covers 29 devices per file — whichever top-20 entries sit in your</p>
+<p>half are your Phase 2/3 headline);</p>
+<p>(c) for your half's not-populated devices, attempt population from the **public LineageOS</p>
+<p>install packages** (per-device ~1–1.3 GB fetches, only as needed — no bulk download exists</p>
+<p>anywhere);</p>
+<p>(d) extend the matrix rows for your half (<code>blob-matrix/desktop/</code> outputs below).</p>
+<ol>
+<li>For each device: gather every public fact obtainable without the payload — upstream data</li>
+</ol>
+<p>   repo rows, vendor/SoC identification, public mainline kernel support status, public vendor</p>
+<p>   trees, published teardown/firmware listings. Network is flaky: retries, and mark failures</p>
+<p>   honestly.</p>
+<ol>
+<li>Per family present (modem/wifi/bt/tz/boot/adsp/cdsp/camera/gpu/other): census what is</li>
+</ol>
+<p>   obtainable (file names, sizes, hashes where public, ISA from public analyses where they</p>
+<p>   exist — cite them; never re-claim another project's result as lab work).</p>
+<ol>
+<li>Output: <code>blob-matrix/desktop/devices-001-222.csv</code> —</li>
+</ol>
+<p>   <code>device,vendor,soc,family,file,bytes,sha256,public_status,notes</code>. Plus</p>
+<p>   <code>blob-matrix/desktop/deep-re-notes.md</code> for per-device findings that exceed a CSV row.</p>
+<h2>PHASE 2 — BLOB FAMILIES DOCUMENTED (template-driven, per device/family in rows 1–222)</h2>
+<ol>
+<li>For every family where Phase 1 produced real data: write the family doc from the FP6/MT6785</li>
+</ol>
+<p>   exemplar templates (<code>qualcomm-fp6/docs/</code>, <code>mediatek/docs/</code> are the patterns): container</p>
+<p>   layout, ISA/proof status, interface facts, open questions — each doc marked with its</p>
+<p>   evidence class (census/ISA-identified/spec-complete).</p>
+<ol>
+<li>Output: <code>docs/devices/&lt;device&gt;/&lt;family&gt;.md</code> (stub-level is honest for metadata-only</li>
+</ol>
+<p>   devices; the FP6/MT6785 depth is the target only where payloads/analysis exist).</p>
+<h2>PHASE 3 — CLEAN-ROOM IMPLEMENTATION (from published specs ONLY)</h2>
+<ol>
+<li>Inventory the lab's completed specs (FP6 WMI dispatch architecture, LPEC codec model</li>
+</ol>
+<p>   (100%-closed), boot-chain map, TrustZone census, MT6785 ISA maps…).</p>
+<ol>
+<li>Write clean-room implementation components from those specs ONLY — every file headered</li>
+</ol>
+<p>   with the clean-room statement. Suggested starts (highest value first):</p>
+<p>   - <strong>Qualcomm side:</strong> the wpss WMI/HTT/CE interface components that open PR #58</p>
+<p>     (codeberg rsavoye/librephone) explicitly lacks — the lab's decoded dispatch spec is</p>
+<p>     exactly what its author asked for. Liaison note: implement against</p>
+<p>     <code>qualcomm-fp6/docs/wmi-*</code> + the dispatch paper, NOT against ath11k's header copies</p>
+<p>     unless they are clean-room-safe public code (they are GPL public code — usable).</p>
+<p>   - <strong>LPEC:</strong> the decoder exists (<code>track-c-discovery-engine</code> lpec_decoder) — package it as a</p>
+<p>     standalone implementation with the spec doc as its design document.</p>
+<ol>
+<li>Output: <code>implementations/&lt;family&gt;/&lt;component&gt;/</code> with README stating the spec-derived</li>
+</ol>
+<p>   provenance. Where a spec is incomplete, implement the spec'd subset and file the gap as an</p>
+<p>   open item — never guess beyond the spec.</p>
+<h2>PHASE 4 — DEVICE FRAGMENTATION (your half, merge-ready)</h2>
+<ol>
+<li>From Phases 1-2: the fragmentation analysis for rows 1–222 — SoC generations, family</li>
+</ol>
+<p>   sharing, leverage ranking (blobs shared across the most devices), and the split-notes the</p>
+<p>   lead needs to merge your half with the laptop's into the full 444-device picture.</p>
+<ol>
+<li>Output: <code>blob-matrix/desktop/fragmentation-half.md</code> + the merge-ready CSV.</li>
+</ol>
+<h2>FALLBACK (Priority 2 — after all four phases)</h2>
+<p><code>open-research-lab</code>: OEIS A385403 proof attack per</p>
+<p><code>math/property-b-covering/results/a385403-results.md</code> §"Continuation attack" (structural</p>
+<p>Fano-free-8-edge probe FIRST — it proves both brackets by counting), then EP614 extension</p>
+<p>(<code>math/erdos614-fnk/</code>). Only if Phases 1-4 consumed little budget.</p>
+<h2>Do NOT touch</h2>
+<p><code>workorders/WORKORDER-002-laptop.md</code>, the laptop's files (rows 223-444 outputs),</p>
+<p>open-discovery-lab (the notebook is the lead's).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

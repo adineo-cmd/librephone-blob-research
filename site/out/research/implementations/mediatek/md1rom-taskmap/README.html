@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/mediatek/md1rom-taskmap — clean-room data-driven task-interface model — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/mediatek/md1rom-taskmap — clean-room data-driven task-interface model</h1><p>A data-driven module for the MT6785 (Helio G95) `md1rom` modem image&#x27;s</p><p>Evidence: none</p>
+<h1>implementations/mediatek/md1rom-taskmap — clean-room data-driven task-interface model</h1>
+<p>A data-driven module for the MT6785 (Helio G95) <code>md1rom</code> modem image's</p>
+<p><strong>documented</strong> task interface and dispatch structure. Every fact is a</p>
+<p>committed spec fact; everything the specs do not pin is an explicit stub.</p>
+<p>CLEAN-ROOM STATEMENT: written from <code>mediatek/docs/md1rom-decode.md</code> (F-31),</p>
+<p><code>mediatek/rosemary-census.md</code>, <code>mediatek/docs/md1dsp-decode.md</code> (F-36) and</p>
+<p><code>mediatek/docs/md32-gap.md</code> (F-45) on <strong>2026-11-16</strong>; no proprietary</p>
+<p>material accessed during development.</p>
+<h2>What it emits (<code>python3 -I md1rom_taskmap.py [--json out.json]</code>)</h2>
+<ul>
+<li><code>image</code> — size, container, ISA attribution (MIPS32 LE entry + MIPS16e</li>
+</ul>
+<p>  islands; microMIPS/nanoMIPS ruled out), MOLY LR13 version strings,</p>
+<p>  auto-analysis counts (F-31).</p>
+<ul>
+<li><code>entry_chain</code> — the byte-verified reset trampoline at 0x0</li>
+</ul>
+<p>  (`lui a2,0x174 / addiu a2,a2,0x2ed0 / jr a2 -&gt; 0x176ed0 / _mtc0</p>
+<p>  zero,Count<code>) plus the documented </code>00 65` filler pattern (F-31).</p>
+<ul>
+<li><code>region_map</code> — the F-31 decode-density region map (code islands,</li>
+</ul>
+<p>  partial windows, data/compressed regions), honestly coverage-derived.</p>
+<ul>
+<li><code>task_inventory</code> / <code>task_dispatch_families</code> — the modem L1/PHY task</li>
+</ul>
+<p>  names the corpus documents (LTE: 4g_dci_parse_task, 4g_pcfich_parse_task,</p>
+<p>  4g_pdsch_crc_task, 4g_pdsch_proc_task; HSPA: hspa_agch_event_task;</p>
+<p>  CDMA2000: c2k_scheduler, LISR_c2k_pilot_arrival), each with its</p>
+<p>  evidence class (string level, F-36).</p>
+<ul>
+<li><code>payload_manifest</code> — the md1img payload set with container + signedness</li>
+</ul>
+<p>  per the census (modem data payloads unsigned; md1dsp via GFH type 260).</p>
+<ul>
+<li><code>stubs</code> — the boundary, verbatim: task entry addresses, task-to-region</li>
+</ul>
+<p>  binding, CCCI channel map, per-segment map, MD32 ISA, host interface.</p>
+<h2>Byte verifier</h2>
+<p><code>verify_entry_chain(data)</code> checks a local md1rom image against exactly the</p>
+<p>F-31-pinned bytes: the three instruction words (<code>0x3c060174</code>, <code>0x24c62ed0</code>,</p>
+<p><code>0x00c00008</code>) and the <code>00 65</code> filler at 0x10..0x30. The <code>_mtc0</code> word is</p>
+<p>deliberately <strong>not</strong> checked — the spec pins it by mnemonic only (facts-not-</p>
+<p>blobs: no invented encoding). CLI: <code>--verify-entry FILE</code> (exit 0/1).</p>
+<h2>RULE 0 note</h2>
+<p>This is a model of the lab's own published findings (no equivalent public</p>
+<p>artifact exists — the F-31 doc records that no public decode-level analysis</p>
+<p>of MT6785 md1rom exists, checked 2026-11-12; re-confirmed 2026-11-16 via the</p>
+<p>container component's searches, which surfaced no md1rom task-map or</p>
+<p>dispatch-structure tool). The component is a faithful, testable packaging</p>
+<p>of documented facts, not a new binary-analysis claim.</p>
+<h2>Tests</h2>
+<p><code>python3 -m unittest -v test_md1rom_taskmap</code> — 11 tests, including</p>
+<p>entry-chain verification pass/negative cases on self-made fixture bytes.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WMI registry consumers: the b06 side of the F-22 message-ID registry (F-23) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>WMI registry consumers: the b06 side of the F-22 message-ID registry (F-23)</h1><p>*Investigator: F-23, 2026-11-11. Inputs: wpss.mdt / wpss.b06 / wpss.b09</p><p>Evidence: none</p>
+<h1>WMI registry consumers: the b06 side of the F-22 message-ID registry (F-23)</h1>
+<p>*Investigator: F-23, 2026-11-11. Inputs: wpss.mdt / wpss.b06 / wpss.b09</p>
+<p>(lineage-fp6, qca6750), instruments/ath11k/wmi.h. Tooling:</p>
+<p>scratch-wmi-dispatch/wmi_b06_consumer_scan{,2,3}.py.*</p>
+<h2>Claim</h2>
+<p>The F-22 registry in wpss.b09 (<code>[ptr, id, 0]</code>, 12-byte stride, runs at</p>
+<p>vaddr 0xc0691080...) is consumed by <strong>Hexagon</strong> code in wpss.b06 — not RISC-V</p>
+<p>code. Two corrections and one mapping come out of this:</p>
+<ol>
+<li><strong>Architecture correction (firm, header-level):</strong> wpss.mdt declares</li>
+</ol>
+<p>   <code>e_machine = 164 = EM_HEXAGON</code> (EM_ARM=40, EM_RISCV=243). b06 is a Hexagon</p>
+<p>   QDSP image segment, not RV32+C. Every RV32-lens conclusion about b06</p>
+<p>   executable content (F-20/F-22 "handler prologue" style tests, lui/addi</p>
+<p>   construction search) was inapplicable; our RV32-C decodes of b06 produce</p>
+<p>   coherent-looking noise, and they do so *even at the 28 eh_frame-verified</p>
+<p>   function starts* — which confirms the wrong-ISA diagnosis.</p>
+<ol>
+<li><strong>Per-group handler mapping (structural, high confidence):</strong> registry</li>
+</ol>
+<p>   records cluster by WMI group to ~one dominant b06 pointer per group —</p>
+<p>   exactly the shape of per-module WMI event dispatch (one shared handler per</p>
+<p>   pdev/vdev/peer/roam module). Mapping below.</p>
+<ol>
+<li><strong>Consumer-constant search: honest negative.</strong> No instruction encoding we</li>
+</ol>
+<p>   can check (RV32 lui/auipc/addi12 over all five exec segments b01–b06; raw</p>
+<p>   32-bit literals across b01–b12; Hexagon immext-class-0xD words) materializes</p>
+<p>   any registry address outside b09 itself. The registry is reached via</p>
+<p>   pointer variables (list-head anchors), not via code-materialized constants —</p>
+<p>   or via Hexagon encodings beyond our scan's coverage.</p>
+<h2>Method</h2>
+<ol>
+<li>Re-derived the registry from wpss.b09 independently of F-22 with a looser</li>
+</ol>
+<p>   filter (ptr in b06 exec range, grp 1..20, cmd 1..0x2e0, third word 0):</p>
+<p>   **193 records, 32 distinct pointers, of which 178 records / 26 pointers sit</p>
+<p>   in the 30 stride-12 runs of &gt;= 2 records** (F-22's stricter ath11k-name</p>
+<p>   filter got 225/16; both agree on the main-run area 0xc0691080–0xc06914d8).</p>
+<ol>
+<li>Byte-level scan of every exec segment (b01 0xfe000000, b02 0xfe002000,</li>
+</ol>
+<p>   b03, b05, b06 0xc0002000–0xc05bd111 (end-exclusive; canonical per filesz 6,074,641)) for RV32 <code>lui</code>/<code>auipc</code> words landing in</p>
+<p>   the registry window 0xc0682000–0xc06a0000, <code>addi rd,rd,12</code>, and <code>c.addi rd,12</code>;</p>
+<p>   capstone decode of every hit context.</p>
+<ol>
+<li>Raw 32-bit literal search for all 12 representative registry run-start</li>
+</ol>
+<p>   addresses across b01–b12.</p>
+<ol>
+<li>Hexagon immext scan: 4-byte-aligned words with top nibble 0xD whose</li>
+</ol>
+<p>   26-bit field at shifts 0..6 equals <code>target&gt;&gt;6</code> for the 12 run starts.</p>
+<ol>
+<li>eh_frame FDE parse of b09 (first 1072 bytes): DWARF32 FDEs with</li>
+</ol>
+<p>   <strong>absolute</strong> pc_begin — all 28 land in b06 (0xc04e6878–0xc04e7a70),</p>
+<p>   confirming F-22's "FDEs point into b06 ~0xC04E6BD0" and giving ground-truth</p>
+<p>   function starts. (pcrel interpretation of the same fields yields 0x80b4xxxx,</p>
+<p>   matching no segment — absolute is the consistent reading.)</p>
+<ol>
+<li>ath11k cross-check: group byte of each ID against <code>wmi_grp</code> enum in</li>
+</ol>
+<p>   instruments/ath11k/wmi.h; sample IDs against F-22's u32 id hit table.</p>
+<h2>Per-group handler mapping (the load-bearing result)</h2>
+<table>
+<tr>
+<th>WMI grp</th>
+<th>ath11k name</th>
+<th>records</th>
+<th>distinct ptrs</th>
+<th>dominant b06 ptr (count)</th>
+</tr>
+<tr>
+<td>3</td>
+<td>SCAN</td>
+<td>7</td>
+<td>7</td>
+<td>none dominant (0xc02f2f20, 0xc02f382c, 0xc02f3888, ...)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>PDEV</td>
+<td>48</td>
+<td>1</td>
+<td><strong>0xc02cd9cc (48)</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>VDEV</td>
+<td>41</td>
+<td>5</td>
+<td><strong>0xc031d8c8 (37)</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>PEER</td>
+<td>23</td>
+<td>3</td>
+<td><strong>0xc02d94bc (20)</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>MGMT</td>
+<td>11</td>
+<td>4</td>
+<td>0xc02df240 (4), 0xc03bd4c0 (4)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>BA_NEG</td>
+<td>5</td>
+<td>1</td>
+<td>0xc0377b5c (5)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>DFS</td>
+<td>8</td>
+<td>2</td>
+<td>0xc0376c54 (4), 0xc03771b8 (4)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>ROAM</td>
+<td>24</td>
+<td>3</td>
+<td><strong>0xc035d2e0 (22)</strong></td>
+</tr>
+<tr>
+<td>13</td>
+<td>P2P</td>
+<td>5</td>
+<td>3</td>
+<td>0xc03c1ca8 (2), 0xc03d3640 (2)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>PROFILE</td>
+<td>7</td>
+<td>2</td>
+<td>0xc04b603c (4), 0xc04ecc3d (3)</td>
+</tr>
+<tr>
+<td>17</td>
+<td>SUSPEND</td>
+<td>3</td>
+<td>2</td>
+<td>0xc02cd9cc (2), 0xc04ecc3d (1)</td>
+</tr>
+<tr>
+<td>18</td>
+<td>BCN_FILTER</td>
+<td>2</td>
+<td>1</td>
+<td>0xc03b9be8 (2)</td>
+</tr>
+<tr>
+<td>19</td>
+<td>WOW</td>
+<td>6</td>
+<td>3</td>
+<td>0xc0424740 (3), 0xc03cffa0 (2)</td>
+</tr>
+<tr>
+<td>20</td>
+<td>RTT</td>
+<td>2</td>
+<td>1</td>
+<td>0xc0400550 (2)</td>
+</tr>
+</table>
+<p>Sample records (main-run area): <code>[0xc02cd9cc, 0x4001 WMI_PDEV_TPC_CONFIG_EVENTID, 0]</code>,</p>
+<p><code>[0xc02cd9cc, 0x4002 WMI_CHAN_INFO_EVENTID, 0]</code>, `[0xc02cd9cc, 0x4009</p>
+<p>WMI_SERVICE_READY_EXT_EVENTID, 0]<code>, </code>[0xc02cd9cc, 0x11001, 0]`, ...; scan</p>
+<p>records <code>[., 0x3001 WMI_SCAN_EVENTID, 0]</code>, <code>[., 0x3003 WMI_SCAN_CHAN_LIST_CMDID, 0]</code></p>
+<p>carry per-event pointers.</p>
+<p><strong>Read:</strong> the "ptr" column is consistent with Hexagon function pointers —</p>
+<p>per-module dispatch handlers — with one shared handler serving a whole WMI</p>
+<p>module's event set (PDEV 48 events → one pointer). All 32 distinct ptrs are</p>
+<p>4-byte aligned except <code>0xc04ecc3d</code> (odd — anomalous for Hexagon packets; treat</p>
+<p>with suspicion; it serves 3 PROFILE records + 1 SUSPEND). Registry vaddrs are</p>
+<p>also 4-aligned, as are all 28 eh_frame function starts.</p>
+<h2>The owner-pointer cluster 0xc02cd9cc</h2>
+<p>Inside b06 exec range (b06 = 0xc0002000–0xc05bd111 (end-exclusive; canonical per filesz 6,074,641)), 4-byte aligned, dominant</p>
+<p>ptr of the entire registry (51 of 193 records, groups 4/5/7/17). RV32-C decode</p>
+<p>at that address is mid-function noise (<code>c.lw s1, 0x10(s1)</code>...) — but so is the</p>
+<p>decode at eh_frame-verified starts, so this neither confirms nor refutes</p>
+<p>code-ness. Best supported reading: <strong>the PDEV module's shared event handler</strong></p>
+<p>(or a per-group dispatcher table entry), not a struct field — it appears only</p>
+<p>in the ptr column, never as a standalone pointer elsewhere in b09/b10.</p>
+<h2>List-head structure (new structural fact)</h2>
+<p>Every run start is preceded 8–12 bytes earlier by a 32-bit word equal to the</p>
+<p>run start address itself (20 literal hits, all inside b09), e.g.</p>
+<p><code>0xc0691078: 0xc0691080</code>, <code>0xc06913dc: 0xc06913e8</code>, <code>0xc0684d94: 0xc0684da0</code>.</p>
+<p>Preceding words include run record-counts (<code>0x14</code> before the 20-record run,</p>
+<p><code>0x7</code> before the 7-record run) and <code>0x1</code> sentinels. The registry is not one</p>
+<p>flat table: it is a set of anchored, count-prefixed lists. Two anchored runs</p>
+<p>sit outside the F-22 main window: 0xc0684da0 (3 recs) and 0xc069dfc8 (4 recs).</p>
+<h2>Consumer hunt: what was checked and what it means</h2>
+<ul>
+<li>RV32 lens over all exec segments: <strong>0</strong> lui/auipc into the registry window;</li>
+</ul>
+<p>  <strong>0</strong> <code>addi rd,rd,12</code> in the whole 6 MB of b06 (271 <code>c.addi rd,12</code> exist but</p>
+<p>  carry no registry linkage we can establish without a real Hexagon decoder).</p>
+<ul>
+<li>Literal search b01–b12: the registry's addresses appear <strong>only in b09</strong> (the</li>
+</ul>
+<p>  list-head anchors) — no code or data anywhere else holds one.</p>
+<ul>
+<li>Hexagon immext-class-0xD scan: 0 hits, but the encoding assumption is</li>
+</ul>
+<p>  unverified (capstone 5.0.7 ships no Hexagon decoder, so we could not</p>
+<p>  ground-truth it). This is the main uncovered gap, not proof of absence.</p>
+<h2>Honest unknowns</h2>
+<ol>
+<li><strong>No Hexagon disassembler on host</strong> (capstone 5.0.7 lacks</li>
+</ol>
+<p>   <code>CS_ARCH_HEXAGON</code>): handler prologue validity is <strong>not verifiable</strong>; the</p>
+<p>   "prologue-valid 1/18" style numbers from an RV32 lens are meaningless and</p>
+<p>   are retracted here. Next investigator needs a Hexagon decoder (llvm-objdump</p>
+<p>   --triple=hexagon or qdsp6 objdump) to do Q2 properly.</p>
+<ol>
+<li>Who <em>reads</em> the lists: expected to be an HTC/WMI rx dispatch loop in b06</li>
+</ol>
+<p>   reached via pointer variables set up at init. Constant search cannot find</p>
+<p>   that; needs Hexagon control-flow recovery around the anchors.</p>
+<ol>
+<li>The 0x16010/0x1d010-style slot IDs seen before some runs (grp 0x16 = 0x16</li>
+</ol>
+<p>   PROFILE, 0x1d = MISC per the ath11k enum, with cmd IDs in the low 12 bits)</p>
+<p>   and runs 0xc0684da0/0xc069dfc8 are unmapped to ath11k names.</p>
+<ol>
+<li>Odd pointer 0xc04ecc3d unexplained.</li>
+</ol>
+<h2>Data</h2>
+<p>results/wmi-registry-consumers.json (16 KB) — full runs, cluster table,</p>
+<p>sample decodes, FDE list, search counts. Raw scanner outputs kept in</p>
+<p>scratch-wmi-dispatch/results-wmi-b06-consumers{,2,3}.json.</p>
+<h2>Update (F-28, 2026-11-11): handler mapping decode-verified</h2>
+<p>The "structural, not decode-verified" caveat and unknown #1 above are</p>
+<p>RESOLVED: F-28 installed Ghidra 12.2 (Hexagon:LE:32:default — see</p>
+<p>open-discovery-lab docs/hexagon-decode.md) and decode-verified the mapping —</p>
+<p>**21/22 dominant pointers (incl. PDEV 0xc02cd9cc = 9,828-byte dispatcher)</p>
+<p>accept functions as real Hexagon code; 28/28 eh_frame starts take</p>
+<p>functions; the odd pointer 0xc04ecc3d decodes to nothing (confirmed dead)**.</p>
+<p>Unknown #2 partially answered by F-29: the PDEV dispatcher materializes the</p>
+<p>registry head (0xc0691050/68) and arms setbit() enable masks inside the</p>
+<p>record area — the registry is the group-routing level, per-event routing is</p>
+<p>via b06-resident jump tables (0xc056423c / 0xc05641fc). Remaining unknowns:</p>
+<p>per-record 12-stride consumption loop, dispatcher call-site.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

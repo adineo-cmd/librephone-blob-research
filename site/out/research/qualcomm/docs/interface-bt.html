@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bluetooth driver ↔ blob interface (Fairphone FP6, WCN6750) — for upstream issue #15 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Bluetooth driver ↔ blob interface (Fairphone FP6, WCN6750) — for upstream issue #15</h1><p>One-page interface doc, API-doc style as the issue requests (&quot;will be</p><p>Evidence: none</p>
+<h1>Bluetooth driver ↔ blob interface (Fairphone FP6, WCN6750) — for upstream issue #15</h1>
+<p>One-page interface doc, API-doc style as the issue requests ("will be</p>
+<p>turned into a test suite"). Written 2026-11-16 for</p>
+<p><a href="https://codeberg.org/rsavoye/librephone/issues/15">upstream issue #15</a></p>
+<p>(High Priority). Companion to the lab's</p>
+<p><a href="research/qualcomm/docs/bt-firmware-census.html">bt-firmware-census.md</a> — that doc is the</p>
+<p>blob-side census (container formats, headers, hashes); this doc is the</p>
+<p>driver↔blob contract itself.</p>
+<p><strong>Legend:</strong> [PUBLIC] = public-kernel fact, source cited; [LAB] =</p>
+<p>lab-derived fact from committed censuses; [OPEN] = not establishable</p>
+<p>from data available to this box.</p>
+<h2>1. What the "blob" is on this device</h2>
+<ul>
+<li>[LAB] The FP6 ships its BT firmware family in the dedicated</li>
+</ul>
+<p>  <code>bluetooth</code> OTA partition — a FAT16 filesystem holding two generations</p>
+<p>  of Moselle (WCN6750) rampatch (msbtfw11/msbtfw12 as <code>.mbn</code> ELF +</p>
+<p>  <code>.tlv</code> container + <code>.ver</code> + NVM <code>.bin</code>) **plus a third "EVROS" family</p>
+<p>  (evrbtfw20.tlv / evrnv20.bin) that mainline Linux cannot name or</p>
+<p>  select**. Full inventory with sizes/sha256 in</p>
+<p>  <a href="research/qualcomm/docs/bt-firmware-census.html">bt-firmware-census.md</a>.</p>
+<ul>
+<li>[LAB] Both <code>.mbn</code> rampatches are ELF32 <strong>e_machine = 40 (EM_ARM)</strong>,</li>
+</ul>
+<p>  e_type EXEC, entry = LOAD vaddr | 1 → <strong>ARM Thumb entry point</strong>. The</p>
+<p>  WCN6750's WLAN core (wpss) on the same chip is 32-bit RISC-V running</p>
+<p>  QURT — BT and WLAN firmware are different ISAs on this SoC (first</p>
+<p>  public identification, per the architecture census).</p>
+<ul>
+<li>[LAB] linux-firmware carries msbtfw11/msnv11 at <em>different sizes</em></li>
+</ul>
+<p>  than the FP6 builds (different builds), and **no msbtfw12 and no</p>
+<p>  evr\<em> files at all</em>* — checked 2026-11-10 against the linux-firmware</p>
+<p>  tree listing.</p>
+<h2>2. Driver ↔ blob interface, layer by layer</h2>
+<p>All [PUBLIC] anchors verified against <code>torvalds/linux</code> master on</p>
+<p>2026-11-16 (files fetched; line-references below):</p>
+<table>
+<tr>
+<th>layer</th>
+<th>what crosses it</th>
+<th>mainline anchor</th>
+</tr>
+<tr>
+<td>transport</td>
+<td>H4-style HCI byte stream over a UART (serdev); regulators + <code>bt_en</code> enable GPIO owned by <code>qca_serdev</code></td>
+<td><code>drivers/bluetooth/hci_qca.c</code> (<code>qca_serdev</code>, <code>qca_regulator_enable</code>)</td>
+</tr>
+<tr>
+<td>framing</td>
+<td>standard HCI command/event packets, <code>hci_uart</code> protocol "qca"</td>
+<td><code>drivers/bluetooth/hci_uart.c</code>, <code>hci_qca.c</code></td>
+</tr>
+<tr>
+<td>power (runtime)</td>
+<td><strong>HCI_IBS in-band sleep</strong>: single-byte signals SLEEP_IND <code>0xFE</code>, WAKE_IND <code>0xFD</code>, WAKE_ACK <code>0xFC</code>; per-direction state machines, clock voting, retransmit timeout 100 ms, SoC TX-idle 200 ms, host TX-idle 2 s</td>
+<td><code>hci_qca.c</code> (<code>HCI_IBS_*</code> defines, <code>send_hci_ibs_cmd</code>, <code>serial_clock_vote</code>)</td>
+</tr>
+<tr>
+<td>bring-up</td>
+<td>soc-version read: HCI EDL opcode <strong>0xFC00</strong>, reply carries <code>soc_id</code> + <code>rom_ver</code></td>
+<td><code>btqca.c</code> <code>qca_read_soc_version</code> (lines 16–89)</td>
+</tr>
+<tr>
+<td>filename math</td>
+<td><code>rom_ver = ((soc_ver &amp; 0x00000f00) &gt;&gt; 4) | (soc_ver &amp; 0x0000000f)</code> (default branch — the one WCN6750 takes) selects <code>qca/msbtfw%02x.mbn</code></td>
+<td><code>btqca.c</code> lines 770–820</td>
+</tr>
+<tr>
+<td>patch download</td>
+<td>rampatch as <strong>ELF patch</strong> (<code>ELF_TYPE_PATCH</code> → <code>dnld_mode = QCA_SKIP_EVT_VSE_CC</code>: segments are send-only, the driver injects a synthetic command-complete) for WCN6750's <code>.mbn</code>, with <strong><code>.tlv</code> fallback</strong> (<code>TLV_TYPE_PATCH</code>, whose 32-byte header's <code>download_mode</code> field decides VSE/ack behavior)</td>
+<td><code>btqca.c</code> <code>qca_tlv_check_data</code> (lines 292–321), <code>qca_uart_setup</code> lines 779–855</td>
+</tr>
+<tr>
+<td>patch segmentation</td>
+<td>HCI EDL opcode 0xFC00 + payload command <strong>0x1E</strong>, chunks of <strong>243 bytes</strong> (<code>MAX_SIZE_PER_TLV_SEGMENT</code>); the last segment is always acked regardless of mode</td>
+<td><code>btqca.h</code> lines 8–18, <code>qca_download_firmware</code></td>
+</tr>
+<tr>
+<td>patch-config</td>
+<td>WCN6750-only pre-download config: EDL opcode <strong>0xFC00</strong> + sub-command <strong>0x28</strong> (<code>EDL_PATCH_CONFIG_CMD</code>), payload {0x01, 0, 0, 0}</td>
+<td><code>btqca.c</code> <code>qca_send_patch_config_cmd</code> (lines 154–175), called from <code>qca_uart_setup</code> line 780</td>
+</tr>
+<tr>
+<td>NVM download</td>
+<td><code>qca/msnv%02x.bin</code> TLV tag set; <strong>the kernel rewrites tags in flight</strong>: tag 2 = BD address (6 B), tag 17 (HCI) sets the in-band-sleep bit <code>0x80</code> + baud-rate byte, tag 27 (deep sleep) sets the sleep-enable mask; NVMs with multiple tag sets carry an <strong>enclosing type-4 header</strong> — the kernel skips to the first type-2 set</td>
+<td><code>btqca.c</code> <code>qca_tlv_check_data</code> case <code>TLV_TYPE_NVM</code> (lines 363–437); <code>EDL_TAG_ID_*</code> in <code>btqca.h</code></td>
+</tr>
+<tr>
+<td>speed</td>
+<td>baudrate change: vendor opcode <strong>0xFC48</strong>, single parameter; WCN6750-family settle wait 1–10 ms</td>
+<td><code>hci_qca.c</code> <code>qca_set_baudrate</code> (lines 1347–1397)</td>
+</tr>
+<tr>
+<td>post-setup</td>
+<td>disable SOC logging; Microsoft vendor extension opcode <strong>0xFD70</strong>; HCI reset; fw-build-info query; BD-address check (quirk <code>HCI_QUIRK_USE_BDADDR_PROPERTY</code> when the controller address equals the NVM address)</td>
+<td><code>btqca.c</code> lines 940–1010</td>
+</tr>
+<tr>
+<td>crash path</td>
+<td>memdump trigger byte <code>0xFB</code> + coredump trigger via opcode <strong>0xFC0C</strong> (param 0x26); SSR timeouts sized around FW-download + memdump windows</td>
+<td><code>hci_qca.c</code> <code>hci_coredump_qca</code> (lines 1889–1897), <code>qca_controller_memdump</code>, lines 71–55</td>
+</tr>
+</table>
+<h2>3. Blob-side facts the driver source alone does not show ([LAB])</h2>
+<ul>
+<li><strong>The kernel's filename math reproduces the shipped filenames</strong> from</li>
+</ul>
+<p>  the shipped binaries' headers: TLV field <code>rom_build</code> = 0x0101 →</p>
+<p>  17 → msbtfw11; 0x0102 → 18 → msbtfw12; 0x0200 → 32 → evrbtfw20.</p>
+<p>  First time shown numerically against real firmware (census doc,</p>
+<p>  "rom_build → filename" table).</p>
+<ul>
+<li>The shipped TLV headers carry <code>download_mode = 3</code> =</li>
+</ul>
+<p>  <code>QCA_SKIP_EVT_VSE_CC</code> — the value the kernel also hard-forces for</p>
+<p>  ELF patches, i.e. FP6's controller acks only the last patch segment</p>
+<p>  in both container flavors.</p>
+<ul>
+<li>The <code>.mbn</code> and <code>.tlv</code> are the same payload in two containers: the</li>
+</ul>
+<p>  TLV <code>entry</code> field equals the ELF entry minus the Thumb bit</p>
+<p>  (0x24c50↔0x24c51; 0x23dc4↔0x23dc5) — verified numerically.</p>
+<ul>
+<li><strong>Container-length delta:</strong> the vendor TLV patch header carries 12</li>
+</ul>
+<p>  extra bytes of reserved fields (on-device header is 32 bytes before</p>
+<p>  data, entry at offset 0x24) vs upstream's 24-byte</p>
+<p>  <code>struct tlv_type_patch</code> — a re-implementation should decode</p>
+<p>  accordingly.</p>
+<ul>
+<li>NVM tag 1 (64 B) is the firmware version string (e.g.</li>
+</ul>
+<p>  <code>BTFW.MOSELLE.1.1.2-00064-PATCHZ-2</code>); tag 2 is the BD-address slot</p>
+<p>  the Android vendor HAL (<code>PatchDLManager::ReadTlvInfo</code>) writes before</p>
+<p>  download. The EVROS NVM carries an outer <strong>type-4</strong> enclosing TLV</p>
+<p>  plus 903 trailing bytes — the vendor HAL's multi-NVM</p>
+<p>  (<code>TLV_TYPE_BT_FM_NVM</code>) unwrap path, of which the kernel implements</p>
+<p>  only the skip-to-first-set part.</p>
+<ul>
+<li><strong>The EVROS gap:</strong> no <code>evr</code> string exists anywhere in upstream</li>
+</ul>
+<p>  <code>btqca.c</code>/<code>hci_qca.c</code>; linux-firmware has no evr\* files; the</p>
+<p>  consumer of <code>evrbtfw20.tlv</code> is Qualcomm's Android vendor BT HAL,</p>
+<p>  which selects patch paths from a chipset-version table not public.</p>
+<p>  [OPEN] Which chip EVROS (product_id 29) is; flagged in the census</p>
+<p>  doc as needing the HAL's map or a named verinfo dump.</p>
+<h2>4. Test-suite hooks (the issue's stated end goal)</h2>
+<ol>
+<li><strong>Filename math</strong> — feed real <code>rom_build</code> values (0x0101/0x0102/</li>
+</ol>
+<p>   0x0200) through the kernel's formula and assert the msbtfw11/12/</p>
+<p>   evrbtfw20 outputs; negative case: EVROS has no kernel consumer.</p>
+<ol>
+<li><strong>Version round trip</strong> — 0xFC00 soc-version read/parse</li>
+</ol>
+<p>   (<code>qca_btsoc_version</code> fields), then the rom_ver branch selection.</p>
+<ol>
+<li><strong>Patch segmentation</strong> — 243-byte chunking + last-segment-acked</li>
+</ol>
+<p>   semantics for each <code>download_mode</code> (NONE/VSE/CC/VSE_CC); ELF-patch</p>
+<p>   synthetic-CC injection path.</p>
+<ol>
+<li><strong>NVM rewrite determinism</strong> — tag 17 in-band-sleep bit + baud byte,</li>
+</ol>
+<p>   tag 27 mask, tag 2 BD-address passthrough; multi-set type-4 unwrap</p>
+<p>   (and the documented 32-byte on-device header delta).</p>
+<ol>
+<li><strong>IBS state machine</strong> — 0xFE/0xFD/0xFC sequences under the four</li>
+</ol>
+<p>   timeout constants; clock-vote counters.</p>
+<ol>
+<li><strong>Blob-side validation</strong> — every downloaded file is checkable</li>
+</ol>
+<p>   without a device: ELF32/Thumb entry math for <code>.mbn</code>, TLV</p>
+<p>   type/length/entry decode against the committed header tables</p>
+<p>   (<code>results/bt-tz-census.json</code>).</p>
+<h2>Sources consulted (accessed 2026-11-16 unless noted; network flaky — status recorded)</h2>
+<ul>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/bluetooth/btqca.c (fetched, 1,032 lines — opcodes, modes, filename math quoted above)</li>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/bluetooth/hci_qca.c (fetched, 2,855 lines — IBS, baudrate, memdump, patch-config)</li>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/bluetooth/btqca.h (fetched — EDL constants, tag IDs, soc-type enum incl. QCA_WCN6750)</li>
+<li>Lab: <code>qualcomm-fp6/docs/bt-firmware-census.md</code> (blob census, prior art + hashes), <code>qualcomm-fp6/results/bt-tz-census.json</code> (full header decode)</li>
+<li>Concurrency note: the lab's QCA-BT clean-room implementation stream (from the lab's published BT specs) runs in a separate session; if/when committed under <code>implementations/</code>, its service-side stubs are the test-suite's second half.</li>
+</ul>
+<p><strong>Clean-room statement:</strong> public-kernel facts + lab census facts only;</p>
+<p>no proprietary content, no decompiled code, no firmware bytes</p>
+<p>redistributed.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

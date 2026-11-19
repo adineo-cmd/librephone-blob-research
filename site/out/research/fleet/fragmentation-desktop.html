@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desktop half — device fragmentation analysis (Phase 4, merge-ready) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Desktop half — device fragmentation analysis (Phase 4, merge-ready)</h1><p>Rows 1–222 of the 249-identity universe (split rule in</p><p>Evidence: none</p>
+<h1>Desktop half — device fragmentation analysis (Phase 4, merge-ready)</h1>
+<p>Rows 1–222 of the 249-identity universe (split rule in</p>
+<p><a href="research/fleet/deep-re-notes.html">deep-re-notes.md</a> §1). All numbers from the committed</p>
+<p>coverage matrix + device inventory, codename-joined; the OnePlus 6</p>
+<p>payload census is included where noted. 2026-11-16.</p>
+<h2>1. SoC generations (222 devices)</h2>
+<ul>
+<li><strong>Qualcomm: 89 named</strong> across 29 chip generations (SM6375 ×12, SM8250</li>
+</ul>
+<p>  ×7, SM8475 ×3, SM6115 ×5, SM7250 ×5, SM8550 ×3, SM4250 ×3, SM6225 ×4,</p>
+<p>  SM7325 family ×5, SDM845 ×4, SM8350 family ×4, MSM8998 ×2, plus</p>
+<p>  singles: QCM6490, SDM636, SM8150 family ×2, SM4375, SM4350, SM8475,</p>
+<p>  SM7225, SM7325-AE variants)</p>
+<ul>
+<li><strong>Google Tensor: 14</strong> (GS101 ×3, GS201 ×5, G3 ×5, G4 ×1)</li>
+<li><strong>Other named: 3</strong> (Amlogic S905Y2/S905X3 TV boxes)</li>
+<li><strong>Blank SOC: 116</strong> — the upstream DB's biggest fragmentation-data hole</li>
+</ul>
+<p>  (concentrated on Samsung/Motorola/Xiaomi rows where <code>builds.csv</code> never</p>
+<p>  filled the cell)</p>
+<p>SoC-vendor split of the 110 populated devices: Qualcomm 89, Google 14,</p>
+<p>other 3, blank 4.</p>
+<h2>2. Family sharing (blobs shared across the most devices)</h2>
+<p>Corrected leverage ranking (in-half device counts; md5-keyed):</p>
+<ol>
+<li><code>oplus_vooc_fw_rk826.bin</code> + <code>oplus_vooc_fw.bin</code> — <strong>36 devices each</strong></li>
+</ol>
+<p>   (VOOC fast-charge firmware, OnePlus+realme rows only)</p>
+<ol>
+<li>QCA BT patch fleet (<code>crbtfw20.tlv</code>, <code>apbtfw10.tlv</code>, <code>crbtfw11.tlv</code>,</li>
+</ol>
+<p>   <code>crnv20.bin</code>, <code>crnv11.bin</code>, <code>apnv10.bin</code>) — <strong>29 devices each</strong></p>
+<ol>
+<li><code>bm2n06/08/12/13/14/15.bin</code> (ADSP-region fleet) + <code>sequence_manifest.bin</code></li>
+</ol>
+<p>   + <code>unified_ksqs.bin</code> — 22 each in half (25-26 fleet-wide)</p>
+<ol>
+<li><code>a619_gmu.bin</code> — 21; <code>a660_sqe.fw</code> — 20; <code>a660_gmu.bin</code> — 18;</li>
+</ol>
+<p>   <code>a630_sqe.fw</code> — 16; <code>aoa_cldb_falcon.bin</code>/<code>aoa_cldb_swl14.bin</code> — 16</p>
+<p>Shared-blob histogram in the half (16,063 distinct blobs keyed by</p>
+<p>filename+md5, size-as-proxy where the upstream DB lists no md5):</p>
+<p>10,759 on 1 device · 2,095 on 2 · 693 on 3 · 1,112 on 4 · 223 on 5 ·</p>
+<p>… down to 7 blobs on 29 and 7 on 30 devices (the BT fleet and VOOC</p>
+<p>pair). **5,304 distinct blobs (33.0%) are shared by ≥2 devices, and</p>
+<p>22,137 of 33,481 rows (66.1%) are instances of a shared blob** —</p>
+<p>consistent with recon.md's fleet-wide 68.0%.</p>
+<h2>3. Family × device coverage</h2>
+<table>
+<tr>
+<th>family</th>
+<th>devices carrying it (of 110 populated)</th>
+</tr>
+<tr>
+<td>boot</td>
+<td>110</td>
+</tr>
+<tr>
+<td>other (camera/touch/audio long tail)</td>
+<td>107</td>
+</tr>
+<tr>
+<td>modem</td>
+<td>101</td>
+</tr>
+<tr>
+<td>wifi</td>
+<td>95</td>
+</tr>
+<tr>
+<td>gpu</td>
+<td>92</td>
+</tr>
+<tr>
+<td>tz</td>
+<td>79</td>
+</tr>
+<tr>
+<td>bt</td>
+<td>73</td>
+</tr>
+<tr>
+<td>adsp</td>
+<td>68</td>
+</tr>
+<tr>
+<td>cdsp</td>
+<td>63</td>
+</tr>
+</table>
+<p>92 of 110 populated devices carry ≥5 families — the modern</p>
+<p>(SDM660-and-later) shape; the pre-2018 devices carry fewer.</p>
+<h2>4. Byte-weighted fragmentation</h2>
+<p>Top devices by enumerated bytes (halving the corpus is concentrated at</p>
+<p>the top): Nord_4 1.94 GB · OnePlus_12 1.87 · OnePlus_11_5G 1.60 ·</p>
+<p>Mi_13_Pro 1.48 · Mi_13 1.46 · Poco_F6_PRo 1.42 · Mi_12S_Pro 1.41 ·</p>
+<p>Nord_CE4 1.40 · Mi_12S_Ultra 1.39 · Mi_12S 1.39 · Poco_F5_Pro 1.31 ·</p>
+<p>Edge_40_Pro 1.30 · Mi_12T_Pro 1.30 · OnePlus_13 1.23 · Redmi_K60_Pro</p>
+<p>1.14. All 15 are 2021-2024 SM8-series/SM7-series flagships — byte</p>
+<p>weight tracks SoC generation, and the OnePlus/oxygen ecosystem alone</p>
+<p>accounts for ~9 of the top 15.</p>
+<p>By family (half): modem 25.94 GB · boot 22.05 GB (of which the</p>
+<p>free-kernel boot.img/vendor_boot rows are a large upstream-mislabeled</p>
+<p>share — see recon.md's family-note) · other 14.15 GB · adsp 3.49 GB ·</p>
+<p>wifi 0.71 GB · tz 0.67 GB · cdsp 0.28 GB · bt 0.12 GB · gpu 0.09 GB.</p>
+<h2>5. Merge notes for the lead (444 → 249 reconciliation)</h2>
+<ol>
+<li>The laptop-flagged remainder is rows 223–249: 27 devices, all</li>
+</ol>
+<p>   X<em>/Z</em>-named — 12 Sony Xperia (incl. 12 of the 123 populated), Nubia</p>
+<p>   Z17/Z18/Z5_Pro_GT/Z6_Pro, Zenfone 5Z/8, Zero TV/tablet boxes.</p>
+<p>   Nothing in the top-20 leverage list lands there.</p>
+<ol>
+<li>Split rule to re-derive identically: sort <code>device-inventory.csv</code> by</li>
+</ol>
+<p>   <code>model</code> (fallback <code>build_codename</code>), plain codepoint, desktop rows</p>
+<p>   1–222, laptop 223–249. Codename-join to the matrix via <code>db_path</code></p>
+<p>   (NOT display name — the <code>Phone_2</code>/aura/<code>Pong</code> collision, see</p>
+<p>   deep-re-notes §2).</p>
+<ol>
+<li>Upstream-matrix data quality to fix at merge: 586 true duplicate</li>
+</ol>
+<p>   (device, filename, md5) triples; duplicate display names <code>Xperia_1_II</code></p>
+<p>   (two codenames) and <code>Phone_2</code> (aura + Pong); typo <code>Poco_F6_PRo</code>;</p>
+<p>   stray <code>\ufffd</code> byte in one SOC cell.</p>
+<ol>
+<li>The OnePlus 6 census rows (57, sha256-bearing,</li>
+</ol>
+<p>   <code>populated-local-session</code>) merge cleanly: device <code>OnePlus_6</code>,</p>
+<p>   vendor <code>OnePlus</code>, soc <code>Qualcomm SDM845 Snapdragon 845</code>.</p>
+<h2>6. What the merge enables</h2>
+<p>Desktop half + laptop half = the full 444→249 device picture at the</p>
+<p>same evidence level; the corrected leverage ranking applies fleet-wide</p>
+<p>(VOOC pair 36, BT fleet 29 — both fully inside desktop rows), and the</p>
+<p>Phase-3 clean-room components cover the transport/dispatch layer shared</p>
+<p>by every Qualcomm device in both halves.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

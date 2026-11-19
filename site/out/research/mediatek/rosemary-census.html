@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture census of MediaTek MT6785 (Helio G95) firmware + userspace blobs — Xiaomi Redmi Note 10S &quot;rosemary&quot;, LineageOS 24.0 (2026-11-04 nightly) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Architecture census of MediaTek MT6785 (Helio G95) firmware + userspace blobs — Xiaomi Redmi Note 10S &quot;rosemary&quot;, LineageOS 24.0 (2026-11-04 nightly)</h1><p>**Claim:** The MT6785 tinysys coprocessor family runs on **ARM Cortex-M4 cores</p><p>Evidence: none</p>
+<h1>Architecture census of MediaTek MT6785 (Helio G95) firmware + userspace blobs — Xiaomi Redmi Note 10S "rosemary", LineageOS 24.0 (2026-11-04 nightly)</h1>
+<p><strong>Claim:</strong> The MT6785 tinysys coprocessor family runs on **ARM Cortex-M4 cores</p>
+<p>(Thumb-2)**, not RISC-V — established three independent ways: the images</p>
+<p>self-report their core in their record names (<code>tinysys-loader-CM4_A</code>,</p>
+<p><code>tinysys-scp-CM4_A</code>), the SCP loader opens with a textbook Cortex-M vector</p>
+<p>table (initial SP <code>0x538</code>, reset handler <code>0x1e1</code>, Thumb bit set), and the SCP</p>
+<p>DRAM code image decodes **256/256 as Thumb-2 with clean <code>push {r4,lr}</code></p>
+<p>prologues while every other ISA decodes 0/256<strong>. The SCP runs </strong>FreeRTOS**</p>
+<p>(embedded path <code>kernel/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c</code> — the</p>
+<p>Cortex-M4F port). The camera **CCU (Camera Control Unit) runs on Synopsys</p>
+<p>ARCv2 cores** — <code>vendor/firmware/lib3a.ccu</code> + 20 per-sensor <code>libccu_*</code> ELFs</p>
+<p>carry <code>e_machine=195</code> (binutils <code>EM_ARC_COMPACT2</code>; glibc <code>elf.h</code> leaves 195</p>
+<p>unassigned — the lab's older tables mislabeled it "TILE64"), self-identify</p>
+<p>via the GCC record `GCC: (ARCompact/ARCv2 ISA elf32 toolchain 2017.09)</p>
+<p>7.1.1<code> plus the ARC extension string </code>BITSCAN,CD,DIV_REM,FPUDA,BS`, and ship</p>
+<p>per-core entry points 16 KB apart (0x10038000 / 0x1003c000) matching the two</p>
+<p><code>custsensor1.ld</code>/<code>custsensor2.ld</code> link scripts in leaked MTK CCU build</p>
+<p>config. The audio DSP is a <strong>Cadence HiFi3 (Xtensa)</strong> — self-named</p>
+<p><code>hifi3_a_{dram,iram,sram}</code> (byte-level confirmation pending: capstone has no</p>
+<p>Xtensa backend). <code>spmfw</code> is <strong>not CPU code at all</strong>: SPM/PCM microcode</p>
+<p>(header magic <code>2MPS</code>, embedded original filename <code>spm_firmware.bin</code>). The</p>
+<p>modem (<code>md1rom</code>) is a <strong>raw concatenated image with no ELF header</strong>;</p>
+<p>nanoMIPS per public prior art (NCC Group, taszk), unverifiable with capstone</p>
+<p>(no nanoMIPS decoder — decode rates 0–45/48 across six supported ISAs at 12+</p>
+<p>probed offsets, no dominant ISA) *(overturned 2026-11-12 by F-31 — see the</p>
+<p>corrections banner below)<em>. </em>*Zero ELF files exist in the firmware</p>
+<p>partition set** — but the userspace partitions do contain ELFs, and exactly</p>
+<p>one non-ARM family: the ARCv2 CCU fleet. Every firmware code payload ships</p>
+<p>in the MediaTek <code>mtk_hdr</code> record chain (magic <code>0x58881688</code>, 512-byte</p>
+<p>headers, name at 0x08, extension record <code>0x58891689</code> at 0x30 with header</p>
+<p>size 0x200 @0x34 and payload alignment 0x10 @0x44) and is individually</p>
+<p>signed with a **pair of DER X.509 certificates (cert1 = 1,709 B, cert2 = 957</p>
+<p>B)** — 34 payloads, 19 signed pairs; the modem's 13 data payloads</p>
+<p>(<code>md1_filter*</code>, <code>md1_mddb*</code>, <code>md1_mdmlayout</code>, <code>md1_file_map</code>), gz's <code>unmap2</code></p>
+<p>and lk's <code>kaeru</code> carry no signature records.</p>
+<blockquote>**Corrections (2026-11-12, superseding the nanoMIPS/Coresonic readings in</blockquote>
+<blockquote>this census):<strong> F-31 decode-verified <code>md1rom</code> as </strong>MIPS32 LE + MIPS16e**</blockquote>
+<blockquote>(4-language decode-density on identical windows; 1,322,630 instructions,</blockquote>
+<blockquote>16,297 functions — the NCC/taszk nanoMIPS attribution is Dimensity-era</blockquote>
+<blockquote>MT6873+ 2023, and this MT6785/MOLY-LR13 chip predates it). F-36</blockquote>
+<blockquote>byte-verified the <code>md1dsp</code> container and identified the core as **MTK</blockquote>
+<blockquote>MD32-class** (the Coresonic reading is superseded); F-45 diagnoses the</blockquote>
+<blockquote>remaining instruction-level decode gap. See <code>docs/md1rom-decode.md</code>,</blockquote>
+<blockquote><code>docs/md1dsp-decode.md</code>, <code>docs/md32-gap.md</code>.</blockquote>
+<p>This is the MTK mirror of the FP6 methodology finding: **MTK does not use</p>
+<p>ELF/MDT containers for subsystem firmware on this SoC** — there is no</p>
+<p><code>e_machine</code> to read there. Architecture must be established from record</p>
+<p>names, branch/vector words, and decode-rate sanity. Where ELFs <em>do</em> appear</p>
+<p>(userspace), one MTK coprocessor family still breaks ARM-only assumptions:</p>
+<p>the CCU fleet is ARCv2.</p>
+<p><strong>Prior art checked (2026-11-11):</strong></p>
+<p><a href="https://github.com/nccgroup/mtk_bp">NCC Group mtk_bp</a> (Kaitai defs; md1img</p>
+<p>file-table container; example build dated 2023-05, MT6879/NR16 — nanoMIPS);</p>
+<p><a href="https://github.com/nccgroup/ghidra-mtk-loader">NCC Group ghidra-mtk-loader</a></p>
+<p>(verified verbatim: "Currently, only nanoMIPS-based firmware is supported")</p>
+<ul>
+<li><a href="https://github.com/nccgroup/ghidra-nanomips">ghidra-nanomips</a>;</li>
+</ul>
+<p><a href="https://labs.taszk.io/articles/post/full_chain_bb_part1">taszk labs full-chain baseband series, part 1</a></p>
+<p>(2023-12-07, Daniel Komaromy — Helio <strong>and</strong> Dimensity baseband</p>
+<p>exploitation, "our nanoMIPS decompiler, debugger, and emulator for Mediatek</p>
+<p>basebands"; CCCI/RIL pivot focus, no per-partition census);</p>
+<p><a href="https://x.com/0xor0ne/status/1864942969800810775">0xor0ne MTK 5G baseband RE write-up</a></p>
+<p>(2024-12-05, X + blog); [BlackHat USA 2021, Grassi/Keen Lab: Over The Air</p>
+<p>Baseband Exploit — RCE on 5G Smartphones](https://i.blackhat.com/us21/Wednesday-Handouts/us21-Grassi-Over-The-Air-Baseband-Exploit-RCE-On-5G-Smartphones.pdf)</p>
+<p>(MT baseband RCE, no header census); [Marco Grassi &amp; Kira "Exploring the</p>
+<p>MediaTek Baseband"](https://medium.com/tenable-techblog) (baseband RE</p>
+<p>course material); <a href="https://github.com/cyrozap/mediatek-lte-baseband-re">cyrozap/mediatek-lte-baseband-re</a></p>
+<p>(older MT65xx-era LTE modems: Cortex-R4 protocol core + Coresonic "SIMT"</p>
+<p>DSP); <a href="https://www.usenix.org/conference/usenixsecurity23/presentation/kim-eunsoo">BaseComp</a></p>
+<p>(USENIX Security '23, 2023-08 — Samsung <strong>and</strong> MediaTek baseband integrity</p>
+<p>protection, 29 bugs; no coprocessor census);</p>
+<p><a href="https://arxiv.org/abs/2409.00475">BaseMirror</a> (CCS 2024 — Samsung Shannon</p>
+<p>only); <a href="https://github.com/CrimsonGlory/wairz">CrimsonGlory/wairz</a></p>
+<p><code>backend/.../parsers/mediatek_tinysys.py</code> + <code>mediatek_gfh.py</code> (LK/GFH</p>
+<p>container parsing incl. compact layout; classifier asserts SCP = "Cortex-M4F</p>
+<p>running FreeRTOS" with <code>tinysys-loader-CM4_A</code> bootstub, SSPM = Cortex-M</p>
+<p>behind <code>0x58901690</code> segment-chain, SPMFW = <code>2MPS</code> PCM microcode "NOT ARM</p>
+<p>code", MCUPM/DPM = tinysys siblings — <strong>all confirmed here for MT6785</strong>;</p>
+<p>wairz itself states its evidence is classifier-level, not instruction-level);</p>
+<p><a href="https://github.com/19h/zrax-isa-workbench/blob/main/docs/socboot2.md">19h/zrax-isa-workbench <code>docs/socboot2.md</code></a></p>
+<p>(mtk_hdr layout + GFH chain, extension fields at 0x34/0x44 marked empirical</p>
+<p>from 18 "fw1" images; explicitly states **no vendor-built MediaTek preloader</p>
+<p>was tested** — rosemary confirms the layout byte-for-byte on production</p>
+<p>images, which is new); <a href="https://github.com/mtk-watch/android_ccu_tool/blob/main/mt6779/custsensor/ccu_arc_binary.mk">mtk-watch/android_ccu_tool <code>mt6779/custsensor/ccu_arc_binary.mk</code></a></p>
+<p>(leaked MTK CCU build config: <code>arc-elf32</code> toolchain 2016.09, <code>-mcpu=em4_fpus</code>,</p>
+<p><code>-DCPU_ARCEM</code>, dual link scripts + pm/dm/<code>ddr</code> artifacts — implies ARC for</p>
+<p>MT6779 CCU by build flags alone; <strong>no public binary-level identification</strong>);</p>
+<p>U-Boot <code>tools/mtk_image.h</code> (GFH record structs, types 0/1/2/3/7/8);</p>
+<p>bkerler/mtkclient (bootloader/DA exploitation); mainline Linux</p>
+<p><code>drivers/remoteproc/mtk_scp.c</code> (documents registers, **never states the</p>
+<p>SCP's ISA** — checked 2026-11-11); AOSP <code>system/chre</code> <code>platform/tinysys</code></p>
+<p>(source-available MTK SCP firmware platform; names the SCP "Sensor-hub</p>
+<p>Control Processor", no ISA claim). GitHub code search for per-partition</p>
+<p>ELF/header census of an MT6785 build returned nothing: no public source</p>
+<p>documents the architecture/segment/version facts below for this device or</p>
+<p>SoC generation (checked: mtk_bp, wairz, zrax, mtkclient, android_ccu_tool,</p>
+<p>awesome-telco lists, XDA-adjacent repos — 2026-11-11).</p>
+<h2>Method</h2>
+<p>Source: <code>lineage-24.0-20261104-nightly-rosemary-signed.zip</code></p>
+<p>(1,172,896,925 B, sha256 <code>6b4269e4…6e7ff1</code>, Princeton mirror, published</p>
+<p>2026-11-04; official LineageOS, branch 24.0). Extraction:</p>
+<p><code>payload_manifest.py</code> (protobuf-free CrAU manifest parse; 21 partitions;</p>
+<p>ops REPLACE / REPLACE_XZ / REPLACE_BZ — the type-1 op is bzip2, as on FP6)</p>
+<p>→ <code>payload_dump.py</code> (19 partitions dumped incl. the four ext4 images) →</p>
+<p><code>payload_walk.py</code> (mtk_hdr record-chain splitter; 49 records → 34 payloads +</p>
+<p>15 signature blocks) → <code>extract_ext4.py</code> (debugfs per-file dump; vendor 2500</p>
+<p>files, system_ext 3512, system 3244, product 496) → <code>census_mtk.py</code></p>
+<p>(magic sniffing, LK/GFH container parse, ELF parse, targeted version-string</p>
+<p>scan) → <code>isa_probe.py</code> / <code>region_scan.py</code> (capstone decode-rate sanity</p>
+<p>across arm32/thumb2/arm64/mips32/mips64/riscv32/riscv64 + 4 KB entropy</p>
+<p>mapping to locate code regions in raw images). Derived facts only; no</p>
+<p>binary content.</p>
+<p>Device identity (LineageOS wiki index, 2026-11-11): Xiaomi Redmi Note 10S</p>
+<p>4G / POCO M5s family, codename <code>rosemary</code>, SoC "MediaTek Helio G95"</p>
+<p>(= MT6785V family), released 2021-04, official branches 20 → 24.0.</p>
+<h2>Results</h2>
+<h3>Partition set (payload manifest, 21 partitions)</h3>
+<p>Firmware: <code>md1img</code> (modem, 60,190,720 B), <code>scp</code> (2,207,744), <code>sspm</code></p>
+<p>(663,552), <code>spmfw</code> (16,384), <code>audio_dsp</code> (1,404,928), <code>cam_vpu1/2/3</code></p>
+<p>(1,150,976 / 8,286,208 / 8,192), <code>tee</code> (2,560,000), <code>gz</code> (1,265,664), <code>lk</code></p>
+<p>(1,855,488), <code>preloader_raw</code> (352,256), <code>vbmeta{,_system,_vendor}</code> (4,096</p>
+<p>each). Android: <code>boot</code> (67,108,864), <code>dtbo</code> (8,388,608), <code>system</code></p>
+<p>(1,194,274,816), <code>system_ext</code> (582,656,000), <code>product</code> (1,747,333,120),</p>
+<p><code>vendor</code> (785,686,528). **No <code>mcupm</code>, <code>dpm</code>, <code>vcp</code>, or <code>piimg</code> partitions</p>
+<p>exist on this device** — those names belong to other MTK generations; the</p>
+<p>MT6785 firmware set is exactly the 12 firmware partitions above.</p>
+<h3>Per-partition architecture map (the ISA map of the MT6785 firmware set)</h3>
+<table>
+<tr>
+<th>partition / payload</th>
+<th>container</th>
+<th>architecture evidence</th>
+<th>verdict</th>
+</tr>
+<tr>
+<td><code>md1img</code> → <code>md1rom</code> (26,682,512 B)</td>
+<td>mtk_hdr</td>
+<td>raw image, no ELF, no arch strings; all-ISA decode sanity fails (see negatives)</td>
+<td><strong>nanoMIPS per prior art (NCC/taszk), unverified from bytes</strong> <em>(overturned 2026-11-12 by F-31: decode-verified MIPS32+MIPS16e)</em></td>
+</tr>
+<tr>
+<td><code>md1img</code> → <code>md1drdi</code> (1,368,064 B)</td>
+<td>mtk_hdr</td>
+<td>avg entropy 0.8–1.5 (mostly zero-padded), no header, no code signature</td>
+<td>data/debug image; no ISA claim</td>
+</tr>
+<tr>
+<td><code>md1img</code> → <code>md1dsp</code> (6,783,260 B)</td>
+<td>GFH MMM-chain (sig_type=0, load_addr=0xFFFFFFFF)</td>
+<td>GFH records ver=1; record type <strong>260 (0x104)</strong> — beyond U-Boot's enum {0,1,2,3,7,8}; code region begins with ASCII magic <strong><code>DSP!</code></strong></td>
+<td>DSP bootloader image (modem DSP = Coresonic-class per cyrozap/NCC DSP symbol history); ISA not decodable <em>(superseded 2026-11-12 by F-36: MD32-class, container byte-verified; decode gap diagnosed in F-45)</em></td>
+</tr>
+<tr>
+<td><code>md1img</code> → <code>md1_filter*</code> ×8, <code>md1_emfilter</code>, <code>md1_mddbmeta</code>, <code>md1_mddbmetaodb</code> (gzip XML, 2.9 MB decoded), <code>md1_mddb</code>, <code>md1_mdmlayout</code>, <code>md1_file_map</code></td>
+<td>mtk_hdr, unsigned</td>
+<td>modem catcher-filter/DB payloads; <code>md1_mddbmetaodb</code> = gzipped modem-DB XML (<code>kal_uint32</code> type tables); <code>md1_file_map</code> = plain-text name map</td>
+<td>data; no ISA</td>
+</tr>
+<tr>
+<td><code>scp</code> → <code>tinysys-loader-CM4_A</code> (1,080 B)</td>
+<td>mtk_hdr</td>
+<td>Cortex-M vector table: SP=0x538, reset=0x1e1 (odd = Thumb), 6× handler 0x26d</td>
+<td><strong>ARM Cortex-M4 (Thumb)</strong></td>
+</tr>
+<tr>
+<td><code>scp</code> → <code>tinysys-scp-CM4_A</code> (1,824,584 B)</td>
+<td>mtk_hdr</td>
+<td>header = u32 table (0xb8180, 0x387d9, 0x392f9, …) — section table; strings <code>SCP_VOW_TASK_VER</code>, <code>VER_18041204</code>, version <code>2.4.4-9d0f65f</code></td>
+<td>tinysys multibin; ISA via its dram image below</td>
+</tr>
+<tr>
+<td><code>scp</code> → <code>tinysys-scp-CM4_A_dram</code> (366,952 B)</td>
+<td>mtk_hdr</td>
+<td>capstone thumb2 <strong>256/256</strong> (<code>push {r4,lr}; mov r4,r0; mov r0,r1</code>), every other ISA <strong>0/256</strong>; strings <code>kernel/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c</code>, <code>kernel/FreeRTOS/Source/tasks.c</code>, <code>FreeRTOS %s(build:%s %s)</code></td>
+<td><strong>ARM Cortex-M4F + FreeRTOS — instruction-level confirmed</strong></td>
+</tr>
+<tr>
+<td><code>sspm</code> → <code>tinysys-sspm</code> (657,704 B)</td>
+<td>mtk_hdr</td>
+<td>own header magic <strong>0x58901690</strong> + fields (0x18, 0x116b0, 4); strings <code>vproc1/vproc2/vsram_proc1/vsram_proc2</code>, <code>[EMI] %s</code>; body entropy 7.95+ from 0x20000</td>
+<td><strong>encrypted/packed — no ISA claim</strong>; SSPM = power/security processor (per LK CCCI tables "Tinysys-SSPM ROM")</td>
+</tr>
+<tr>
+<td><code>spmfw</code> → <code>spmfw</code> (11,119 B)</td>
+<td>mtk_hdr</td>
+<td>header magic <strong><code>2MPS</code></strong> + embedded filename <code>spm_firmware.bin</code>; u32 table at 0x44 (0x1e0abe, 0x1e3200, 0x1e6a00 … SPM-SRAM-range values)</td>
+<td><strong>SPM/PCM microcode — programmable power-sequencer image, not a CPU ISA</strong></td>
+</tr>
+<tr>
+<td><code>audio_dsp</code> → <code>hifi3_a_dram</code> (32,768) / <code>hifi3_a_iram</code> (36,864) / <code>hifi3_a_sram</code> (1,320,904)</td>
+<td>mtk_hdr</td>
+<td><strong>self-reported core name <code>hifi3</code></strong> (Cadence HiFi3); iram head <code>06 15 00 00 08 ff ff ff</code>; sram contains audio task strings (<code>PCM_HWFREE*</code>, <code>scp_addr</code>, <code>scp_ipi_registration</code>)</td>
+<td><strong>Cadence HiFi3 (Xtensa) — name-level ID; byte-level pending (no capstone Xtensa)</strong></td>
+</tr>
+<tr>
+<td><code>cam_vpu1/2</code> (1,145,104 / 8,280,528)</td>
+<td>mtk_hdr</td>
+<td>entropy-mapped code regions; capstone thumb2 58–64/64 vs arm32 1–7/64, mips32 0–1/64; 201 <code>push {…,lr}</code> prologues in first 1 MB; 447 × <code>VPU6</code> strings; <code>VERSION_MAJOR/MINOR</code>, <code>SW_VERSION</code></td>
+<td><strong>ARM32 Thumb-2 camera-VPU ("VPU6" generation) firmware</strong></td>
+</tr>
+<tr>
+<td><code>cam_vpu3</code> (3,392 B)</td>
+<td>mtk_hdr</td>
+<td>head <code>09 01 11 17 06 17 12 24</code> (same as vpu1/vpu2)</td>
+<td>stub/placeholder payload for VPU3</td>
+</tr>
+<tr>
+<td><code>tee</code> → <code>atf</code> (170,496 B)</td>
+<td>mtk_hdr</td>
+<td>payload header: byte-swapped ASCII words <code>EET </code>/<code>KTM </code> (i.e. "TEE "/" MTK" stored per-word BE) + size fields (0x297c0 ×2); strings <code>SPM_*</code>, <code>TEE_PARAMETER_BASE</code>, <code>TEE_SECMEM</code>, <code>atf-ramdump</code></td>
+<td><strong>ARM Trusted Firmware (EL3) for MT6785</strong> — AArch64 expected, byte-probe not run (policy: census-only)</td>
+</tr>
+<tr>
+<td><code>tee</code> → <code>tee</code> (2,377,216 B)</td>
+<td>mtk_hdr</td>
+<td>same <code>TEE </code>/<code> MTK</code> header family; string <code>TEEI</code> (MicroTrust TEEi marker)</td>
+<td><strong>MTK TEE (MicroTrust/TEEi flavor)</strong> — census-only, no code RE (policy boundary)</td>
+</tr>
+<tr>
+<td><code>gz</code> → <code>gz</code> (1,115,632 B)</td>
+<td>mtk_hdr</td>
+<td>opaque high-entropy body from offset 0 (no readable header)</td>
+<td><strong>GenieZone hypervisor/TEE image, encrypted — no ISA claim</strong></td>
+</tr>
+<tr>
+<td><code>gz</code> → <code>unmap2</code> (143,072 B)</td>
+<td>mtk_hdr</td>
+<td>entropy 7.95–7.97 throughout, unsigned</td>
+<td>encrypted auxiliary image; no claim</td>
+</tr>
+<tr>
+<td><code>lk</code> → <code>lk</code> (1,665,018 B)</td>
+<td>mtk_hdr</td>
+<td>first word <code>0xea000007</code> (<code>b #0x24</code>) = ARM32 branch; arm32 decode dominant (83/256 vs thumb2 40/256, others junk); strings: chip table <code>MT6785V/CB,CC,CU,CV,WB</code>, tinysys loader table (<code>tinysys-loader-CM4_A</code>, <code>tinysys-scp-CM4_A</code>, <code>tinysys-scp-CM4_A_dram</code>), <code>SPM firmware version</code></td>
+<td><strong>ARM32 (A32) Little Kernel bootloader</strong></td>
+</tr>
+<tr>
+<td><code>lk</code> → <code>lk_main_dtb</code> (168,829 B)</td>
+<td>mtk_hdr</td>
+<td>head <code>d00dfeed</code> (FDT magic); strings <code>MT6359</code>, <code>MT6785</code>, <code>scp-sys-md1-main</code></td>
+<td>device tree</td>
+</tr>
+<tr>
+<td><code>lk</code> → <code>kaeru</code> (10,839 B)</td>
+<td>mtk_hdr, unsigned</td>
+<td>capstone thumb2 256/256 (<code>movs r0,#0; push {r4,lr}; bl</code>); banner <code>****…</code>; rest high-entropy</td>
+<td><strong>Thumb-2 LK-adjacent module, identity of "kaeru" undetermined</strong></td>
+</tr>
+<tr>
+<td><code>preloader_raw</code> (352,256 B)</td>
+<td>GFH MMM-chain (per U-Boot <code>mtk_image.h</code>)</td>
+<td>FILE_INFO: name "FILE_INFO", file_type=1, flash_type=5 (GEN), <strong>sig_type=5 (opaque — matches the RSA cert pairs)</strong>, load_addr=<strong>0x00200f10</strong> (SRAM), total 0x55134, jump_offset=0xf0; BL_INFO attr=1; BROM_CFG cfg_bits=0x90 (no <code>JUMP_BL_ARM64_EN</code>); ANTI_CLONE; BROM_SEC_CFG; code at 0xF4 = <strong><code>0xea000005</code> (A32 branch)</strong></td>
+<td><strong>ARM32 preloader, SRAM load 0x200F10, RSA-signed (sig_type 5)</strong></td>
+</tr>
+<tr>
+<td><code>vbmeta{,_system,_vendor}</code></td>
+<td>AVB0</td>
+<td>standard AVB 1.0 headers</td>
+<td>Android Verified Boot</td>
+</tr>
+</table>
+<h3>The camera CCU fleet — Synopsys ARCv2 (new, userspace)</h3>
+<p><code>vendor/firmware/</code> ships 21 non-ARM ELF32 EXECs — the Camera Control Unit</p>
+<p>firmware loaded by the MTK camera HAL:</p>
+<table>
+<tr>
+<th>file</th>
+<th>size</th>
+<th>entry</th>
+<th>phdrs</th>
+<th>notes</th>
+</tr>
+<tr>
+<td><code>lib3a.ccu</code></td>
+<td>1,429,664</td>
+<td>0xb4</td>
+<td>4</td>
+<td>LOAD RWX @vaddr 0 (filesz 0x7640), RWX @0x10000000 (0x27d0c), RW @0x80000000 (0xc14), RW @0x80000c18 (bss 0x6b64); <code>.ARC.attributes</code>; CCU AE algo strings (<code>CCU_SENSOR_MARGIN_ERROR</code>, <code>STACK_OVERFLOW</code>); sha256_16 <code>13cbabedb3d7ff71</code></td>
+</tr>
+<tr>
+<td><code>libccu_&lt;sensor&gt;_mipi_&lt;t&gt;1</code> ×10</td>
+<td>13,680–15,760</td>
+<td>0x10038000</td>
+<td>2</td>
+<td>per-sensor firmware, <strong>core 1</strong>; sensors: gc02m1b sunny/ofi, imx355 sunny/ofi, ov02b1b ofi, ov13b10 sunny/ofi, ov64b40 ofi/semco</td>
+</tr>
+<tr>
+<td><code>libccu_&lt;sensor&gt;_mipi_&lt;t&gt;2</code> ×10</td>
+<td>13,680–15,760</td>
+<td>0x1003c000</td>
+<td>2</td>
+<td>same sensors, <strong>core 2</strong> — entries 16 KB apart</td>
+</tr>
+</table>
+<p>All 21 carry <code>e_machine=195</code>. Identification chain: (1) readelf resolves</p>
+<p>195 → <strong>ARCv2</strong> (binutils <code>EM_ARC_COMPACT2</code>); (2) each per-sensor image</p>
+<p>embeds <code>GCC: (ARCompact/ARCv2 ISA elf32 toolchain 2017.09) 7.1.1 20170710</code></p>
+<p>followed by the ARC ISA-extension string <code>BITSCAN,CD,DIV_REM,FPUDA,BS</code>;</p>
+<p>(3) leaked MTK CCU build config (android_ccu_tool, MT6779 gen) builds the</p>
+<p>same artifacts with `arc-elf32-gcc -mcpu=em4_fpus -DCPU_ARCEM</p>
+<p>-mfpu=fpus_fma` and <strong>two</strong> link scripts → the 1/2 file pairs are **two ARC</p>
+<p>EM4 (FPU) cores**, matching the 16 KB entry spacing; the <code>.ddr</code> artifact in</p>
+<p>that build is literally <code>cat pm1 pm2 &gt; module.ddr</code>, matching the pair</p>
+<p>layout. Registry note: glibc <code>elf.h</code> has <code>EM_TILE64=187</code>, <code>EM_TILEGX=191</code>,</p>
+<p><code>EM_TI_PRU=144</code>, and <strong>195 unassigned</strong> — the lab's FP6-era <code>census.py</code></p>
+<p>table ("195: TILE64", "93: TI PRU") is wrong on both counts; corrected</p>
+<p>table ships in <code>mediatek/tools/census_mtk.py</code> (93 = EM_ARC_COMPACT,</p>
+<p>195 = EM_ARC_COMPACT2 per binutils <code>include/elf/arc.h</code>).</p>
+<h3>Userspace census (vendor / system_ext / system / product ext4)</h3>
+<table>
+<tr>
+<th>image</th>
+<th>files</th>
+<th>bytes</th>
+<th>ELF machines</th>
+<th>notes</th>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>2,500</td>
+<td>843,948,054</td>
+<td>AArch64 1281, ARM 263, <strong>ARCv2 21</strong>, BPF 1</td>
+<td><code>bin/hw</code> 41 MTK HAL services (bluetooth/gnss/graphics/memtrack <code>…-mediatek</code>, NN <code>…-mtk-neuron</code>, keymaster <code>beanpod</code>); <code>lib64</code> 1162 files incl. <code>libcamalgo.*</code>; <code>thh/ta</code> 30 trustlets (UUID-named <code>.ta</code>, 11.7 MB — census-level only, policy); <code>etc/mdota</code> 142 modem-OTA configs (<code>MCF_OPOTA</code>, <code>SBPID</code>); <code>etc/audio_param</code> 113</td>
+</tr>
+<tr>
+<td><code>system_ext</code></td>
+<td>3,512</td>
+<td>460,338,798</td>
+<td>AArch64 58, ARM 12</td>
+<td>mostly terminfo/share; MTK IMS/telephony extension jars (<code>mediatek-ims-extension-plugin</code>), no firmware</td>
+</tr>
+<tr>
+<td><code>system</code></td>
+<td>3,244</td>
+<td>1,058,749,057</td>
+<td>AArch64 1108, ARM 472, BPF 11</td>
+<td>AOSP framework; 11 eBPF <code>.o</code> (standard Android); no MTK coprocessor images</td>
+</tr>
+<tr>
+<td><code>product</code></td>
+<td>496</td>
+<td>503,268,027</td>
+<td>AArch64 34, ARM 3</td>
+<td>media/priv-apps; nothing proprietary-ISA</td>
+</tr>
+</table>
+<p>The CCU fleet is the <strong>only</strong> non-ARM ELF family in the entire image set;</p>
+<p>everything else is AArch64/ARM32 userspace (plus 12 standard Android eBPF</p>
+<p>ELFs across vendor/system).</p>
+<h3>Container formats (empirical, cross-checked)</h3>
+<ol>
+<li><strong>mtk_hdr record chain</strong> (all partitions except preloader/vbmeta):</li>
+</ol>
+<p>   `{magic 0x58881688 @0, payload size @4, NUL-padded ASCII name @8 (≥20</p>
+<p>   bytes on MT6785: "tinysys-loader-CM4_A" needs it — the 8-byte name of</p>
+<p>   older docs truncates)<code>, extension record </code>0x58891689 @0x30` with header</p>
+<p>   size 0x200 @0x34 and payload alignment 0x10 @0x44; next record at</p>
+<p>   align(payload_end). Matches zrax's socboot2 empirical model and wairz's</p>
+<p>   16-byte-alignment sub-image walk, byte-for-byte — against a **production</p>
+<p>   device image** (zrax tested synthetic fixtures only).</p>
+<ol>
+<li><strong>GFH MMM-chain</strong> (preloader_raw, md1dsp): records</li>
+</ol>
+<p>   <code>{magic_version 0x014D4D4D, size u16, type u16}</code> with types 0 (FILE_INFO),</p>
+<p>   1 (BL_INFO), 7 (BROM_CFG), 2 (ANTI_CLONE), 8 (BROM_SEC_CFG) on the</p>
+<p>   preloader — exactly U-Boot's structs; **md1dsp adds type 260 (0x104),</p>
+<p>   absent from U-Boot's enum**.</p>
+<ol>
+<li><strong>Per-payload signature</strong>: every <em>code</em> payload is followed by</li>
+</ol>
+<p>   <code>cert1</code> (1,709 B) and <code>cert2</code> (957 B) records, both starting</p>
+<p>   <code>30 82 …</code> (DER X.509 SEQUENCEs) — a two-certificate RSA chain per image.</p>
+<p>   Modem data payloads ship unsigned.</p>
+<h3>Version strings</h3>
+<table>
+<tr>
+<th>blob</th>
+<th>version evidence</th>
+</tr>
+<tr>
+<td>md1rom / md1dsp / md1_file_map</td>
+<td><strong><code>MOLY.LR13.R1.MP.V89.6.P79</code></strong> (+ <code>MOLY_LR13_R1_MP_V89_6_P79.bin/.EDB/.XML.GZ</code> names; verified present in <code>md1_file_map</code>)</td>
+</tr>
+<tr>
+<td>silicon/flavor</td>
+<td><code>MT6785_S00</code>, <code>MT6295_S00</code> (modem DSP die), <code>G95UySW</code> (Helio G95 flavor in md1_mddb)</td>
+</tr>
+<tr>
+<td>lk</td>
+<td>chip support table <code>MT6785V/CB /CC /CU /CV /WB</code>, <code>MT6359</code> (PMIC)</td>
+</tr>
+<tr>
+<td>scp</td>
+<td>component version <code>2.4.4-9d0f65f</code> (git-hash style), <code>VER_18041204</code>, FreeRTOS build string <code>FreeRTOS %s(build:%s %s)</code></td>
+</tr>
+<tr>
+<td>cam_vpu1/2</td>
+<td><code>VPU6</code> (camera VPU generation 6), <code>VERSION_MAJOR/MINOR</code>, <code>SW_VERSION</code></td>
+</tr>
+<tr>
+<td>ccu</td>
+<td>toolchain ident <code>GCC (ARCompact/ARCv2 ISA elf32 toolchain 2017.09) 7.1.1</code>; lib3a <code>Version 8282002</code>, <code>OpenCCUAE open 0225</code></td>
+</tr>
+<tr>
+<td>atf/tee</td>
+<td><code>atf-ramdump</code>, <code>TEEI</code> (MicroTrust TEEi) — no full build string recoverable (census-only boundary)</td>
+</tr>
+<tr>
+<td>ELBRUS</td>
+<td><strong>0 occurrences tree-wide</strong> — the brand codename does not appear on this MT6785 build</td>
+</tr>
+</table>
+<h2>Findings</h2>
+<ol>
+<li>**MTK tinysys = Cortex-M4(F) + FreeRTOS on MT6785, instruction-level</li>
+</ol>
+<p>   proven** — upgrades wairz's classifier claim to verified fact for a</p>
+<p>   phone SoC: vector table + Thumb-2 decode 256/256 + embedded</p>
+<p>   <code>ARM_CM4F/port.c</code> FreeRTOS path. The RISC-V tinysys story belongs to</p>
+<p>   mt8186/mt8192+ generations, not Helio G95.</p>
+<ol>
+<li><strong>The camera CCU fleet is Synopsys ARCv2 (2× ARC EM4-FPU cores)</strong> —</li>
+</ol>
+<p>   <code>e_machine=195</code> = EM_ARC_COMPACT2, vendor's own GCC ident, dual-core</p>
+<p>   entry spacing matching leaked build config. First published</p>
+<p>   binary-level (ELF header/segment/entry) identification of CCU firmware</p>
+<p>   on a production device, to our knowledge; the leaked <code>ccu_arc_binary.mk</code></p>
+<p>   implies ARC for MT6779 by build flags but is not an analysis and names</p>
+<p>   no production build. This parallels the FP6 result (camera ICP =</p>
+<p>   RISC-V): **Qualcomm and MediaTek independently chose unusual RISC cores</p>
+<p>   for camera coprocessors in the same period.**</p>
+<ol>
+<li><strong>Zero ELF files in the firmware partition set.</strong> The Qualcomm</li>
+</ol>
+<p>   MDT/ELF methodology does not transfer to MTK firmware: <code>e_machine</code></p>
+<p>   evidence does not exist there; architecture comes from record names,</p>
+<p>   branch/vector words, and decode-rate sanity. ELFs appear only in</p>
+<p>   userspace partitions — where 21 of ~9,700 files are still non-ARM (ARC).</p>
+<ol>
+<li>**Per-payload dual X.509 signing (cert1 1709 B + cert2 957 B) wraps</li>
+</ol>
+<p>   every code payload**, incl. spmfw and sspm; modem data payloads are</p>
+<p>   unsigned. The preloader's <code>sig_type=5</code> (outside U-Boot's 0/1 enum)</p>
+<p>   corresponds to this RSA-certificate scheme.</p>
+<ol>
+<li><strong>spmfw is PCM microcode, not CPU firmware</strong> — <code>2MPS</code> magic + embedded</li>
+</ol>
+<p>   <code>spm_firmware.bin</code> name; there is no "CPU" to name, matching wairz's</p>
+<p>   comment and the SPM's programmable-sequencer design.</p>
+<ol>
+<li><strong>audio_dsp = HiFi3 (Xtensa)</strong> by self-report — on MT6785 the MTK ADSP</li>
+</ol>
+<p>   is HiFi3, not the RISC-V ADSP of mt8186+/SOF platforms and not the</p>
+<p>   Cortex-M tinysys family. Three distinct "small core" ISAs (Cortex-M4</p>
+<p>   Thumb, HiFi3 Xtensa, PCM microcode) + an ARCv2 camera pair coexist on</p>
+<p>   one SoC next to an A32 preloader/LK and (presumably) AArch64 ATF.</p>
+<ol>
+<li><strong>md1dsp GFH record type 260 is beyond the public U-Boot enum</strong> and the</li>
+</ol>
+<p>   payload opens with an undocumented <code>DSP!</code> magic — the modem DSP loader</p>
+<p>   format is publicly undecoded (NCC's <code>md1_dbginfodsp</code> symbol work covers</p>
+<p>   DSP <em>code</em>, not this container).</p>
+<ol>
+<li><strong>Encrypted subsystems</strong>: sspm body, gz, and unmap2 are high-entropy</li>
+</ol>
+<p>   (≥7.95) with no readable headers; tinysys-sspm carries its own magic</p>
+<p>   <code>0x58901690</code>. Any deeper work on these needs decrypt-first tooling.</p>
+<ol>
+<li><strong>Tool correction for the lab</strong>: EM_NAMES in FP6-era census.py mislabeled</li>
+</ol>
+<p>   195 (TILE64→actually unassigned in glibc; binutils EM_ARC_COMPACT2) and</p>
+<p>   93 (TI PRU→actually EM_ARC_COMPACT; TI PRU=144). Any Qualcomm corpus</p>
+<p>   re-scan should use the corrected table.</p>
+<h2>Negative results / limitations</h2>
+<ul>
+<li><strong>md1rom ISA not independently verified.</strong> Public prior art (NCC Group</li>
+</ul>
+<p>  ghidra-mtk-loader/mtk_bp, taszk 2023) identifies MediaTek modem firmware</p>
+<p>  as nanoMIPS for Helio/Dimensity generations; capstone has no nanoMIPS</p>
+<p>  decoder, and 12+ probed md1rom windows give no dominant supported ISA</p>
+<p>  (arm32 0–32/48, thumb2 0–45/48, mips32 0–26/48) — consistent with an</p>
+<p>  unknown encoding plus data regions. Claim stands on prior art only.</p>
+<p>  *(Overturned 2026-11-12 by F-31: 4-language decode-density pins MIPS32</p>
+<p>  entry + MIPS16e islands — see <code>docs/md1rom-decode.md</code>.)*</p>
+<ul>
+<li><strong>HiFi3 (Xtensa) not byte-verified</strong> — no capstone backend; name-level</li>
+</ul>
+<p>  identification only.</p>
+<ul>
+<li><strong>ARCv2 decode not byte-verified</strong> — capstone has no ARC backend either;</li>
+</ul>
+<p>  identification rests on the vendor's own GCC ident string + readelf</p>
+<p>  registry + leaked build flags (three independent sources).</p>
+<ul>
+<li><strong>sspm/gz/unmap2 encrypted</strong> — header facts recorded, no code census.</li>
+<li>**TEE (atf/tee) and Trustonic trustlets (<code>vendor/thh/ta</code>) censused at</li>
+</ul>
+<p>  container level only** (header magic, sizes, identity strings, UUID</p>
+<p>  names) — no disassembly, per lab TZ policy boundary.</p>
+<ul>
+<li><strong>ATF (EL3) not AArch64-confirmed</strong> from bytes (probe not run);</li>
+</ul>
+<p>  expected for a 64-bit SoC's EL3.</p>
+<ul>
+<li><code>boot</code>/<code>dtbo</code> Android boot images not decompressed (framework side;</li>
+</ul>
+<p>  vendor carries the device-specific payload).</p>
+<ul>
+<li><code>kaeru</code> (LK, Thumb, 10.8 KB, unsigned) — identity undetermined; flagged</li>
+</ul>
+<p>  for follow-up.</p>
+<ul>
+<li>No disassembly-level proof that <code>atf</code> is AArch64 (expected for EL3 on a</li>
+</ul>
+<p>  64-bit SoC; BROM_CFG lacks the U-Boot ARM64 hand-off flag, which per</p>
+<p>  zrax socboot2 claims nothing either way).</p>
+<h2>Reproduce</h2>
+<pre><code class="language-bash">
+python3 tools/payload_manifest.py payload.bin                     # 21 partitions
+python3 tools/payload_dump.py payload.bin md1img md1img.img       # + 18 more
+python3 tools/payload_dump.py payload.bin vendor vendor.img       # ext4 images
+python3 tools/payload_walk.py extract/parts extract/trees         # 49 records
+python3 -I tools/extract_ext4.py vendor.img / extract/trees/vendor # + 3 more
+python3 -I tools/census_mtk.py extract/trees/vendor --out vendor-census.json
+python3 tools/isa_probe.py trees/scp/06_tinysys-scp-CM4_A_dram.bin 0
+python3 tools/region_scan.py trees/sspm/00_tinysys-sspm.bin
+python3 -I tools/make_compact.py &lt;full.json&gt; rosemary-census.json
+readelf -h extract/trees/vendor/firmware/lib3a.ccu                # Machine: ARCv2
+</code></pre>
+<p>(All scripts under <code>mediatek/tools/</code>; <code>payload_manifest.py</code>/<code>payload_dump.py</code></p>
+<p>are unmodified copies of the FP6-era lab tools; <code>census_mtk.py</code>,</p>
+<p><code>payload_walk.py</code>, <code>isa_probe.py</code>, <code>region_scan.py</code>, <code>entry_sanity.py</code>,</p>
+<p><code>make_compact.py</code>, <code>extract_ext4.py</code> are adapted/MTK-specific — census_mtk</p>
+<p>carries the corrected EM_NAMES registry.)</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations — clean-room, spec-derived components — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations — clean-room, spec-derived components</h1><p>Everything here is implemented from the lab&#x27;s published spec documents and</p><p>Evidence: none</p>
+<h1>implementations — clean-room, spec-derived components</h1>
+<p>Everything here is implemented from the lab's published spec documents and</p>
+<p>public GPL kernel sources only. No proprietary code, headers, or strings</p>
+<p>were read by any implementer; no proprietary payload is committed. Each</p>
+<p>component carries a clean-room statement header and a self-test.</p>
+<table>
+<tr>
+<th>component</th>
+<th>source spec</th>
+<th>status</th>
+</tr>
+<tr>
+<td><a href="wmi/dispatch-registry/">wmi/dispatch-registry</a></td>
+<td>papers/wmi-dispatch-architecture.md + qualcomm-fp6/docs/wmi-* (F-22/F-23/F-28/F-29)</td>
+<td>self-test passing (33 checks)</td>
+</tr>
+<tr>
+<td><a href="wmi/tlv/">wmi/tlv</a></td>
+<td>public ath11k wmi.h (GPL) framing facts</td>
+<td>self-test passing (36 checks)</td>
+</tr>
+<tr>
+<td><a href="ce/service-model/">ce/service-model</a></td>
+<td>public ath11k ce.h/hw.c + docs/interface-copyengine.md</td>
+<td>self-test passing (29 checks)</td>
+</tr>
+<tr>
+<td><a href="htc/frame-layer/">htc/frame-layer</a></td>
+<td>public ath11k htc.h (GPL) frame/service facts</td>
+<td>self-test passing (23 checks)</td>
+</tr>
+<tr>
+<td><a href="htt/">htt</a></td>
+<td>none committed — open item</td>
+<td>documented gap</td>
+</tr>
+<tr>
+<td><a href="lpec/frame-parser/">lpec/frame-parser</a></td>
+<td>open-discovery-lab track-c lpec spec docs (F-47/F-48/F-49 + pass3)</td>
+<td>packaged, byte-exact per pass3 validation</td>
+</tr>
+<tr>
+<td><a href="mediatek/container/">mediatek/container</a></td>
+<td>rosemary census "Container formats" + U-Boot tools/mtk_image.h (GPL)</td>
+<td>self-test passing (57 checks incl. md32-interface)</td>
+</tr>
+<tr>
+<td><a href="mediatek/md1rom-taskmap/">mediatek/md1rom-taskmap</a></td>
+<td>rosemary census md1rom regions (F-31)</td>
+<td>self-test passing; 6 explicit stubs</td>
+</tr>
+<tr>
+<td><a href="mediatek/md32-interface/">mediatek/md32-interface</a></td>
+<td>F-45 MD32 interface lever-2 facts</td>
+<td>self-test passing</td>
+</tr>
+<tr>
+<td><a href="qca-bt/">qca-bt</a></td>
+<td>public btqca.h/btqca.c (GPL, torvalds/linux master, fetched 2026-11-16) — TLV patch/NVRAM container families (crbtfw/apbtfw/crnv/apnv …)</td>
+<td>unittest suite passing (30 tests)</td>
+</tr>
+</table>
+<p>Build: <code>gcc -std=c99 -Wall -Wextra -O2 -o test &lt;comp&gt;/test_*.c &lt;comp&gt;/*.c</code> (each</p>
+<p>test binary self-validates and exits non-zero on any failure).</p>
+<h2>Liaison target</h2>
+<p><a href="https://codeberg.org/rsavoye/librephone/pulls/58">upstream PR #58</a> ("Add WCN6750</p>
+<p>AMSS Zephyr implementation", state open, author L123123, fetched 2026-11-16)</p>
+<p>states in its own body: "WMI/HTT/CE and the RF/PHY stack are not implemented."</p>
+<p>The WMI/CE/HTC components here are written against the lab's decoded WCN6750</p>
+<p>wpss dispatch spec — the exact gap the PR names.</p>
+<h2>RULE 0 prior-art record (all searches 2026-11-16)</h2>
+<ul>
+<li><code>Qualcomm Bluetooth ROM patch .tlv format reverse engineering crbtfw apbtfw</code></li>
+</ul>
+<p>  — no dedicated RE writeup of the QCA .tlv patch format exists; adjacent work</p>
+<p>  is Broadcom/Realtek RE + mainline <code>drivers/bluetooth/btqca.c</code> protocol code.</p>
+<ul>
+<li><code>"lpec" audio codec reverse engineering lineage phone qmi</code> — zero hits; LPEC</li>
+</ul>
+<p>  is Sony's voice-recorder codec (MultimediaWiki MSV page, 2009, container-only);</p>
+<p>  no open-source decoder (confirmed again 2026-11-14 in the lab's F-47 census).</p>
+<ul>
+<li>`android proprietary blob database coverage matrix per-device firmware census</li>
+</ul>
+<p>  lineageos` — closest: "An Empirical Study of Proprietary Vendor Blobs in</p>
+<p>  Android" (ICPADS 2024, arXiv:2410.11075, 13k firmware releases, staleness</p>
+<p>  focus) and per-device <code>proprietary-blobs.txt</code> build manifests. Neither is a</p>
+<p>  RE-status coverage matrix; delta recorded, not rebuilt.</p>
+<ul>
+<li><code>"bm2n" bin adsp firmware reverse engineering qualcomm</code> — no direct hits for</li>
+</ul>
+<p>  the bm2nXX fleet; adjacent: linux-msm/hexagon-dsp-binaries, TR25 hexagon RE,</p>
+<p>  SRLabs hexagon fuzzing, bkerler QDSP walkthrough.</p>
+<ul>
+<li>`ath11k WMI dispatcher firmware side reference implementation table driven</li>
+</ul>
+<p>  clean room` — no firmware-side clean-room dispatcher reference exists</p>
+<p>  publicly; ath11k's host-side dispatcher is table-driven but is not the</p>
+<p>  decoded firmware architecture implemented here.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

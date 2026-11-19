@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>md1rom decode-verified: MIPS32 + MIPS16e hybrid — the nanoMIPS prior-art attribution does NOT apply to MT6785 (F-31) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>md1rom decode-verified: MIPS32 + MIPS16e hybrid — the nanoMIPS prior-art attribution does NOT apply to MT6785 (F-31)</h1><p>**Finding:** The MT6785 (&quot;rosemary&quot;, Helio G95) modem firmware `md1rom`</p><p>Evidence: none</p>
+<h1>md1rom decode-verified: MIPS32 + MIPS16e hybrid — the nanoMIPS prior-art attribution does NOT apply to MT6785 (F-31)</h1>
+<p><strong>Finding:</strong> The MT6785 ("rosemary", Helio G95) modem firmware <code>md1rom</code></p>
+<p>(26,682,512 B) is <strong>not nanoMIPS</strong>. Byte-level decode testing in Ghidra 12.2</p>
+<p>shows it is a classic MTK 4G-generation hybrid: a **MIPS32 little-endian reset</p>
+<p>trampoline at 0x0** (a fully coherent 4-instruction sequence</p>
+<p><code>lui a2,0x174; addiu a2,a2,0x2ed0; jr a2; mtc0 zero,Count</code>) followed by</p>
+<p><strong>MIPS16e-compressed code islands</strong> (Ghidra language <code>MIPS:LE:32:16e</code> gives</p>
+<p>88–100.8 % instruction coverage in 256-byte windows at 0x200000, 0x700000,</p>
+<p>0xe00000, 0x1200000, 0x1300000, 0x1400000 where pure MIPS32, microMIPS and</p>
+<p>nanoMIPS all fail), interleaved with zero-coverage data/payload regions.</p>
+<p>microMIPS is ruled out. A first-public nanoMIPS confirmation is therefore</p>
+<p><strong>overturned</strong> for this chip: prior art (NCC ghidra-mtk-loader, taszk 2023)</p>
+<p>establishes nanoMIPS for Dimensity-generation modems (MT6873+, NR16 build</p>
+<p>2023); MT6785 is one generation earlier (MOLY LR13, 2020) and its ISA matches</p>
+<p>the older MIPS32+MIPS16e baseband architecture. No public decode-level</p>
+<p>analysis of MT6785 md1rom exists (per F-16 prior-art audit); this is the first</p>
+<p>instruction-level characterization of this image we are aware of.</p>
+<h2>Claim</h2>
+<ol>
+<li><strong>Entry point at 0x0</strong> (image imports as one flat block at base 0x0): the</li>
+</ol>
+<p>   reset vector decodes as real MIPS32 LE code under <code>MIPS:LE:32:default</code>:</p>
+<p>   ```</p>
+<p>   00000000: lui   a2,0x174        ; word 0x3c060174</p>
+<p>   00000004: addiu a2,a2,0x2ed0     ; word 0x24c62ed0</p>
+<p>   00000008: jr    a2               ; word 0x00c00008  → jump to 0x176ed0</p>
+<p>   0000000c: _mtc0 zero,Count       ; COP0, delay slot — clear the Count timer</p>
+<p>   ```</p>
+<p>   A <code>lui/addiu/jr</code> trampoline followed by a CP0 write is a textbook MTK</p>
+<p>   bootloader reset sequence; it is not a container header misread as code.</p>
+<p>   After it, bytes <code>00 65</code> repeat to 0x30 (padding filler), explaining why</p>
+<p>   whole-image auto-analysis left 0x0 undefined until disassembly is forced.</p>
+<ol>
+<li><strong>MIPS16e code islands decode densely</strong> under <code>MIPS:LE:32:16e</code> where</li>
+</ol>
+<p>   MIPS32-only cold-start fails (the two languages share <code>mips16.sinc</code>; the</p>
+<p>   16e variant only changes the <em>initial</em> ISA mode, so window comparison is</p>
+<p>   the right discriminator — see table).</p>
+<ol>
+<li><strong>microMIPS is ruled out</strong>: <code>MIPS:LE:32:micro</code> peaks at 12.5 % coverage in</li>
+</ol>
+<p>   a code window and is near-zero everywhere else.</p>
+<ol>
+<li><strong>nanoMIPS is ruled out at decode level</strong>: the NCC ghidra-nanomips</li>
+</ol>
+<p>   processor module (v0.3.3, pure-SLEIGH) was built against Ghidra 12.2 and</p>
+<p>   the identical windows tested — near-zero coverage on every code island</p>
+<p>   (median 0.78 %, max 3.91 % in code), while MIPS16e decodes the same bytes</p>
+<p>   at 88–100.8 %. Build notes below for reproducibility.</p>
+<ol>
+<li>Version strings recovered at decode level: build</li>
+</ol>
+<p>   <strong>MOLY.LR13.R1.MP.V89.6.P79</strong> (modem OS version, matches the</p>
+<p>   <code>md1_file_map</code> census hit), flavor path</p>
+<p>   <code>mtk_rel/XIAOMI_S0MP1_K6785V1_64/LWCTG_CUSTOM/L4/csm/ss/…</code> (Xiaomi-class</p>
+<p>   build of MOLY LR13 for MT6785). Auto-analysis of the full image creates</p>
+<p>   1,322,630 instructions and 16,297 functions under <code>MIPS:LE:32:default</code>.</p>
+<h2>Prior art (with dates)</h2>
+<ul>
+<li><a href="https://github.com/nccgroup/ghidra-mtk-loader">NCC Group ghidra-mtk-loader</a></li>
+</ul>
+<p>  (verified verbatim: "Currently, only nanoMIPS-based firmware is supported")</p>
+<p>  + <a href="https://github.com/nccgroup/ghidra-nanomips">ghidra-nanomips</a> — establishes</p>
+<p>  nanoMIPS for the md1img samples NCC processed (Dimensity-era builds; their</p>
+<p>  docs reference an MT6879/NR16 build dated 2023).</p>
+<ul>
+<li><a href="https://labs.taszk.io/articles/post/full_chain_bb_part1">taszk labs full-chain baseband series, part 1</a></li>
+</ul>
+<p>  (2023-12-07, Daniel Komaromy) — "our nanoMIPS decompiler, debugger, and</p>
+<p>  emulator for Mediatek basebands" (Dimensity-generation work).</p>
+<ul>
+<li>Neither source names MT6785; the census (F-16) generalized the attribution</li>
+</ul>
+<p>  and flagged it unverified-from-bytes. This doc resolves that flag.</p>
+<h2>Method</h2>
+<ol>
+<li>Input: <code>md1img</code> → <code>00_md1rom.bin</code> (26,682,512 B) from the rosemary payload</li>
+</ol>
+<p>   tree (F-16/F-17 extraction, mtk_hdr chain, no ELF).</p>
+<ol>
+<li>Ghidra 12.2 PUBLIC headless, each candidate language imports the image as a</li>
+</ol>
+<p>   raw binary flat block at base <strong>0x0</strong>, <strong>no auto-analysis</strong> (cold-start):</p>
+<p>   <code>MIPS:LE:32:default</code> (MIPS32), <code>MIPS:LE:32:16e</code> (MIPS16e initial mode),</p>
+<p>   <code>MIPS:LE:32:micro</code> (microMIPS), <code>nanomips:LE:32:default</code> (NCC processor</p>
+<p>   module built for 12.2).</p>
+<ol>
+<li>F-20/F-28 decode-density methodology: at fixed 256-byte windows (entry 0x0,</li>
+</ol>
+<p>   the <code>jr</code> target 0x176ed0, and a 1 MiB-step sweep across the whole image,</p>
+<p>   31 windows), force <code>clearListing</code> then explicit disassembly from the window</p>
+<p>   start; count valid instruction bytes vs window size. Comparing *the same</p>
+<p>   windows* across languages isolates the ISA, since each language can only</p>
+<p>   succeed on bytes actually encoded in its ISA.</p>
+<ol>
+<li>A second pass let full auto-analysis run on the MIPS32-default import to</li>
+</ol>
+<p>   measure whole-image instruction/function creation and to harvest defined</p>
+<p>   strings.</p>
+<h2>Decode-density table (256-byte windows, coverage = valid instruction bytes / 256)</h2>
+<table>
+<tr>
+<th>window</th>
+<th>MIPS32:LE:default</th>
+<th>MIPS16e (16e)</th>
+<th>microMIPS</th>
+<th>nanoMIPS (NCC)</th>
+</tr>
+<tr>
+<td>0x0 (entry)</td>
+<td><strong>6.25 %</strong> (4 real MIPS32 insns)</td>
+<td>0.8 %</td>
+<td>6.3 %</td>
+<td>1.6 %</td>
+</tr>
+<tr>
+<td>0x176ed0 (<code>jr</code> target)</td>
+<td>1.6 %</td>
+<td><strong>25.0 %</strong></td>
+<td>1.6 %</td>
+<td>0 %</td>
+</tr>
+<tr>
+<td>0x174100</td>
+<td>12.5 %</td>
+<td><strong>50.0 %</strong></td>
+<td>12.5 %</td>
+<td>0.8 %</td>
+</tr>
+<tr>
+<td>0x200000</td>
+<td>0 %</td>
+<td><strong>88.3 %</strong></td>
+<td>0 %</td>
+<td>0 %</td>
+</tr>
+<tr>
+<td>0x700000</td>
+<td>93.0 %</td>
+<td>93.0 %</td>
+<td>1.6 %</td>
+<td>0 %</td>
+</tr>
+<tr>
+<td>0xe00000</td>
+<td>84.4 %</td>
+<td>84.4 %</td>
+<td>0 %</td>
+<td>3.9 %</td>
+</tr>
+<tr>
+<td>0x1200000</td>
+<td>1.6 %</td>
+<td><strong>100.8 %</strong></td>
+<td>1.6 %</td>
+<td>0.8 %</td>
+</tr>
+<tr>
+<td>0x1300000</td>
+<td>1.6 %</td>
+<td><strong>100.0 %</strong></td>
+<td>1.6 %</td>
+<td>2.3 %</td>
+</tr>
+<tr>
+<td>0x1400000</td>
+<td>1.6 %</td>
+<td><strong>91.4 %</strong></td>
+<td>1.6 %</td>
+<td>1.6 %</td>
+</tr>
+</table>
+<p>nanoMIPS across the full 31-window sweep (1 MiB step, 0x0–0x1900000): median</p>
+<p>coverage <strong>0.78 %</strong>, maximum in any code region <strong>3.91 %</strong>; the only windows</p>
+<p>above 20 % (0x1500000, 0x1600000, 0x1800000: 25–31 %) are tail <em>data</em> regions</p>
+<p>that partially decode in every 32-bit ISA tested (microMIPS also hits 26.6 %</p>
+<p>at 0x1700000/0x1800000). microMIPS is near-zero on every code island</p>
+<p>(max 12.5 %). Full per-window data in results/md1rom-decode.json.</p>
+<p>Sample decoded listing, window 0x1200000 under MIPS16e (dense, coherent):</p>
+<pre><code>
+jal 0x011c5004
+_nop
+li a2,0x32db
+lw a1,0x504(pc)          ; PC-relative loads — MIPS16e signature
+jal 0x011c5064
+_addiu a0,sp,0x44
+lw a2,0x4f8(pc)
+li a3,0x32de
+li a0,0x26c
+jal 0x0134ee04
+_li a1,0x1
+sw v0,0x18(sp)
+lw v0,0x44(sp)
+lw s0,0x4e8(pc)
+lbu a2,0x0(v0)
+cmpi a2,0x2
+</code></pre>
+<h2>Region map (from the 1 MiB sweep, 16e language)</h2>
+<ul>
+<li>0x0: MIPS32 reset trampoline + <code>00 65</code> filler.</li>
+<li>~0x174000–0x176ed0+: MIPS16 code the entry <code>jr</code> targets (entry chain:</li>
+</ul>
+<p>  0x0 → 0x176ed0), partial windows (25–51 %) — island boundaries not mapped.</p>
+<ul>
+<li>Dense code islands: 0x80000 (100.8 %), 0x100000 (55.5 %), 0x200000</li>
+</ul>
+<p>  (88.3 %), 0x300000 (50.8 %), 0x700000 (93.0 %), 0xe00000 (84.4 %),</p>
+<p>  0x1000000–0x1400000 (32.8–100.8 %), 0x1960000 (100 %).</p>
+<ul>
+<li>Zero/near-zero regions (data, compressed payloads, DB/EM tables — 26 MB</li>
+</ul>
+<p>  total image): 0x400000–0x500000, 0x800000, 0x900000, 0xb00000, 0xc00000,</p>
+<p>  0xd00000, 0xf00000, 0x1500000, 0x1600000–0x1900000.</p>
+<ul>
+<li>A per-segment byte-exact map (the loader's <code>INT_InitRegions_C</code> route) is</li>
+</ul>
+<p>  future work; this pass maps coverage, not segment semantics.</p>
+<h2>Verdict</h2>
+<p>**nanoMIPS OVERTURNED for MT6785 md1rom — the image is MIPS32 LE entry code +</p>
+<p>MIPS16e-compressed code islands** (the classic pre-Dimensity MTK baseband</p>
+<p>architecture). The nanoMIPS attribution from prior art is confirmed as</p>
+<p>generation-specific (Dimensity/MT6873+), not a general MTK-modem property. F-16</p>
+<p>and F-18 should be corrected accordingly.</p>
+<h2>Honest negatives / limitations</h2>
+<ul>
+<li>The NCC <strong>ghidra-mtk-loader container loader was NOT used</strong> for this pass:</li>
+</ul>
+<p>  its release zip targets Ghidra 12.1 and its build requires Gradle 9.1+</p>
+<p>  (we built the nanomips processor module instead and imported the raw image).</p>
+<p>  The loader's <code>INT_InitRegions_C</code>/<code>MtkInitRegions</code> segment-expansion route is</p>
+<p>  therefore unexercised — segment boundaries in the region map are</p>
+<p>  coverage-derived, not container-derived.</p>
+<ul>
+<li>NanoMIPS module install (for the next agent): Ghidra 12.2's</li>
+</ul>
+<p>  <code>buildExtension.gradle</code> requires <strong>Gradle ≥ 9.1</strong> (the repo's wrapper pins</p>
+<p>  8.10.2 — bump <code>gradle-wrapper.properties</code> to 9.9.1); Gradle ≤ 8.x cannot</p>
+<p>  evaluate build scripts under JDK 25 ("Unsupported class file major version</p>
+<p>  69"). Built with JDK 25 + Gradle 9.9.1 (BUILD SUCCESSFUL in 1m56s). The</p>
+<p>  module is pure SLEIGH data (no Java classes): registering it by copying the</p>
+<p>  repo layout to <code>&lt;ghidra&gt;/Ghidra/Processors/nanomips/</code> (Module.manifest +</p>
+<p>  data/languages + lib jar) makes <code>nanomips:LE:32:default</code> available to</p>
+<p>  headless without any GUI install — placing it in the user-settings</p>
+<p>  Extensions dir does NOT register it headless (verified: "Unsupported</p>
+<p>  language" until the Processors copy).</p>
+<ul>
+<li>0x80000 and 0x700000/0xe00000 decode densely under <em>both</em> MIPS32-default and</li>
+</ul>
+<p>  16e — expected: Ghidra's MIPS32 sleigh includes mips16.sinc and can switch</p>
+<p>  ISA mode mid-flow; window-level ISA attribution for those regions needs</p>
+<p>  per-instruction ISA-mode inspection (not done this pass).</p>
+<ul>
+<li>Coverage windows are 256 B and step 1 MiB — island boundaries are coarse.</li>
+<li>md1dsp (Coresonic-class DSP, <code>DSP!</code> magic) remains not byte-verified (F-17);</li>
+</ul>
+<p>  no DSP ISA decoder available this pass.</p>
+<p>  *(Superseded later the same day by F-36: the md1dsp container is</p>
+<p>  byte-verified and the core is MTK MD32-class — the Coresonic attribution</p>
+<p>  is superseded; the instruction-level decode gap remains, diagnosed in</p>
+<p>  <code>md32-gap.md</code> (F-45).)*</p>
+<h2>Reproduce</h2>
+<pre><code>
+GH=/…/ghidra_12.2_PUBLIC; JAVA_HOME=/…/jdk-25.0.5+8
+analyzeHeadless /tmp/proj p -import 00_md1rom.bin -processor MIPS:LE:32:16e \
+  -loader-baseAddr 0x0 -noanalysis -scriptPath &lt;tools&gt; -postScript window_stats.java
+</code></pre>
+<p>Stats script: <code>window_stats.java</code> (clearListing + forced disassembly per</p>
+<p>256-byte window; JSON + listing dump). Windows used: entry 0x0, 0x176ed0,</p>
+<p>0x174100, 0x174400, 0x175000, 0x100000…0x1900000 step 0x100000, plus 0x80000.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

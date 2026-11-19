@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture census of Fairphone FP6 Qualcomm firmware (LineageOS 23.2, 2026-11-09 nightly) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Architecture census of Fairphone FP6 Qualcomm firmware (LineageOS 23.2, 2026-11-09 nightly)</h1><p>**Claim:** The WCN6750 wpss firmware runs on a **32-bit RISC-V** core (not the</p><p>Evidence: none</p>
+<h1>Architecture census of Fairphone FP6 Qualcomm firmware (LineageOS 23.2, 2026-11-09 nightly)</h1>
+<p><strong>Claim:</strong> The WCN6750 wpss firmware runs on a <strong>32-bit RISC-V</strong> core (not the</p>
+<p>"8-bit ATMel AVR" upstream guessed); Qualcomm's camera-ICP and all VPU</p>
+<p>firmware on this device are also RISC-V, built with a toolchain using the</p>
+<p>historic <code>e_machine=94</code> ID; and per-segment <code>.bXX</code> ELF headers carry</p>
+<p>untrustworthy <code>e_machine</code> values, which breaks naive automated corpus</p>
+<p>classification. <strong>None of this is documented anywhere public</strong> (checked:</p>
+<p>GitHub code search, ath11k docs, SRLabs 2025, LWN, XDA — 2026-11-09).</p>
+<p><strong>Prior art checked:</strong> upstream <code>docs/wireless.md</code> (unverified AVR/RISCV32</p>
+<p>guess); <a href="https://srlabs.de/blog/hexagon-fuzz-full-system-emulated-fuzzing-of-qualcomm-basebands">SRLabs Hexagon fuzzing</a></p>
+<p>("no free tools or documentation exist"); GitHub code search <code>wpss.b07</code>,</p>
+<p><code>WCN6750 ELF</code>, <code>CAMERA_ICP riscv</code> (no results); ath11k kernel docs (no ISA</p>
+<p>info). No published ELF-header analysis of any of these images exists.</p>
+<h2>Method</h2>
+<p>Source: <code>lineage-23.2-20261109-nightly-FP6-signed.zip</code> (public mirror).</p>
+<p>Extraction: <code>payload_dumper</code> → partitions; <code>tools/extract_vfat.py</code> (modem.img,</p>
+<p>vfat) and <code>tools/extract_ext4.py</code> (vendor.img/dsp.img, ext4); census via</p>
+<p><code>tools/census.py</code> (stdlib ELF parser; hashes + program headers, no binary</p>
+<p>content). All scripts in <code>tools/</code>, census in <code>results/census.md</code>.</p>
+<h2>Results</h2>
+<h3>Architecture histogram (665 files, 4.9 GB partitions)</h3>
+<table>
+<tr>
+<th>e_machine</th>
+<th>files</th>
+<th>notable contents</th>
+</tr>
+<tr>
+<td>0 (EM_NONE, header junk)</td>
+<td>166</td>
+<td>mcfg .mbn configs, split-image segment files</td>
+</tr>
+<tr>
+<td>Hexagon (164)</td>
+<td>94</td>
+<td>modem.b<em>, adsp.</em>, cdsp.*, ipa_fws, GPU zap shaders</td>
+</tr>
+<tr>
+<td>AArch64 (183)</td>
+<td>34</td>
+<td>hdcp, soter64, smplap64, evautil64 (modem/image)</td>
+</tr>
+<tr>
+<td>ARM (40)</td>
+<td>31</td>
+<td>bdwlan board-data ELFs (60,000 B each), CAMERA_ICP_170.elf</td>
+</tr>
+<tr>
+<td>RISC-V historic (94)</td>
+<td>12</td>
+<td>*<em>CAMERA_ICP.mbn/.elf/.mdt, vpu20/30/33_</em>.mbn**</td>
+</tr>
+<tr>
+<td>RISC-V (243)</td>
+<td>1</td>
+<td><strong>modem/image/qca6750/wpss.b07</strong></td>
+</tr>
+<tr>
+<td>x86 (3, header junk)</td>
+<td>1</td>
+<td>qca6750/wpss.b08 (data segment, bogus header)</td>
+</tr>
+</table>
+<h3>The wpss (WCN6750 wireless processor subsystem)</h3>
+<ul>
+<li><code>wpss.b07</code> — ELF32, <strong>e_machine=243 (EM_RISCV)</strong>, e_type=EXEC, entry</li>
+</ul>
+<p>  <strong>0x404000</strong>, 6 program headers, loads spanning vaddr 0x404000–0x422528.</p>
+<p>  Version strings: <code>QC_IMAGE_VERSION_STRING=WLAN.MSL.3.0.1-00591-QCAMSLSWPLZ-1</code>.</p>
+<ul>
+<li><code>wpss.b08</code> — largest wpss segment (275,644 B), single RWX LOAD at vaddr</li>
+</ul>
+<p>  <strong>0x4ff00000</strong>, e_machine=3 (x86) with entry 0x401 — a nonsense header for</p>
+<p>  a data segment. Contains <code>WLAN_UCODE_MOSELLE_4.2.0-00000</code> ("Moselle" =</p>
+<p>  WCN6750 firmware codename). **Conclusion: .bXX segment-file ELF headers are</p>
+<p>  not reliable for architecture identification.**</p>
+<h3>Camera ICP / VPU</h3>
+<ul>
+<li><code>CAMERA_ICP.mbn/.elf/.mdt</code>, <code>CAMERA_ICP_170.elf</code>, <code>vpu20_2v/4v.mbn</code>,</li>
+</ul>
+<p>  <code>vpu30_2v.mbn</code>, <code>vpu33_4v.mbn</code> (+ <code>_unsigned</code> variants) — ELF32,</p>
+<p>  <strong>e_machine=94</strong>, the historic RISC-V value used by early toolchains</p>
+<p>  (243 was assigned later). ICP version: <code>CICP.FW.7.0-00021</code> (CRM), platform</p>
+<p>  strings <code>CAMERA_640_V1 (Mimas)</code>, <code>CAMERA_740_V1 (Skye)</code>.</p>
+<ul>
+<li>Public Qualcomm documentation does not state the ICP/VPU ISA; kernel</li>
+</ul>
+<p>  sources name the devices but not the cores. This appears to be the first</p>
+<p>  public identification of FP6 ICP/VPU firmware as RISC-V.</p>
+<h2>Implications</h2>
+<ol>
+<li>LibrePhone upstream's <code>docs/wireless.md</code> should replace the AVR guess with</li>
+</ol>
+<p>   the verified RISC-V identification (PR planned).</p>
+<ol>
+<li>The ath11k ↔ wpss boundary can now be analyzed against real RISC-V</li>
+</ol>
+<p>   disassembly (capstone supports RISC-V; Hexagon support is experimental —</p>
+<p>   Hexagon remains the harder, still-undocumented side).</p>
+<ol>
+<li>Automated firmware-census tooling (including ours, pre-fix) must treat</li>
+</ol>
+<p>   .bXX e_machine fields as noise; use .mdt headers + entry-point sanity.</p>
+<h2>Negative results / limitations</h2>
+<ul>
+<li>Census covers modem.img, vendor.img /firmware,/dsp,/bt_firmware (symlink →</li>
+</ul>
+<p>  empty), dsp.img. system/product/system_ext not yet walked (Android</p>
+<p>  framework, not firmware blobs; queued).</p>
+<ul>
+<li>Entry-point sanity was checked only for the headline files; a systematic</li>
+</ul>
+<p>  "trustworthy header" pass per file is queued.</p>
+<ul>
+<li>Disassembly-level confirmation <strong>done</strong>: capstone (RV32+RVC) decodes</li>
+</ul>
+<p>  <code>wpss.b07</code>'s entry segment (file offset 16384 = vaddr 0x404000) into clean</p>
+<p>  RV32 machine-mode startup code — `c.lui t0,2; addi t0,t0,-0x800; csrs</p>
+<p>  mstatus,t0; csrci mstatus,8; auipc; csrw mtvec,...` — i.e., real RISC-V</p>
+<p>  machine-mode interrupt setup. The wpss is RISC-V beyond reasonable doubt.</p>
+<p>  (Note: plain RV32 without the C extension decodes nothing; the firmware</p>
+<p>  uses compressed instructions.)</p>
+<h2>Reproduce</h2>
+<pre><code class="language-bash">
+python3 tools/extract_vfat.py partitions/modem.img trees/modem
+python3 tools/extract_ext4.py partitions/vendor.img /firmware trees/vendor-firmware
+python3 tools/census.py trees --out census.json --md census.md
+# then: filter census.json for family wifi-wpss / machines 94 &amp; 243
+</code></pre>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

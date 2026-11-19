@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 (enchilada) — Modem family — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 (enchilada) — Modem family</h1><p>**Evidence class: format-spec** (container decoded 2026-11-17; per-file</p><p>Evidence: none</p>
+<h1>OnePlus 6 (enchilada) — Modem family</h1>
+<p><strong>Evidence class: format-spec</strong> (container decoded 2026-11-17; per-file</p>
+<p>census with fleet md5 joins).</p>
+<p>Source: LineageOS 22.2 nightly 2026-11-11 enchilada, OTA payload partition</p>
+<p><code>modem</code> → <code>modem.img</code> (119,820,288 B, sha256 in the matrix CSV).</p>
+<p>52 REPLACE_XZ + 5 REPLACE_BZ + 1 REPLACE ops reconstructed it from the OTA.</p>
+<h2>Container layout (DECODED 2026-11-17)</h2>
+<p><code>modem.img</code> (119,820,288 B) is a <strong>FAT16 volume</strong> (BPB: 4,096 B/sector,</p>
+<p>4 sec/cluster, 2 FATs × 4 sectors) whose <code>IMAGE</code> directory carries **403</p>
+<p>named firmware files / 113.5 MB** — the full OP6 firmware set laid bare:</p>
+<p><code>image_modem.b16/b17/b20/b24</code> (the mpss Hexagon segments, largest 26.3 MB),</p>
+<p><code>image_adsp.*</code> (18 segments incl. 7.1 MB b10), <code>image_cdsp.*</code>,</p>
+<p><code>image_slpi.*</code>, <code>image_wlanmdsp.mbn</code> (the WCN3990 WiFi firmware),</p>
+<p>37 × <code>image_bdwlan.*</code> WCN3990 board-data variants, <code>image_gfp9508.*</code>,</p>
+<p><code>image_qdsp6m.qdb</code>, <code>image_mba.*</code>, keymaster/cmnlib/cmnlib64 MDT sets, and</p>
+<p>the DSP launch manifests. **201 of the 403 files md5-join to multi-device</p>
+<p>fleet blobs in the committed matrix** — the sha256↔md5 fleet join that was</p>
+<p>an open item is now delivered at scale from this one device (see</p>
+<p><code>blob-matrix/desktop/fleet-re/oneplus6-partition-map.md</code>).</p>
+<h2>Fragmentation significance</h2>
+<p>modem is the largest byte-weighted family across the whole matrix</p>
+<p>(25.94 GB of 69.80 GB). Every SDM845-generation device in the half shares</p>
+<p>this shape — and, as demonstrated here, that shape is a FAT firmware</p>
+<p>volume, not a monolithic blob. The lab's FP6 modem findings (F-19/F-26:</p>
+<p>b23/b24 segments, q6zip-suspected opaque bodies) map onto named segment</p>
+<p>files at this generation: <code>image_modem.b20</code> (26.3 MB) and friends are the</p>
+<p>directly comparable units.</p>
+<h2>ISA/proof status</h2>
+<p>Segment files not decoded (ISA unknown at file granularity; the lab's</p>
+<p>Hexagon decode recipe — papers/wmi-dispatch-architecture.md §6 — applies</p>
+<p>once a target segment is chosen).</p>
+<h2>Interface facts</h2>
+<p>Consumers: QRTR/DIAG/peripheral-image loader (mainline <code>qcom_q6v5_mss</code></p>
+<p>PIL driver loads this partition on sdm845 — public code); QMI/RIL above.</p>
+<p>The FAT tree makes per-file interface attribution tractable (file name =</p>
+<p>PIL image name).</p>
+<h2>Open questions</h2>
+<ul>
+<li>per-segment ISA/e_machine confirmation for the modem.bNN set</li>
+<li>q6zip-suspected compressed bodies (F-26 method) against the named files</li>
+<li>dsp.img's 60 Hexagon ELFs (see partition-map open items)</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

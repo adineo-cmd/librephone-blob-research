@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LibrePhone blob-database reconnaissance + coverage-matrix scaffold (2026-11-16) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>LibrePhone blob-database reconnaissance + coverage-matrix scaffold (2026-11-16)</h1><p>Session goal: locate the owner-described &quot;~100 GB database of firmware/blobs</p><p>Evidence: none</p>
+<h1>LibrePhone blob-database reconnaissance + coverage-matrix scaffold (2026-11-16)</h1>
+<p>Session goal: locate the owner-described "~100 GB database of firmware/blobs</p>
+<p>for listed devices" WITHOUT downloading it, enumerate it completely from</p>
+<p>metadata APIs, and build the master coverage-matrix scaffold</p>
+<p>(<code>device-inventory.csv</code> + <code>coverage-matrix.csv</code>, both written alongside this</p>
+<p>file). Companion to the F-69 audit</p>
+<p>(<a href="research/upstream/librephone-wants.html">../librephone-wants.md</a>); all network fetches this</p>
+<p>session are logged below with status and byte size. Scratch space:</p>
+<p><code>/tmp/lpdb/</code> (raw fetched artifacts + parser scripts).</p>
+<h2>Headline finding — where the database lives (and does not)</h2>
+<p>**The published "database" is metadata only. The ~100 GB payload corpus is</p>
+<p>not published anywhere we can find, and its existence is now pinned down to</p>
+<p>a specific local layout on the maintainer's machine.**</p>
+<ol>
+<li>What IS published (all under <code>codeberg.org/rsavoye/librephone</code>, branch</li>
+</ol>
+<p>   <code>main</code>, dir <code>data/</code>, all fetched byte-exact this session): the dumps of a</p>
+<p>   <strong>PostgreSQL database</strong> (<code>devices</code>, owner <code>rob</code>, dumped by pg_dump 18.0):</p>
+<p>   <code>devices.sql.bz2</code> (708,066 B compressed → 6,548,830 B SQL) plus seven</p>
+<p>   CSV projections. The dump's <code>blobs</code> jsonb column carries per-device blob</p>
+<p>   rows whose <code>path</code> field is the maintainer's local absolute path, e.g.</p>
+<p>   <code>/work/Lineage-images/blobs/fairphone/FP6/modem/image</code> — i.e. the corpus</p>
+<p>   lives at <strong><code>/work/Lineage-images/</code></strong> (LineageOS install packages</p>
+<p>   downloaded and blob-extracted), exactly matching upstream's own</p>
+<p>   <code>docs/totals.md</code>: *"To produce these numbers, I downloaded all 210</p>
+<p>   Lineage install packages and extracted the files from those."*</p>
+<ol>
+<li>What is NOT published: no download/database/torrent/magnet/meta4 link on</li>
+</ol>
+<p>   any librephone.fsf.org page; the git repo is 7.9 MB and contains zero</p>
+<p>   payload archives (recursive tree, 153 entries, <code>truncated=false</code>, no</p>
+<p>   <code>.zip/.tar/.xz/.zst/.img/.torrent/.magnet</code> blobs at all); archive.org has</p>
+<p>   no LibrePhone corpus item under any probed name (11 probes, section</p>
+<p>   below); no collection <code>librephone</code> exists.</p>
+<ol>
+<li>Size arithmetic for the owner's "~100 GB" claim: the current dump</li>
+</ol>
+<p>   enumerates <strong>69.80 GB of blob files across 123 extracted devices</strong>, with</p>
+<p>   <strong>113 more devices listed but not blob-populated</strong> (extraction failed or</p>
+<p>   pending — <code>blobs</code> jsonb is NULL). 210-250 LineageOS zips at ~1-1.3 GB</p>
+<p>   each are ~210-325 GB of downloads; the extracted blob tree plus retained</p>
+<p>   images comfortably spans "~100 GB". The claim is consistent with the</p>
+<p>   evidence; the payload is simply local.</p>
+<h2>Route history (RULE 0 — every probe, 2026-11-16, retries as noted)</h2>
+<table>
+<tr>
+<th>#</th>
+<th>Endpoint / probe</th>
+<th>Result</th>
+</tr>
+<tr>
+<td>1</td>
+<td><code>https://librephone.fsf.org/</code></td>
+<td>200, 29,379 B — nav-only link surface</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>https://librephone.fsf.org/hardware</code></td>
+<td>200, 17,589 B — links: <code>/hardware/fairphone6</code> only</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>https://librephone.fsf.org/hardware/fairphone6</code></td>
+<td>200, 47,689 B</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>https://librephone.fsf.org/faq</code></td>
+<td>200, 39,697 B</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>https://librephone.fsf.org/freedom</code></td>
+<td>200, 48,904 B</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>https://librephone.fsf.org/site/</code></td>
+<td>200, 33,667 B (after 301)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>https://librephone.fsf.org/site/tools/</code></td>
+<td>200, 37,442 B</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>https://librephone.fsf.org/home</code>, <code>/javascript</code></td>
+<td>200/301 — home = same body as <code>/</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>tag-stripped text grep of all 8 pages for <code>download/database/torrent/.zip/corpus/100 GB/mirror</code></td>
+<td><strong>zero hits</strong> — the site has no download surface at all</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>api/v1/repos/rsavoye/librephone</code></td>
+<td>200, 2,765 B — repo <code>size</code> <strong>7,910 KB</strong>, 119 stars, 28 open issues</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>api/v1/repos/rsavoye/librephone/contents/</code></td>
+<td>200, 24,015 B — root: <code>data/ docs/ kmod/ librephone/ m4/ tests/</code> + autotools</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>api/v1/repos/rsavoye/librephone/contents/data</code></td>
+<td>200, 14,198 B — 14 artifacts (table below)</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>api/v1/repos/rsavoye/librephone/branches</code></td>
+<td>200, 2,346 B — <code>main</code> @ <code>12dd433d5eda47a73d8bf800248ba72e394fad2d</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>api/v1/repos/rsavoye/librephone/git/trees/{sha}?recursive=true</code></td>
+<td>200, 35,760 B — <strong>153 entries, 142 blobs, 6,746,882 B, <code>truncated=false</code></strong>; largest artifact = <code>data/sizes.csv</code> (1.6 MB); regex scan for <code>torrent|magnet|metalink|.zip|.xz|.zst|.tar|.img</code> → <strong>0 hits</strong></td>
+</tr>
+<tr>
+<td>15</td>
+<td>raw fetch × 11 <code>data/</code> artifacts (sizes below)</td>
+<td>all 200; 3 transfers dropped mid-stream (curl exit 56/92 — this box's flaky network), recovered on retry <code>--retry 3 --retry-delay 5</code>, byte-exact vs the contents-API sizes</td>
+</tr>
+<tr>
+<td>16</td>
+<td>raw <code>docs/csvdata.md</code> (996 B), <code>docs/comparing.md</code> (8,933 B), <code>docs/totals.md</code> (43,180 B)</td>
+<td>200 — csvdata.md documents the dump set; totals.md: <em>"I downloaded all 210 Lineage install packages"</em></td>
+</tr>
+<tr>
+<td>17</td>
+<td>archive.org <code>advancedsearch.php q=librephone</code> (fl=identifier,title,item_size,mediatype,creator)</td>
+<td>200, 982 B — <strong>numFound 4</strong>: <code>hpr4499</code> (HPR interview with Librephone lead Rob Savoye, 832.5 MB audio), a Fireship OGG, an LWN video, FSF Bulletin 46 — <strong>no corpus</strong></td>
+</tr>
+<tr>
+<td>18</td>
+<td>archive.org <code>q=creator:rsavoye</code> / <code>creator:Rob_Savoye</code> / <code>title:(librephone)</code> / <code>collection:librephone</code> / <code>librephone_blobs</code> / <code>librephone-database</code> / <code>lineageos_blobs</code></td>
+<td>2 mapillary photo dumps / 0 / hpr4499 / 0 / 0 / 0 / 7 unrelated LineageOS misc items — <strong>no corpus item anywhere</strong></td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>api/v1/repos/rsavoye/abe</code></td>
+<td>200 — "Advanced Build Environment" cross-compiler tool; not the corpus</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>api/v1/repos/rsavoye/librephone-web</code> + branches + recursive tree</td>
+<td>200 — 32 files, 6.9 MB: pure site source (bootstrap/jquery/aos assets, 9 PHP pages); no download/database page</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>librephone.org</code> itself</td>
+<td>NOT re-probed this session: F-69 audit (2026-11-15) recorded a 50-redirect 302 loop; <code>/kernel-xref/html/</code> + <code>/modules-xref/html/</code> Doxygen trees were the only resolvers then. No download route was found via those pages in the audit.</td>
+</tr>
+</table>
+<p>Honest negatives: no host timeout this session; the three mid-transfer</p>
+<p>drops are logged with their recovery. The FSF hub and the web repo were</p>
+<p>completely swept for links — every href captured; none leads to a payload.</p>
+<h2>What the published database actually is</h2>
+<p><code>data/</code> directory, <code>codeberg.org/rsavoye/librephone@main</code> (sizes = contents</p>
+<p>API, verified by re-download):</p>
+<table>
+<tr>
+<th>Artifact</th>
+<th>Bytes</th>
+<th>Content</th>
+</tr>
+<tr>
+<td><code>devices.sql.bz2</code></td>
+<td>708,066</td>
+<td>pg_dump 18.0 of DB <code>devices</code> (owner <code>rob</code>). 5 tables: <strong>devices (236 rows)</strong> — version/vendor/model/build/<strong>blobs jsonb</strong>/available/builds/extracts/soc/released; gsmarena, images, linux, specs — <strong>all 0 rows (empty tables shipped in the dump)</strong>. Enums: <code>bintypes</code> (67 values incl. WIFI_BLUETOOTH, CELL_WIFI_GPS_BLUETOOTH, FASTCHG, UEFIBOOT...), <code>archtypes</code> (ARM/AARCH64/RISCV/XTENSA/MIPS/QUALCOMM/CORTEXM...), <code>celltypes</code>, <code>cputypes</code>, <code>gpumodels</code>, <code>devstatus</code>.</td>
+</tr>
+<tr>
+<td><code>devices-22.2.sql.bz2</code></td>
+<td>230,113</td>
+<td>same schema, older Lineage-22.2-era DB: <strong>220 device rows</strong></td>
+</tr>
+<tr>
+<td><code>devices.csv</code></td>
+<td>518,612</td>
+<td><strong>3,880 rows = per-BLOB table</strong>: <code>file,count,devices</code> — which devices use each distinct blob filename (quoting style: a repr'd Python list, inner single quotes)</td>
+</tr>
+<tr>
+<td><code>sizes.csv</code></td>
+<td>1,608,802</td>
+<td><strong>15,071 rows</strong>: <code>vendor,model,build,path,file,size,md5sum,type,released</code> — 63 devices, 30.11 GB, 8,004 distinct md5. <strong>Stale</strong>: zero FP6/rosemary rows (the FP5 rows are present, 706 of them)</td>
+</tr>
+<tr>
+<td><code>count.csv</code></td>
+<td>277,985</td>
+<td><strong>204 distinct devices</strong> (rows duplicated per-something — e.g. larry ×203 — every duplicate carries the same total)</td>
+</tr>
+<tr>
+<td><code>builds.csv</code></td>
+<td>12,494</td>
+<td><strong>246 devices</strong> + <code>Extract 22.2</code>/<code>Build 22.2</code> status (<code>completes</code>/<code>fails</code>) + <code>SOC</code> string + <code>Released</code> — the widest device list; SOC filled for ~124, blank for ~122</td>
+</tr>
+<tr>
+<td><code>contains-binaries.csv</code></td>
+<td>359,773</td>
+<td>files-with-binary-content → device lists</td>
+</tr>
+<tr>
+<td><code>binfiles_devices.csv</code></td>
+<td>88,983</td>
+<td><code>file,count,devices</code> subset (binary files only)</td>
+</tr>
+<tr>
+<td><code>track.csv</code></td>
+<td>19,625</td>
+<td>per-IMAGE → comma list of devices containing it (the blob-sharing cluster map, image granularity)</td>
+</tr>
+<tr>
+<td><code>sort-totals.csv</code></td>
+<td>7,392</td>
+<td>per-device <code>images,binaries,firmware,hex</code> counts</td>
+</tr>
+<tr>
+<td><code>totals.csv</code></td>
+<td>25</td>
+<td><strong>empty (header only)</strong></td>
+</tr>
+<tr>
+<td><code>files.csv</code></td>
+<td>0</td>
+<td><strong>empty file</strong></td>
+</tr>
+<tr>
+<td><code>sizes-22.2.csv.bz2</code> / <code>devices-22.2.csv.bz2</code></td>
+<td>110,707 / 15,423</td>
+<td>22.2-era projections</td>
+</tr>
+</table>
+<p><code>blobs</code> jsonb row shape: <code>{"file", "path": "/work/Lineage-images/blobs/&lt;vendor&gt;/&lt;build&gt;/...", "size", "type" (bintype), "md5sum", "version": 23.0}</code>.</p>
+<p>Device-count reconciliation across the five sources (this is itself a</p>
+<p>fragmentation finding — the same "database" has five different device</p>
+<p>universe definitions):</p>
+<table>
+<tr>
+<th>Source</th>
+<th>Distinct devices</th>
+</tr>
+<tr>
+<td><code>builds.csv</code> (widest)</td>
+<td>246</td>
+</tr>
+<tr>
+<td><code>devices.csv</code> blob-list device tokens</td>
+<td>248 tokens — <strong>all 248 matched</strong> a <code>builds.csv</code>/SQL identity (0 orphans)</td>
+</tr>
+<tr>
+<td><code>devices.sql.bz2</code> devices table</td>
+<td>236 (123 with blob jsonb, 113 NULL)</td>
+</tr>
+<tr>
+<td><code>count.csv</code></td>
+<td>204</td>
+</tr>
+<tr>
+<td><code>sizes.csv</code> (file-level)</td>
+<td>63</td>
+</tr>
+<tr>
+<td><code>devices-22.2.sql.bz2</code></td>
+<td>220 (older era)</td>
+</tr>
+</table>
+<h2>Total enumeration (no sampling — these are complete counts)</h2>
+<ul>
+<li><strong>Blob rows (device,file) enumerated: 33,917</strong> across <strong>123 devices</strong>,</li>
+</ul>
+<p>  totaling <strong>69,797,539,502 bytes = 69.80 GB (65.00 GiB)</strong>.</p>
+<ul>
+<li><strong>Distinct blobs by md5: 15,091</strong> — i.e. behind the 33,917 device-rows</li>
+</ul>
+<p>  there are only 15,091 actual file images.</p>
+<ul>
+<li><strong>Shared blobs: 4,763</strong> distinct md5s appear on &gt;1 device;</li>
+</ul>
+<p>  <strong>23,080 of 33,917 rows (68.0%) are instances of a shared blob</strong>.</p>
+<ul>
+<li>Sharing histogram (distinct blobs by device count): 10,328 on 1 device ·</li>
+</ul>
+<p>  3,472 on 2-4 · 1,104 on 5-9 · 144 on 10-19 · <strong>43 on 20+ devices</strong>.</p>
+<ul>
+<li>113 further devices are listed with NULL blob data; 123 more exist only</li>
+</ul>
+<p>  in <code>builds.csv</code>/<code>count.csv</code> (no blob enumeration at all).</p>
+<h3>Size breakdown by family (mapped from filename + upstream bintype)</h3>
+<table>
+<tr>
+<th>family</th>
+<th>rows</th>
+<th>bytes</th>
+<th>note</th>
+</tr>
+<tr>
+<td>modem</td>
+<td>2,539</td>
+<td>25.94 GB</td>
+<td>incl. <code>modem.img</code>/<code>md1img.img</code> partition dumps + MDT segments</td>
+</tr>
+<tr>
+<td>boot</td>
+<td>1,038</td>
+<td>23.86 GB</td>
+<td><strong>incl. <code>boot.img</code>/<code>vendor_boot</code> (67 MB each × many devices) — these are the FREE kernel images, not blobs</strong>; also xbl/abl/uefi chains</td>
+</tr>
+<tr>
+<td>other</td>
+<td>14,987</td>
+<td>14.15 GB</td>
+<td>long tail: camera 1,493+ rows, touch, audio, fastchg, media/venus, 8,664 rows typed UNKNOWN upstream</td>
+</tr>
+<tr>
+<td>adsp</td>
+<td>3,281</td>
+<td>3.98 GB</td>
+<td>incl. <code>bm2nXX.bin</code> ADSP-region fleet (upstream types them MODEM; they live in <code>vendor/lib/rfsa/adsp</code>)</td>
+</tr>
+<tr>
+<td>wifi</td>
+<td>5,642</td>
+<td>0.71 GB</td>
+<td>WCN/qca firmware + MTK combo (WIFI_BLUETOOTH 3,243 rows)</td>
+</tr>
+<tr>
+<td>tz</td>
+<td>4,264</td>
+<td>0.67 GB</td>
+<td>TrustZone TAs/keymasters/DRM</td>
+</tr>
+<tr>
+<td>cdsp</td>
+<td>940</td>
+<td>0.28 GB</td>
+<td>compute DSP</td>
+</tr>
+<tr>
+<td>bt</td>
+<td>445</td>
+<td>0.12 GB</td>
+<td>QCA BT ROM patches (<code>.tlv</code>) + NVRAM</td>
+</tr>
+<tr>
+<td>gpu</td>
+<td>781</td>
+<td>0.09 GB</td>
+<td>Adreno GMU/SQE/zap + kbc math libs</td>
+</tr>
+</table>
+<h3>By vendor (bytes with blob data; devices with data / devices listed)</h3>
+<p>oneplus 18.31 GB · xiaomi 16.96 · motorola 14.58 · google 6.71 · samsung</p>
+<p>5.50 · sony 1.99 · fairphone 1.98 · realme 1.52 · nothing 1.47 · fxtec</p>
+<p>0.45 · lenovo 0.33 — rows: oneplus 10,772 · xiaomi 9,830 · motorola 7,041 ·</p>
+<p>google 1,089 · samsung 914 · fairphone 1,439 · nothing 1,129 · sony 416 ·</p>
+<p>realme 980 · fxtec 287 · lenovo 20. Devices with blob data per vendor:</p>
+<p>motorola 23, oneplus 22, xiaomi 21, google 19, samsung 17, sony 12,</p>
+<p>fairphone 3 (FP3/FP5/FP6), nothing 2, realme 2, lenovo 1, fxtec 1. Devices</p>
+<p>listed but not extracted (NULL blobs) concentrate on the same vendors plus</p>
+<p>nvidia/nubia/lge/asus/nokia/razer/radxa/essential/shift/zte. Top-3 vendors</p>
+<p>carry 49.85 GB = 71.4% of all enumerated bytes.</p>
+<h3>SoC fragmentation (from <code>builds.csv</code> + SQL <code>soc</code>)</h3>
+<ul>
+<li>39 distinct SoC strings → **35 distinct chips: 29 Qualcomm Snapdragon</li>
+</ul>
+<p>  generations** (MSM8996/8998 → SDM630-845 → SM4250-8550 incl. -AC/−AE</p>
+<p>  variants, QCM6490), <strong>4 Google Tensor</strong> (GS101/GS201/G3/G4), **2</p>
+<p>  Amlogic** (TV boxes). SOC is blank for ~122 of 246 devices — the known</p>
+<p>  set under-represents MediaTek (rosemary = MT6785 Helio G95 per the lab</p>
+<p>  census, yet its <code>builds.csv</code> SOC cell is blank).</p>
+<ul>
+<li>SoC generation spread: every Snapdragon generation 2016-2024 is present —</li>
+</ul>
+<p>  release years in the DB span 2016-2024 (peak 2018/2021, 19 devices each).</p>
+<h2>Top-20 highest-leverage blobs (RE once, frees many devices)</h2>
+<p>Ranked by distinct device count sharing the identical file (md5), filtered</p>
+<p>to real firmware (≥1 KB, no <code>.jsn/.json/.xml/.txt</code> manifests — the raw</p>
+<p>top-by-count is dominated by &lt;1 KB DSP launch manifests <code>adspr.jsn</code> ×30 and</p>
+<p>zero-byte MDT segment stubs <code>venus.b17</code> ×34, themselves a fragmentation</p>
+<p>finding). md5s and device lists are in <code>coverage-matrix.csv</code>.</p>
+<table>
+<tr>
+<th>#</th>
+<th>devices</th>
+<th>bytes</th>
+<th>family</th>
+<th>file</th>
+</tr>
+<tr>
+<td>1</td>
+<td>29</td>
+<td>56,180</td>
+<td>bt</td>
+<td><code>crbtfw20.tlv</code> (QCA BT ROM patch 2.0)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>29</td>
+<td>56,052</td>
+<td>bt</td>
+<td><code>apbtfw10.tlv</code> (BT patch 1.0)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>29</td>
+<td>29,368</td>
+<td>bt</td>
+<td><code>crbtfw11.tlv</code> (BT patch 1.1)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>29</td>
+<td>3,936</td>
+<td>bt</td>
+<td><code>crnv20.bin</code> (BT NVRAM 2.0)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>29</td>
+<td>2,798</td>
+<td>bt</td>
+<td><code>crnv11.bin</code> (BT NVRAM 1.1)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>29</td>
+<td>1,243</td>
+<td>bt</td>
+<td><code>apnv10.bin</code> (BT NVRAM 1.0)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>26</td>
+<td>2,623,528</td>
+<td>adsp</td>
+<td><code>bm2n12.bin</code> (ADSP-region, <code>vendor/lib/rfsa/adsp</code>)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>26</td>
+<td>1,082,856</td>
+<td>adsp</td>
+<td><code>bm2n15.bin</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>26</td>
+<td>103,168</td>
+<td>adsp</td>
+<td><code>bm2n14.bin</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td>26</td>
+<td>32,768</td>
+<td>gpu</td>
+<td><code>a619_gmu.bin</code> (Adreno 619 GMU microcode)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>25</td>
+<td>3,091,896</td>
+<td>adsp</td>
+<td><code>bm2n08.bin</code></td>
+</tr>
+<tr>
+<td>12</td>
+<td>25</td>
+<td>1,106,944</td>
+<td>adsp</td>
+<td><code>bm2n13.bin</code></td>
+</tr>
+<tr>
+<td>13</td>
+<td>25</td>
+<td>864,824</td>
+<td>adsp</td>
+<td><code>bm2n06.bin</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>25</td>
+<td>796,357</td>
+<td>other</td>
+<td><code>unified_ksqs.bin</code></td>
+</tr>
+<tr>
+<td>15</td>
+<td>25</td>
+<td>5,704</td>
+<td>gpu</td>
+<td><code>sequence_manifest.bin</code> (kbc/GPU calibration)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>21</td>
+<td>40,496</td>
+<td>gpu</td>
+<td><code>a660_sqe.fw</code> (Adreno 660 SQE)</td>
+</tr>
+<tr>
+<td>17</td>
+<td>19</td>
+<td>55,256</td>
+<td>gpu</td>
+<td><code>a660_gmu.bin</code></td>
+</tr>
+<tr>
+<td>18</td>
+<td>19</td>
+<td>32,456</td>
+<td>gpu</td>
+<td><code>a630_sqe.fw</code></td>
+</tr>
+<tr>
+<td>19</td>
+<td>19</td>
+<td>2,126</td>
+<td>other</td>
+<td><code>CFR_OPlus_EF017_UW_snapshot.bin</code></td>
+</tr>
+<tr>
+<td>20</td>
+<td>17</td>
+<td>839,856</td>
+<td>wifi</td>
+<td><code>aoa_cldb_falcon.bin</code> (wlan calibration DB)</td>
+</tr>
+</table>
+<p>The whole QCA BT patch fleet (rows 1-6) is the single highest-leverage</p>
+<p>family: one RE pass covers the BT bring-up of up to 29 devices. The</p>
+<p><code>bm2nXX.bin</code> ADSP fleet (0.8-3.1 MB each, 25-26 devices) is the largest</p>
+<p>byte-weighted target. Image-granularity sharing (<code>track.csv</code>) adds the boot</p>
+<p>chain: <code>abl.img</code> ×75, <code>devcfg.img</code> ×76, <code>dsp.img</code> ×71 devices — structurally</p>
+<p>similar signed containers per the lab's F-15 census, so tooling RE (not</p>
+<p>per-file RE) is the multiplier there.</p>
+<h2>The coverage-matrix scaffold (what each cell holds)</h2>
+<p><code>coverage-matrix.csv</code> — 33,917 rows, one per blob per device, columns:</p>
+<p>`device, vendor, soc, blob_family, blob_subfamily, filename, size_bytes,</p>
+<p>md5_db, sha256_if_listed, isa_identified, interface_documented, priority,</p>
+<p>db_path, db_type`. Family mapping is filename-first with upstream bintype</p>
+<p>fallback (rules embedded in the generator; misc subfamily = 8,664 rows the</p>
+<p>upstream DB itself types UNKNOWN). Filled cells, honestly:</p>
+<ul>
+<li><code>isa_identified</code>: <strong>101 rows</strong> (0.30%). FP6: 95 rows carry the lab's</li>
+</ul>
+<p>  committed ISA facts (<code>qualcomm-fp6/results/census.md</code> table matched on</p>
+<p>  filename+size — sizes differ across nightlies, so matches were</p>
+<p>  filename+size first, then unique-filename; source recorded per rule in</p>
+<p>  the generator) + the boot-chain doc-level facts (xbl/shrm/aop/aop_config/</p>
+<p>  cpucp RV32, qupfw Hexagon header-claim, uefi AArch64 FV, abl ARM32 —</p>
+<p>  <code>results/bootchain-census.json</code> + <code>docs/bootchain-census.md</code>, which</p>
+<p>  supersedes that JSON's raw container labels e.g. xbl "M32"). rosemary/</p>
+<p>  MT6785: 6 rows (<code>md1img.img</code> = mtk_hdr container w/ F-31 MIPS32 LE +</p>
+<p>  MIPS16e modem region + F-36 MD32-class md1dsp; <code>scp.img</code> Cortex-M4 +</p>
+<p>  FreeRTOS; <code>sspm.img</code> CM4 per tinysys family claim; <code>audio_dsp.img</code> HiFi3</p>
+<p>  Xtensa byte-confirm-pending; <code>lk.img</code>/<code>gz.img</code> container labels).</p>
+<p>  <strong>Everything else: empty = honestly un-RE'd.</strong></p>
+<ul>
+<li><code>sha256_if_listed</code>: 102 rows (16-hex truncated values from the lab</li>
+</ul>
+<p>  censuses; the upstream DB lists <strong>md5 only</strong>, never sha256 — full</p>
+<p>  64-hex sha256 lives in the lab census docs but the FP6 nightly mismatch</p>
+<p>  limits safe joins).</p>
+<ul>
+<li><code>interface_documented</code>: <strong>116 rows, all FP6</strong> (<code>y</code> with doc pointer for</li>
+</ul>
+<p>  modem → <code>interface-cellular.md</code>; wifi → <code>interface-copyengine.md</code>,</p>
+<p>  <code>interface-pcie-bridge.md</code>, <code>interface-ftm-diag.md</code>; NFC subfamily →</p>
+<p>  <code>interface-nfc.md</code>). All non-FP6 rows <code>n</code> — consistent with the F-69</p>
+<p>  audit row B-9 (no per-family interface docs upstream).</p>
+<ul>
+<li><code>priority</code>: P1 = FP6 (447 rows) — the FSF flagship per F-69 (C-3:</li>
+</ul>
+<p>  hardware page lists exactly one device). P2 = 1,608 rows across 21</p>
+<p>  devices with public mainline/ports progress (FP3/FP4/FP5, OnePlus 6/6T/</p>
+<p>  7 Pro, POCO F1, Mi 8, Shift 6MQ, Pixel 3/3a/3a XL/4/4 XL/4a/6/6a/7/7 Pro,</p>
+<p>  Sony Xperia XA2 — basis string recorded per device in</p>
+<p>  <code>device-inventory.csv</code>; **agent-knowledge list, dated 2026-11, flagged</p>
+<p>  for verification against the postmarketOS wiki**). P3 = 31,862 rows.</p>
+<p><code>device-inventory.csv</code> — <strong>249 devices</strong>, one row per distinct identity</p>
+<p>(join key = build codename; vendor/model normalized), with per-source</p>
+<p>membership columns (<code>in_devices_sql</code>, <code>blob_rows_devices_sql</code>,</p>
+<p><code>total_bytes_devices_sql</code>, <code>in_builds_csv</code>, <code>extract_status_22.2</code>,</p>
+<p><code>in_count_csv</code>, <code>in_sizes_csv</code>, <code>in_devices_csv_bloblists</code>, <code>soc</code>,</p>
+<p><code>soc_source</code>, <code>priority</code>, <code>mainline_basis_or_note</code>, <code>source_artifacts</code>).</p>
+<p>This resolves the "444 devices" question from the owner/task framing: the</p>
+<p>real per-BLOB table (<code>devices.csv</code>) has 3,880 rows; **FP6 is mentioned in</p>
+<p>418 of them** (the F-69 audit's "444 FP6 rows" number, from 2026-11-15,</p>
+<p>differs — either the file changed that day or the audit's parse counted</p>
+<p>multi-device rows differently; recheck on next fetch). The DB itself</p>
+<p>carries FP6 as 447 blob rows / 703,921,964 B (Lineage 23.0) vs the lab</p>
+<p>census's 665 files / 240,352,566 B (23.2-20261109) — different nightly and</p>
+<p>different scope; both recorded.</p>
+<h3>Upstream data-quality findings (new this session)</h3>
+<ol>
+<li><code>files.csv</code> is a 0-byte file; <code>totals.csv</code> header-only; the SQL dump's</li>
+</ol>
+<p>   <code>gsmarena</code>, <code>images</code>, <code>linux</code>, <code>specs</code> tables ship empty (schema with no</p>
+<p>   rows) — the DB's relational enrichment is aspirational, only <code>devices</code></p>
+<p>   is populated.</p>
+<ol>
+<li><code>count.csv</code> duplicates every device row dozens-hundreds of times (larry</li>
+</ol>
+<p>   ×203) with identical totals — a generator join artifact.</p>
+<ol>
+<li><code>builds.csv</code> SOC blank for ~122 devices; one row (Phone_2/aura) even has</li>
+</ol>
+<p>   a blank vendor; a stray <code>\ufffd</code> byte precedes one SOC value.</p>
+<ol>
+<li><code>a660_sqe.fw</code> (Adreno 660 SQE microcode, GPU) is typed <code>AUDIO</code> in</li>
+</ol>
+<p>   upstream's bintypes — a bintypes mislabel; same for the <code>bm2nXX.bin</code></p>
+<p>   ADSP-region fleet typed <code>MODEM</code> while living in <code>vendor/lib/rfsa/adsp</code>.</p>
+<ol>
+<li><code>devices.csv</code>'s device lists use repr'd Python lists with inner single</li>
+</ol>
+<p>   quotes inside the CSV double quotes — nonstandard quoting that breaks</p>
+<p>   naive CSV parsers (and likely explains audit-count drift).</p>
+<ol>
+<li><code>sizes.csv</code> (63 devices) lags <code>devices.sql.bz2</code> (123 populated devices):</li>
+</ol>
+<p>   the SQL dump is the only artifact with FP6 + rosemary rows.</p>
+<h2>What remains (the honest mountain)</h2>
+<ul>
+<li><strong>33,816 of 33,917 matrix rows (99.70%) have no ISA identified</strong>; even</li>
+</ul>
+<p>  for FP6, 352 of 447 rows (mostly camera/unknown tail) carry no committed</p>
+<p>  ISA fact. ISA is <em>unknown</em>, not <em>knowable-now</em> — the lab's FP6/MT6785</p>
+<p>  method (ELF e_machine + decode-rate sanity + container records) applies</p>
+<p>  to any extracted device, but nothing else has been run.</p>
+<ul>
+<li><strong>116 of 33,917 rows (0.34%) have a documented driver↔blob interface.</strong></li>
+<li><strong>113 devices</strong> in the DB have zero blob data; <strong>123 more</strong> exist only as</li>
+</ul>
+<p>  names in <code>builds.csv</code>/<code>count.csv</code>. The matrix's per-device coverage is</p>
+<p>  52% of the SQL device universe (123/236), 50% of <code>count.csv</code> (123/204),</p>
+<p>  47% of <code>devices.csv</code> tokens (123/248).</p>
+<ul>
+<li>The payload corpus itself is not publicly fetchable; everything above was</li>
+</ul>
+<p>  derived from metadata (git trees API + dump + CSVs), zero payload bytes</p>
+<p>  downloaded. The one-actionable cross-check that remains owner-gated:</p>
+<p>  a full-corpus torrent/archive.org mirror would collapse the corpus-access</p>
+<p>  blocker for every downstream RE effort.</p>
+<h2>Radio / regulatory stub — hurdles to replacing radio firmware</h2>
+<p>**Flag: dedicated documentation session required; nothing below is a</p>
+<p>conclusion — these are the enumerated dimensions to fill.**</p>
+<p>(FILLED 2026-11-16: the full document now lives at</p>
+<p><a href="research/upstream/radio-regulatory-hurdles.html">../radio-regulatory-hurdles.md</a> — primary</p>
+<p>texts fetched verbatim, precedents surveyed, RULE-0 query log included.</p>
+<p>The stub below is retained as the original dimension list.)</p>
+<ol>
+<li>**Type-approval per radio (modem/WiFi/BT/GNSS/NFC are certified as a</li>
+</ol>
+<p>   unit per device):** FCC (US; Part 15 + Part 22/24/27 for cellular,</p>
+<p>   SAR rules), CE / EU Radio Equipment Directive 2014/53/EU, UKCA, India</p>
+<p>   TEC/MTCTE, Japan TELEC/MIC, China SRRC, Brazil ANATEL. A free radio</p>
+<p>   firmware replacement re-opens the approval; modular-approval vs</p>
+<p>   per-device economics needs documenting.</p>
+<ol>
+<li><strong>Legality of RE-ing radio firmware:</strong> US DMCA §1201 rulemaking</li>
+</ol>
+<p>   exemptions (computer-program interoperability; wireless-device</p>
+<p>   unlocking exemptions 2015/2018/2021) — scope for <em>firmware</em></p>
+<p>   interoperability RE specifically; EU Software Directive 2009/24/EC</p>
+<p>   decompilation-for-interop; India/UK fair dealing. Carrier/SDO contract</p>
+<p>   terms (GCF/PTCRB certification conditions) as a separate non-statutory</p>
+<p>   hurdle.</p>
+<ol>
+<li><strong>Export controls on crypto:</strong> modem firmware embeds crypto (A5/3, RSA,</li>
+</ol>
+<p>   ECDH for SIM/network auth) → EAR Cat.5 Pt.2 / Wassenaar / EU dual-use</p>
+<p>   2021/1080 — where RE tooling and published specs sit; the lab's</p>
+<p>   no-keys/no-bypass charter (F-14 policy note) intersects this.</p>
+<ol>
+<li><strong>The FSF's own position:</strong> campaign texts (fsf.org campaign + news</li>
+</ol>
+<p>   pages, librephone.fsf.org/{freedom,faq}) demand RE-and-replace of the</p>
+<p>   proprietary modules; historical FSF line on secondary-processor</p>
+<p>   firmware (RYF certification criteria) vs radio firmware as the</p>
+<p>   acknowledged hard case — collect exact citations.</p>
+<ol>
+<li><strong>Precedents to survey:</strong> Openmoko/Calypso (the only fully-free modem</li>
+</ol>
+<p>   attempt), Replicant's modem status page, Qualcomm's mainline Linux</p>
+<p>   firmware split (ath11k/wcn6750 board data vs amss), MediaTek MOLY</p>
+<p>   stack, Google Tensor modem (Samsung Exynos-derived, shut in radio/).</p>
+<ol>
+<li><strong>Safety/EMC liability + spectrum-coexistence testing</strong> (SAR re-test,</li>
+</ol>
+<p>   coex between WiFi/BT/modem antennas) as the practical bring-up gate</p>
+<p>   beyond legality.</p>
+<h2>Files written (this session)</h2>
+<ul>
+<li><code>upstream-contribution/blob-database/recon.md</code> — this file.</li>
+<li><code>upstream-contribution/blob-database/device-inventory.csv</code> — 249 devices.</li>
+<li><code>upstream-contribution/blob-database/coverage-matrix.csv</code> — 33,917 rows.</li>
+<li>Scratch (re-generatable): <code>/tmp/lpdb/</code> — raw fetched artifacts</li>
+</ul>
+<p>  (<code>devices.sql</code> decompressed, all CSVs/JSONs) + <code>build_scaffold.py</code> (the</p>
+<p>  generator; family/ISA/interface rules embedded and commented).</p>
+<p>No git commit, no push (per instructions).</p>
+<h2>Workorder impact (lead note, 2026-11-16)</h2>
+<p>The finding above CORRECTS workorder W1 (desktop): no payload corpus is</p>
+<p>published, so there is nothing to bulk-download. Desktop payloads come</p>
+<p><strong>per-device from the public LineageOS install packages</strong> (~1-1.3 GB each,</p>
+<p>fetched only when a device in its half reaches a payload-needing phase).</p>
+<p>The published metadata needs no download — it is already distilled into</p>
+<p><code>coverage-matrix.csv</code> (33,917 rows) and <code>device-inventory.csv</code> (249</p>
+<p>devices), which the two-machine 222/222 program consumes directly.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What the Gunyah hypervisor is used for (FP6) — for upstream issue #39 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>What the Gunyah hypervisor is used for (FP6) — for upstream issue #39</h1><p>One-page note from **public data + lab-derived facts**</p><p>Evidence: none</p>
+<h1>What the Gunyah hypervisor is used for (FP6) — for upstream issue #39</h1>
+<p>One-page note from <strong>public data + lab-derived facts</strong></p>
+<p>(<a href="https://codeberg.org/rsavoye/librephone/issues/39">upstream issue #39</a>:</p>
+<p>"I noticed in the boot logs a mention of the Gunyah hypervisor, which</p>
+<p>is a free software project maintained by Qualcomm. What is this used</p>
+<p>for ?"). Written 2026-11-16.</p>
+<p><strong>Legend:</strong> [PUBLIC] = public fact; [LAB] = lab-derived fact; [OPEN] =</p>
+<p>not establishable from data on this box.</p>
+<h2>1. What Gunyah is</h2>
+<ul>
+<li>[PUBLIC] Gunyah is Qualcomm's open-source <strong>Type-1 hypervisor</strong> —</li>
+</ul>
+<p>  its own description: "Gunyah is a Type-1 hypervisor designed for</p>
+<p>  strong security, performance and modularity"</p>
+<p>  (<code>github.com/quic/gunyah-hypervisor</code>, accessed 2026-11-16). A Type-1</p>
+<p>  hypervisor runs below the OS: the kernel (Linux) becomes one guest,</p>
+<p>  and Gunyah multiplexes the CPU/other resources between it and</p>
+<p>  <strong>protected VMs (pVMs)</strong> — isolated secondary VMs for things like</p>
+<p>  trusted execution environments, DRM media paths, or OEM services,</p>
+<p>  each verified at boot (the Android "pvmfw" = protected-VM firmware</p>
+<p>  mechanism).</p>
+<ul>
+<li>[PUBLIC] Kernel-side, the mainline tree ships the Gunyah</li>
+</ul>
+<p>  <strong>watchdog</strong> driver speaking Gunyah's SMCCC hypercall convention</p>
+<p>  (fast calls, owner <code>ARM_SMCCC_OWNER_VENDOR_HYP</code>, functions</p>
+<p>  0x0005–0x0008: CONTROL/STATUS/PING/SET_TIME, and the public</p>
+<p>  <code>gunyah_error</code> enum) — <code>drivers/watchdog/gunyah_wdt.c</code>,</p>
+<p>  <code>torvalds/linux</code> (fetched 2026-11-16). The fuller Gunyah driver</p>
+<p>  stack (VM lifecycle, resource manager RPC) has been posted upstream</p>
+<p>  over the years but is <strong>not</strong> in <code>torvalds/master</code> as of</p>
+<p>  2026-11-16 (checked: <code>drivers/virt/</code> has no <code>gunyah</code>; both probed</p>
+<p>  2026-11-16) — on Android devices it comes with the vendor kernel.</p>
+<ul>
+<li>[PUBLIC] Qualcomm's reference hypervisor implementation and docs</li>
+</ul>
+<p>  are public at <code>github.com/quic/gunyah-hypervisor</code>.</p>
+<h2>2. What it is used for on FP6</h2>
+<ul>
+<li>[PUBLIC/asker's evidence] FP6 boot logs mention Gunyah — i.e., the</li>
+</ul>
+<p>  device boots Linux <strong>under</strong> the Gunyah hypervisor, not bare-metal:</p>
+<p>  Linux is guest 0, and the hypervisor owns the boot chain handoff.</p>
+<ul>
+<li>[LAB] The FP6 OTA carries the supporting partition set:</li>
+</ul>
+<p>  <code>pvmfw</code> (protected-VM firmware, 1,048,576 B; AVB-verified with a</p>
+<p>  descriptor in <code>vbmeta_system</code>; built from source by LineageOS) and</p>
+<p>  <code>vbmeta_system</code> descriptors covering pvmfw/product/system/system_ext</p>
+<p>  — <code>qualcomm-fp6/docs/bootchain-census.md</code>. That is the standard</p>
+<p>  Android pKVM/pVM arrangement Gunyah hosts.</p>
+<ul>
+<li>[LAB] The AP's second stage also ships the classic QTEE/QHEE pair:</li>
+</ul>
+<p>  <code>tz.img</code> (QTEE OS) + <code>hyp.img</code> (QHEE hypervisor, one TZ build</p>
+<p>  <code>TZ.XF.5.28.0-00021-LANAIAAAAANAZT-1</code>) —</p>
+<p>  <code>qualcomm-fp6/docs/trustzone-census.md</code>. Relation: QHEE/Gunyah-style</p>
+<p>  pVM hosting operate at different layers of the secure-boot stack;</p>
+<p>  which exact combination the shipping FP6 firmware orchestrates is</p>
+<p>  <strong>[OPEN]</strong> from committed data (needs the boot-log ↔ image mapping</p>
+<p>  on hardware).</p>
+<ul>
+<li>[LAB, the F-8 cross] Gunyah (AP-side pVM hypervisor) is distinct</li>
+</ul>
+<p>  from the QURT microkernel the lab identified on the WPSS small core</p>
+<p>  (<code>qualcomm-fp6/docs/wpss-qurt-rtos.md</code>): same vendor lineage of</p>
+<p>  microkernel-style RTOS/hypervisor software, different processors</p>
+<p>  and roles — worth stating so "Gunyah" and "QURT" are not conflated.</p>
+<h2>3. Bottom line for the issue</h2>
+<p>Gunyah on FP6 = the chip vendor's free, open-source hypervisor that</p>
+<p>boots before Linux and hosts protected VMs (pvmfw-verified) next to</p>
+<p>the Android host; Linux talks to it over SMCCC vendor-hyp hypercalls.</p>
+<p>For LibrePhone purposes: the hypervisor itself is <strong>free software</strong></p>
+<p>(the goal state of the campaign), the interesting RE surface is the</p>
+<p>blob-side firmware and the pVM boundary, both already partially</p>
+<p>censused by the lab.</p>
+<h2>Sources consulted (accessed 2026-11-16)</h2>
+<ul>
+<li>https://api.github.com/repos/quic/gunyah-hypervisor (repo metadata,</li>
+</ul>
+<p>  description quoted)</p>
+<ul>
+<li>https://raw.githubusercontent.com/torvalds/linux/master/drivers/watchdog/gunyah_wdt.c (fetched)</li>
+<li>probes that returned 404 (recorded as honest negatives):</li>
+</ul>
+<p>  <code>drivers/virt/gunyah/*</code>, <code>Documentation/virt/gunyah/*</code>,</p>
+<p>  <code>include/linux/gunyah.h</code> in <code>torvalds/master</code></p>
+<ul>
+<li>Lab: <code>qualcomm-fp6/docs/bootchain-census.md</code> (pvmfw/vbmeta_system),</li>
+</ul>
+<p>  <code>qualcomm-fp6/docs/trustzone-census.md</code> (QTEE/QHEE),</p>
+<p>  <code>qualcomm-fp6/docs/wpss-qurt-rtos.md</code> (F-8 QURT)</p>
+<p><strong>Clean-room statement:</strong> public facts + lab census facts only; no</p>
+<p>hypervisor internals, no keys, no bypass content.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

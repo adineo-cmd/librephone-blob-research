@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Per-SoC census method plans (236-device split, top-8 clusters) — 2026-11-16 — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Per-SoC census method plans (236-device split, top-8 clusters) — 2026-11-16</h1><p>Purpose: the per-SoC execution plans for the lab&#x27;s FP6/MT6785 census</p><p>Evidence: none</p>
+<h1>Per-SoC census method plans (236-device split, top-8 clusters) — 2026-11-16</h1>
+<p>Purpose: the per-SoC execution plans for the lab's FP6/MT6785 census</p>
+<p>pipeline (container walk → ISA identification → per-family census →</p>
+<p>interface decode) applied to the top device clusters of the</p>
+<p>LibrePhone 236-device universe, plus the <strong>upstream-facing</strong> section:</p>
+<p>what LibrePhone could accept upstream per cluster (doc stubs,</p>
+<p>sizes.csv rows, interface facts). This file complements the fleet docs</p>
+<p>in <a href="../laptop/">laptop/</a> (ADSP bm2nXX fleet, QCA BT fleet, Adreno GMU —</p>
+<p>which cover shared-blob families) and the matrix scaffold</p>
+<p>(<code>upstream-contribution/blob-database/coverage-matrix.csv</code>); it is the</p>
+<p>per-SOC planning layer.</p>
+<h2>Data basis and provenance (RULE 0)</h2>
+<ul>
+<li><strong>Device universe:</strong> <code>/tmp/lpdb/split.json</code> — the 236-device split of</li>
+</ul>
+<p>  the upstream <code>devices.sql.bz2</code> <code>devices</code> table (118 desktop-half +</p>
+<p>  118 laptop-half rows; blob rows carry file/type/size/md5, no paths).</p>
+<p>  Regeneration method per WORKORDER-001-desktop.md (recon stream).</p>
+<p>  Counts below are complete enumerations, not samples; computed this</p>
+<p>  session 2026-11-16 with the scripts sketched in the appendix of this</p>
+<p>  file's history (regex-token SoC normalization, family rules at the</p>
+<p>  bottom of this file).</p>
+<ul>
+<li><strong>Upstream metadata:</strong> <code>upstream-contribution/blob-database/</code></li>
+</ul>
+<p>  (recon.md, coverage-matrix.csv, device-inventory.csv) — fetched and</p>
+<p>  committed 2026-11-16 by the recon stream; not re-fetched (no</p>
+<p>  download needed, per F-71: the published "database" is metadata</p>
+<p>  only).</p>
+<ul>
+<li><strong>Mainline kernel support levels:</strong> verified per-SoC this session by</li>
+</ul>
+<p>  fetching <code>torvalds/linux</code> master files (every claim below names the</p>
+<p>  file; all fetches 2026-11-16, status: OK — network flaky but all</p>
+<p>  succeeded within 3 retries; failures would be recorded per file).</p>
+<ul>
+<li><strong>BT chip identities per cluster</strong> are decoded from the DB's own</li>
+</ul>
+<p>  blob filenames through the **mainline <code>btqca.c</code> rampatch-prefix →</p>
+<p>  soc-type switch** (fetched and verified this session):</p>
+<p>  <code>msbtfw*</code>→WCN6750, <code>crbtfw*</code>→WCN3990/91/98, <code>apbtfw*</code>→WCN3988,</p>
+<p>  <code>cmbtfw*</code>→WCN3950, <code>htbtfw*</code>→QCA6390, <code>hpbtfw*</code>→QCA2066,</p>
+<p>  <code>wcnhpbtfw*</code>→WCN6855, <code>hmtbtfw*</code>→WCN7850. This is a lab-derived</p>
+<p>  fact chain (upstream DB filenames × mainline kernel case labels) —</p>
+<p>  first recorded anywhere as a per-cluster chip census.</p>
+<h2>The SoC distribution of the 236 devices</h2>
+<p>The <code>soc</code> column is present for only 115 of 236 devices; **121 are</p>
+<p>blank** (including FP6 itself — the lab's flagship has no SOC cell</p>
+<p>upstream). Grouped by chip (variant suffixes -AC/-AE merged; the</p>
+<p>stray <code>\ufffd</code> byte on the <code>larry</code> row stripped):</p>
+<table>
+<tr>
+<th>devices</th>
+<th>SoC</th>
+<th>blob rows in DB</th>
+<th>GB (blob bytes)</th>
+<th>populated</th>
+</tr>
+<tr>
+<td>121</td>
+<td><strong>(blank — 51.3% of the universe)</strong></td>
+<td>17,358</td>
+<td>36.97</td>
+<td>56 devices</td>
+</tr>
+<tr>
+<td>16</td>
+<td>SDM845 (Snapdragon 845)</td>
+<td>83</td>
+<td>0.11</td>
+<td>3</td>
+</tr>
+<tr>
+<td>15</td>
+<td>SM6375 (Snapdragon 695)</td>
+<td>3,562</td>
+<td>7.29</td>
+<td>12</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Google Tensor (GS101 ×3, GS201 ×5, G3 ×5, G4 ×1)</td>
+<td>677</td>
+<td>4.66</td>
+<td>14</td>
+</tr>
+<tr>
+<td>8</td>
+<td>SM7250 (Snapdragon 765G)</td>
+<td>938</td>
+<td>2.00</td>
+<td>4</td>
+</tr>
+<tr>
+<td>8</td>
+<td>MSM8998/SDM835 (Snapdragon 835)</td>
+<td>871</td>
+<td>1.08</td>
+<td>2 (both mislabeled — see below)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>SM8250 (Snapdragon 865/870)</td>
+<td>1,900</td>
+<td>2.65</td>
+<td>6</td>
+</tr>
+<tr>
+<td>5</td>
+<td>SM8150 (Snapdragon 855)</td>
+<td>871</td>
+<td>1.10</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SM7325 (Snapdragon 778G)</td>
+<td>880</td>
+<td>1.81</td>
+<td>4</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SM6115 (Snapdragon 662)</td>
+<td>967</td>
+<td>2.03</td>
+<td>4</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SM8475 (Snapdragon 8+ Gen 1)</td>
+<td>654</td>
+<td>0.81</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SM8350 (Snapdragon 888)</td>
+<td>1,344</td>
+<td>1.72</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SM6225 (Snapdragon 680 4G)</td>
+<td>704</td>
+<td>1.40</td>
+<td>3</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Amlogic S905X3/S905Y2</td>
+<td>25</td>
+<td>0.04</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2 each</td>
+<td>SDM632, SDM630, SDM636, SDM660, SDM670, SM8550, SM4250, MSM8996 Pro</td>
+<td>(see device-inventory.csv)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1 each</td>
+<td>SM7225 (FP4), QCM6490 (FP5), SM4350, SM4375</td>
+<td>286/706/44/364</td>
+<td>0.69/0.59/0.15/0.78</td>
+<td>all</td>
+</tr>
+</table>
+<p>Upstream data-quality findings surfaced by this grouping (each is a</p>
+<p>fact from the dump, verifiable in devices.sql.bz2):</p>
+<ol>
+<li><strong>Mislabeled SOC cells:</strong> Pixel 4 (<code>flame</code>) carries "SM8150 855"</li>
+</ol>
+<p>   (it is SDM845); Pixel 4 XL (<code>coral</code>) carries "SM7250 765G" (it is</p>
+<p>   SDM845); OnePlus 7 (<code>guacamoleb</code>) and OnePlus 7T (<code>hotdogb</code>) carry</p>
+<p>   "MSM8998 835" (they are SM8150). Consequence: the MSM8998</p>
+<p>   cluster's entire 871-row blob content is actually SM8150-family</p>
+<p>   firmware; the genuine-835 devices (mata, joan, nx659j,</p>
+<p>   cheeseburger, walleye, taimen) have <strong>zero</strong> blob rows.</p>
+<ol>
+<li>A stray <code>\ufffd</code> byte precedes one SOC value (<code>larry</code>, OnePlus</li>
+</ol>
+<p>   Nord CE 3 Lite) — already noted by the recon stream.</p>
+<ol>
+<li>The <code>extracts</code> flag does not track blob presence (FP6:</li>
+</ol>
+<p>   extracts=False with 447 blob rows; several extracts=True devices</p>
+<p>   have 0 rows) — same finding as the laptop Phase-4 fragmentation</p>
+<p>   half.</p>
+<ol>
+<li>FP6's own SOC cell is <code>\N</code> — the flagship device is in the blank</li>
+</ol>
+<p>   bucket.</p>
+<ol>
+<li><strong>SOC cells contradict device identities</strong> in both directions</li>
+</ol>
+<p>   (device identity from the dump's own vendor/model strings, public</p>
+<p>   SoC from the device's known spec): <code>tundra</code> (Moto Edge 30</p>
+<p>   Fusion, public SM7325-AE) carries SM7250 with 639 rows — the</p>
+<p>   SM7250 cluster's largest contributor; <code>pioneer</code>/<code>voyager</code>/</p>
+<p>   <code>discovery</code> (Sony Xperia XA2/XA2 Plus/XA2 Ultra, public SDM630)</p>
+<p>   carry SDM845 and hold the SDM845 cluster's entire 83-row blob</p>
+<p>   content (Adreno-530-generation files — which fits the 845 label</p>
+<p>   but not the device family, i.e. the rows and the label cannot</p>
+<p>   both be right); <code>cheryl</code> (Razer Phone, public MSM8998) and</p>
+<p>   <code>akershus</code> (ZTE Axon 9 Pro, public SDM845) carry SM6375;</p>
+<p>   <code>nx659j</code> (Red Magic 5G per the model string, public SM8250)</p>
+<p>   carries MSM8998; <code>caiman</code>/<code>comet</code> (Pixel 9 Pro/9 Pro Fold,</p>
+<p>   public Tensor G4) carry "Tensor G3". **Consequence for this</p>
+<p>   file:** cluster row-counts are reported under the DB's labels</p>
+<p>   as-is, with each contradiction flagged where it affects the</p>
+<p>   cluster's data interpretation; fixing the labels is upstream</p>
+<p>   deliverable #2 in the summary table below.</p>
+<h2>The census method (the FP6/MT6785 pipeline, parameterized)</h2>
+<p>Four phases; the per-SoC sections below state only what <strong>differs</strong></p>
+<p>from the FP6 exemplar (which ran all four end-to-end, see</p>
+<p><code>qualcomm-fp6/docs/fp6-architecture-census.md</code>):</p>
+<ol>
+<li><strong>Container walk</strong> — OTA payload.bin manifest → per-partition dump</li>
+</ol>
+<p>   (<code>tools/payload_manifest.py</code>, <code>payload_dump.py</code>); vfat/ext4</p>
+<p>   extraction (<code>extract_vfat.py</code>, <code>extract_ext4.py</code>). Per-SoC knobs:</p>
+<p>   Tensor devices ship a different partition grammar entirely</p>
+<p>   (bl1/bl2/bl31/pbl/ldfw/tzsw = Arm-trusted-boot chain, no</p>
+<p>   Qualcomm .mdt splits at all); Amlogic TV boxes are Android-TV</p>
+<p>   images (boot/recovery + dtb.img) with no per-subsystem partitions.</p>
+<ol>
+<li><strong>ISA identification</strong> — ELF header census + entry-point sanity +</li>
+</ol>
+<p>   RV32/Hexagon opcode enrichment (the junk-header rule: per-segment</p>
+<p>   <code>.bXX</code> e_machine values are noise; trust <code>.mdt</code>/<code>.mbn</code> headers and</p>
+<p>   entry-in-LOAD checks). Per-SoC knobs: Tensor images are mostly</p>
+<p>   raw AArch64 or AOSP-format containers (no ELF wrapper) — the</p>
+<p>   identification anchor is the dtb/DTBO + bootloader binary</p>
+<p>   signature, not e_machine.</p>
+<ol>
+<li><strong>Per-family census</strong> — filename-first family mapping with</li>
+</ol>
+<p>   upstream bintype fallback (the generator rules embedded in</p>
+<p>   build_scaffold.py, blob-database stream). Per-SoC knob: the BT</p>
+<p>   fleet prefix decode (msbtfw/crbtfw/apbtfw/cmbtfw/htbtfw/hpbtfw/</p>
+<p>   hmtbtfw) resolves the BT chip per device <strong>without any new RE</strong>;</p>
+<p>   the touch-panel fleets (FW_<em>/LIMIT_</em> Samsung/Novatek/Goodix/</p>
+<p>   FocalTech images) are the dominant row mass on Motorola/Xiaomi</p>
+<p>   clusters and need a per-vendor touch-IC census template.</p>
+<ol>
+<li><strong>Interface decode</strong> — only where a mainline driver exists to</li>
+</ol>
+<p>   decode against (ath10k/ath11k WMI+CE, btqca TLV, fastrpc,</p>
+<p>   qseecom, QRTR/QMI). Per-SoC knob: Tensor has <em>no</em> mainline</p>
+<p>   driver surface (verified below) — its interface half is blocked</p>
+<p>   on AOSP kernel sources, not mainline.</p>
+<h2>Top-8 clusters (plus the two one-device Fairphone exemplars)</h2>
+<h3>1. SDM845 (Snapdragon 845) — 16 devices, 83 rows, 0.11 GB</h3>
+<ul>
+<li>Devices (DB vendor/model strings): blueline/crosshatch (Pixel</li>
+</ul>
+<p>  3/3XL), judyln/judyp/judypn (LG G7 ThinQ/V35/V40), enchilada</p>
+<p>  (OnePlus 6), aura (Razer Phone 2), axolotl (Shift 6MQ), akari/</p>
+<p>  xz2c/aurora/akatsuki (Sony XZ2 family), caymanslm (LG Velvet),</p>
+<p>  pioneer/voyager/discovery (Sony XA2 family — see contradiction</p>
+<p>  note 5 above: their SOC cell and their 83 rows disagree with the</p>
+<p>  device family), beryllium (Poco F1) and others per</p>
+<p>  device-inventory.csv.</p>
+<ul>
+<li>DB state: <strong>almost unpopulated</strong> — 3 Sony devices carry 83 rows</li>
+</ul>
+<p>  (Adreno 530 GPU fleet a530*_pfp/pm4/gpmu/seq + camera cpp_firmware</p>
+<p>  + boot.img). Everything else needs first-population from</p>
+<p>  per-device LineageOS packages (~1-1.3 GB each).</p>
+<ul>
+<li>Mainline support (verified 2026-11-16): the strongest of any</li>
+</ul>
+<p>  cluster — <code>sdm845.dtsi</code> + <code>sdm845-db845c.dts</code> + **<code>sdm845-google-blueline.dts</code></p>
+<p>  (Pixel 3 mainlined)** among 24 dts/dtsi files; PAS compatibles</p>
+<p>  <code>qcom,sdm845-adsp-pas</code>, <code>qcom,sdm845-cdsp-pas</code> (+ slpi resource);</p>
+<p>  modem via <code>qcom_q6v5_mss</code>; WiFi = <strong>ath10k <code>qca6174</code>/<code>wcn3990 hw1.0</code></strong></p>
+<p>  (WCN3990 dir constant verified in <code>ath10k/core.c</code> lines 714-726);</p>
+<p>  GPU = Adreno 530 (a530 firmware, freedreno/mesa public).</p>
+<ul>
+<li>Census method: run the FP6 pipeline verbatim (same MDT grammar,</li>
+</ul>
+<p>  same PAS loading); the wifi family is ath10k-SNOC (wlan_firmware/</p>
+<p>  WCNSS-style files) not ath11k — the interface decode anchors are</p>
+<p>  <code>ath10k_snoc</code> + the WCNSS NV blob (wcnss.wcnss_nv_*), a different</p>
+<p>  driver than FP6's.</p>
+<ul>
+<li>Upstream-facing: FP6-style per-family doc stubs would land on</li>
+</ul>
+<p>  fertile ground here (upstream has zero 845-family docs); sizes.csv</p>
+<p>  rows for the 13 unpopulated devices; interface facts: ath10k SNOC</p>
+<p>  probe/download sequence, a530 GMU-less GPU firmware set (a530_*,</p>
+<p>  7 files — one RE pass frees the whole cluster's GPU story).</p>
+<h3>2. SM6375 (Snapdragon 695) — 15 devices, 3,562 rows, 7.29 GB</h3>
+<ul>
+<li>Devices (DB vendor/model strings): miami (Moto Edge 30 Neo), fogos</li>
+</ul>
+<p>  (Moto G34 5G), rhodep (Moto G82 5G), bangkk (Moto G84 5G), oscaro</p>
+<p>  (OnePlus Nord CE2), larry (OnePlus Nord CE3), gunnar (OnePlus Nord</p>
+<p>  N20 5G), luigi (Realme 10 Pro), oscar (Realme 9 Pro), pdx225/</p>
+<p>  pdx235/pdx234/pdx237 (Sony Xperia 10 IV/10 V/1 V/5 V); plus two</p>
+<p>  zero-row label errors (cheryl = Razer Phone, akershus = ZTE Axon 9</p>
+<p>  Pro — see note 5).</p>
+<ul>
+<li>DB state: the <strong>largest populated modern cluster</strong> (12 devices with</li>
+</ul>
+<p>  345-506 rows each). Row mass is dominated by **touch-panel</p>
+<p>  firmware fleets** (FW_NF_NT36672C_TIANMA ×28, FW_FT3518_SAMSUNG</p>
+<p>  ×24, FW_NF_ILI7807S_TIANMA ×16 — per-panel variants).</p>
+<ul>
+<li>BT chips (decoded): *<em>crbtfw\</em> → WCN3990/91/98 Rome family ×28,</li>
+</ul>
+<p>  apbtfw\<em> → WCN3988 ×16</em>* — consistent with mainline</p>
+<p>  <code>sm6375.dtsi</code>'s <code>qcom,wcn3990-wifi</code> compatible (verified, line</p>
+<p>  1736): this cluster's combo chip is the WCN39xx generation, NOT</p>
+<p>  the FP6's WCN6750.</p>
+<ul>
+<li>Mainline support (verified): <code>sm6375.dtsi</code> +</li>
+</ul>
+<p>  <code>sm6375-sony-xperia-murray-pdx225.dts</code> (+ pdx235); PAS compatibles</p>
+<p>  <code>qcom,sm6375-adsp-pas</code>, <code>qcom,sm6375-cdsp-pas</code>,</p>
+<p>  <code>qcom,sm6375-mpss-pas</code> — the full four-processor PAS set.</p>
+<ul>
+<li>Census method: FP6 pipeline; two additions — (a) a **touch-IC</li>
+</ul>
+<p>  census template** (file → vendor token NT36672C/FT3518/ILI7807S →</p>
+<p>  panel vendor; type/size/hashes only), because touch is the family</p>
+<p>  mass here; (b) the BT census is the <em>Rome</em> flavor — the lab's QCA</p>
+<p>  BT fleet doc (../laptop/qualcomm-qca-bt-fleet.md) plus the crbtfw</p>
+<p>  branches of btqca.c.</p>
+<ul>
+<li>Upstream-facing: upstream's docs have no 6xx-generation content at</li>
+</ul>
+<p>  all; the single highest-leverage upstream artifact for this</p>
+<p>  cluster is the per-family doc stub set (modem/adsp/cdsp/mpss +</p>
+<p>  WCN39xx WiFi/BT) — sizes.csv rows for the 12 populated devices are</p>
+<p>  a 10-minute contribution (sizes.csv has zero 695-family rows).</p>
+<h3>3. Google Tensor (GS101/GS201/G3/G4) — 14 devices, 677 rows, 4.66 GB</h3>
+<ul>
+<li>Devices: oriole, raven, bluejay (GS101), panther, cheetah, lynx,</li>
+</ul>
+<p>  felix, tangorpro (GS201), shiba, husky, akita, caiman, comet (G3</p>
+<p>  per the DB's SOC cell; caiman/comet are Pixel 9 Pro/9 Pro Fold —</p>
+<p>  public Tensor G4, note 5), tokay (G4) — every device populated</p>
+<p>  (abl.img/bl1/bl2/bl31/tzsw/pbl/ldfw ×14 identical filenames).</p>
+<ul>
+<li>DB state: uniform boot-chain file set across all 14 devices — the</li>
+</ul>
+<p>  Tensor family is one <strong>Arm trusted-boot grammar</strong>: bl1/bl2/bl31</p>
+<p>  (ARM Trusted Firmware stages), pbl, ldfw, tzsw (Samsung TZ</p>
+<p>  software), abl, mfc_fw.bin (Exynos MFC video codec), evt.ec.bin</p>
+<p>  (embedded controller). No Qualcomm .mdt/.bXX splits anywhere.</p>
+<ul>
+<li>Mainline support (verified): <strong>none</strong> —</li>
+</ul>
+<p>  <code>arch/arm64/boot/dts/google/</code> contains only lga-* files (a</p>
+<p>  different platform); no gs101/gs201/zuma dtsi in master (checked</p>
+<p>  2026-11-16 via the contents API). Tensor mainlining lives in AOSP</p>
+<p>  and out-of-tree series, not torvalds master.</p>
+<ul>
+<li>Census method: the pipeline must switch to the **MT6785-style</li>
+</ul>
+<p>  grammar** (lab mediatek/rosemary census: vendor-container formats,</p>
+<p>  per-payload records) adapted to Samsung's chain: container walk =</p>
+<p>  per-image ELF/raw classification, ISA identification = AArch64</p>
+<p>  raw-code detection + DTB/DTBO parsing, family census = Exynos</p>
+<p>  names (mfc/shldrdm?), interface decode = **blocked on AOSP kernel</p>
+<p>  sources** (exynos9820-era drivers; gs101/gs201 are public in</p>
+<p>  AOSP — citable but not mainline).</p>
+<ul>
+<li>Upstream-facing: upstream has zero Tensor content; the modem</li>
+</ul>
+<p>  (Exynos Modem 5123/5300/5400, "shut in radio/" per the recon's</p>
+<p>  regulatory stub) is the freedom-critical blob — the honest</p>
+<p>  upstream deliverable here is a **radio-directory inventory doc per</p>
+<p>  Tensor device** (what files, what sizes, what hash identity across</p>
+<p>  the 14 devices — the DB already shows they share filenames), plus</p>
+<p>  sizes.csv rows. No interface claims should be filed until the AOSP</p>
+<p>  kernel cross-reference is done.</p>
+<h3>4. SM7250 (Snapdragon 765G) — 8 devices, 938 rows, 2.00 GB</h3>
+<ul>
+<li>Devices: sunfish (Pixel 4A), bramble (Pixel 4A 5G), redfin</li>
+</ul>
+<p>  (Pixel 5), barbet (Pixel 5A), tundra (Moto Edge 30 Fusion — SOC</p>
+<p>  cell contradiction, note 5: the cluster's largest contributor at</p>
+<p>  639 rows carries the SM7250 label), kiev (Moto G 5G), nairo (Moto</p>
+<p>  G 5G Plus), coral (Pixel 4 XL — mislabel, data-quality finding 1).</p>
+<p>  Populated: bramble (105), redfin (103), barbet (91), tundra (639).</p>
+<ul>
+<li>DB state: full firmware-update partition set per device (xbl/abl/</li>
+</ul>
+<p>  aop/devcfg/uefisecapp/modemr.jsn/tz/hyp ×4).</p>
+<ul>
+<li>BT chips (decoded): hpbtfw\* → QCA2066 ×2 (tundra generation).</li>
+<li>Mainline support (verified): <strong>no sm7250.dtsi in mainline</strong> (404</li>
+</ul>
+<p>  checked) — this cluster has no upstream kernel surface; its</p>
+<p>  kernel-side interface facts must come from Qualcomm/AOSP vendor</p>
+<p>  trees (cite as vendor-tree facts, not mainline).</p>
+<ul>
+<li>Census method: FP6 pipeline works as-is (same MDT grammar); ISA</li>
+</ul>
+<p>  identification will find the same generation mix (Hexagon</p>
+<p>  modem/adsp/cdsp + AArch64 TZ). Flag: without mainline dts, the</p>
+<p>  interface-decode phase has no in-tree anchor — record as</p>
+<p>  interface_documented=n until a vendor tree is chosen.</p>
+<ul>
+<li>Upstream-facing: sizes.csv rows for the 4 populated devices; a</li>
+</ul>
+<p>  Pixel-4a-5G/5/5a/7-tundra? note — no. Honest scope: blob census</p>
+<p>  + BT chip decode only.</p>
+<h3>5. MSM8998/SDM835 (Snapdragon 835) — 8 devices, 871 rows (0 from 835 devices), 1.08 GB</h3>
+<ul>
+<li>Devices: mata (Essential PH-1), joan (LG V30), nx659j (Red Magic 5G</li>
+</ul>
+<p>  per the model string — public SM8250, another SOC contradiction,</p>
+<p>  0 rows), cheeseburger (OnePlus 5), walleye/taimen (Pixel 2/2 XL),</p>
+<p>  guacamoleb/hotdogb (**mislabeled SM8150 devices carrying all 871</p>
+<p>  rows**).</p>
+<ul>
+<li>DB state: the genuine-835 devices are <strong>empty</strong> — first-population</li>
+</ul>
+<p>  is the whole task for this cluster. Pixel 2/2 XL are the priority</p>
+<p>  (long mainline pedigree: walleye/taimen mainline dts exist —</p>
+<p>  <code>msm8998-*</code> dts files verified present, 15 files incl.</p>
+<p>  <code>msm8998-fxtec-pro1.dts</code> and Pixel 2 entries).</p>
+<ul>
+<li>Mainline support (verified): <code>msm8998.dtsi</code> + 14 device dts;</li>
+</ul>
+<p>  PAS compatible <code>qcom,msm8998-adsp-pas</code>; modem via mss driver.</p>
+<ul>
+<li>Census method: FP6 pipeline + older-grammar alert: 835-era</li>
+</ul>
+<p>  firmware uses the <strong>older split-ELF and WCNSS grammar</strong> (WiFi =</p>
+<p>  wcn3990 or qca6174 PCIe; BT per DB decode = crbtfw ×6 / apbtfw ×4</p>
+<p>  — but those rows belong to the mislabeled SM8150 devices, so the</p>
+<p>  835 devices' BT chips are <strong>[OPEN] until first population</strong>).</p>
+<ul>
+<li>Upstream-facing: doc stubs would target the already-mainlined</li>
+</ul>
+<p>  devices (Pixel 2, Fxtec Pro1) — the "docs one per mainlined</p>
+<p>  device" pattern; sizes.csv rows after population.</p>
+<h3>6. SM8250 (Snapdragon 865/870) — 8 devices, 1,900 rows, 2.65 GB</h3>
+<ul>
+<li>Devices: instantnoodle, instantnoodlep, kebab, lemonades, martini</li>
+</ul>
+<p>  (OnePlus 8/8 Pro/8T/9R/9RT), pdx206 (Sony Xperia 5 II), pstar/nio</p>
+<p>  (Moto Edge 20 Pro/Edge S, 870).</p>
+<ul>
+<li>DB state: 6 populated; row mass = OnePlus fast-charge firmware</li>
+</ul>
+<p>  (oplus_vooc_fw*.bin ×80/x80/x12) + Samsung touch fleets</p>
+<p>  (FW_S3908_SAMSUNG ×25) — the "other" long tail dominates.</p>
+<ul>
+<li>BT chips (decoded): *<em>htbtfw\</em> → QCA6390 ×6, hpbtfw\* → QCA2066</li>
+</ul>
+<p>  ×4** — the discrete BT-chip generation (QCA6390 is a real</p>
+<p>  PCIe-attached BT chip, unlike WCN6750's UART).</p>
+<ul>
+<li>Mainline support (verified): <code>sm8250.dtsi</code> + 13 dts files (HDK,</li>
+</ul>
+<p>  MTP, Samsung); PAS <code>qcom,sm8250-adsp-pas</code>/<code>cdsp</code> (+ mss modem);</p>
+<p>  no OnePlus dts in mainline (404 checked for</p>
+<p>  sm8250-oneplus-common.dtsi).</p>
+<ul>
+<li>Census method: FP6 pipeline verbatim; the fast-charge/touch fleet</li>
+</ul>
+<p>  needs the vendor "other" template; WiFi/BT = the QCA6390 discrete</p>
+<p>  generation (BT decode above; <code>ath11k</code> supports QCA6390_HW20 per</p>
+<p>  the verified core.c table) — interface decode anchors at</p>
+<p>  <code>ath11k</code> qca6390 hw params, a genuinely different transport</p>
+<p>  (PCIe MHI) than FP6's IPCI.</p>
+<ul>
+<li>Upstream-facing: the OnePlus 8-series is the largest populated</li>
+</ul>
+<p>  OnePlus cluster upstream — sizes.csv rows + a fast-charge firmware</p>
+<p>  family doc (oplus_vooc_fw: one RE pass covers ×80+ device-rows).</p>
+<h3>7. SM8150 (Snapdragon 855) — 5 devices, 871 rows, 1.10 GB</h3>
+<ul>
+<li>Devices: guacamole, hotdog (OnePlus 7 Pro/7T Pro — the two</li>
+</ul>
+<p>  populated), flame (mislabeled Pixel 4), fajita (OnePlus 6T? no —</p>
+<p>  fajita is OnePlus 6T which is SDM845; **another likely upstream</p>
+<p>  SOC mislabel** — fajita's DB SOC says SM8150; OnePlus 6T is</p>
+<p>  SDM845), TP1803.</p>
+<ul>
+<li>DB state: rows split guacamole 435 / hotdog 436 (OnePlus 7</li>
+</ul>
+<p>  family firmware).</p>
+<ul>
+<li>BT chips (decoded): crbtfw\<em> ×6 + apbtfw\</em> ×4 (Rome/WCN39xx</li>
+</ul>
+<p>  generation) — from the guacamole/hotdog rows.</p>
+<ul>
+<li>Mainline support (verified): <code>sm8150.dtsi</code> + 7 dts files (HDK855,</li>
+</ul>
+<p>  Surface Duo, MTP); PAS <code>qcom,sm8150-adsp/cdsp/mpss-pas</code> full set.</p>
+<ul>
+<li>Census method: FP6 pipeline verbatim. Data-quality lever: filing</li>
+</ul>
+<p>  upstream SOC corrections for fajita/flame/guacamoleb/hotdogb rows</p>
+<p>  (see upstream-facing) would fix the matrix's join keys.</p>
+<ul>
+<li>Upstream-facing: SOC-cell corrections upstream (a small data PR),</li>
+</ul>
+<p>  sizes.csv rows, and the OnePlus-7-family doc stubs.</p>
+<h3>8. SM7325 (Snapdragon 778G) — 4 devices, 880 rows, 1.81 GB</h3>
+<ul>
+<li>Devices: berlin, berlna, dubai, Spacewar (Nothing Phone 1,</li>
+</ul>
+<p>  SM7325-AE) — all populated (bluetooth.img/boot/vbmeta/sequence_</p>
+<p>  manifest.bin ×4 each).</p>
+<ul>
+<li>BT chips (decoded): *<em>msbtfw\</em> → WCN6750 ×12** (msbtfw10+msbtfw11</li>
+</ul>
+<p>  both shipped, + msnv10/11) + cmbtfw\* → WCN3950 ×6 — the same BT</p>
+<p>  firmware family as the FP6, at different patch versions.</p>
+<ul>
+<li>Mainline support (verified): <code>sm7325.dtsi</code> + 8 dts files (Motorola</li>
+</ul>
+<p>  dubai variants); PAS: no sm7325-specific entries (nearest:</p>
+<p>  sm8350 resources) — flagged honestly.</p>
+<ul>
+<li>Census method: FP6 pipeline + the BT census is directly the lab's</li>
+</ul>
+<p>  msbtfw/WCN6750 expertise (bt-firmware-census.md) — the msnv10 vs</p>
+<p>  msnv11 NVM tag diff is a natural first deliverable (msnv10 is</p>
+<p>  absent from FP6's partition, so this cluster extends the lab's BT</p>
+<p>  census by one generation).</p>
+<ul>
+<li>Upstream-facing: extend the lab's BT census doc with the</li>
+</ul>
+<p>  SM7325-variant rows; interface facts reuse interface-bt.md (the</p>
+<p>  driver side is identical — same btqca branches).</p>
+<h3>9-12. The next tier (SM6115 ×4, SM8475 ×4, SM8350 ×3, SM6225 ×3)</h3>
+<ul>
+<li>SM6115 (662): pro1x (Fxtec Pro1-X), bathena (Moto Defy 2021),</li>
+</ul>
+<p>  caprip (Moto G30), borneo (Moto G Power) — fully populated (967</p>
+<p>  rows); BT = cmbtfw\* → WCN3950 ×20; mainline:</p>
+<p>  <code>sm6115.dtsi</code> + <code>sm6115-fxtec-pro1x.dts</code> + <code>sm6115-xiaomi-lemon.dts</code>;</p>
+<p>  PAS full set (adsp/cdsp/mpss). Best upstream landing zone of the</p>
+<p>  tier: the Fxtec Pro1-X is an official mainline-adjacent device.</p>
+<ul>
+<li>SM8475 (8+ Gen 1): eqs (Moto Edge 30 Ultra), Pong (Nothing Phone</li>
+</ul>
+<p>  2), ingot (Solana Saga) + bronco (Moto ThinkPhone — the</p>
+<p>  mislabeled "8 Gen1" row); only 1 populated (amss.bin/amss20.bin/</p>
+<p>  m3.bin/regdb.bin ×2 = the raw-modem-image era begins); mainline</p>
+<p>  has no sm8475 dtsi (404) — upstream support routes through</p>
+<p>  sm8450.</p>
+<ul>
+<li>SM8350 (888): lemonadep (OnePlus 9 Pro), pdx214 (Xperia 5 III) +</li>
+</ul>
+<p>  xpeng (Moto G200); 2 populated (1,344 rows); mainline</p>
+<p>  <code>sm8350.dtsi</code> + 7 dts; PAS full set.</p>
+<ul>
+<li>SM6225 (680 4G): devon, hawao, rhode (Moto G32/G42/G52) — 3</li>
+</ul>
+<p>  populated (704 rows); <strong>no sm6225.dtsi in mainline</strong> (404) — same</p>
+<p>  vendor-tree-only situation as SM7250.</p>
+<h3>The Fairphone exemplars (1 device each — the method's proof points)</h3>
+<ul>
+<li><strong>QCM6490 = FP5</strong>: 706 rows/0.59 GB; BT = msbtfw\* (WCN6750) +</li>
+</ul>
+<p>  hpbtfw\* (QCA2066); mainline <code>qcm6490-fairphone-fp5.dts</code> with</p>
+<p>  <code>qcom,wcn6750-bt</code> bluetooth compatible (verified line 1537) — the</p>
+<p>  FP6 census method applies unchanged and its upstream cross-check</p>
+<p>  already exists.</p>
+<ul>
+<li><strong>SM7225 = FP4</strong>: 286 rows; BT = crbtfw\<em>/apbtfw\</em>; mainline</li>
+</ul>
+<p>  <code>sm7225-fairphone-fp4.dts</code> exists — FP4 is the cheapest full</p>
+<p>  pipeline run (1 device, mainlined, populated DB).</p>
+<ul>
+<li><strong>FP6</strong>: in the (blank) bucket upstream (SOC cell <code>\N</code>) with 447</li>
+</ul>
+<p>  blob rows; the lab's FP6 census is the completed exemplar; a</p>
+<p>  one-cell upstream fix (SOC = QCM6490/"milos") plus the</p>
+<p>  <code>milos-fairphone-fp6.dts</code> existence (verified: 1,106 lines by</p>
+<p>  Luca Weiss, 2025, compatible <code>fairphone,fp6</code>/<code>qcom,milos</code> —</p>
+<p>  <strong>the FP6 is now partially mainlined</strong>) are the upstream-facing</p>
+<p>  items.</p>
+<h2>Upstream-facing summary (what LibrePhone could accept, per cluster)</h2>
+<p>Ranked by (devices covered × effort):</p>
+<table>
+<tr>
+<th>#</th>
+<th>deliverable</th>
+<th>clusters</th>
+<th>upstream target</th>
+<th>effort</th>
+</tr>
+<tr>
+<td>1</td>
+<td>sizes.csv rows for populated devices (63 devices → 123+; zero 695/7325/8550 rows today)</td>
+<td>all</td>
+<td><code>data/sizes.csv</code></td>
+<td>mechanical (rows exist in the DB dump)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>SOC-cell corrections (flame, coral, guacamoleb, hotdogb, fajita; +FP6 blank cell)</td>
+<td>845/8150/835/FP6</td>
+<td><code>data/</code> SQL/CSVs</td>
+<td>one-session data PR</td>
+</tr>
+<tr>
+<td>3</td>
+<td>per-family doc stubs for the PAS clusters (modem/adsp/cdsp + WiFi + BT per decoded chip)</td>
+<td>SM6375, SM8250, SM8150, SM8350, SM6115, SM7325, QCM6490</td>
+<td><code>docs/</code> one stub per family per device-class</td>
+<td>1 session each, FP6-exemplar format</td>
+</tr>
+<tr>
+<td>4</td>
+<td>BT-fleet generation doc (Rome/WCN39xx vs WCN6750 vs QCA6390/QCA2066/WCN7850 across the DB's own filenames)</td>
+<td>all Qualcomm clusters</td>
+<td>extend <code>docs/files.md</code> bluetooth section / new fleet doc</td>
+<td>small; the decode table is already in this file</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Tensor radio-directory inventory (14-device shared-filename analysis; modem identity facts only)</td>
+<td>Tensor</td>
+<td>extend <code>docs/track.md</code>-style doc</td>
+<td>medium; interface claims stay blocked</td>
+</tr>
+<tr>
+<td>6</td>
+<td>touch-panel firmware family template (FW_<em>/LIMIT_</em> naming grammar: vendor, panel, FAE/AGING/LIMIT variants)</td>
+<td>SM6375, SM8250, MSM8998</td>
+<td>new <code>docs/other.md</code> section</td>
+<td>small; naming grammar is DB-derivable</td>
+</tr>
+<tr>
+<td>7</td>
+<td>oplus fast-charge fleet doc (oplus_vooc_fw*.bin ×80+ rows)</td>
+<td>SM8250 (+ blank bucket)</td>
+<td>new <code>docs/other.md</code> section</td>
+<td>small</td>
+</tr>
+</table>
+<h2>Family-classification rules used in this file (reproducible)</h2>
+<p>BT prefix map (verified against mainline <code>btqca.c</code> case labels,</p>
+<p>2026-11-16): msbtfw→WCN6750, crbtfw→WCN3990/3991/3998, apbtfw→</p>
+<p>WCN3988, cmbtfw→WCN3950, htbtfw→QCA6390, hpbtfw→QCA2066,</p>
+<p>wcnhpbtfw→WCN6855, hmtbtfw→WCN7850, rampatch_%08x→default.</p>
+<p>Families: bt (the prefixes + nvn/nvram), wifi-wlan (bdwlan/wlanmac/</p>
+<p>wmdr/wcnss/wlan/wpss/ath/regdb), modem (modem/mpss/mba/efs/fsg/modemst/</p>
+<p>md1img/moly), dsp-audio (adsp/cdsp/slpi/venus/sns/sensor/audio),</p>
+<p>tz (tz/keymaster/qsee/cmnlib/hyp/devcfg/uefisecapp/featenabler/hdcp/</p>
+<p>widevine/soter/smplap/...), bootchain (xbl/abl/aop/shrm/cpucp/qupfw/</p>
+<p>uefi/vbmeta/dtbo/splash/pbl/bl1/bl2/bl31/ldfw/...), gpu (gmu/sqe/zap/</p>
+<p>aNNN_*), other (rest — the upstream UNKNOWN 8,664-row tail).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

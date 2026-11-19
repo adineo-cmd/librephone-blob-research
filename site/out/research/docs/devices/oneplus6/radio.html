@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OnePlus 6 (enchilada) — Radio (RIL) surface — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>OnePlus 6 (enchilada) — Radio (RIL) surface</h1><p>**Evidence class: census** (files extracted + hashed; content NOT analyzed —</p><p>Evidence: none</p>
+<h1>OnePlus 6 (enchilada) — Radio (RIL) surface</h1>
+<p><strong>Evidence class: census</strong> (files extracted + hashed; content NOT analyzed —</p>
+<p>SQL/config, not firmware). Source: LineageOS 22.2 nightly 2026-11-11 enchilada,</p>
+<p><code>/vendor/radio/qcril_database/</code>.</p>
+<h2>Contents</h2>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+</tr>
+<tr>
+<td><code>qcril.db</code></td>
+<td>126,976</td>
+</tr>
+<tr>
+<td><code>upgrade/0_initial.sql</code> … <code>9_version_update_ecc_table.sql</code></td>
+<td>691-67,038 (9 files, 155,935 total)</td>
+</tr>
+</table>
+<p>A SQLite radio-config database plus its versioned SQL upgrade chain</p>
+<p>(emergency-call table updates, WPS config). These are configuration</p>
+<p>artifacts of the RIL stack, not radio firmware — kept in the census</p>
+<p>because the upstream DB counts the same surface, but marked honestly:</p>
+<p>nothing here is executable, nothing here is a blob in the firmware sense.</p>
+<h2>ISA/proof status</h2>
+<p>Not applicable (data files).</p>
+<h2>Open questions</h2>
+<ul>
+<li>none for this family at census level; deep value only if the lab later</li>
+</ul>
+<p>  models RIL config drift across devices.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

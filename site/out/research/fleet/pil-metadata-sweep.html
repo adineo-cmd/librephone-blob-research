@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PIL metadata sweep: per-phdr hash-slot layout across every signed PIL image (SDM845 + SM8250) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>PIL metadata sweep: per-phdr hash-slot layout across every signed PIL image (SDM845 + SM8250)</h1><p>Workorder: WORKORDER-001 (desktop fleet RE). Analysis date: 2026-11-19.</p><p>Evidence: none</p>
+<h1>PIL metadata sweep: per-phdr hash-slot layout across every signed PIL image (SDM845 + SM8250)</h1>
+<p>Workorder: WORKORDER-001 (desktop fleet RE). Analysis date: 2026-11-19.</p>
+<p>Prior evidence: <code>blob-matrix/desktop/fleet-re/qsee-crossgen.md</code> (layout decoded on tz.img of both devices, SHA-256 vs SHA-384 split, first-public hash-slot decode).</p>
+<p>Machine-readable evidence: <code>analysis/out/pil-metadata-sweep.json</code> (28 per-image records: ELF facts, phdr table, metadata candidates, width trials, per-slot status, header words, certs, sig blocks, version strings).</p>
+<p>Script: <code>analysis/tools/pil_metadata_sweep.py</code> (stdlib-only; ELF/phdr parse, PT_NULL candidate scan, sha256/sha384/sha512 width trials with byte-search + base alignment, per-slot verify, DER cert scan).</p>
+<p>Evidence classes: <strong>F</strong> = measured fact, <strong>I</strong> = interpretation, <strong>H</strong> = hypothesis, <strong>N</strong> = negative.</p>
+<h2>0. Headline answer</h2>
+<p><strong>The SHA-384 metadata is SM8250-wide, not TZ-specific (F).</strong> 16/16 signed PIL images from the SM8250 device decode with SHA-384 (48 B) hash slots; 12/12 SDM845 images decode with SHA-256 (32 B) slots. 28/28 swept images match the decoded layout — zero exceptions, zero parse failures, zero metadata-less images. The per-phdr hash-slot container is <strong>universal across the entire signed PIL/secboot chain on both SoCs</strong>: tz, hyp, xbl, xbl_config, abl (ABOOT), aop, cmnlib, cmnlib64, keymaster, devcfg, uefisecapp, imagefv, qupfw, storsec, multiimgoem, featenabler.</p>
+<p>Totals (F): 220 hash slots verified (178 exact digest hits + 42 zero slots), 35 X.509 chains (7 production + 28 test-only) = 105 certs, 35 signature blocks (exactly one 256-B block per chain), 29 version-string hits.</p>
+<h2>1. Inputs (sha256, F)</h2>
+<p>11 enchilada partitions (cmnlib, cmnlib64, keymaster, devcfg, hyp, aop, abl, qupfw, storsec, xbl, xbl_config) were dumped this session from <code>data-fetch/enchilada/payload.bin</code> with <code>librephone-blob-research/qualcomm-fp6/tools/payload_dump.py</code>. boot.img/recovery (Android bootimg) excluded as out of scope; no bootimg magic was encountered in the swept set.</p>
+<table>
+<tr>
+<th>file</th>
+<th>size</th>
+<th>sha256</th>
+<th>SoC</th>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/tz.img</code></td>
+<td>3,194,880</td>
+<td><code>c75d2bd2...7018603</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/abl.img</code></td>
+<td>225,280</td>
+<td><code>27bb1240...c32a24b8</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/aop.img</code></td>
+<td>204,800</td>
+<td><code>b2e1330f...4f9fed43</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/cmnlib.img</code></td>
+<td>401,408</td>
+<td><code>98f706db...561e874f</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/cmnlib64.img</code></td>
+<td>520,192</td>
+<td><code>6cdd8073...cc9c333d</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/devcfg.img</code></td>
+<td>57,344</td>
+<td><code>70f0c68e...0492750d</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/featenabler.img</code></td>
+<td>90,112</td>
+<td><code>d3b540d5...e5ee22ea</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/hyp.img</code></td>
+<td>450,560</td>
+<td><code>a66d4705...28a92be3</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/imagefv.img</code></td>
+<td>1,191,936</td>
+<td><code>f295c675...5b671a5b</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/keymaster.img</code></td>
+<td>266,240</td>
+<td><code>5412f657...63e2657e</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/multiimgoem.img</code></td>
+<td>16,384</td>
+<td><code>e4969bf3...9f8c3c63</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/qupfw.img</code></td>
+<td>57,344</td>
+<td><code>7c41ee2f...3de47b3c</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/storsec.img</code></td>
+<td>24,576</td>
+<td><code>82f093ae...5bc9ac7e</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/uefisecapp.img</code></td>
+<td>126,976</td>
+<td><code>906cb598...0f9b7543</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/xbl.img</code></td>
+<td>3,985,408</td>
+<td><code>6509bafb...de084b8e</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/second-device/instantnoodle/xbl_config.img</code></td>
+<td>94,208</td>
+<td><code>f17be502...8993b28f</code></td>
+<td>SM8250</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/tz.img</code></td>
+<td>2,056,192</td>
+<td><code>2d133bda...d16baca</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/abl.img</code></td>
+<td>2,183,168</td>
+<td><code>cff7cbf5...55afbe34</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/aop.img</code></td>
+<td>184,320</td>
+<td><code>f6311ac6...78b12629</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/cmnlib.img</code></td>
+<td>380,928</td>
+<td><code>fc726681...ee425920</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/cmnlib64.img</code></td>
+<td>499,712</td>
+<td><code>0cb7e040...33753725</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/devcfg.img</code></td>
+<td>40,960</td>
+<td><code>139e0d80...adbf4b6e</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/hyp.img</code></td>
+<td>397,312</td>
+<td><code>eaf681c1...6c83e2a8</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/keymaster.img</code></td>
+<td>233,472</td>
+<td><code>7e61215d...7af114fb</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/qupfw.img</code></td>
+<td>65,536</td>
+<td><code>92edf512...30eca96e</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/storsec.img</code></td>
+<td>24,576</td>
+<td><code>6d170aef...4795fda1</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/xbl.img</code></td>
+<td>3,289,088</td>
+<td><code>b0bd4280...847810e0</code></td>
+<td>SDM845</td>
+</tr>
+<tr>
+<td><code>data-fetch/enchilada/xbl_config.img</code></td>
+<td>98,304</td>
+<td><code>b089b9de...62f7b84f</code></td>
+<td>SDM845</td>
+</tr>
+</table>
+<p>tz.img sha256s of both devices are byte-identical to the files analyzed in qsee-crossgen.md — the controls are the same binaries (F).</p>
+<h2>2. Sweep table (F)</h2>
+<p>All images: metadata is PT_NULL segment <strong>seg[1]</strong> at file offset 0x1000 (every image). <code>phnum</code> = e_phnum; <code>base</code> = hash-table offset inside the metadata segment (== metadata header size); <code>w5</code> = metadata header word[5] (u32le); <code>hit</code>/<code>zero</code> = slot statuses; <code>chains</code> = cert chain groups (prod = CASS leaf chain present).</p>
+<table>
+<tr>
+<th>image</th>
+<th>ELF</th>
+<th>e_type</th>
+<th>phnum</th>
+<th>meta filesz</th>
+<th>algo</th>
+<th>base</th>
+<th>w5 (= phnum x width)</th>
+<th>hit/zero</th>
+<th>chains</th>
+<th>class</th>
+</tr>
+<tr>
+<td>SM8250 tz</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>23</td>
+<td>20,800</td>
+<td><strong>SHA-384</strong></td>
+<td>288</td>
+<td>1104 = 23x48</td>
+<td>21/2</td>
+<td>2 (prod+test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 abl</td>
+<td>ELF32 ARM</td>
+<td>ET_EXEC</td>
+<td>3</td>
+<td>6,712</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>144 = 3x48</td>
+<td>2/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 aop</td>
+<td>ELF32 ARM</td>
+<td>ET_EXEC</td>
+<td>7</td>
+<td>6,904</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>336 = 7x48</td>
+<td>6/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 cmnlib</td>
+<td>ELF32 ARM</td>
+<td>ET_DYN</td>
+<td>6</td>
+<td>19,984</td>
+<td><strong>SHA-384</strong></td>
+<td>288</td>
+<td>288 = 6x48</td>
+<td>5/1</td>
+<td>2 (prod+test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 cmnlib64</td>
+<td>ELF64 AArch64</td>
+<td>ET_DYN</td>
+<td>6</td>
+<td>19,984</td>
+<td><strong>SHA-384</strong></td>
+<td>288</td>
+<td>288 = 6x48</td>
+<td>5/1</td>
+<td>2 (prod+test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 devcfg</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>4</td>
+<td>6,760</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>192 = 4x48</td>
+<td>3/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 featenabler</td>
+<td>ELF64 AArch64</td>
+<td>ET_DYN</td>
+<td>8</td>
+<td>20,080</td>
+<td><strong>SHA-384</strong></td>
+<td>288</td>
+<td>384 = 8x48</td>
+<td>7/1</td>
+<td>2 (prod+test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 hyp</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>4</td>
+<td>6,760</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>192 = 4x48</td>
+<td>2/2</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 imagefv</td>
+<td>ELF32 ARM</td>
+<td>ET_EXEC</td>
+<td>3</td>
+<td>6,712</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>144 = 3x48</td>
+<td>2/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 keymaster</td>
+<td>ELF64 AArch64</td>
+<td>ET_DYN</td>
+<td>8</td>
+<td>6,952</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>384 = 8x48</td>
+<td>7/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 multiimgoem</td>
+<td>ELF32 ARM</td>
+<td>ET_NONE</td>
+<td>3</td>
+<td>6,712</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>144 = 3x48</td>
+<td>2/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 qupfw</td>
+<td>ELF32 EM_QDSP6 (164)</td>
+<td>ET_EXEC</td>
+<td>10</td>
+<td>20,176</td>
+<td><strong>SHA-384</strong></td>
+<td>288</td>
+<td>480 = 10x48</td>
+<td>9/1</td>
+<td>2 (prod+test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 storsec</td>
+<td>ELF32 ARM</td>
+<td>ET_DYN</td>
+<td>8</td>
+<td>6,952</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>384 = 8x48</td>
+<td>7/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 uefisecapp</td>
+<td>ELF32 ARM</td>
+<td>ET_DYN</td>
+<td>8</td>
+<td>6,952</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>384 = 8x48</td>
+<td>7/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 xbl</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>15</td>
+<td>7,288</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>720 = 15x48</td>
+<td>10/5</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SM8250 xbl_config</td>
+<td>ELF64 ARM(40)</td>
+<td>ET_EXEC</td>
+<td>6</td>
+<td>6,856</td>
+<td><strong>SHA-384</strong></td>
+<td>168</td>
+<td>288 = 6x48</td>
+<td>5/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha384</td>
+</tr>
+<tr>
+<td>SDM845 tz</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>17</td>
+<td>19,992</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>544 = 17x32</td>
+<td>14/3</td>
+<td>2 (prod+test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 abl</td>
+<td>ELF32 ARM</td>
+<td>ET_EXEC</td>
+<td>3</td>
+<td>6,536</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>96 = 3x32</td>
+<td>2/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 aop</td>
+<td>ELF32 ARM</td>
+<td>ET_EXEC</td>
+<td>6</td>
+<td>6,632</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>192 = 6x32</td>
+<td>5/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 cmnlib</td>
+<td>ELF32 ARM</td>
+<td>ET_DYN</td>
+<td>6</td>
+<td>6,632</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>192 = 6x32</td>
+<td>5/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 cmnlib64</td>
+<td>ELF64 AArch64</td>
+<td>ET_DYN</td>
+<td>6</td>
+<td>6,632</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>192 = 6x32</td>
+<td>5/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 devcfg</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>4</td>
+<td>6,568</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>128 = 4x32</td>
+<td>3/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 hyp</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>4</td>
+<td>6,568</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>128 = 4x32</td>
+<td>2/2</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 keymaster</td>
+<td>ELF64 AArch64</td>
+<td>ET_DYN</td>
+<td>8</td>
+<td>6,696</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>256 = 8x32</td>
+<td>7/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 qupfw</td>
+<td>ELF32 EM_QDSP6 (164)</td>
+<td>ET_EXEC</td>
+<td>12</td>
+<td>19,832</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>384 = 12x32</td>
+<td>11/1</td>
+<td>2 (prod+test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 storsec</td>
+<td>ELF32 ARM</td>
+<td>ET_DYN</td>
+<td>8</td>
+<td>6,696</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>256 = 8x32</td>
+<td>7/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 xbl</td>
+<td>ELF64 AArch64</td>
+<td>ET_EXEC</td>
+<td>16</td>
+<td>6,952</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>512 = 16x32</td>
+<td>10/6</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+<tr>
+<td>SDM845 xbl_config</td>
+<td>ELF64 ARM(40)</td>
+<td>ET_EXEC</td>
+<td>8</td>
+<td>6,696</td>
+<td><strong>SHA-256</strong></td>
+<td>40</td>
+<td>256 = 8x32</td>
+<td>7/1</td>
+<td>1 (test)</td>
+<td>layout-matches-sha256</td>
+</tr>
+</table>
+<p>Notes (F): the wide-metadata images (~20 KB filesz) are exactly the trustlet-style images (tz, cmnlib, cmnlib64, featenabler, qupfw); all others carry compact ~6.5-7.3 KB metadata. The 40-B-header (SDM845) column also proves the header size is not fixed per generation — see section 4.</p>
+<h2>3. Controls re-verified (F)</h2>
+<ul>
+<li>instantnoodle tz.img: word5 = 1104, table base 288, SHA-384, 21/23 in-place hits, zero slots {1 (metadata self), 2 (filesz 0)} — identical to qsee-crossgen.md section 3.2; all six certs at the same offsets (1648/2707/3811/8048/9085/10180) with the same subjects.</li>
+<li>enchilada tz.img: word5 = 544, base 40, SHA-256, 14/17 hits, zero slots {1, 2, 16 (BSS, memsz 8192)} — identical to prior; certs at 840/2227/3323/7240/8560/9697.</li>
+</ul>
+<h2>4. Metadata header decode — refined by the fleet (F; corrects two claims in qsee-crossgen.md)</h2>
+<p>Header base (== hash-table offset) is <strong>chain-count dependent on SM8250, fixed on SDM845</strong>:</p>
+<table>
+<tr>
+<th>header word (u32le)</th>
+<th>1-chain images (n=22)</th>
+<th>2-chain images (n=6)</th>
+<th>prior doc claim</th>
+</tr>
+<tr>
+<td>base / word count</td>
+<td>SDM845: 40 B (10 words); SM8250: <strong>168 B (42 words)</strong></td>
+<td>SDM845: 40 B; SM8250: <strong>288 B (72 words)</strong> = 168 + 120</td>
+<td>"SM8250 header 288 B" — actually the 2-chain size</td>
+</tr>
+<tr>
+<td>w[1]</td>
+<td>SDM845: 5; SM8250: 6 (constant per SoC, H: secboot metadata version)</td>
+<td>same</td>
+<td>"25/5 vs 0/6" — w[0] is actually image-specific, see below</td>
+</tr>
+<tr>
+<td>w[2]</td>
+<td><strong>0</strong></td>
+<td>256</td>
+<td>"w[2] = sig block size" — set only when a second chain exists</td>
+</tr>
+<tr>
+<td>w[3]</td>
+<td><strong>0</strong></td>
+<td>6144</td>
+<td>"constant 6144" — refuted; second-chain cap</td>
+</tr>
+<tr>
+<td>w[4] - w[5]</td>
+<td><strong>6,400</strong></td>
+<td><strong>19,200</strong></td>
+<td>"constant 19,200" — refuted; 6400 + 12800 x (chains-1)</td>
+</tr>
+<tr>
+<td>w[7]</td>
+<td>256</td>
+<td>256</td>
+<td>sig block size (holds, all 28)</td>
+</tr>
+<tr>
+<td>w[9]</td>
+<td><strong>6,144</strong></td>
+<td><strong>12,288</strong></td>
+<td>"constant 12288" — refuted; <strong>w[9] = 6144 x chain_count</strong> (28/28)</td>
+</tr>
+<tr>
+<td>w[10] (SM8250 only)</td>
+<td>0</td>
+<td>120</td>
+<td>per-chain header extension, 120 B/chain</td>
+</tr>
+<tr>
+<td>w[11] (SM8250 only)</td>
+<td>120</td>
+<td>120</td>
+<td>constant</td>
+</tr>
+<tr>
+<td>w[0]</td>
+<td>image-specific, in {0, 4, 5, 25} (e.g. tz: 25 SDM845 / 0 SM8250; cmnlib 4; imagefv, xbl 5)</td>
+<td>same</td>
+<td>unassigned</td>
+</tr>
+</table>
+<p>Rules w[9] = 6144 x chains, w[4]-w[5] = 6400 + 12800 x (chains-1), w[2]/w[3] zero unless second chain, w[10] = 120 x (chains-1) hold <strong>28/28</strong> (F). Interpretation (I): the SM8250 header is a fixed 168-B base plus one 120-B extension per extra chain; w[9] and w[3] are per-chain size caps of 6144 B; w[4]-w[5] encodes the same per-chain budget in the "offset of the first sig/chain region" field. The qsee-crossgen.md descriptor pairs <code>[7,0,1,0,0,X,24584]</code> at words 14-20 and 44-50 sit inside this 120-B per-chain region; single-chain images carry one region (values differ per image, e.g. abl <code>28,0,81,19821,0,258,24584</code>, xbl <code>0,0,81,19821,0,2,24584</code>) — values unassigned (H).</p>
+<h2>5. Hash-slot semantics — confirmed fleet-wide (F)</h2>
+<ul>
+<li>slot count == phnum and word5 == phnum x digest width in <strong>28/28</strong> images.</li>
+<li>Zero slots occur exactly at (a) the metadata segment itself (always phdr index 1) and (b) segments with filesz == 0 (incl. both xbl's 4-5 empty phdrs and SDM845 tz's BSS seg 16). No exceptions; the prior "empty segment = zero slot, self = zero slot" rules generalize to the whole fleet.</li>
+<li>Digest hit totals: 100 SHA-384 slot verifications (SM8250) + 78 SHA-256 (SDM845) = 178; plus 42 zero slots = 220 = sum of all phnum.</li>
+<li>sha512 (64 B) probes: 0 hits in all 28 metadata segments (N).</li>
+</ul>
+<h2>6. Version strings (F)</h2>
+<p>29 string hits total; <code>QC_IMAGE_VERSION_STRING=</code> / <code>IMAGE_VARIANT_STRING=</code> / <code>OEM_IMAGE_VERSION_STRING=</code> values (all in RW segments):</p>
+<table>
+<tr>
+<th>image</th>
+<th>triple</th>
+</tr>
+<tr>
+<td>SM8250 tz (@1471832/1471872/1471903)</td>
+<td><code>TZ.XF.5.8-00274</code> / <code>DARAANAAA</code> / <code>CRM</code></td>
+</tr>
+<tr>
+<td>SM8250 aop (@98726/98767/98798)</td>
+<td><code>AOP.HO.2.0-00194</code> / <code>AAAAANAZO</code> / <code>dg02-pool06-kvm58</code></td>
+</tr>
+<tr>
+<td>SM8250 hyp (@363134/363174/363205)</td>
+<td><code>TZ.XF.5.8-00274</code> / <code>DARAANAAA</code> / <code>CRM</code> (carries the TZ triple)</td>
+</tr>
+<tr>
+<td>SM8250 xbl (@440207 seg4, @734242 seg8)</td>
+<td><code>BOOT.XF.3.2-00358-SM8250-1</code> / <code>Soc8250LAB</code> / <code>dg02-pool06-kvm58</code></td>
+</tr>
+<tr>
+<td>SM8250 xbl (@3751716 seg9)</td>
+<td><code>TZ.XF.5.8-00174</code> / <code>DARAANAAA</code> / <code>CRM</code> (embedded second image)</td>
+</tr>
+<tr>
+<td>SDM845 tz (@1122340/1122387/1122418)</td>
+<td><code>TZ.XF.5.0.1.C5-00083.1</code> / <code>WAXAANAAA</code> / <code>CRM</code></td>
+</tr>
+<tr>
+<td>SDM845 hyp (@313982/314029/314060)</td>
+<td><code>TZ.XF.5.0.1.C5-00083.1</code> / <code>WAXAANAAA</code> / <code>CRM</code></td>
+</tr>
+<tr>
+<td>SDM845 xbl (@41155 seg2, @665985 seg11)</td>
+<td><code>BOOT.XF.2.0-00364-SDM845LZB-1</code> / <code>SDM845LA</code> / <code>rd-build-73</code></td>
+</tr>
+<tr>
+<td>SDM845 xbl (@2698864 seg12)</td>
+<td><code>TZ.XF.5.0.1-00106</code> / <code>WAXAANAAA</code> / <code>CRM</code> (embedded second image)</td>
+</tr>
+</table>
+<p>(F) xbl.img on both devices embeds at least two distinct image version triples in different segments — the XBL ELF container wraps multiple sub-images (BOOT plus a TZ-tree image). (N) No version strings found in the other 21 images.</p>
+<h2>7. Signature and cert-chain facts (F)</h2>
+<ul>
+<li>Every image carries at least one full secboot chain: one 256-B high-entropy signature block immediately before a 3-cert X.509 chain (entropy 7.06-7.26 per block; 35 blocks / 35 chains / 105 certs total). Region after the last cert is pure 0xFF padding to segment end (all_ff true, 28/28).</li>
+<li>All 105 certs: RSASSA-PSS (OID 1.2.840.113549.1.1.10), RSA-2048 SPKIs; issuer/subject CN ordering forms leaf&lt;-intermediate&lt;-root in every chain.</li>
+<li>Production chains (CASS leaf, QSEE Attestation CA path): SM8250 tz/cmnlib/cmnlib64/featenabler/qupfw; SDM845 tz/qupfw. 7 production chains total.</li>
+<li>All remaining 28 chains are the test chain: leaf <code>SecTools Test User</code>; intermediate <code>OEM Attestation CA</code> + self-signed <code>QCT Root CA 1</code> (OU "General Use Key", O=OEM) on SM8250, or <code>QUALCOMM Attestation CA</code> + <code>QCT Root CA 1</code> (OU "General Use Test Key (for testing 13 only)") on SDM845.</li>
+<li>Test-leaf issuance dates cluster at 2021-11-25 (SDM845 set), 2024-06-11 (most SM8250), and 2025-11-04 (SM8250 abl) — (I) partitions were re-signed at build/package time with the OEM test key rather than carrying the factory production signature.</li>
+<li>(I) The single-chain vs two-chain split correlates exactly with metadata header size on SM8250 (168 vs 288 B), giving a structural fingerprint of signing mode without parsing certs.</li>
+</ul>
+<h2>8. Per-image structure notes (F)</h2>
+<ul>
+<li><strong>abl</strong> (both): ABOOT ELF32 ARM, entry 0x9fa00000, 3 phdrs — same QSEE metadata layout as everything else; on SM8250 its test leaf was issued 2025-11-04 (freshest signature in the fleet).</li>
+<li><strong>aop</strong>: ELF32 ARM ET_EXEC, entry 0xb000009 (both); 6-7 phdrs.</li>
+<li><strong>qupfw</strong>: EM_QDSP6 (164) ELF, 10-12 phdrs, wide ~20 KB metadata, both devices carry prod+test chains.</li>
+<li><strong>imagefv</strong>: ELF32 ARM wrapper (3 phdrs; seg0 filesz 0/memsz 112 MB) — the UEFI firmware volume (<code>_FVH</code> magic at file offset 0x3028) lives inside seg2; the outer ELF carries the standard metadata/test chain.</li>
+<li><strong>multiimgoem</strong>: 16 KB ELF32 ARM with e_type 0 (ET_NONE) — unusual but parses fine; standard metadata.</li>
+<li><strong>xbl</strong>: biggest phnum (15/16); 5-6 zero slots from empty segments; single test chain; embedded sub-image version strings (section 6).</li>
+<li><strong>xbl_config</strong>: ELF64 with e_machine 40 (ARM) — 64-bit ARM, not AArch64; standard metadata.</li>
+<li><strong>hyp</strong>: carries its platform's TZ version triple on both devices.</li>
+</ul>
+<h2>9. Open items</h2>
+<ul>
+<li>w[0] semantics ({0,4,5,25}); descriptor-region word values (per-image).</li>
+<li>Exact byte range signed by each 256-B PSS block (unchanged from qsee-crossgen.md).</li>
+<li>w[4]-w[5] budget decomposition (6400 + 12800/chain) — which sub-regions the 6400/12800 account for.</li>
+<li>Whether w[1] (5 vs 6) is a secboot metadata format version and whether it flips with the hash width or with the SoC generation (only one SoC per value observed).</li>
+<li>Root-of-trust question (I/H): whether the OEM test-root chain is accepted by retail fuse state or only on engineering devices — needs boot-chain evidence beyond blobs.</li>
+</ul>
+<h2>10. Honest negatives</h2>
+<ul>
+<li><strong>No metadata-less signed image in this fleet</strong>: every devcfg/qupfw carries a full header + hash table + sig + chain (+ 0xFF pad).</li>
+<li>No SHA-256 digest hits in any SM8250 metadata and no SHA-384 hits in any SDM845 metadata (0/28 for the wrong width of its own SoC); sha512 never occurs.</li>
+<li>21 of 28 images contain no version strings at all.</li>
+<li>No image lacks at least one signature block + cert chain; none carries more than two chains; no chain has other than 3 certs.</li>
+<li>The multi-chain descriptors and w[0]/w[1] remain role-unassigned; no claims made beyond the recorded values.</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

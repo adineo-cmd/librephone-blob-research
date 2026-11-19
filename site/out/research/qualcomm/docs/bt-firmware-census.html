@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bluetooth firmware census — Fairphone FP6 (QCM6490 / WCN6750) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Bluetooth firmware census — Fairphone FP6 (QCM6490 / WCN6750)</h1><p>**Claim:** First public version, architecture, container-format and segment</p><p>Evidence: none</p>
+<h1>Bluetooth firmware census — Fairphone FP6 (QCM6490 / WCN6750)</h1>
+<p><strong>Claim:</strong> First public version, architecture, container-format and segment</p>
+<p>documentation of the FP6's Bluetooth firmware family. The FP6 ships its entire</p>
+<p>BT firmware family in a dedicated <code>bluetooth</code> partition (FAT16) holding</p>
+<p>**two generations of Moselle (WCN6750) firmware plus a third "EVROS" combo</p>
+<p>family that upstream Linux does not know how to name**; the rampatch headers</p>
+<p>decode cleanly against <code>btqca.h</code> and their <code>rom_build</code> fields map to the</p>
+<p>kernel's own <code>rom_ver</code>→filename math; and the <code>.mbn</code> ELF patches are</p>
+<p><strong>32-bit ARM (Thumb-2)</strong> — a different core than the RISC-V wpss on the same</p>
+<p>chip. <code>msbtfw12.*</code> and all <code>evr*</code> files are <strong>absent from linux-firmware</strong>.</p>
+<p><strong>Prior art checked (2026-11-10):</strong> GitHub code search <code>msbtfw11</code> (420 hits —</p>
+<p>all packaging: linux-firmware WHENCE forks, pmaports/pacstall APKBUILDs,</p>
+<p>distro file lists, LibrePhone <code>docs/files.md</code> file list — zero analysis);</p>
+<p><code>evrbtfw20 OR evrnv20</code> (3 hits: a file list and two Qualcomm vendor-HAL</p>
+<p>source dumps); <code>BTFW.EVROS OR BTFW.MOSELLE</code> (2 hits: raw <code>ver_info.txt</code></p>
+<p>device dumps, e.g. <a href="https://github.com/ChkDumps/redmi_flute_dump">ChkDumps/redmi_flute_dump</a>,</p>
+<p>metabuild dated 2025-12-25 — version <em>strings</em> only, no structural work);</p>
+<p>linux-firmware <code>qca/</code> tree (has <code>msbtfw11.mbn/.tllv</code> + <code>msnv11.bin</code> at</p>
+<p><em>different sizes</em> than FP6's — different builds — and **no msbtfw12, no</p>
+<p>evr\<em> files</em>*). No public source documents the architecture, segment layout,</p>
+<p>or header structure of any of these images.</p>
+<h2>Method</h2>
+<ol>
+<li>The BT firmware is <strong>not</strong> in the trees the lab had already extracted:</li>
+</ol>
+<p>   <code>vendor/bt_firmware</code> is an empty symlink, and the census had zero BT-named</p>
+<p>   files. The firmware lives in the dedicated <code>bluetooth</code> OTA partition.</p>
+<p>   We parsed the OTA <code>payload.bin</code> manifest without protobuf</p>
+<p>   (<code>tools/payload_manifest.py</code>) and dumped the partition with the new</p>
+<p>   <code>tools/payload_dump.py</code> (REPLACE/REPLACE_XZ/bzip2 ops; the type-1 op is</p>
+<p>   <strong>bzip2</strong>, not brotli — verified by the <code>BZh9</code> magic).</p>
+<p>   Validation: re-dumping the <code>modem</code> partition reproduces the existing</p>
+<p>   payload_dumper output <strong>byte-for-byte</strong> (sha256 <code>8a329c30…</code>, 89 ops).</p>
+<ol>
+<li><code>bluetooth.img</code> is a <strong>FAT16 filesystem</strong> (864,256 B) — extracted with the</li>
+</ol>
+<p>   lab's <code>extract_vfat.py</code>; 11 files.</p>
+<ol>
+<li>Census (<code>tools/census.py</code>) + TLV/NVM decode (<code>tools/bt_tz_analyze.py</code>),</li>
+</ol>
+<p>   decoding against the upstream <code>drivers/bluetooth/btqca.h</code> struct layouts</p>
+<p>   (fetched from kernel.org gitweb, 2026-11-10).</p>
+<h2>Results</h2>
+<h3>File inventory (<code>bluetooth</code> partition, <code>image/</code> directory)</h3>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>sha256 (16)</th>
+<th>content</th>
+</tr>
+<tr>
+<td>msbtfw11.mbn</td>
+<td>210,724</td>
+<td>(results JSON)</td>
+<td>ELF32 ARM rampatch, Moselle 1.1</td>
+</tr>
+<tr>
+<td>msbtfw11.tlv</td>
+<td>198,512</td>
+<td>"</td>
+<td>same patch in TLV container</td>
+</tr>
+<tr>
+<td>msbtfw11.ver</td>
+<td>34</td>
+<td>"</td>
+<td><code>BTFW.MOSELLE.1.1.2-00064-PATCHZ-2</code></td>
+</tr>
+<tr>
+<td>msnv11.bin</td>
+<td>6,366</td>
+<td>"</td>
+<td>NVM config, Moselle 1.1 (66 tags)</td>
+</tr>
+<tr>
+<td>msbtfw12.mbn</td>
+<td>112,788</td>
+<td>"</td>
+<td>ELF32 ARM rampatch, Moselle 1.2</td>
+</tr>
+<tr>
+<td>msbtfw12.tlv</td>
+<td>100,576</td>
+<td>"</td>
+<td>same patch in TLV container</td>
+</tr>
+<tr>
+<td>msbtfw12.ver</td>
+<td>34</td>
+<td>"</td>
+<td><code>BTFW.MOSELLE.1.2.0-00380-PATCHZ-1</code></td>
+</tr>
+<tr>
+<td>msnv12.bin</td>
+<td>6,316</td>
+<td>"</td>
+<td>NVM config, Moselle 1.2 (64 tags)</td>
+</tr>
+<tr>
+<td>evrbtfw20.tlv</td>
+<td>48,769</td>
+<td>"</td>
+<td>TLV rampatch, EVROS 2.0</td>
+</tr>
+<tr>
+<td>evrnv20.bin</td>
+<td>8,331</td>
+<td>"</td>
+<td>NVM config, EVROS 2.0 (67 tags)</td>
+</tr>
+<tr>
+<td>evrbtfw20.ver</td>
+<td>35</td>
+<td>"</td>
+<td><code>BTFW.EVROS.2.0.0-00143-PATCHZ-5_DEF</code></td>
+</tr>
+</table>
+<p>(Full hashes + decoded headers in <code>results/bt-tz-census.json</code>.)</p>
+<h3>Architecture (first public statement for this family)</h3>
+<p>Both <code>.mbn</code> files: <strong>ELF32, e_machine = 40 (EM_ARM)</strong>, e_type = EXEC, with</p>
+<p>three program headers and a single RWX <code>LOAD</code>:</p>
+<table>
+<tr>
+<th>file</th>
+<th>entry</th>
+<th>LOAD vaddr</th>
+<th>LOAD filesz</th>
+</tr>
+<tr>
+<td>msbtfw11.mbn</td>
+<td>0x24c51</td>
+<td>0x24c50</td>
+<td>0x30724 (198,436 B)</td>
+</tr>
+<tr>
+<td>msbtfw12.mbn</td>
+<td>0x23dc5</td>
+<td>0x23dc4</td>
+<td>0x18894 (100,500 B)</td>
+</tr>
+</table>
+<p>Entry = LOAD vaddr <strong>| 1</strong> → <strong>ARM Thumb entry point</strong>. Unlike the modem's</p>
+<p><code>.bXX</code> segment files (see the architecture census, F-7), these are</p>
+<p>complete, self-consistent ELF files (sane e_type/e_machine/entry), so the</p>
+<p>ARM identification is trustworthy without .mdt cross-checks. Contrast: the</p>
+<p>WCN6750 <strong>wpss on the same chip is 32-bit RISC-V</strong> (F-5) — Qualcomm's BT and</p>
+<p>WLAN cores on this SoC are different ISAs. Nothing public states what CPU the</p>
+<p>WCN6750 BT firmware executes on; this is the first published identification.</p>
+<h3>TLV rampatch header decode (against <code>btqca.h</code> structs)</h3>
+<table>
+<tr>
+<th>field</th>
+<th>msbtfw11.tlv</th>
+<th>msbtfw12.tlv</th>
+<th>evrbtfw20.tlv</th>
+</tr>
+<tr>
+<td>type (<code>type_len &amp; 0xff</code>)</td>
+<td>1 = TLV_TYPE_PATCH</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>length field</td>
+<td>198,508 (= size−4)</td>
+<td>100,572 (= size−4)</td>
+<td>48,765 (= size−4)</td>
+</tr>
+<tr>
+<td>format_version / signature</td>
+<td>1 / 0</td>
+<td>1 / 0</td>
+<td>1 / 0</td>
+</tr>
+<tr>
+<td>download_mode</td>
+<td><strong>3 = QCA_SKIP_EVT_VSE_CC</strong></td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>product_id</td>
+<td><strong>21</strong></td>
+<td>21</td>
+<td><strong>29</strong></td>
+</tr>
+<tr>
+<td>rom_build</td>
+<td>0x0101</td>
+<td>0x0102</td>
+<td>0x0200</td>
+</tr>
+<tr>
+<td>patch_version</td>
+<td>0x89fd (35,325)</td>
+<td>0x8b04 (35,588)</td>
+<td>0x8c69 (35,945)</td>
+</tr>
+<tr>
+<td>entry (@ container offset 0x24)</td>
+<td>0x00024c50</td>
+<td>0x00023dc4</td>
+<td>0x20027fc8</td>
+</tr>
+</table>
+<ul>
+<li><strong>The <code>entry</code> field of the TLV equals the ELF entry minus the Thumb bit</strong></li>
+</ul>
+<p>  (0x24c50↔0x24c51; 0x23dc4↔0x23dc5): the <code>.mbn</code> and <code>.tlv</code> are the same</p>
+<p>  firmware payload in two containers, confirmed numerically.</p>
+<ul>
+<li><strong>rom_build → filename:</strong> upstream <code>btqca.c</code> computes</li>
+</ul>
+<p>  <code>rom_ver = ((soc_ver &amp; 0xf00) &gt;&gt; 4) | (soc_ver &amp; 0xf)</code>. With</p>
+<p>  rom_build = 0x0101 → 17 = 0x11 → <code>msbtfw11</code>; 0x0102 → 18 = 0x12 →</p>
+<p>  <code>msbtfw12</code>; 0x0200 → 32 = 0x20 → <code>evrbtfw20</code>. **The kernel's own math</p>
+<p>  reproduces all three filenames from the shipped binaries.** First time</p>
+<p>  this correspondence is shown against real firmware headers (upstream</p>
+<p>  documents the formula but no public source ties it to the files).</p>
+<ul>
+<li>The on-device patch header is 32 bytes before data (entry at offset 0x24),</li>
+</ul>
+<p>  i.e. the vendor containers carry 12 more bytes (reserved fields) than the</p>
+<p>  upstream 24-byte <code>struct tlv_type_patch</code>; decode accordingly.</p>
+<ul>
+<li>EVROS entry <strong>0x20027fc8</strong> sits in the classic Cortex-M SRAM window</li>
+</ul>
+<p>  (0x2000_0000+) and appears with companion pointers 0x200117b7/0x20017xxx —</p>
+<p>  a different load layout than Moselle's 0x24c50 region.</p>
+<h3>NVM files</h3>
+<p>All three decode as TLV tag sets (<code>tlv_type_nvm</code>): **tag 1 (64 B) is the</p>
+<p>firmware version string** (e.g. <code>BTFW.MOSELLE.1.1.2-00064-PATCHZ-2</code>),</p>
+<p><strong>tag 2 is 6 bytes — the BD address slot</strong> (the Android vendor BT HAL</p>
+<p><code>PatchDLManager::ReadTlvInfo</code> writes the device BD address into tag 2 before</p>
+<p>download). msnv11: 66 tags; msnv12: 64; evrnv20: 67 tags <em>and</em> an outer</p>
+<p><strong>type-4 enclosing TLV header</strong> plus 903 trailing bytes — matching the HAL's</p>
+<p>multi-NVM/<code>TLV_TYPE_BT_FM_NVM</code> unwrapping path, which upstream kernel</p>
+<p><code>btqca.c</code> does not implement.</p>
+<h3>Kernel ↔ firmware cross-reference (drivers/bluetooth, kernel.org, 2026-11-10)</h3>
+<ul>
+<li><code>btqca.c</code> <code>qca_uart_setup</code> for <strong>WCN6750</strong>: rampatch = <code>qca/msbtfw%02x.mbn</code></li>
+</ul>
+<p>  <strong>preferred as an ELF patch</strong> (ELF patches force</p>
+<p>  <code>QCA_SKIP_EVT_VSE_CC</code> — segments are send-only, a synthetic</p>
+<p>  command-complete is injected), fallback <code>qca/msbtfw%02x.tlv</code>; NVM =</p>
+<p>  <code>qca/msnv%02x.bin</code>. All three filename families on the FP6 partition map</p>
+<p>  onto this logic except <code>evr*</code>.</p>
+<ul>
+<li><strong>No <code>evr</code> string exists anywhere in upstream btqca.c/hci_qca.c.</strong> The</li>
+</ul>
+<p>  consumer of <code>evrbtfw20.tlv</code> is Qualcomm's <strong>Android vendor BT HAL</strong></p>
+<p>  (<code>vendor.qti.bluetooth@1.x</code> <code>patch_dl_manager.cpp</code> — present in public</p>
+<p>  AOSP-derived proprietary dumps), which picks patch paths from a</p>
+<p>  <code>chipset_ver → PatchPathInfoMap_</code> table not shipped in the HAL source we</p>
+<p>  could see. So: **FP6 ships a second combo BT chip family (EVROS, product</p>
+<p>  ID 29) that the Linux mainline stack cannot name or select.**</p>
+<ul>
+<li>The same <code>ver_info.txt</code> dump that lists Moselle builds also lists</li>
+</ul>
+<p>  <code>wlan_evr: WLAN.EVR.1.0-01270-QCAEVRSWPLZ-1</code> — EVROS has its own <em>WLAN</em></p>
+<p>  image family (<code>QCAEVRSWPLZ</code>) alongside the Moselle WLAN family</p>
+<p>  (<code>QCAMSLSWPLZ</code>, the one in <code>wpss.b07</code>): EVROS is a full WLAN+BT combo chip</p>
+<p>  shipped alongside WCN6750 on Lanai-family (QCM6490) boards. Its exact chip</p>
+<p>  identity is <strong>not established</strong> here — flagged for follow-up.</p>
+<ul>
+<li>linux-firmware (tree listing fetched 2026-11-10) ships</li>
+</ul>
+<p>  <code>msbtfw11.mbn</code> 202,508 B / <code>msbtfw11.tlv</code> 190,296 B / <code>msnv11.bin</code> 5,899 B</p>
+<p>  — <strong>all different sizes from the FP6 builds</strong> (210,724 / 198,512 / 6,366),</p>
+<p>  and <strong>no msbtfw12, no evr files</strong>. Fairphone FP6's BT family is not fully</p>
+<p>  covered by linux-firmware.</p>
+<h2>Negatives / open questions</h2>
+<ul>
+<li>Which SoC is EVROS (product_id 29)? Not decidable from the partition</li>
+</ul>
+<p>  alone; needs the HAL's chipset-version map or a device with a named</p>
+<p>  verinfo. (Candidates per kernel enum naming: none match "evr".)</p>
+<ul>
+<li><code>msbtfw11.mbn</code> contains two <code>NULL</code> phdrs (vaddr 0x58000 / 0x3e000,</li>
+</ul>
+<p>  filesz 0x1208 each) besides the code LOAD — likely embedded TLV/signature</p>
+<p>  blocks; not further decoded (out of census scope for now).</p>
+<ul>
+<li>The kernel selects between msbtfw11/msbtfw12 by the controller-reported</li>
+</ul>
+<p>  <code>rom_ver</code> at runtime; both are shipped so either ROM revision boots. Which</p>
+<p>  one FP6's chip actually requests is only observable at runtime.</p>
+<ul>
+<li>No gatekeeper partition/image found in the FP6 payload (see</li>
+</ul>
+<p>  [[trustzone-census]]).</p>
+<h2>Reproduce</h2>
+<pre><code class="language-bash">
+python3 tools/payload_manifest.py payload.bin          # 37 partitions
+python3 tools/payload_dump.py payload.bin bluetooth bluetooth.img
+python3 tools/extract_vfat.py bluetooth.img trees-bt/
+python3 tools/census.py trees-bt --out bt.json
+python3 tools/bt_tz_analyze.py trees-tzbt trees-tzbt/census-tzbt.json
+</code></pre>
+<p>(Paths per lab layout: <code>downloads/lineage-fp6/extracted/…</code>.)</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>
