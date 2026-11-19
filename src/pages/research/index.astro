@@ -8,6 +8,6 @@ const docs = buildDocs();
   <p>{docs.length} evidence-classed documents. Every claim carries [F] fact,
   [I] inference, [H] hypothesis or [N] negative.</p>
   <ul>
-    {docs.map((d) => <li><a href={`research/${d.path.replace(/\.md$/, '.html')}`}>{d.title || d.path}</a> {d.evidence_classes.map((c) => <span class="evidence" data-evidence={c.toLowerCase()}>{c}</span>)}</li>)}
+    {docs.map((d) => <li><a href={`${import.meta.env.BASE_URL}${d.path.replace(/\.md$/, '.html')}`}>{d.title || d.path}</a> {d.evidence_classes.map((c) => <span class="evidence" data-evidence={c.toLowerCase()}>{c}</span>)}</li>)}
   </ul>
 </Base>

@@ -1,12 +1,12 @@
 ---
 import fs from 'node:fs';
 import path from 'node:path';
-import Base from '../../layouts/Base.astro';
-import { ROOT, buildDocs } from '../../lib/data';
-import { render } from '../../lib/markdown';
+import Base from '../layouts/Base.astro';
+import { ROOT, buildDocs } from '../lib/data';
+import { render } from '../lib/markdown';
 
 export function getStaticPaths() {
-  return buildDocs().map((doc) => ({ params: { slug: doc.path.replace(/\.md$/, '') }, props: { doc } }));
+  return buildDocs().map((doc) => ({ params: { slug: doc.url.replace(/\.html$/, '') }, props: { doc } }));
 }
 const { doc } = Astro.props;
 const base = import.meta.env.BASE_URL;
