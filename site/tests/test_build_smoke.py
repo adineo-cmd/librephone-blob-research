@@ -6,8 +6,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 BUILD = REPO / "site" / "build.py"
 
-if str(REPO) not in sys.path:
-    sys.path.insert(0, str(REPO))
+if str(REPO / "site") not in sys.path:
+    sys.path.insert(0, str(REPO / "site"))
 
 
 class BuildSmokeTest(unittest.TestCase):
@@ -27,6 +27,12 @@ class BuildSmokeTest(unittest.TestCase):
             text=True,
         )
         self.assertIn("missing: site/data/device-types.csv", result.stdout)
+        for rel in (
+            "site/data/device-types.csv",
+            "site/data/upstream-counts.csv",
+            "site/data/links.csv",
+        ):
+            self.assertIn("missing: " + rel, result.stdout)
 
 
 if __name__ == "__main__":

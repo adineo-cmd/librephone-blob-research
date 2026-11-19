@@ -7,16 +7,18 @@ INPUTS = (
     "upstream-contribution/blob-database/coverage-matrix.csv",
     "upstream-contribution/blob-database/device-inventory.csv",
     "site/data/device-types.csv",
+    "site/data/upstream-counts.csv",
     "site/data/links.csv",
 )
 
 
 def main(argv):
     if "--check" in argv:
-        for rel in INPUTS:
-            if not (REPO / rel).is_file():
-                print("missing: " + rel)
-                return 1
+        missing = [rel for rel in INPUTS if not (REPO / rel).is_file()]
+        for rel in missing:
+            print("missing: " + rel)
+        if missing:
+            return 1
         print("check ok")
         return 0
     raise NotImplementedError("full build lands in task 9")

@@ -164,6 +164,18 @@ hr {
 }
 
 .evidence {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.evidence-block {
   font-family: var(--mono);
   font-size: 0.8125rem;
   line-height: 1.5;
@@ -175,15 +187,6 @@ hr {
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.evidence .source {
-  display: block;
-  font-family: inherit;
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin-bottom: 0.4rem;
 }
 
 .gap {
@@ -264,7 +267,7 @@ hr {
   }
 
   pre,
-  .evidence {
+  .evidence-block {
     font-size: 0.75rem;
   }
 
