@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/adsp-fleet — clean-room ADSP `bm2nXX.bin` container probe — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/adsp-fleet — clean-room ADSP `bm2nXX.bin` container probe</h1><p>A structural probe for the Qualcomm ADSP `bm2nNN.bin` fleet — the files that</p><p>Evidence: none</p>
+<h1>implementations/adsp-fleet — clean-room ADSP <code>bm2nXX.bin</code> container probe</h1>
+<p>A structural probe for the Qualcomm ADSP <code>bm2nNN.bin</code> fleet — the files that</p>
+<p>ship at <code>vendor/lib/rfsa/adsp/</code> and that the upstream coverage database records</p>
+<p>under 25–26 devices each. The probe answers the question the metadata matrix</p>
+<p>could not: <strong>what is inside the container, and is it DSP firmware at all?</strong></p>
+<p>It is not. <code>bm2nXX.bin</code> is a <strong>serialized C++ object graph</strong> — a QNN/HTP</p>
+<p>tensor pickle — not Hexagon DSP code. The head is a load-header plus a segment</p>
+<p>table, followed by a prologue carrying length-prefixed RTTI type names, followed</p>
+<p>by a run of <code>0x1337BEEF</code>-tagged records and a <code>0xBEEFF00D</code> terminator.</p>
+<p>Sibling documents own the other two views of this fleet and are <strong>not</strong></p>
+<p>duplicated here:</p>
+<table>
+<tr>
+<th>document</th>
+<th>owns</th>
+</tr>
+<tr>
+<td><code>../../blob-matrix/laptop/qualcomm-adsp-bm2n-container-header.md</code></td>
+<td>the byte-level container layout, the 48-file invariant audit, and the negative result on build-id similarity</td>
+</tr>
+<tr>
+<td><code>../../blob-matrix/laptop/qualcomm-adsp-bm2n-variant-matrix.md</code></td>
+<td>the measured md5/source matrix across 15+ fleet variants</td>
+</tr>
+<tr>
+<td><code>bm2n-fleet-analysis.md</code> (this directory)</td>
+<td>the per-file fleet table, the region decomposition, the record grammar, and the tool contract</td>
+</tr>
+</table>
+<p><strong>Ground truth (public sources only):</strong></p>
+<table>
+<tr>
+<th>what</th>
+<th>where</th>
+<th>what it settles</th>
+</tr>
+<tr>
+<td><code>TENSOR_MAGIC = 0x1337beef</code></td>
+<td><code>QNN/HTP/core/tensor.h</code> (BSD-3-Clause-Clear)</td>
+<td>the record tag; its count equals the record count exactly</td>
+</tr>
+<tr>
+<td><code>Hdr_MAGIC = 0x7309F72B</code>, <code>Hdr_MAGIC_MULTI = 0x3790FA5C</code></td>
+<td><code>QNN/HTP/include/HTP/pickle_header_tags.h</code></td>
+<td>the second container family (one payload in the fleet)</td>
+</tr>
+<tr>
+<td><code>htp_header_locate_field()</code> record grammar (<code>rlen = recdesc &amp; 0xFFFF</code>, <code>tag = recdesc &gt;&gt; 16</code>)</td>
+<td>same header</td>
+<td>the pickle-family field walk</td>
+</tr>
+<tr>
+<td><code>OP_SEQNO_MARKER_XOR = 0x1303ee71</code></td>
+<td><code>QNN/HTP/core/serialize_defs.h</code></td>
+<td>the <code>0x1303ee71</code> marker in record bodies</td>
+</tr>
+<tr>
+<td>ADSP domain / rfsa transport</td>
+<td><code>drivers/misc/fastrpc.c</code> (GPL-2.0)</td>
+<td>why the files live under <code>lib/rfsa/adsp/</code></td>
+</tr>
+</table>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>bm2n_probe.py</code></td>
+<td>the probe: header decode, segment-table walk, prologue grammar, record walk, region entropy, string census, word histograms, fleet diff. CLI <code>python3 -I bm2n_probe.py &lt;file&gt; [--json out.json] [--brief] [--fleet f1 f2 …]</code>; exit 1 on structural violations</td>
+</tr>
+<tr>
+<td><code>make_fixture.py</code></td>
+<td>deterministic synthetic fixtures built from the measured layout only (no proprietary bytes)</td>
+</tr>
+<tr>
+<td><code>fixtures/*.bin</code></td>
+<td>synthetic fixtures, both container families + error paths. <strong><code>*.bin</code> is gitignored</strong> — regenerate with <code>python3 -I make_fixture.py</code></td>
+</tr>
+<tr>
+<td><code>test_bm2n_probe.py</code></td>
+<td>unittest suite: <code>python3 -m unittest -v test_bm2n_probe</code> — <strong>86 tests, all passing</strong> when the real payloads are present in <code>/tmp/astro_u/payloads</code>; the real-payload tests skip cleanly when they are not, so the suite runs from a fresh clone with no proprietary bytes</td>
+</tr>
+<tr>
+<td><code>bm2n-fleet-analysis.md</code></td>
+<td>the analysis: per-file fleet table, region decomposition, record grammar, the two families, [OPEN] list</td>
+</tr>
+</table>
+<h2>Fleet scope</h2>
+<p>All six DB identities were fetched from public repositories on 2026-11-19 and</p>
+<p>md5-verified byte-exact against <code>coverage-matrix.csv</code>:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>DB md5</th>
+<th>verified</th>
+<th>DB devices</th>
+</tr>
+<tr>
+<td><code>bm2n06.bin</code></td>
+<td>864,824</td>
+<td><code>9010bb1a7c08222a058aaef7edd938c6</code></td>
+<td><strong>MATCH</strong></td>
+<td>25</td>
+</tr>
+<tr>
+<td><code>bm2n08.bin</code></td>
+<td>3,091,896</td>
+<td><code>1275a2d212e5bccce734d3055ff10156</code></td>
+<td><strong>MATCH</strong></td>
+<td>25</td>
+</tr>
+<tr>
+<td><code>bm2n12.bin</code></td>
+<td>2,623,528</td>
+<td><code>5c86c8fcc7451f51e11d38276253aac8</code></td>
+<td><strong>MATCH</strong></td>
+<td>26</td>
+</tr>
+<tr>
+<td><code>bm2n13.bin</code></td>
+<td>1,106,944</td>
+<td><code>bf635d9084b54633526f9ad8a84d299b</code></td>
+<td><strong>MATCH</strong></td>
+<td>25</td>
+</tr>
+<tr>
+<td><code>bm2n14.bin</code></td>
+<td>103,168</td>
+<td><code>805176afaae27821520b79647fa5d498</code></td>
+<td><strong>MATCH</strong></td>
+<td>26</td>
+</tr>
+<tr>
+<td><code>bm2n15.bin</code></td>
+<td>1,082,856</td>
+<td><code>2ce8163cda60f33cbf2b50f03a3d0ea1</code></td>
+<td><strong>MATCH</strong></td>
+<td>26</td>
+</tr>
+</table>
+<p>Source: <code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code>,</p>
+<p><code>sm8350-common/proprietary/vendor/lib/rfsa/adsp/&lt;name&gt;</code>, except <code>bm2n13.bin</code></p>
+<p>which comes from <code>TheMuppets/proprietary_vendor_motorola</code> @ <code>lineage-19.1</code>,</p>
+<p><code>sm7325-common/proprietary/vendor/lib/rfsa/adsp/bm2n13.bin</code>.</p>
+<p>Plus one genuine non-DB variant, kept in the fleet diff as the version axis:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>note</th>
+</tr>
+<tr>
+<td><code>bm2n13_sm8350.bin</code></td>
+<td>1,082,824</td>
+<td><code>2d267761f3291c9ca4a7850ab0ef1966</code></td>
+<td>the OnePlus <code>sm8350-common</code> revision; byte-identical to <code>bm2n54.bin</code> on Nothing Pong</td>
+</tr>
+</table>
+<h2>Usage</h2>
+<pre><code class="language-bash">
+# single file, full report
+python3 -I bm2n_probe.py /path/to/bm2n12.bin
+
+# fleet table only
+python3 -I bm2n_probe.py /path/to/bm2n12.bin --brief
+
+# cross-file identity matrix
+python3 -I bm2n_probe.py bm2n12.bin --fleet bm2n08.bin bm2n12.bin bm2n15.bin
+
+# machine-readable
+python3 -I bm2n_probe.py bm2n12.bin --json out.json
+</code></pre>
+<p>Exit status is <code>0</code> when every structural invariant holds and <code>1</code> when the</p>
+<p>prologue grammar, the segment sentinel, the record walk, or the tail terminator</p>
+<p>fails.</p>
+<h2>Test status</h2>
+<pre><code>
+$ python3 -m unittest discover -q
+Ran 86 tests in 82.5s
+OK
+</code></pre>
+<p>All 86 pass with the seven real payloads present in <code>/tmp/astro_u/payloads</code></p>
+<p>(verified this session). Without them the real-payload tests skip cleanly, so</p>
+<p>the suite is runnable from a fresh clone with no proprietary bytes.</p>
+<h2>Value statement</h2>
+<p><strong>What this buys the program.</strong> The fleet's 25–26 devices per file can now be</p>
+<p>described in terms a free implementation can act on: the container is</p>
+<p>specified well enough that a reader can walk it and reach the record stream, and</p>
+<p>the record stream is a serialized object graph rather than opaque machine code —</p>
+<p>which means the <em>class</em> of the content is known (QNN/HTP tensor pickles) even</p>
+<p>though the individual record semantics are <code>[OPEN]</code>.</p>
+<p><strong>What it does not buy.</strong> It does not decode the tensor graph. Which tensors</p>
+<p>the graph describes, what the models compute, and how the ADSP consumer</p>
+<p>schedules them are all <code>[OPEN]</code> and are listed explicitly rather than guessed.</p>
+<p>The probe also establishes a <em>negative</em> that matters: build-id is <strong>not</strong> a</p>
+<p>proxy for content similarity, so a reader must not attribute one file's findings</p>
+<p>to another file in the same lineage.</p>
+<p>Not legal advice, not a replacement implementation. Regulatory/legal hurdles:</p>
+<p><code>../../upstream-contribution/radio-regulatory-hurdles.md</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -2,12 +2,12 @@ import html
 from collections import defaultdict
 from pathlib import Path
 
-EXPECTED_DOCS = 118
+EXPECTED_DOCS = 141
 EXPECTED_DEVICES = 245
 EXPECTED_FAMILIES = 9
 EXPECTED_TYPES = 5
 EXPECTED_STATIC = 7
-EXPECTED_TOTAL = 384
+EXPECTED_TOTAL = 407
 
 NAV = [
     ("index.html", "Home"),

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualcomm ADSP `bm2nXX.bin` — container header, segment table, and a negative result on build-id similarity — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Qualcomm ADSP `bm2nXX.bin` — container header, segment table, and a negative result on build-id similarity</h1><p>Analysis date: 2026-11-18. Evidence class: **MEASURED PAYLOADS** (every number below is computed</p><p>Evidence: none</p>
+<h1>Qualcomm ADSP <code>bm2nXX.bin</code> — container header, segment table, and a negative result on build-id similarity</h1>
+<p>Analysis date: 2026-11-18. Evidence class: <strong>MEASURED PAYLOADS</strong> (every number below is computed</p>
+<p>from bytes on disk; nothing is copied from a manifest).</p>
+<p>Inputs: seven DB-verified payloads in <code>/tmp/astro_u/payloads/</code> (the six DB identities plus the</p>
+<p>non-DB <code>bm2n13</code> revision), cross-validated against 48 further fetched variants in <code>/tmp/astro_u/hunt/</code>.</p>
+<p>Tooling: <code>bm2n_container_probe.py</code> (this directory). Variant inventory: <strong><code>qualcomm-adsp-bm2n-variant-matrix.md</code></strong></p>
+<p>(sibling agent) — that document owns the md5/source matrix; this one owns the bytes.</p>
+<p>Payloads used as the primary fleet, all md5-verified this session against the DB and against the</p>
+<p>variant matrix:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>DB devices</th>
+</tr>
+<tr>
+<td>bm2n06.bin</td>
+<td>864,824</td>
+<td><code>9010bb1a7c08222a058aaef7edd938c6</code></td>
+<td>25</td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>3,091,896</td>
+<td><code>1275a2d212e5bccce734d3055ff10156</code></td>
+<td>25</td>
+</tr>
+<tr>
+<td>bm2n12.bin</td>
+<td>2,623,528</td>
+<td><code>5c86c8fcc7451f51e11d38276253aac8</code></td>
+<td>26</td>
+</tr>
+<tr>
+<td>bm2n13.bin</td>
+<td>1,106,944</td>
+<td><code>bf635d9084b54633526f9ad8a84d299b</code></td>
+<td>25</td>
+</tr>
+<tr>
+<td>bm2n14.bin</td>
+<td>103,168</td>
+<td><code>805176afaae27821520b79647fa5d498</code></td>
+<td>26</td>
+</tr>
+<tr>
+<td>bm2n15.bin</td>
+<td>1,082,856</td>
+<td><code>2ce8163cda60f33cbf2b50f03a3d0ea1</code></td>
+<td>26</td>
+</tr>
+<tr>
+<td>bm2n13_sm8350.bin <em>(variant)</em></td>
+<td>1,082,824</td>
+<td><code>2d267761f3291c9ca4a7850ab0ef1966</code></td>
+<td>1 (as <code>bm2n54.bin</code>)</td>
+</tr>
+</table>
+<p>The seventh file is the genuine non-DB revision: its bytes <em>are</em> in the DB, but recorded under the</p>
+<p>filename <code>bm2n54.bin</code> on <code>nothing/Pong</code> (variant matrix, notes to Table 2).</p>
+<p>---</p>
+<h2>1. The container is now specified — 48/48 files, five invariants</h2>
+<p>The head of every <code>bm2nXX.bin</code> is a <strong>little-endian load-header followed by a segment table</strong>. All</p>
+<p>five structural rules below hold on <strong>48/48</strong> distinct-or-duplicate container files (12 distinct</p>
+<p>payloads, 48 files) and on <strong>7/7</strong> of the primary fleet. None of them is documented publicly as far</p>
+<p>as this session's search reached (see §6).</p>
+<table>
+<tr>
+<th>offset</th>
+<th>width</th>
+<th>field</th>
+<th>evidence</th>
+</tr>
+<tr>
+<td><code>0x00</code></td>
+<td>u32</td>
+<td><strong>load base</strong></td>
+<td>one of <code>0x200000</code>/<code>0x400000</code>/<code>0x800000</code>; repeated at <code>0x1c</code>; equals <code>segment[0].addr</code></td>
+</tr>
+<tr>
+<td><code>0x04</code></td>
+<td>u32</td>
+<td>reserved</td>
+<td><code>0</code> in 48/48</td>
+</tr>
+<tr>
+<td><code>0x08</code></td>
+<td>u32</td>
+<td><strong>build-id string length</strong></td>
+<td>equals <code>strlen()</code> of the string at <code>0x0c</code> in 48/48</td>
+</tr>
+<tr>
+<td><code>0x0c</code></td>
+<td>char[8]</td>
+<td><strong>build-id</strong>, ASCII, NUL-terminated</td>
+<td>7 hex chars + NUL in 48/48</td>
+</tr>
+<tr>
+<td><code>0x14</code></td>
+<td>u32</td>
+<td><strong>magic <code>0xfa0000fa</code></strong></td>
+<td>48/48</td>
+</tr>
+<tr>
+<td><code>0x18</code></td>
+<td>u32</td>
+<td>constant <code>4</code></td>
+<td>48/48; function unresolved</td>
+</tr>
+<tr>
+<td><code>0x1c</code></td>
+<td>u32</td>
+<td>load base (repeat of <code>0x00</code>)</td>
+<td>48/48</td>
+</tr>
+<tr>
+<td><code>0x20</code></td>
+<td>u32</td>
+<td><strong>segment count</strong> <em>n</em></td>
+<td>2–4 observed</td>
+</tr>
+<tr>
+<td><code>0x24</code></td>
+<td>(u32 addr, u32 flags) × n</td>
+<td><strong>segment table</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>0x24+8n</code></td>
+<td>u32</td>
+<td><strong>terminator</strong>: <code>((~n &amp; 0xffff) &lt;&lt; 16) | n</code></td>
+<td>48/48, see below</td>
+</tr>
+</table>
+<pre><code>
+bm2n13.bin, 1,106,944 B
+00000000: 0000 2000 0000 0000 0700 0000 3533 3731  .. .........5371
+00000010: 3830 3600 fa00 00fa 0400 0000 0000 2000  806........... .
+00000020: 0300 0000 0000 2000 0004 0100 0070 ac00  .............p..
+00000030: 0001 0200 000e 0800 0001 0f00 0300 fcff  ................
+          ^entry[0].addr ^entry[0].flags ^entry[1].addr ^e[1].flags  ^terminator
+</code></pre>
+<p>The terminator is self-describing: its low 16 bits repeat the segment count and its high 16 bits are</p>
+<p>the count's complement, so <code>0xfffc0003</code> = 3 segments, <code>0xfffd0002</code> = 2, <code>0xfffb0004</code> = 4. It held on</p>
+<p>every file including the only 4-segment blob (<code>bm2n12.bin</code> on <code>diting</code>, <code>0xfffb0004</code>). **This is the</p>
+<p>"segment-table marker" hypothesis from the brief — confirmed, but it is a per-file terminator whose</p>
+<p>value varies with the segment count, not a constant.**</p>
+<p><strong>Segment <code>addr</code> fields are LOAD ADDRESSES, not file offsets.</strong> They routinely exceed the file size —</p>
+<p><code>bm2n13.bin</code> is 0x10e400 bytes but <code>segment[1].addr</code> is <code>0xac7000</code>. Any reader treating them as</p>
+<p>offsets will overrun. This is why no <code>(offset, size)</code> field pair sums to the file size anywhere in the</p>
+<p>fleet; the header carries no file-offset table at all.</p>
+<p>Segment flags observed, by table position:</p>
+<table>
+<tr>
+<th>position</th>
+<th>flags</th>
+<th>count</th>
+</tr>
+<tr>
+<td>entry[0]</td>
+<td><code>0x00010400</code></td>
+<td>12/12 — <strong>always</strong></td>
+</tr>
+<tr>
+<td>entry[1]</td>
+<td><code>0x00020100</code></td>
+<td>6</td>
+</tr>
+<tr>
+<td>entry[1]</td>
+<td><code>0x000f0100</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td>entry[1]</td>
+<td><code>0x00000100</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td>entry[2]</td>
+<td><code>0x000f0100</code></td>
+<td>6</td>
+</tr>
+<tr>
+<td>entry[2]</td>
+<td><code>0x00000100</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td>entry[3]</td>
+<td><code>0x000f0100</code></td>
+<td>1</td>
+</tr>
+</table>
+<p>The flags split cleanly into a <code>0x0100</code>/<code>0x0400</code>/<code>0x0200</code> low half and a <code>0x0001</code>/<code>0x0002</code>/<code>0x000f</code></p>
+<p>high half, consistent with a (permission, type) pair — but the <em>semantics</em> are not established by</p>
+<p>this data and are not claimed.</p>
+<p>---</p>
+<h2>2. Question (b): what <code>u32[2]==7</code> and <code>u32[10]==0x010400</code> actually are</h2>
+<h3><code>u32[10] == 0x010400</code> is not a format field — it is <code>segment[0].flags</code></h3>
+<p><code>0x010400</code> is at byte offset <code>0x28</code>, which is the second word of the <strong>first segment-table entry</strong></p>
+<p>(table starts at <code>0x24</code>). It is constant across the whole fleet for the same reason every file's first</p>
+<p>segment is the same kind of segment: entry[0] is always the load-base/code segment, and its <code>.addr</code> is</p>
+<p>always the load base at <code>0x00</code>. Both of entry[0]'s words are therefore predictable from <code>0x00</code>:</p>
+<pre><code>
+u32@0x00 == u32@0x1c == segment[0].addr   →  48/48
+segment[0].flags == 0x010400              →  48/48 (12/12 distinct payloads)
+</code></pre>
+<p>So the constants the brief observed at <code>u32[2]</code> and <code>u32[10]</code> are **two different things wearing the</p>
+<p>same costume**: one is a real header field, the other is data belonging to a substructure that happens</p>
+<p>to start at a fixed offset.</p>
+<p>If a format-version pair is wanted, the better candidates are <code>magic == 0xfa0000fa</code> at <code>0x14</code> and the</p>
+<p>constant <code>4</code> at <code>0x18</code>. Both are 48/48 constants that sit <em>outside</em> the segment table and belong to no</p>
+<p>identified substructure — but neither is confirmed as a version, and <code>4</code> is unexplained.</p>
+<h3><code>u32[2] == 7</code> is the build-id string length, not "version 7"</h3>
+<p><code>u32[2]</code> at <code>0x08</code> equals <code>strlen()</code> of the NUL-terminated string at <code>0x0c</code> in 48/48 files. The</p>
+<p>alternative reading — a format/build version that happens to equal 7 — **cannot be excluded by this</p>
+<p>data**, because every build-id in the entire sampled fleet is exactly 7 characters. Both hypotheses</p>
+<p>predict 7 everywhere. Recording this as undecidable rather than picking the tidier story.</p>
+<p>Evidence favouring "length": the field is maximally redundant with a string it immediately precedes</p>
+<p>(<code>0x08</code> then <code>0x0c</code>), which is the usual C pattern for a length-prefixed string. Evidence that could</p>
+<p>settle it: a single bm2n blob with a build-id of any other length. None has been found — see §6.</p>
+<p>---</p>
+<h2>3. Question (a) — NEGATIVE RESULT: the build-id does <strong>not</strong> predict content similarity</h2>
+<p>This is the headline of the report, and it inverts the brief's hypothesis.</p>
+<p>The lead's framing was that build-id identifies a build lineage, and asked whether build-id equality</p>
+<p>predicts high same-offset byte identity. Tested directly. The naive number looks encouraging; it does</p>
+<p>not survive controls.</p>
+<h3>3.1 The 42.84 % figure reproduces exactly — and it is ~42 % coincident zeros</h3>
+<p><code>bm2n13.bin</code> (1,106,944 B) vs <code>bm2n13_sm8350.bin</code> (1,082,824 B), over the 1,082,824-byte min length:</p>
+<pre><code>
+identical bytes = 463,905 / 1,082,824 = 42.842142 %   -&gt; 42.84 %   (lead's figure: CONFIRMED)
+  of which coincident zeros : 454,842  (42.01 %)
+  of which non-zero agreement:   9,063  ( 0.84 %)
+</code></pre>
+<p>Both files are ~61 % zero bytes (60.96 % / 61.13 %). Two files that share nothing but their sparsity</p>
+<p>pattern will show ~42 % "identity" by construction. **Non-zero agreement — 0.84 % — is the only part of</p>
+<p>that number carrying information.**</p>
+<h3>3.2 Same-build pairs sit <em>inside</em> the cross-build range</h3>
+<p>Primary fleet, all 21 pairs, decomposed. "Same build-id" means the 7-char ids at <code>0x0c</code> match.</p>
+<table>
+<tr>
+<th>pair</th>
+<th>build-id</th>
+<th>identity</th>
+<th>coincident zeros</th>
+<th>non-zero agree</th>
+</tr>
+<tr>
+<td>bm2n13_sm8350 vs bm2n15</td>
+<td><strong>differs</strong></td>
+<td><strong>47.25 %</strong></td>
+<td>44.49 %</td>
+<td>2.76 %</td>
+</tr>
+<tr>
+<td>bm2n13 vs bm2n13_sm8350</td>
+<td>differs</td>
+<td>42.84 %</td>
+<td>42.01 %</td>
+<td>0.84 %</td>
+</tr>
+<tr>
+<td>bm2n13 vs bm2n15</td>
+<td><strong>same <code>5371806</code></strong></td>
+<td>42.67 %</td>
+<td>41.84 %</td>
+<td>0.83 %</td>
+</tr>
+<tr>
+<td>bm2n12 vs bm2n15</td>
+<td>differs</td>
+<td>42.22 %</td>
+<td>—</td>
+<td>0.79 %</td>
+</tr>
+<tr>
+<td>bm2n12 vs bm2n13_sm8350</td>
+<td><strong>same <code>2c855d1</code></strong></td>
+<td>41.77 %</td>
+<td>40.94 %</td>
+<td>0.83 %</td>
+</tr>
+<tr>
+<td>… 14 pairs omitted …</td>
+<td></td>
+<td>32–41 %</td>
+<td></td>
+<td>0.3–0.8 %</td>
+</tr>
+<tr>
+<td>bm2n06 vs bm2n08</td>
+<td>differs</td>
+<td>7.18 %</td>
+<td>6.67 %</td>
+<td>0.51 %</td>
+</tr>
+</table>
+<ul>
+<li>The <strong>highest</strong> identity in the whole matrix (47.25 %, and the only pair with elevated non-zero</li>
+</ul>
+<p>  agreement at 2.76 %) is a <strong>cross-build</strong> pair.</p>
+<ul>
+<li>The two same-build pairs (42.67 %, 41.77 %) are unremarkable members of the 41–43 % band.</li>
+<li>bm2n13 vs bm2n15 share a build-id and sit <em>below</em> bm2n13 vs bm2n13_sm8350, which do not.</li>
+</ul>
+<p>Grouped means: same-build <strong>42.22 %</strong> (n=2) vs different-build <strong>28.23 %</strong> (n=19). That gap looks like</p>
+<p>signal but is an artifact of the different-build group containing the two tiny/oddly-shaped files</p>
+<p>(bm2n06, bm2n14), which have low zero-fraction. Controlling for it with a chance model below removes it.</p>
+<h3>3.3 The chance model removes the effect</h3>
+<p>Expected same-offset identity under the null "these two bodies are statistically independent" is</p>
+<p><code>Σ_v p_A(v)·p_B(v)</code>, computed per pair from each file's own byte histogram. Ratio = measured / chance;</p>
+<p>1.0 means the pair is no more similar than its byte histograms predict.</p>
+<table>
+<tr>
+<th>group</th>
+<th>n</th>
+<th>measured</th>
+<th>chance</th>
+<th>ratio (mean)</th>
+<th>ratio (max)</th>
+</tr>
+<tr>
+<td>same build-id</td>
+<td>2</td>
+<td>42.22 %</td>
+<td>35.51 %</td>
+<td><strong>1.19</strong></td>
+<td>1.24</td>
+</tr>
+<tr>
+<td>different build-id</td>
+<td>19</td>
+<td>28.23 %</td>
+<td>27.43 %</td>
+<td><strong>0.97</strong></td>
+<td><strong>1.36</strong></td>
+</tr>
+</table>
+<p>The best ratio in the entire 7-file matrix (1.36) belongs to a <strong>different-build</strong> pair</p>
+<p>(bm2n12 vs bm2n14). The same-build pairs are 1.19 and 1.14 — unremarkable.</p>
+<h3>3.4 The 48-file corpus confirms it, and is harsher</h3>
+<p>Distinct payloads in <code>/tmp/astro_u/hunt</code> (12 containers, 60 pairs):</p>
+<table>
+<tr>
+<th>group</th>
+<th>n pairs</th>
+<th>identity mean</th>
+<th>non-zero mean</th>
+<th>chance mean</th>
+<th>ratio mean</th>
+<th>ratio max</th>
+</tr>
+<tr>
+<td>same build-id</td>
+<td>6</td>
+<td><strong>21.75 %</strong></td>
+<td>0.59 %</td>
+<td>20.29 %</td>
+<td>0.99</td>
+<td>1.37</td>
+</tr>
+<tr>
+<td>different build-id</td>
+<td>60</td>
+<td><strong>23.79 %</strong></td>
+<td>0.83 %</td>
+<td>22.73 %</td>
+<td>1.01</td>
+<td><strong>2.54</strong></td>
+</tr>
+</table>
+<p>Same-build pairs are, on average, <strong>less</strong> similar than different-build pairs, and the single most</p>
+<p>similar pair in the corpus by ratio (2.54) is cross-build. The build-id carries no content-similarity</p>
+<p>signal.</p>
+<p>Decisive counterexample inside one build lineage: build-id <code>bab1be8</code> covers <strong>three</strong> file roles —</p>
+<p><code>bm2n06.bin</code> (836,968 B), <code>bm2n08.bin</code> (3,059,736 B) and <code>bm2n12.bin</code> (1,638,360 B) — and the</p>
+<p>bm2n06/bm2n12 pair scores <strong>4.46 %</strong>, the lowest of any same-build pair and the floor of the</p>
+<p>same-build group. A second example: <code>594e022</code> covers <code>bm2n08</code> (3,059,736 B) and <code>bm2n13</code></p>
+<p>(1,339,032 B) at <strong>15.44 %</strong>. One build-id demonstrably spans wholly different file roles.</p>
+<p>All five same-build pairs in the corpus, for completeness:</p>
+<table>
+<tr>
+<th>pair</th>
+<th>build-id</th>
+<th>identity</th>
+</tr>
+<tr>
+<td>bm2n13 / bm2n15 (Moto SM6375, ArrowOS)</td>
+<td><code>5371806</code></td>
+<td>42.67 %</td>
+</tr>
+<tr>
+<td>bm2n13 / bm2n12 (bheatleyyy, FP5)</td>
+<td><code>2c855d1</code></td>
+<td>41.77 %</td>
+</tr>
+<tr>
+<td>bm2n08 / bm2n06 (cupid, diting)</td>
+<td><code>bab1be8</code></td>
+<td>20.23 %</td>
+</tr>
+<tr>
+<td>bm2n08 / bm2n13 (diting, mayfly)</td>
+<td><code>594e022</code></td>
+<td>15.44 %</td>
+</tr>
+<tr>
+<td>bm2n08 / bm2n12 (cupid, diting)</td>
+<td><code>bab1be8</code></td>
+<td>5.93 %</td>
+</tr>
+<tr>
+<td>bm2n06 / bm2n12 (diting, diting)</td>
+<td><code>bab1be8</code></td>
+<td>4.46 %</td>
+</tr>
+</table>
+<h3>3.5 What build-id equality <em>does</em> predict: the header, exactly</h3>
+<p>Here is the real (and genuinely useful) fleet-structure finding. Longest common prefix from offset 0</p>
+<p>separates the fleet <strong>perfectly</strong>:</p>
+<table>
+<tr>
+<th>lcp</th>
+<th>n pairs</th>
+<th>all same build-id?</th>
+<th>mechanical meaning</th>
+</tr>
+<tr>
+<td><code>0x2d</code> (45)</td>
+<td>3</td>
+<td><strong>yes</strong></td>
+<td>agree through <code>0x2c</code> — same base, build-id, <em>n</em>, and <code>segment[0]</code>; first difference at <code>segment[1].addr</code></td>
+</tr>
+<tr>
+<td><code>0x20</code> (32)</td>
+<td>2</td>
+<td><strong>yes</strong></td>
+<td>agree through <code>0x1f</code>; first difference at <code>0x20</code> = <strong>segment count</strong></td>
+</tr>
+<tr>
+<td><code>0x0d</code> (13)</td>
+<td>3</td>
+<td>no</td>
+<td>agree through first build-id char; differ at <code>0x0d</code> (inside the id)</td>
+</tr>
+<tr>
+<td><code>0x0c</code> (12)</td>
+<td>13</td>
+<td>no</td>
+<td>differ at <code>0x0c</code> — first build-id character</td>
+</tr>
+<tr>
+<td><code>0x02</code> (2)</td>
+<td>45</td>
+<td>no</td>
+<td>differ at <code>0x02</code> — <strong>different load base</strong> (0x00..0x01 zero for all)</td>
+</tr>
+</table>
+<p>Every lcp value is <strong>fully explained by the header fields</strong> and nothing else:</p>
+<ul>
+<li>lcp = 2 ⟺ different load base.</li>
+<li>lcp = 12 or 13 ⟺ same load base, different build-id.</li>
+<li>lcp = 32 ⟺ same load base <strong>and</strong> same build-id, different segment count.</li>
+<li>lcp = 45 ⟺ same load base, same build-id, same segment count — first divergence is the second</li>
+</ul>
+<p>  segment's address.</p>
+<p>So <code>lcp == 0x2d</code> is a <strong>perfect predictor of same build-id</strong> (0 contradictions, 21/21 pairs), and</p>
+<p><code>lcp ≤ 0x1f</code> a perfect predictor of a different one. But it predicts the header, not the body — and</p>
+<p>that is the trap: the identity percentages in §3.2 are inflated by header agreement plus zero</p>
+<p>coincidence, both of which track sparse-structure alignment rather than shared code.</p>
+<p><strong>Practical consequence for the lab's leverage argument:</strong> build-id is a safe <em>tier-1 grouping key</em></p>
+<p>(it partitions the fleet exactly, and is cheaper to read than a hash — 7 bytes at <code>0x0c</code>), but it is</p>
+<p><strong>not</strong> a substitute for md5 and gives no licence to attribute one file's RE findings to another file</p>
+<p>in the same lineage. That is the same conclusion the variant matrix reached from the filename side,</p>
+<p>now established independently from the byte side.</p>
+<p>---</p>
+<h2>4. Question 3: <code>u32[0]</code> is a load base, and the "only bm2n06 has 0x400000" premise is a 7-file artifact</h2>
+<h3>The field cannot be a size</h3>
+<p>Decisive single counterexample in the wider corpus:</p>
+<pre><code>
+v_fp5_bm2n12.bin   u32[0] = 0x00200000   file size = 0x00280828   &lt;- file is 786 KB larger than u32[0]
+</code></pre>
+<p>A section or region <strong>size</strong> cannot be smaller than the file it describes. Across 12 distinct payloads</p>
+<p>this is the only violation, and one counterexample is enough.</p>
+<p>Corroborating evidence that it is an address:</p>
+<ol>
+<li>It is <strong>duplicated</strong> at <code>0x1c</code> (48/48) — headers repeat an address they need, not a size.</li>
+<li>It <strong>equals <code>segment[0].addr</code></strong> (48/48) — it is literally the first entry of the segment table.</li>
+<li>All values are page-aligned plausible DSP memory bases: <code>0x200000</code>, <code>0x400000</code>, <code>0x800000</code>.</li>
+<li>It does <strong>not</strong> track file size monotonically: <code>bm2n14.bin</code> (103,168 B) and <code>bm2n13.bin</code></li>
+</ol>
+<p>   (1,106,944 B) share base <code>0x200000</code>; <code>v_diting_bm2n15.bin</code> (1,339,032 B) uses <code>0x800000</code>.</p>
+<h3><code>0x400000</code> is not unique to bm2n06</h3>
+<p>The brief's observation was correct for the seven-file fleet and dissolves on the wider sample:</p>
+<table>
+<tr>
+<th>load base</th>
+<th>distinct payloads (48-file corpus)</th>
+</tr>
+<tr>
+<td><code>0x200000</code></td>
+<td>5 (<code>2a8527c</code>, <code>2c855d1</code>×2, <code>5371806</code>×2)</td>
+</tr>
+<tr>
+<td><code>0x400000</code></td>
+<td>5 (<code>594e022</code>/bm2n08, <code>5da2bda</code>, <code>bab1be8</code>×3)</td>
+</tr>
+<tr>
+<td><code>0x800000</code></td>
+<td>2 (<code>33e15da</code>, <code>594e022</code>/bm2n13)</td>
+</tr>
+</table>
+<p><code>bm2n08</code> and <code>bm2n12</code> also occur at <code>0x400000</code> on other device generations. (<code>bm2n15</code> does not — it</p>
+<p>appears only at <code>0x200000</code> and <code>0x800000</code>; the earlier claim that it does was wrong and is corrected</p>
+<p>here.) There is no build-generation correlation either: <code>bm2n06</code>'s build-id <code>4bd22b0</code> is unique in the</p>
+<p>corpus, so "the only file whose build-id starts with 4" has a sample of one and cannot establish a</p>
+<p>trend.</p>
+<p>Within a build lineage the load base is <em>usually</em> constant (6 of 7 lineages) but <strong>not always</strong>:</p>
+<pre><code>
+lineage 594e022:  v_diting_bm2n08.bin  base=0x400000
+                  v_mayfly_bm2n13.bin  base=0x800000   &lt;- same build-id, different base
+</code></pre>
+<p>So the load base is a <strong>per-build choice recorded in the header</strong>, correlated with but not determined</p>
+<p>by the build lineage. It is not a version marker and does not track the filename index either</p>
+<p>(<code>bm2n12</code> and <code>bm2n15</code> each appear with two different bases).</p>
+<p>Not forced to a conclusion: whether the base is chosen by the SoC memory map, the linker, or the</p>
+<p>packaging tool is <strong>not</strong> settled by these bytes. What is settled is that it is an address, not a size.</p>
+<p>---</p>
+<h2>5. Two by-products worth recording</h2>
+<h3>5.1 A <code>bm2n12.bin</code> in the DB is a completely different file <em>format</em></h3>
+<p><code>f87d78518cf940b7c79d0e02bd7369c4</code>, 2,359,272 B, DB row <code>Nord_CE4 / oneplus / bm2n12.bin</code></p>
+<p>(variant matrix Table 2, the <code>benz</code> row). It is <strong>not</strong> the bm2n container:</p>
+<pre><code>
+first 32 bytes: 2bf70973 78020100 33004964 00000000 ...
+u32@0x00 = 0x7309f72b   (not a load base; magic absent; whole header shape differs)
+</code></pre>
+<p>It carries a machine-generated option-string block instead, and the option names identify it:</p>
+<pre><code>
+min_arch=73; tile_height=8; vtcm_mb=2; num_hmx=4/8; hvx=8; soc_type=; ...
+supertile=0; afterburner=true; largest_memory_alloc_size=1073741824
+</code></pre>
+<p><code>min_arch=73</code> (Hexagon v73), <code>vtcm_mb</code>, <code>num_hmx</code>, <code>num_hvx</code> and the <code>tile</code>/<code>crouton</code> vocabulary are</p>
+<p><strong>Hexagon HTP / QNN graph-preparation context</strong> parameters, not DSP firmware. Flagged as</p>
+<p><em>strongly-indicated</em> rather than confirmed — no QNN/HTP header magic was matched.</p>
+<p>This sharpens the variant matrix's "filename ≠ identity" thesis beyond what either document claimed</p>
+<p>alone: <code>bm2n12.bin</code> in the DB does not merely span two builds of one format, it spans **two unrelated</p>
+<p>file formats**. A <code>bm2n12.bin</code> sweep that hashes without parsing will fold an ML context blob into</p>
+<p>DSP-firmware statistics.</p>
+<h3>5.2 The container doubles as a cheap md5 pre-screen</h3>
+<p>Because <code>build-id + load-base + segment-count + segment[0..k]</code> is a near-unique header fingerprint, the</p>
+<p>first 0x40 bytes reject most non-matches without hashing: within the corpus, all 12 distinct payloads</p>
+<p>have distinct first-0x2d-byte prefixes except the same-build/same-shape pairs, which the build-id</p>
+<p>already ties. Useful for triaging large vendor trees; not a replacement for md5 on exact identity.</p>
+<p>---</p>
+<h2>6. Honest limitations and failed checks</h2>
+<ul>
+<li><strong>Prior-art search was impaired.</strong> <code>websearch</code> returned HTTP 402 and the GitHub code-search API</li>
+</ul>
+<p>  returned 401 from this session; the prior-art claim in §1 is therefore weaker than RULE 0 wants.</p>
+<p>  In-repo grep (all <code>*.md</code>) found no prior header parse: the only <code>bm2n</code> docs are metadata tables</p>
+<p>  (<code>qualcomm-adsp-bm2n-fleet.md</code>, <code>qualcomm-adsp-bm2n-variant-matrix.md</code>). **A follow-up session must</p>
+<p>  re-run the public prior-art check before this is published.**</p>
+<ul>
+<li><strong><code>u32[2]==7</code> is undecidable as "length" vs "version"</strong> with current data (§2). Needs a blob with a</li>
+</ul>
+<p>  non-7-character build-id.</p>
+<ul>
+<li><strong><code>u32@0x18 == 4</code> is unexplained.</strong> Constant in 48/48 and belongs to no identified substructure.</li>
+<li><strong>Segment <code>flags</code> semantics are not decoded.</strong> The (low-half, high-half) split is suggestive of</li>
+</ul>
+<p>  permission/type but no bit meaning is claimed.</p>
+<ul>
+<li><strong>Load-base origin is not determined</strong> (§4).</li>
+<li><strong>One corpus file was empty</strong> (<code>v_moto7325_bm2n06.bin</code>, 0 B) — a truncated fetch, consistent with the</li>
+</ul>
+<p>  variant matrix's own note that large <code>gh api</code> fetches stalled. Excluded, not interpreted.</p>
+<ul>
+<li><strong><code>bm2n13</code> DB coverage differs from the other five</strong> (25 devices vs 26 for bm2n12/14/15) — the</li>
+</ul>
+<p>  variant matrix's Table 1 states 25 for all six; that discrepancy is in <em>its</em> table, not re-derived</p>
+<p>  here, and is flagged for the lead rather than silently corrected.</p>
+<ul>
+<li>Identity percentages use <strong>min length</strong>, which favours long/short pairs toward the shorter file's</li>
+</ul>
+<p>  prefix. The chance model and non-zero decomposition are given precisely so the reader need not</p>
+<p>  trust the raw percentage.</p>
+<p>---</p>
+<h2>7. Reproduce</h2>
+<pre><code class="language-bash">
+# primary fleet + variant (7 files, all md5-verified in §0 of this doc)
+cd /tmp/astro_u/payloads
+python3 bm2n_container_probe.py .
+
+# full 48-file cross-validation corpus
+python3 bm2n_container_probe.py /tmp/astro_u/hunt
+
+# the specific claims, standalone
+python3 - &lt;&lt;'EOF'
+import struct
+A=open('/tmp/astro_u/payloads/bm2n13.bin','rb').read()
+B=open('/tmp/astro_u/payloads/bm2n13_sm8350.bin','rb').read()
+n=min(len(A),len(B))
+same=sum(1 for i in range(n) if A[i]==B[i])
+nz  =sum(1 for i in range(n) if A[i]==B[i] and A[i]!=0)
+print(f"identity      {same/n*100:.6f}%   (lead said 42.84%)")
+print(f"coincident 0s {sum(1 for i in range(n) if A[i]==B[i]==0)/n*100:.2f}%")
+print(f"non-zero agree{nz/n*100:.4f}%")
+EOF
+</code></pre>
+<p>Expected: <code>identity 42.842142%</code>, coincident zeros <code>42.01 %</code>, non-zero agreement <code>0.84 %</code>.</p>
+<p>Header dump for any single file:</p>
+<pre><code class="language-bash">
+xxd -l 96 bm2n13.bin
+</code></pre>
+<p>---</p>
+<h2>8. Answers, in one block</h2>
+<p><strong>(a)</strong> No. Build-id equality does <strong>not</strong> predict content similarity; the apparent effect is</p>
+<p>zero-coincidence plus header agreement. Same-build pairs score 42.22 % vs 28.23 % raw, but</p>
+<p>1.19 vs 0.97 measured/chance, and on the corpus 21.75 % vs 23.79 % — i.e. the sign flips inversely and</p>
+<p>the maximum-ratio pair is always cross-build. The lead's 42.84 % is <strong>verified exactly</strong> but decomposes</p>
+<p>to 42.01 % coincident zeros + 0.84 % non-zero agreement. Build-id <em>does</em> partition the fleet exactly via</p>
+<p><code>lcp == 0x2d</code> (perfect, 0 contradictions) — a header fingerprint, not a content fingerprint.</p>
+<p><strong>(b)</strong> <code>u32[10] == 0x010400</code> is <strong><code>segment[0].flags</code></strong> (byte <code>0x28</code>, first entry of the table at</p>
+<p><code>0x24</code>); it is constant because entry[0] is always the load-base segment. <code>u32[2] == 7</code> is the</p>
+<p><strong>build-id string length</strong>, matching <code>strlen</code> in 48/48, though "version 7" cannot be excluded because</p>
+<p>every sampled build-id is 7 chars. The "segment-table marker" is the table <strong>terminator</strong></p>
+<p><code>((~n &amp; 0xffff) &lt;&lt; 16) | n</code>, confirmed 48/48 — it is per-file, not a constant.</p>
+<p><strong>(3)</strong> <code>u32[0]</code> is a <strong>load base address</strong>, not a section size: it is duplicated at <code>0x1c</code>, equals</p>
+<p><code>segment[0].addr</code>, and one payload (<code>v_fp5_bm2n12.bin</code>, 0x280828 B) is <strong>larger than</strong> its own</p>
+<p><code>u32[0] == 0x200000</code>, which no size field can be. The "only bm2n06 has 0x400000" premise holds only</p>
+<p>within these seven files: the wider corpus shows <code>bm2n08</code> and <code>bm2n12</code> at <code>0x400000</code> too, and</p>
+<p><code>bm2n06</code>'s build-id is unique, so no build-generation correlation can be measured.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

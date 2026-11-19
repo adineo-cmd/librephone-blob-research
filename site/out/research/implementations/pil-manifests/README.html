@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/pil-manifests — clean-room Qualcomm `*.jsn` PDR manifest parser — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/pil-manifests — clean-room Qualcomm `*.jsn` PDR manifest parser</h1><p>A structural parser/validator for the Qualcomm **PDR service-registry</p><p>Evidence: none</p>
+<h1>implementations/pil-manifests — clean-room Qualcomm <code>*.jsn</code> PDR manifest parser</h1>
+<p>A structural parser/validator for the Qualcomm **PDR service-registry</p>
+<p>manifest** family (<code>*.jsn</code>) — the most widely shared small blobs in the</p>
+<p>laptop half of the census (<strong>one analysis covers 17 devices</strong> on a single</p>
+<p>md5). It parses the documented grammar, validates every invariant the</p>
+<p>public consumers rely on, cross-checks the filename taxonomy against the</p>
+<p>mainline kernel's own hardcoded table, and emits the field/service table as</p>
+<p>JSON. Pure stdlib; no proprietary material was accessed (clean-room</p>
+<p>statement in <code>jsn_probe.py</code>).</p>
+<p><strong>Ground truth (fetched 2026-11-18):</strong></p>
+<ul>
+<li><code>torvalds/linux</code> master <code>drivers/soc/qcom/qcom_pd_mapper.c</code> (GPL-2.0-only)</li>
+</ul>
+<p>  — the same domain/instance/service table <strong>as C data</strong>, plus</p>
+<p>  <code>SERVREG_QMI_VERSION 0x101</code> and the implicit <code>tms/servreg</code> rule.</p>
+<ul>
+<li><code>linux-msm/pd-mapper</code> (BSD-3-Clause) <code>json.c</code>/<code>json.h</code>/<code>pd-mapper.c</code> —</li>
+</ul>
+<p>  the <strong>actual on-disk parser</strong> (<code>pd_load_map()</code>), the <code>.jsn</code>/<code>.jsn.xz</code></p>
+<p>  directory-adjacency discovery, the 127-byte string cap and digit-only</p>
+<p>  number rule.</p>
+<ul>
+<li><code>drivers/soc/qcom/mdt_loader.c</code> and <code>drivers/remoteproc/qcom_q6v5_pas.c</code></li>
+</ul>
+<p>  — checked and confirmed to contain <strong>zero</strong> <code>.jsn</code> references (see</p>
+<p>  "honest negative" below).</p>
+<h2>The one thing to know first</h2>
+<p>These files are <strong>not</strong> split-MDT image manifests. They do not name</p>
+<p><code>.mdt</code>/<code>.bNN</code> segments, list sizes or carry hashes. They are **JSON PDR</p>
+<p>service-registry manifests*<em>: a lookup table mapping a QMI </em>service* to the</p>
+<p><em>protection domain</em> that hosts it, plus a QMI instance id. The mainline</p>
+<p>kernel does not open them at all — it ships the identical table compiled in</p>
+<p>(<code>qcom_pd_mapper.c</code>). The file is consumed by userspace <code>pd-mapper</code>, which</p>
+<p>finds it by <strong>directory adjacency</strong> to a remoteproc's firmware path.</p>
+<p>Full detail, citations and the byte-level proof: <strong><code>jsn-manifest-analysis.md</code></strong>.</p>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>jsn_probe.py</code></td>
+<td>parser/validator + JSON emitter + CLI (<code>python3 -I jsn_probe.py &lt;file&gt; [--json out.json] [--brief] [--quiet] [--allow-crlf]</code>; exit 1 on invariant violations, 2 on unparseable input)</td>
+</tr>
+<tr>
+<td><code>make_fixture.py</code></td>
+<td>deterministic <strong>synthetic</strong> manifest generator (self-made bytes from the established grammar; regenerates <code>fixtures/</code>)</td>
+</tr>
+<tr>
+<td><code>fixtures/*.jsn</code></td>
+<td>synthetic manifests — sizes mirror the measured fleet magnitudes (403/513/515/703/710/713/719 B) so the two-generation split is exercised faithfully. <strong>No vendor bytes</strong>; the comment text is deliberately not the vendor's prose</td>
+</tr>
+<tr>
+<td><code>test_jsn_probe.py</code></td>
+<td>unittest suite: <code>python3 -m unittest -v test_jsn_probe</code></td>
+</tr>
+<tr>
+<td><code>jsn-manifest-analysis.md</code></td>
+<td>the analysis: grammar, full key table, suffix taxonomy, two-generation finding, kernel-consumer citation, consistency proofs, [OPEN] list</td>
+</tr>
+</table>
+<h2>Family scope (measured, <code>blob-matrix/laptop/sharing-clusters.csv</code>)</h2>
+<p>Rows are fleet md5s; every one below was fetched and **md5-verified</p>
+<p>byte-exact** (sources and route log in <code>jsn-manifest-analysis.md</code> §1).</p>
+<table>
+<tr>
+<th>md5</th>
+<th>file</th>
+<th>bytes</th>
+<th>devices</th>
+<th>declared domain</th>
+</tr>
+<tr>
+<td><code>5d262bb7661402a8d7ca9724bbb45d46</code></td>
+<td><code>adspr.jsn</code></td>
+<td>513</td>
+<td>17</td>
+<td><code>msm/adsp/root_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>40d6edf129dec063ca3fe6cb6837488f</code></td>
+<td><code>adspr.jsn</code></td>
+<td>403</td>
+<td>6</td>
+<td><code>msm/adsp/root_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>a43d66d0549e33cf421e25be06260ce0</code></td>
+<td><code>adspua.jsn</code></td>
+<td>703</td>
+<td>17</td>
+<td><code>msm/adsp/audio_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>49003ffcd10ec16dee11caad22b11b42</code></td>
+<td><code>cdspr.jsn</code></td>
+<td>513</td>
+<td>17</td>
+<td><code>msm/cdsp/root_pd</code> (76)</td>
+</tr>
+<tr>
+<td><code>0d755b18c24337ebca8313b85f8e8a6c</code></td>
+<td><code>battmgr.jsn</code></td>
+<td>516</td>
+<td>17</td>
+<td><code>msm/adsp/charger_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>72b46949d078a4f226394931a4345e61</code></td>
+<td><code>modemr.jsn</code></td>
+<td>710</td>
+<td>15</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>8167cdcc892464ba0fed63cd439314a2</code></td>
+<td><code>slpir.jsn</code></td>
+<td>513</td>
+<td>11</td>
+<td><code>msm/slpi/root_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>de25e460ce0debb53db0bb15a122ac6f</code></td>
+<td><code>slpius.jsn</code></td>
+<td>515</td>
+<td>11</td>
+<td><code>msm/slpi/sensor_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>cddb328503f04c634cc3251b89dad765</code></td>
+<td><code>adsps.jsn</code></td>
+<td>515</td>
+<td>6</td>
+<td><code>msm/adsp/sensor_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>f2bd80d5f0b19b5b0d36d28383948149</code></td>
+<td><code>cdspr.jsn</code></td>
+<td>403</td>
+<td>6</td>
+<td><code>msm/cdsp/root_pd</code> (76)</td>
+</tr>
+<tr>
+<td><code>d0bd5030a03f631c9af5060a5645d02e</code></td>
+<td><code>adspua.jsn</code></td>
+<td>555</td>
+<td>6</td>
+<td><code>msm/adsp/audio_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>bad87ccee828ee70d0281db170985738</code></td>
+<td><code>modemuw.jsn</code></td>
+<td>713</td>
+<td>4</td>
+<td><code>msm/modem/wlan_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>0492fd466fcf5bf62a3d89ceba83197f</code></td>
+<td><code>modemr.jsn</code></td>
+<td>719</td>
+<td>3</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>c7253d84bff46e4cf5cb0585e9a851c5</code></td>
+<td><code>adsps.jsn</code></td>
+<td>405</td>
+<td>3</td>
+<td><code>msm/adsp/sensor_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>0039483ebd20685728df72c12d13fee4</code></td>
+<td><code>slpius.jsn</code></td>
+<td>405</td>
+<td>3</td>
+<td><code>msm/slpi/sensor_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>2439d6872b39e9c1282c572b266665f0</code></td>
+<td><code>slpir.jsn</code></td>
+<td>403</td>
+<td>3</td>
+<td><code>msm/slpi/root_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>17b878530e8306c3777ead5ec2b84aba</code></td>
+<td><code>modemr.jsn</code></td>
+<td>562</td>
+<td>2</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>6acb8c836e49c5ce08edb3b097517bc0</code></td>
+<td><code>modemr.jsn</code></td>
+<td>719</td>
+<td>1</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>1a4a6904fc55234e68b68ebf4ddefe87</code></td>
+<td><code>wlanpdr.jsn</code></td>
+<td>405</td>
+<td>2</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+</table>
+<p>The 17-device set (caihong, cupid, diting, erhai, fuxi, lemonade,</p>
+<p>lemonadep, marble, martini, mayfly, mondrian, nuwa, socrates, thor,</p>
+<p>unicorn, vermeer, zeus) is <strong>Xiaomi + OnePlus</strong> on SM8250/SM8350/SM8450/</p>
+<p>SM8550. Every file above is also published by <strong>linux-firmware</strong></p>
+<p>(<code>WHENCE</code>, 114 <code>*.jsn</code> entries) — these are already-redistributable</p>
+<p>firmware, not secrets.</p>
+<h2>Usage</h2>
+<pre><code class="language-bash">
+python3 -I jsn_probe.py vendor/firmware/adspr.jsn
+python3 -I jsn_probe.py vendor/firmware/adspr.jsn --brief
+python3 -I jsn_probe.py vendor/firmware/adspr.jsn --json out.json --quiet
+</code></pre>
+<p>Brief mode prints one line:</p>
+<pre><code>
+adspr.jsn: 513B msm/adsp/root_pd inst=74 services=1 stem=adspr [OK 0E/0W]
+</code></pre>
+<p>Full mode prints the framing, the derived taxonomy, the domain/instance,</p>
+<p>the service table and every diagnostic. Exit codes: <strong>0</strong> valid, <strong>1</strong></p>
+<p>parseable but violating an invariant (wrong instance for the domain,</p>
+<p>filename/domain disagreement, unknown version, missing required key), <strong>2</strong></p>
+<p>not JSON / not a file / empty.</p>
+<p>Validation is not cosmetic — it cross-checks the manifest against</p>
+<p><code>qcom_pd_mapper.c</code>: a manifest declaring <code>msm/adsp/root_pd</code> with any</p>
+<p>instance other than 74 is an <strong>error</strong>, because a mainline kernel could</p>
+<p>never answer that lookup. Filename stems are re-derived (<code>adspr</code> → adsp +</p>
+<p><code>r</code> → <code>root_pd</code>) and compared to <code>sr_domain</code>, catching renamed or</p>
+<p>misplaced files.</p>
+<h2>The suffix taxonomy (measured, 0 contradictions)</h2>
+<p><code>&lt;subsystem&gt;&lt;optional u&gt;&lt;role letter&gt;</code>: <code>r</code>=root, <code>s</code>=sensor, <code>a</code>=audio,</p>
+<p><code>o</code>=ois, <code>w</code>=wlan; the <code>u</code> infix marks "not the root PD". So <code>modemuw</code> =</p>
+<p>modem + u + wlan, <code>adspua</code> = adsp + u + audio. <code>battmgr</code> and <code>wlanpdr</code> are</p>
+<p>role-named exceptions. The suffixes are <strong>not</strong> secure/non-secure — a <code>.jsn</code></p>
+<p>has no signature, hash or security field at all.</p>
+<h2>The two-generation split, resolved</h2>
+<p><code>adspr.jsn</code> at 403 vs 513 B is <strong>one optional <code>dcomment</code> field</strong> (110 bytes),</p>
+<p>not a firmware generation. The same holds for <code>adsps</code> (405/515), <code>adspua</code></p>
+<p>(555/703), <code>cdspr</code> (403/513), <code>slpir</code> (403/513) and <code>slpius</code> (405/515):</p>
+<p>after dropping <code>dcomment</code> the JSON documents are <strong>equal</strong>. <code>modemr</code> is the</p>
+<p>one stem that genuinely varies in content (405/406/425/562/710/719/905 B =</p>
+<p>different service lists), and off-by-one sizes elsewhere are a trailing</p>
+<p>newline (514 vs 513) or CRLF (534 vs 513).</p>
+<h2>Honest negative worth stating</h2>
+<p>Mainline does <strong>not</strong> parse these files.</p>
+<ul>
+<li><code>drivers/soc/qcom/mdt_loader.c</code>: <code>grep -c -i jsn</code> → <strong>0</strong>. Split segments</li>
+</ul>
+<p>  are derived arithmetically — `sprintf(seg_name + strlen(fw_name) - 3,</p>
+<p>  "b%02d", segment)<code> turns </code>adsp.mdt<code> into </code>adsp.b00`…, no manifest involved.</p>
+<ul>
+<li><code>drivers/remoteproc/qcom_q6v5_pas.c</code>: <code>grep -c -i jsn</code> → <strong>0</strong>. Firmware</li>
+</ul>
+<p>  selection is <code>desc-&gt;firmware_name</code>.</p>
+<ul>
+<li>Code search <code>jsn repo:torvalds/linux</code> → 2 hits, both spurious.</li>
+</ul>
+<p>The compiler-in replacement is <code>drivers/soc/qcom/qcom_pd_mapper.c</code>, which</p>
+<p>holds the same table as C. Its 19 <code>qcom_pdm_domain_data</code> structs are a</p>
+<p><strong>superset</strong> of the 12 distinct tuples found in 71 measured manifests — zero</p>
+<p>contradictions. For the three SoCs where a complete firmware directory was</p>
+<p>available, the set of shipped <code>.jsn</code> files matches the kernel's per-SoC</p>
+<p>domain list <strong>exactly</strong> (sm8250, sc8280xp, qcm2290).</p>
+<h2>Database type corrections</h2>
+<p><code>coverage-matrix.csv</code> labels are wrong for this family and the analysis</p>
+<p>corrects them (<code>jsn-manifest-analysis.md</code> §7). In short: `adspr/adsps/</p>
+<p>adspua<code> are typed </code>MODEM`, which is wrong (they describe the ADSP);</p>
+<p><code>battmgr.jsn</code> is in family <code>modem</code> but declares <code>msm/adsp/charger_pd</code> (it is</p>
+<p><strong>adsp</strong>); <code>slpir/slpius</code> are family <code>other</code> but SLPI is a first-class</p>
+<p>remoteproc (they should be <strong>slpi</strong>); <code>wlanpdr.jsn</code> is family <code>wifi</code> but</p>
+<p>declares <code>msm/modem/root_pd</code> (it is <strong>modem</strong>). Recommended <code>db_type</code> for</p>
+<p>the whole family: <code>PDR-MANIFEST</code> rather than <code>UNKNOWN</code>/<code>MODEM</code>.</p>
+<h2>Test status</h2>
+<pre><code>
+python3 -m unittest -v test_jsn_probe
+→ 40 tests, 40 passing (1 optional real-payload test skipped by default)
+</code></pre>
+<p>Coverage: grammar (gen1/gen2/multi-service), every field type, the</p>
+<p>two-size variants and the exact 110-byte <code>dcomment</code> arithmetic, byte</p>
+<p>framing (LF/no-BOM/no-trailing-newline, CRLF detection and downgrade),</p>
+<p>the full suffix table, kernel-contract cross-checks (instance table, domain</p>
+<p>sets), 13 malformed inputs across both failure classes, exit codes for all</p>
+<p>three outcomes, the CLI/JSON contract (strict JSON, quiet, <code>--brief</code>), and</p>
+<p>fixture determinism (regeneration is byte-identical).</p>
+<p>Run against real manifests with:</p>
+<pre><code class="language-bash">
+JSN_REAL_DIR=/tmp/astro_u/jsn/realall python3 -m unittest test_jsn_probe
+</code></pre>
+<p><strong>71/71 real manifests parsed with zero error-class diagnostics.</strong></p>
+<h2>Value statement</h2>
+<p>One analysis covers <strong>17 devices</strong> for five files (<code>adspr</code>, <code>adspua</code>,</p>
+<p><code>cdspr</code>, <code>battmgr</code>, plus the 11-device <code>slpi</code> pair) because the md5 is stable</p>
+<p>across the whole fleet. The format is fully specified by GPL/BSD public</p>
+<p>source — the <em>contents</em> of the table are literally in <code>qcom_pd_mapper.c</code> —</p>
+<p>so a free implementation can generate a correct manifest for any declared</p>
+<p>SoC <strong>without ever looking at a vendor file</strong>. The open cost is not this</p>
+<p>family: it is the DSP/modem images (<code>adsp.mdt</code> + segments) that the manifest</p>
+<p>merely points a directory service at.</p>
+<h2>RULE 0 prior-art check (2026-11-18/19, recorded queries)</h2>
+<p>Searches before building: GitHub code search for <code>filename:adspr.jsn</code> (271</p>
+<p>hits), <code>adspua.jsn</code> (279), <code>battmgr.jsn</code> (194), <code>modemuw.jsn</code> (181),</p>
+<p><code>slpius.jsn</code> (251), <code>modemr.jsn</code> (100+ sampled); <code>servreg jsn</code> (219 hits);</p>
+<p><code>jsn repo:torvalds/linux</code> (2, spurious). **No public tool parses these</p>
+<p>files structurally.** The only parsers are:</p>
+<ul>
+<li><code>linux-msm/pd-mapper</code> <code>json.c</code> + <code>pd_load_map()</code> — the real consumer,</li>
+</ul>
+<p>  BSD-3-Clause; it reads only <code>sr_domain</code> + <code>sr_service</code> and does no</p>
+<p>  validation, no taxonomy derivation and no kernel cross-check.</p>
+<ul>
+<li><code>drivers/soc/qcom/qcom_pd_mapper.c</code> — the same data as C, not a file</li>
+</ul>
+<p>  parser.</p>
+<ul>
+<li><code>nshnt-xyz/chef-cyclo</code> <code>tools/servreg-locator/jsn.{c,h}</code> — a small</li>
+</ul>
+<p>  servreg locator, not a manifest validator.</p>
+<p>Delta built here: structural validation + filename-taxonomy derivation +</p>
+<p>kernel-table cross-check + JSON emission + tests + synthetic fixtures. All</p>
+<p>other code-search hits are firmware packagers (distro <code>firmware-*.bb</code>,</p>
+<p><code>proprietary-files.txt</code>, retro-handheld overlays) and the QTI build script</p>
+<p><code>tms_builder_servreg.py</code>, which <em>emits</em> these manifests in the vendor build.</p>
+<p>Pattern precedent for fixtures: <code>implementations/qca-bt/</code> and</p>
+<p><code>implementations/mediatek/container/</code> (parser + make_fixture + tests +</p>
+<p>README; fixtures regenerable).</p>
+<h2>Sibling prior work in this lab</h2>
+<p><code>blob-matrix/desktop/fleet-re/oneplus6-partition-map.md</code> already noticed</p>
+<p>that <code>image_adspr.jsn</code> in the OnePlus 6 image equals the 31-device fleet</p>
+<p>blob, without identifying what the file was. This component closes that</p>
+<p>gap: it is a PDR service registry, not a firmware image manifest.</p>
+<p>Not legal advice, not a replacement implementation. Regulatory context:</p>
+<p><code>../../upstream-contribution/radio-regulatory-hurdles.md</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

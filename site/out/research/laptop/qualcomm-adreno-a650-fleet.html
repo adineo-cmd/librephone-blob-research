@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualcomm Adreno `a650_gmu.bin` + `a650_sqe.fw` — content-level RE: the first container generation, and the SQE build that cannot bring up a GPU — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Qualcomm Adreno `a650_gmu.bin` + `a650_sqe.fw` — content-level RE: the first container generation, and the SQE build that cannot bring up a GPU</h1><p>Analysis date: 2026-11-19. Evidence class: **MEASURED PAYLOADS** — every number</p><p>Evidence: none</p>
+<h1>Qualcomm Adreno <code>a650_gmu.bin</code> + <code>a650_sqe.fw</code> — content-level RE: the first container generation, and the SQE build that cannot bring up a GPU</h1>
+<p>Analysis date: 2026-11-19. Evidence class: <strong>MEASURED PAYLOADS</strong> — every number</p>
+<p>below is computed from bytes on disk or quoted from public GPL kernel source.</p>
+<p>Nothing is copied from a manifest except the explicitly-labelled DB row counts,</p>
+<p>which are re-derived.</p>
+<p>Primary payload: <code>a650_gmu.bin</code>, <strong>41,548 B</strong>, md5</p>
+<p><code>a2b9504e3d1cb8686ae7fcca21a11e1a</code>, sha256 re-derived this session. Secondary:</p>
+<p><code>a650_sqe.fw</code>, two builds (31,632 B device / 31,964 B linux-firmware). Bytes live</p>
+<p>only in <code>/tmp/astro_u/a650/</code>; no proprietary content is committed.</p>
+<p>Companion documents:</p>
+<table>
+<tr>
+<th>document</th>
+<th>owns</th>
+</tr>
+<tr>
+<td><strong><code>qualcomm-adreno-gmu.md</code></strong> (this directory)</td>
+<td>the a619 metadata matrix (5 laptop-half devices, md5/size)</td>
+</tr>
+<tr>
+<td><strong><code>qualcomm-adreno-gmu-content.md</code></strong> (this directory)</td>
+<td>a619 content RE: no header, raw ITCM+DTCM, the 13-of-26 occupancy correction</td>
+</tr>
+<tr>
+<td><strong><code>../../implementations/adreno650-fleet/a650-fleet-analysis.md</code></strong></td>
+<td>the full a650 analysis: block plan, reset-stub decode, vector table, SQE contract, <code>[OPEN]</code> list</td>
+</tr>
+<tr>
+<td><strong><code>../../implementations/adreno650/a650-gmu-analysis.md</code></strong></td>
+<td>the a650 first pass (block table, manifest tiling) — verified correct, extended here</td>
+</tr>
+<tr>
+<td><code>../../implementations/adreno650-fleet/a650_fleet_probe.py</code></td>
+<td>the probe. <code>python3 -I a650_fleet_probe.py &lt;file&gt; --brief</code></td>
+</tr>
+<tr>
+<td><code>../../implementations/adreno650-fleet/README.md</code></td>
+<td>usage, fixture/test instructions, RULE-0 delineation</td>
+</tr>
+</table>
+<p>This file owns the <strong>content-level summary</strong>, the <strong>live-vs-carrying table</strong></p>
+<p>(§4, which corrects the raw DB row count) and the **<code>pdx215</code> path-label</p>
+<p>correction** (§4.1). Read §4 even if you read nothing else.</p>
+<p>Labels used throughout: <strong>[S]</strong> quoted from public GPL source (file:line, fetched</p>
+<p>2026-11-19) · <strong>[M]</strong> my own measurement of payload bytes · <strong>[OPEN]</strong> not</p>
+<p>established, gap named.</p>
+<p>---</p>
+<h2>1. Headline: a650 is the first generation whose file <em>is</em> a container</h2>
+<p>a619 answers "is there a header at all?" with <strong>no</strong> — it is a flat 32 KiB</p>
+<p>ITCM+DTCM image the driver bulk-writes without parsing (<code>gmu-&gt;legacy</code>,</p>
+<p><code>a6xx_gmu.c:894-904</code>). a650 answers <strong>yes</strong>, and the header is fully specified by</p>
+<p>mainline [S]:</p>
+<pre><code class="language-c">
+/* drivers/gpu/drm/msm/adreno/a6xx_gmu.c:857-863, 874-875 */
+struct block_header {
+	u32 addr;
+	u32 size;
+	u32 type;
+	u32 value;
+	u32 data[];
+};
+#define NEXT_BLK(blk) ((const struct block_header *) \
+	((const char *)(blk) + sizeof(*(blk)) + (blk)-&gt;size))
+</code></pre>
+<p><code>a650_gmu.bin</code> walks this chain and lands on <strong>exact EOF at <code>0xa24c</code></strong> after 16</p>
+<p>records — no slack, no padding, no overrun [M]. That exactness is the proof the</p>
+<p>parse is right: a wrong field assignment desynchronises the walk immediately.</p>
+<table>
+<tr>
+<th></th>
+<th>a619 (GEN1)</th>
+<th><strong>a650 (GEN3-class)</strong></th>
+</tr>
+<tr>
+<td>format</td>
+<td>raw 0x8000 image</td>
+<td>16-record container</td>
+</tr>
+<tr>
+<td>loader</td>
+<td><code>gmu-&gt;legacy</code> bulk write, no parse</td>
+<td>block chain, <code>a6xx_gmu.c:906-930</code></td>
+</tr>
+<tr>
+<td>DTCM base</td>
+<td><code>0x00040000</code></td>
+<td><strong><code>0x10004000</code></strong></td>
+</tr>
+<tr>
+<td>windows</td>
+<td>ITCM + DTCM only</td>
+<td>ITCM + icache + DTCM + dummy BO</td>
+</tr>
+<tr>
+<td>reset entry</td>
+<td>ITCM <code>0x08</code></td>
+<td>ITCM <strong><code>0x10</code></strong></td>
+</tr>
+<tr>
+<td>stack page pre-written?</td>
+<td>n/a (flat image)</td>
+<td><strong>no</strong> — painted at runtime</td>
+</tr>
+<tr>
+<td>string table</td>
+<td>1 run ≥10 chars</td>
+<td><strong>81</strong></td>
+</tr>
+<tr>
+<td>linux-firmware</td>
+<td>absent</td>
+<td>ships both files</td>
+</tr>
+</table>
+<p><strong>The format boundary is the load path, not the filename</strong> [S <code>a6xx_gmu.c:2412-2414</code></p>
+<p>sets <code>gmu-&gt;legacy</code> for <code>ADRENO_6XX_GEN1</code>]. Measured across the fleet, that</p>
+<p>predicate is exactly the observed split: a619 and a630 (both GEN1, both 32,768 B)</p>
+<p>fail the walk identically; a640 onward all walk to exact EOF [M].</p>
+<h2>2. The block plan — 9 manifest + 7 payload, and one refuted hypothesis</h2>
+<p>The 16 records split cleanly [M]:</p>
+<ul>
+<li><strong>9 zero-size manifest records</strong> (<code>type</code> 1, one <code>type</code> 7). The kernel skips</li>
+</ul>
+<p>  these wholesale [S <code>a6xx_gmu.c:909-910</code>: <code>if (blk-&gt;size == 0) continue;</code>], so</p>
+<p>  their <code>value</code> field is <strong>never read by Linux</strong>.</p>
+<ul>
+<li><strong>7 payload blocks</strong>, every one tagged <code>type == value == 0xEFBEADDE</code> — on disk</li>
+</ul>
+<p>  <code>DE AD BE EF</code>, a byte-reversed <code>DEADBEEF</code>. This is the container's payload tag,</p>
+<p>  not a terminal sentinel [M].</p>
+<table>
+<tr>
+<th>payload</th>
+<th>addr</th>
+<th>size</th>
+<th>region</th>
+<th>entropy</th>
+</tr>
+<tr>
+<td>p0</td>
+<td><code>0x00000000</code></td>
+<td>192</td>
+<td>ITCM</td>
+<td>5.06</td>
+</tr>
+<tr>
+<td>p1</td>
+<td><code>0x00000200</code></td>
+<td>320</td>
+<td>ITCM</td>
+<td>1.74</td>
+</tr>
+<tr>
+<td>p2</td>
+<td><code>0x00000400</code></td>
+<td>14,092</td>
+<td>ITCM</td>
+<td>6.86</td>
+</tr>
+<tr>
+<td>p3</td>
+<td><code>0x00004000</code></td>
+<td>21,968</td>
+<td>icache</td>
+<td>6.78</td>
+</tr>
+<tr>
+<td>p4</td>
+<td><code>0x00157000</code></td>
+<td>920</td>
+<td>icache</td>
+<td>2.50</td>
+</tr>
+<tr>
+<td>p5</td>
+<td><code>0x10004000</code></td>
+<td>3,776</td>
+<td>DTCM</td>
+<td>0.52</td>
+</tr>
+<tr>
+<td>p6</td>
+<td><code>0x10007fdc</code></td>
+<td>24</td>
+<td>DTCM (tail)</td>
+<td>2.11</td>
+</tr>
+</table>
+<p>Totals: ITCM 14,604 B (≤ 16K) · icache 22,888 B · DTCM 3,800 B. Whole-file</p>
+<p>entropy 6.43 bits/byte, 19.1 % zero.</p>
+<h3>2.1 The manifest is a window map, not a block index — established negatively</h3>
+<p>The 9 manifest <code>(addr, value)</code> pairs tile the loader's own windows exactly, which</p>
+<p>makes it tempting to read them as an index of the payload blocks [M]:</p>
+<table>
+<tr>
+<th>manifest</th>
+<th>addr</th>
+<th>value</th>
+<th>mainline counterpart</th>
+</tr>
+<tr>
+<td>m0–m2</td>
+<td><code>0x0</code>, <code>0x200</code>, <code>0x400</code></td>
+<td><code>0x200</code>, <code>0x200</code>, <code>0x3c00</code></td>
+<td>ITCM <code>0x0..0x4000</code> tiled</td>
+</tr>
+<tr>
+<td>m3</td>
+<td><code>0x4000</code></td>
+<td><code>0x8000</code></td>
+<td>icache base (<code>a6xx_gmu.c:2393</code>)</td>
+</tr>
+<tr>
+<td>m4, m5</td>
+<td><code>0x10004000</code>, <code>0x10007fdc</code></td>
+<td><code>0x3fe0</code>, <code>0x24</code></td>
+<td>DTCM <code>0x10004000..0x10008000</code></td>
+</tr>
+<tr>
+<td>m6, m7</td>
+<td><code>0x144000</code>, <code>0x157000</code></td>
+<td><code>0x13000</code>, <code>0x9000</code></td>
+<td>icache sub-windows</td>
+</tr>
+<tr>
+<td>m8</td>
+<td><code>0x60000000</code> (type 7)</td>
+<td><code>0x1000</code></td>
+<td>dummy page BO (<code>a6xx_gmu.c:2384</code>)</td>
+</tr>
+</table>
+<p><strong>That hypothesis is refuted by measurement</strong> [M]: only <strong>3 of 11</strong> a660-family</p>
+<p>manifests have a pair that exactly matches a payload block, and **a650 matches 0</p>
+<p>of 9*<em>. The manifest is a </em>window map* the chip consumes — not an index of what</p>
+<p>the kernel copies. Recording this as a negative result is the point: a</p>
+<p>reimplementation that built a block-index table from these records would be</p>
+<p>building something the hardware does not use.</p>
+<h2>3. What a650 does that its predecessors do not</h2>
+<p>Three firsts, all measured from the bytes [M], all decoded with exact ARMv7-M</p>
+<p>mask tests (ARM DDI 0403) rather than pattern matching:</p>
+<p><strong>3.1 A stack paint loop.</strong> Before branching to <code>0x400</code>, the prologue writes</p>
+<p><code>0xaaaaaaaa</code> over <code>0x10007000..0x10007f80</code> (0xf80 B) — ending <em>exactly</em> at the</p>
+<p>initial SP <code>0x10007f80</code> (= DTCM top <code>0x10008000</code> − <code>0x80</code>). The 0xaaaaaaaa pattern</p>
+<p>is a stack-high-water detector: bytes the stack never reaches stay painted. The</p>
+<p>container <strong>never writes the stack page</strong> — it falls in a gap between the DTCM</p>
+<p>blocks — and that is correct: a firmware shipping pre-filled stack bytes would be</p>
+<p>initialising a region the core overwrites on its first push.</p>
+<p><strong>3.2 A boot counter.</strong> The prologue does a read-modify-write on <code>0x10007fdc</code></p>
+<p>twice, adding <code>1</code> then <code>2</code>, each as <code>(v &lt;&lt; 8) + n</code>. Two sequential bumps in one</p>
+<p>prologue means this is a stage-tagged sequence counter, not a single boot flag.</p>
+<p>The consumer is <code>[OPEN]</code>.</p>
+<p><strong>3.3 A REX RTOS string table.</strong> 81 printable runs ≥10 chars, against <strong>1</strong> in</p>
+<p>a619 and a630 [M]. The jump arrives with the container generation (a640 has 62).</p>
+<p>These are assert/abort format strings that <strong>name the failing function</strong>:</p>
+<table>
+<tr>
+<th>subsystem</th>
+<th>strings</th>
+</tr>
+<tr>
+<td>REX RTOS scheduler</td>
+<td><code>REX Idle Task</code>, <code>Trying to create more than REX_MAX_TASKS</code>, <code>rex_leave_crit_sect_internals() Failure: save_ptr == NULL</code>, ~20 more <code>rex_*</code></td>
+</tr>
+<tr>
+<td>signals / heap</td>
+<td><code>SIGABRT: Abnormal termination</code>, <code>SIGRTMEM: Out of heap memory</code>, <code>: Heap memory corrupted</code></td>
+</tr>
+<tr>
+<td>event map</td>
+<td><code>EventMapAdd/Remove</code>, <code>RegisterFuncForEvent</code>, <code>AllocEventPool</code>, <code>RecordEvent</code>, <code>PopTaskQueue</code></td>
+</tr>
+<tr>
+<td>cache / memory</td>
+<td><code>InvalidateDCache</code>, <code>InvalidateICache</code>, <code>GmuDCacheOp</code>, <code>FlushWriteBuffer</code>, <code>InvalidateReadBuffer</code></td>
+</tr>
+<tr>
+<td>HFI protocol</td>
+<td><code>HfiReadMsgPool</code>, <code>HfiGetMemDescriptor</code>, <code>HfiValueHandler</code>, <code>HandleHfiCommand</code>, <code>HfiMsgToHost</code>, <code>HfiQueueTryRead</code></td>
+</tr>
+<tr>
+<td>power / idle (IFPC)</td>
+<td><code>GmuPwrStart</code>, <code>GmuPwrRequestPowerOn</code>, <code>GmuPwrGxBwVote</code>, <code>beginHmPwrCollapse</code>, <code>EnterIdleState</code>, <code>ExitIdleState</code>, <code>PwrIdleStateGetStateIdx</code></td>
+</tr>
+<tr>
+<td>clock / voltage (RSCC)</td>
+<td><code>ResMgrReqClkThrot</code>, <code>RsccSetVoltageVoteData</code>, <code>RsccSendVoting</code>, <code>HAL_clk_ValidateRegTimeout</code></td>
+</tr>
+</table>
+<p>This is the highest-value artifact in the file: it names the RTOS primitives, the</p>
+<p>HFI layer, the IFPC idle-state machine and the RSCC voltage path **without any</p>
+<p>code interpretation**. Caveat: a naive <code>&gt;= 8</code>-char ASCII filter over 16-bit Thumb</p>
+<p>also catches machine-code false positives (`<code> </code>pGpG `<code>, </code>g2F)F F'`); the sample is</p>
+<p>a sample, not a symbol table.</p>
+<h2>4. Occupancy correction — 14 DB rows, <strong>9 devices that actually load it</strong></h2>
+<p><strong>This corrects the leverage implied by the raw row count.</strong> All <strong>14</strong> DB rows</p>
+<p>named <code>a650_gmu.bin</code> share md5 <code>a2b9504e…</code> [M, re-derived from</p>
+<p><code>coverage-matrix.csv</code>]. But mainline names the file in exactly <strong>one</strong> catalog</p>
+<p>entry [S <code>a6xx_catalog.c:1052-1057</code>]:</p>
+<pre><code class="language-c">
+	.chip_ids = ADRENO_CHIP_IDS(0x06050002),
+	.family = ADRENO_6XX_GEN3,
+	.revn = 650,
+	.fw = { [ADRENO_FW_SQE] = "a650_sqe.fw",
+	        [ADRENO_FW_GMU] = "a650_gmu.bin" },
+</code></pre>
+<p>Chip id <code>0x06050002</code> is what <code>find_chipid()</code> computes from <code>"qcom,adreno-650.2"</code></p>
+<p>[S <code>adreno_device.c:142-170</code>], the compatible <code>dts_sm8250.dtsi:2935</code> binds. So a</p>
+<p>device <em>carrying</em> the file is not a device <em>loading</em> it.</p>
+<table>
+<tr>
+<th>class</th>
+<th>devices</th>
+<th>platform (verified)</th>
+<th>verdict</th>
+</tr>
+<tr>
+<td><strong>Adreno 650 / SM8250 <code>kona</code></strong></td>
+<td><code>instantnoodle</code>, <code>instantnoodlep</code>, <code>kebab</code>, <code>lemonades</code>, <code>gts7l</code>, <code>gts7lwifi</code>, <code>r8q</code>, <code>pdx206</code>, <code>Xperia_1_II</code></td>
+<td><code>TARGET_BOARD_PLATFORM := kona</code></td>
+<td><strong>live — 9</strong></td>
+</tr>
+<tr>
+<td>Adreno 610 / SM6115 <code>bengal</code></td>
+<td><code>gta4l</code>, <code>gta4lwifi</code></td>
+<td><code>gta4l-common</code>: <code>TARGET_BOARD_PLATFORM := bengal</code>, <code>TARGET_BOARD_PLATFORM_GPU := qcom-adreno610</code></td>
+<td>not loaded</td>
+</tr>
+<tr>
+<td>Adreno 620 / SM7250 <code>lito</code></td>
+<td><code>Pixel_4A_5G</code> (bramble), <code>Pixel_5</code> (redfin), <code>Pixel_5A</code> (barbet)</td>
+<td>the DB's own <code>soc</code> column: <code>Qualcomm SM7250 Snapdragon 765G</code>; <code>redbull/BoardConfig-common.mk</code>: <code>lito</code></td>
+<td>not loaded</td>
+</tr>
+<tr>
+<td><strong>total</strong></td>
+<td><strong>14</strong></td>
+<td>—</td>
+<td><strong>9 live</strong></td>
+</tr>
+</table>
+<p>The five non-live are <strong>co-resident leftovers</strong> — a vendor firmware partition is</p>
+<p>a superset of what one SoC binds. Both non-live Android classes corroborate</p>
+<p>independently: <code>gta4l</code> also ships <code>a702_sqe.fw</code> / <code>a702_zap.mdt</code> (the a702 GMU</p>
+<p>wrapper, <code>sm6115.dtsi:1811</code>), and the three Pixels carry <code>a619_gmu.bin</code> +</p>
+<p><code>a630_sqe.fw</code> + <code>a650_sqe.fw</code> alongside — a whole family of GMU blobs for one GPU.</p>
+<p><strong>So: one RE pass informs 9 devices, not 14.</strong> The <code>14</code> remains correct as "how</p>
+<p>many DB rows share these exact bytes" (the right number for dedup and bandwidth</p>
+<p>accounting); it is wrong as "how many devices run this firmware". Both numbers</p>
+<p>are recorded because the distinction is the finding.</p>
+<h3>4.1 The <code>pdx215</code> row is mislabelled — and the fix makes it <strong>live</strong>, not dead</h3>
+<p>The DB row reads <code>Xperia_1_II | sony/pdx215 | a650_gmu.bin</code>. The codename is</p>
+<p>wrong, and the <em>contents</em> identify the real device:</p>
+<ol>
+<li><strong>Mainline DTS.</strong> <code>sm8250-sony-xperia-edo-pdx203.dts</code> is the Xperia 1 II</li>
+</ol>
+<p>   (<code>model = "Sony Xperia 1 II"</code>, <code>compatible = "sony,pdx203-generic"</code>, SM8250);</p>
+<p>   <code>sm8350-sony-xperia-sagami-pdx215.dts</code> is the <strong>Xperia 1 III</strong> (SM8350). So</p>
+<p>   <code>Xperia_1_II | pdx215</code> is internally inconsistent on its face.</p>
+<ol>
+<li><strong>Contents match pdx203.</strong> All 21 files under the DB's</li>
+</ol>
+<p>   <code>sony/pdx215/vendor/firmware</code> path exist in the pre-split <code>sm8250-common</code></p>
+<p>   tree or the pre-split <code>pdx203</code> directory. The discriminating file is</p>
+<p>   <code>touch_module_id_0x83.img</code> — the DB lists it at 169,224 B / md5</p>
+<p>   <code>279ca2f166d1c051a86f6dbc4165e937</code>, and <code>proprietary_vendor_sony_pdx203</code></p>
+<p>   carries a <strong>byte-identical</strong> copy. The genuine <code>pdx215</code> split tree carries</p>
+<p>   <code>touch_module_id_0x28.img</code> instead.</p>
+<ol>
+<li><strong>The real <code>pdx215</code> does not carry this blob.</strong> Its split vendor tree has</li>
+</ol>
+<p>   <code>a619_gmu.bin</code>, <code>a630_sqe.fw</code>, <code>a660_gmu.bin</code>, <code>a660_sqe.fw</code> — and **no</p>
+<p>   <code>a650_gmu.bin</code>** — on <code>lineage-22.1</code>, <code>22.2</code> and <code>24.0</code>, and its</p>
+<p>   <code>proprietary-files.txt</code> agrees. It inherits <code>sm8350-common</code></p>
+<p>   (<code>TARGET_BOARD_PLATFORM := lahaina</code>) → SM8350 → Adreno 660.</p>
+<ol>
+<li><strong><code>pdx203</code> is SM8250/kona.</strong> Its <code>BoardConfig.mk</code> inherits <code>sm8250-common</code>,</li>
+</ol>
+<p>   whose <code>BoardConfigCommon.mk</code> sets <code>TARGET_BOARD_PLATFORM := kona</code>.</p>
+<p>So the row is a duplicate of the <strong>Xperia 1 II / pdx203</strong> firmware set carrying</p>
+<p>the wrong codename in <code>db_path</code>. <code>device-inventory.csv</code> already lists</p>
+<p><code>Xperia_1_II</code> twice — once as <code>pdx203</code> (SM8250) and once as <code>pdx215</code> (soc blank)</p>
+<p>— which is how the two got crossed.</p>
+<p><strong>Consequence, and a correction to this document's own earlier draft.</strong> I first</p>
+<p>counted this row as a dead SM8350/Adreno-660 leftover, giving 8 live. That was</p>
+<p>wrong: the device behind the row is SM8250/kona, so it is <strong>live</strong>, and the</p>
+<p>count is <strong>9</strong>. The correction <em>raises</em> the impact of the SQE finding rather than</p>
+<p>lowering it. The md5 is byte-identical to the other 13 rows either way, so this</p>
+<p>stays a <strong>database attribution correction, not a payload finding</strong> — and the</p>
+<p>action is to relabel the row, not to drop it.</p>
+<p>Note this also refines the a619 sibling analysis: <code>qualcomm-adreno-gmu-content.md</code></p>
+<p>§5.1 lists <code>pdx215</code> as carrying <code>a650_gmu.bin</code> (taking the DB at face value). The</p>
+<p>vendor-tree evidence says the block is pdx203's, and that the genuine <code>pdx215</code></p>
+<p>carries <code>a660_gmu.bin</code> instead. The a619 conclusion for that device — "not</p>
+<p>loaded, co-resident" — is unchanged; only the identity of the co-resident blob</p>
+<p>differs.</p>
+<h2>5. The SQE gate — the device copy cannot bring up a GPU</h2>
+<h3>5.1 The strip and the version field</h3>
+<p><code>adreno_fw_create_bo()</code> allocates <code>fw-&gt;size − 4</code> and copies from <code>&amp;fw-&gt;data[4]</code></p>
+<p>[S <code>adreno_gpu.c:644-656</code>], so <strong>file dword 0 is a stripped prefix</strong> and the</p>
+<p>driver's <code>buf[0]</code> is <strong>file dword 1</strong>. In all 15 builds examined, file dword 0 is</p>
+<p><code>0x00000000</code>. What the prefix <em>means</em> is <code>[OPEN]</code>.</p>
+<h3>5.2 Four branches, one field asymmetry</h3>
+<p>[S <code>a6xx_gpu.c:985-1049</code>]:</p>
+<table>
+<tr>
+<th>catalog name</th>
+<th>branch</th>
+<th>floor</th>
+</tr>
+<tr>
+<td><code>a630_sqe.fw</code></td>
+<td>patched nibble OR <code>&gt;= 1.90</code></td>
+<td><code>0x190</code></td>
+</tr>
+<tr>
+<td><strong><code>a650_sqe.fw</code></strong></td>
+<td><strong><code>&gt;= 0.95</code></strong></td>
+<td><strong><code>0x095</code></strong></td>
+</tr>
+<tr>
+<td><code>a660_sqe.fw</code></td>
+<td>unconditional accept</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>a702_sqe.fw</code> / a7xx / a8xx</td>
+<td>early return <code>true</code></td>
+<td>—</td>
+</tr>
+</table>
+<p>The asymmetry worth flagging: the a630 patched test reads <code>buf[2]</code> — the <strong>BO's</strong></p>
+<p>dword 2, i.e. <strong>file dword 3</strong> — while the version is <code>buf[0] &amp; 0xfff</code>, i.e. file</p>
+<p>dword 1. Two different dwords, one <code>if</code>. The probe reports them separately.</p>
+<h3>5.3 Measured, both directions</h3>
+<table>
+<tr>
+<th>build</th>
+<th>bytes</th>
+<th>md5</th>
+<th>file dword 1</th>
+<th><code>v &amp; 0xfff</code></th>
+<th>text</th>
+<th>passes a650</th>
+</tr>
+<tr>
+<td>device fleet (DB md5)</td>
+<td>31,632</td>
+<td><code>353e247b2c4ea8c16c49cb31b574edc1</code></td>
+<td><code>0x016dd093</code></td>
+<td><code>0x093</code></td>
+<td>0.93</td>
+<td><strong>NO</strong></td>
+</tr>
+<tr>
+<td>linux-firmware</td>
+<td>31,964</td>
+<td><code>dc02e77a04b97b985281d36ab159c130</code></td>
+<td><code>0x016dd112</code></td>
+<td><code>0x112</code></td>
+<td>1.12</td>
+<td>YES</td>
+</tr>
+</table>
+<p><strong>Every vendor tree examined ships an a650 SQE below mainline's floor.</strong> The</p>
+<p>consequence is fully traceable in public source [S]:</p>
+<pre><code>
+a6xx_ucode_load()      returns -EPERM      (a6xx_gpu.c:1077)
+  -&gt; adreno_load_gpu() returns NULL        (adreno_device.c:96-100)
+    -&gt; the GPU never registers
+</code></pre>
+<p>A device carrying this exact SQE cannot bring up its GPU under mainline, and the</p>
+<p>two builds share only 18 % of same-offset bytes — genuinely different microcode,</p>
+<p>not a repack. The fix is a <code>&gt;= 0.95</code> build, which linux-firmware has had for</p>
+<p>years.</p>
+<h3>5.4 An independent cross-check that the decode is right</h3>
+<p><code>WHENCE</code> declares a version per file. For the <strong>SQE</strong> files it decodes exactly as</p>
+<p><code>%x.%02x</code> of <code>(dword1 &amp; 0xfff)</code> — all five checked [M]:</p>
+<table>
+<tr>
+<th>file</th>
+<th>WHENCE</th>
+<th>decoded</th>
+</tr>
+<tr>
+<td><code>a650_sqe.fw</code></td>
+<td><code>v1.12</code></td>
+<td>1.12 ✓</td>
+</tr>
+<tr>
+<td><code>a660_sqe.fw</code></td>
+<td><code>v1.12</code></td>
+<td>1.12 ✓</td>
+</tr>
+<tr>
+<td><code>a730_sqe.fw</code></td>
+<td><code>v1.81</code></td>
+<td>1.81 ✓</td>
+</tr>
+<tr>
+<td><code>a740_sqe.fw</code></td>
+<td><code>v1.81</code></td>
+<td>1.81 ✓</td>
+</tr>
+<tr>
+<td><code>a630_sqe.fw</code></td>
+<td><code>v2.07</code></td>
+<td>1.97 device / 2.07 linux-fw (WHENCE tracks the linux-fw build)</td>
+</tr>
+</table>
+<p>The <strong>GMU</strong> files carry no such field: <code>a650_gmu.bin</code> dword 1 is <code>0x00000000</code>,</p>
+<p>which a container <em>must</em> keep zero because dword 1 is the first block header's</p>
+<p><code>size</code>. The driver reads the GMU version from a register instead</p>
+<p>(<code>gmu_read(gmu, REG_A6XX_GMU_CORE_FW_VERSION)</code>, [S <code>a6xx_gmu.c:933-937</code>]), so</p>
+<p><code>WHENCE</code>'s <code>qcom/a650_gmu.bin v2.1.8</code> is a release label, not a blob field.</p>
+<p>A version field reproducing the vendor's own declared string across five</p>
+<p>unrelated SQE files is not a coincidence, and it validates the whole</p>
+<p>"read dword 1 → mask <code>0xfff</code> → format major.minor" chain without depending on it.</p>
+<h2>6. The vector table at <code>0x200</code> — word0 is <em>not</em> a stack pointer</h2>
+<p>80 words: 16 architectural entries then 64 external interrupts [M].</p>
+<table>
+<tr>
+<th>index</th>
+<th>vector</th>
+<th>value</th>
+</tr>
+<tr>
+<td>0</td>
+<td>Initial SP slot</td>
+<td><code>0x00000000</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>Reset</td>
+<td><code>0x00000011</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>NMI</td>
+<td><code>0x000004d1</code></td>
+</tr>
+<tr>
+<td>3–6</td>
+<td>HardFault, MemManage, BusFault, UsageFault</td>
+<td><code>0x000004a1</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td>SVCall</td>
+<td><code>0x000035a1</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>PendSV</td>
+<td><code>0x00000509</code></td>
+</tr>
+<tr>
+<td>15</td>
+<td>SysTick</td>
+<td><code>0x000035a3</code></td>
+</tr>
+<tr>
+<td>16–79</td>
+<td>64 external IRQs</td>
+<td><code>0x00000579</code></td>
+</tr>
+</table>
+<p><strong>word0 is zero, and that is the a650 discriminator.</strong> A Cortex-M vector table</p>
+<p>conventionally repeats the initial SP at word 0 — a619 and a640 both do. From</p>
+<p>a650 the SP comes from the prologue's own literal, so <code>0x200</code> is a pure handler</p>
+<p>table. The probe names the role (<code>initial-SP copy</code> / <code>unused (zero)</code>) instead of</p>
+<p>assuming, because assuming would silently mis-read a640 and a650 as the same</p>
+<p>shape.</p>
+<p>Two independent self-consistency checks pass [M]: every non-zero handler is odd</p>
+<p>(Thumb) <strong>and</strong> every one resolves into loaded code. All 64 external interrupts</p>
+<p>collapse onto a <strong>single</strong> handler — the microcode polls rather than dispatching</p>
+<p>per-IRQ.</p>
+<p>From a660/a623/a663 the <code>0x200</code> window is <strong>not loaded at all</strong> (VTOR → <code>0x1000</code>),</p>
+<p>so the probe reports <code>vector_table_absent</code> rather than inventing one out of</p>
+<p>zero-fill.</p>
+<h2>7. Provenance and md5 verification (2026-11-19)</h2>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>status</th>
+<th>source</th>
+</tr>
+<tr>
+<td><code>a650_gmu.bin</code></td>
+<td>41,548</td>
+<td><code>a2b9504e3d1cb8686ae7fcca21a11e1a</code></td>
+<td><strong>MATCH</strong> DB</td>
+<td>linux-firmware <code>qcom/a650_gmu.bin</code>; byte-identical in 5 vendor trees</td>
+</tr>
+<tr>
+<td><code>a650_sqe.fw</code> (device)</td>
+<td>31,632</td>
+<td><code>353e247b2c4ea8c16c49cb31b574edc1</code></td>
+<td><strong>MATCH</strong> DB</td>
+<td>oneplus/samsung/sony/xiaomi vendor trees; <strong>not</strong> in linux-firmware</td>
+</tr>
+<tr>
+<td><code>a650_sqe.fw</code> (linux-fw)</td>
+<td>31,964</td>
+<td><code>dc02e77a04b97b985281d36ab159c130</code></td>
+<td>not in DB</td>
+<td>linux-firmware <code>qcom/a650_sqe.fw</code></td>
+</tr>
+</table>
+<p><code>WHENCE</code> records <code>qcom/a650_gmu.bin v2.1.8</code> and <code>qcom/a650_sqe.fw v1.12</code>. Only</p>
+<p>the SQE version is a field in the blob (<code>%x.%02x</code> of dword 1 &amp; <code>0xfff</code>); the GMU</p>
+<p>label is a release tag, and the driver reads the GMU version from a register</p>
+<p>after start (<code>a6xx_gmu.c:933</code>).</p>
+<h2>8. What this buys a free reimplementation</h2>
+<ul>
+<li><strong>The container format is fully specified</strong> by mainline plus a file that walks</li>
+</ul>
+<p>  to EOF exactly. A free loader already exists (<code>msm</code>); what is missing is the</p>
+<p>  microcode, not the format.</p>
+<ul>
+<li><strong>Three reset-prologue shapes are pinned</strong> (<code>a640</code> / <code>a650</code> / <code>a660</code>) and each</li>
+</ul>
+<p>  is decoded into the architectural facts a reimplementation must reproduce:</p>
+<p>  where the stack is, where VTOR points, whether the stack page is pre-written,</p>
+<p>  whether a boot counter is maintained.</p>
+<ul>
+<li><strong>The SQE gate is a hard, checkable contract.</strong> Any free stack shipping the</li>
+</ul>
+<p>  device copy fails <code>a6xx_ucode_load()</code> with <code>-EPERM</code> and registers no GPU. A</p>
+<p>  <code>&gt;= 0.95</code> build is required. That single fact is actionable for all 9 live</p>
+<p>  devices.</p>
+<ul>
+<li><strong>The string table names the services</strong> — REX, HFI, IFPC idle states, RSCC</li>
+</ul>
+<p>  voting, the RSC/clock HAL — so a reimplementation knows what it must provide</p>
+<p>  without any code having been decompiled.</p>
+<ul>
+<li><strong>The manifest is a window map, not an index</strong> — established negatively, which</li>
+</ul>
+<p>  saves a reimplementation from building a table the chip does not use.</p>
+<h2>9. <code>[OPEN]</code></h2>
+<ol>
+<li><strong>Manifest semantics.</strong> The pairs tile the windows exactly, but the kernel</li>
+</ol>
+<p>   never reads <code>value</code> [S <code>a6xx_gmu.c:909-910</code>]. Only the chip consumes them; the</p>
+<p>   "names a payload block" reading is <em>refuted</em> for a650 (0 of 9).</p>
+<ol>
+<li><strong>The stripped SQE dword 0.</strong> Zero in all 15 builds; semantic unknown, and not</li>
+</ol>
+<p>   a size (the BO is <code>size − 4</code> regardless).</p>
+<ol>
+<li><strong>The <code>0xdeadbeef</code> PSP sentinel's purpose.</strong> It marks PSP deliberately invalid</li>
+</ol>
+<p>   on entry; whether an exception handler checks it is not established.</p>
+<ol>
+<li><strong>The boot-counter consumer.</strong> <code>(v &lt;&lt; 8) + n</code>, bumped <code>+1</code> then <code>+2</code>; the</li>
+</ol>
+<p>   reader is unidentified.</p>
+<ol>
+<li><strong>What the microcode computes.</strong> Out of scope for any clean-room structural</li>
+</ol>
+<p>   method.</p>
+<ol>
+<li><strong><code>pdx215</code> path label</strong> (§4.1) — the row's contents are pdx203's; only the</li>
+</ol>
+<p>   <code>db_path</code> codename is wrong, and the device is live. Resolve by relabelling</p>
+<p>   the row.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

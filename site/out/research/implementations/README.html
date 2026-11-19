@@ -80,9 +80,76 @@
 <td>public btqca.h/btqca.c (GPL, torvalds/linux master, fetched 2026-11-16) — TLV patch/NVRAM container families (crbtfw/apbtfw/crnv/apnv …)</td>
 <td>unittest suite passing (30 tests)</td>
 </tr>
+<tr>
+<td><a href="qca-bt-gen2/">qca-bt-gen2</a></td>
+<td>same GPL sources, second chip generation (<code>hp*</code>=QCA2066 / <code>hmt*</code>=WCN7850); 32-byte header + 36-byte SHA-256 trailer, <code>4+32+len+36</code> size rule</td>
+<td>unittest suite passing (58 tests); cross-family version rule <strong>confirmed</strong>, DB-identical payloads <strong>[OPEN]</strong></td>
+</tr>
+<tr>
+<td><a href="adsp-fleet/">adsp-fleet</a></td>
+<td>public QNN/HTP headers (BSD-3-Clause-Clear: <code>tensor.h</code> <code>TENSOR_MAGIC</code>, <code>pickle_header_tags.h</code>, <code>serialize_defs.h</code>) + <code>fastrpc.c</code> (GPL) — ADSP <code>bm2nXX</code> container</td>
+<td>unittest suite passing (86 tests); container specified, <strong>not DSP firmware</strong> (serialized C++ tensor graph)</td>
+</tr>
+<tr>
+<td><a href="adreno-fleet/">adreno-fleet</a></td>
+<td>public <code>a6xx_gmu.c</code>/<code>a6xx_gmu.xml</code>/<code>a6xx_catalog.c</code> (GPL) — Adreno GMU microcode, raw-ITCM legacy path</td>
+<td>unittest suite passing (62 tests); <code>0x43f80</code> = initial stack pointer; 13 live devices not 26</td>
+</tr>
+<tr>
+<td><a href="data-blob-fleet/">data-blob-fleet</a></td>
+<td>public spatial-audio literature (SOFA/AES69, OpenAL Soft) + own measurements — opaque data blobs</td>
+<td>unittest suite passing (54 tests); <code>hrtf5c.bin</code> decoded (40 azimuths × 2 ears × 257 bins), <code>dax_param.bin</code> matches public <code>dax-default.xml</code></td>
+</tr>
+<tr>
+<td><a href="pil-manifests/">pil-manifests</a></td>
+<td>public <code>mdt_loader.c</code>/<code>qcom_q6v5_pas.c</code>/<code>qcom_pd_mapper.c</code> (GPL) + userspace <code>pd-mapper</code> (BSD-3) — <code>*.jsn</code> manifests</td>
+<td>unittest suite passing (41 tests); premise refuted — JSON PDR service registry, <strong>not</strong> split-MDT manifests</td>
+</tr>
+<tr>
+<td><a href="hbt-fleet/">hbt-fleet</a></td>
+<td>public <code>btqca.h</code>/<code>btqca.c</code> + <code>WHENCE</code> — <code>hpbtfw20</code>/<code>hpnv20</code> (Hastings generation)</td>
+<td>unittest suite passing (6 tests); 44-byte footer, 61-tag NVM</td>
+</tr>
+<tr>
+<td><a href="adreno650/">adreno650</a></td>
+<td>public <code>a6xx_gmu.c</code> (GPL) — a650 GMU + SQE</td>
+<td>unittest suite passing (4 tests); GMU 16-block chain, SQE v0.93 version gap</td>
+</tr>
+<tr>
+<td><a href="adreno650-fleet/">adreno650-fleet</a></td>
+<td>public <code>a6xx_gmu.c</code>/<code>a6xx_gpu.c</code>/<code>a6xx_catalog.c</code> + linux-firmware <code>WHENCE</code> (GPL/redistributable) — a650 GMU container + SQE fleet</td>
+<td>unittest suite passing (113 tests); <strong>container</strong> class (not raw-TCM like a619); SQE floor <code>0x095</code> confirmed at <code>a6xx_gpu.c:1032</code>, multiple sub-0.95 builds circulate; 9 live of 14 carried (<code>pdx215</code> mislabel corrected)</td>
+</tr>
+<tr>
+<td><a href="historic/">historic</a></td>
+<td>public <code>mdt_loader.c</code>, prima driver GPL sources, Replicant/samsung-ipc — FP2, hammerhead, m0</td>
+<td>FP2 parsers passing (<strong>28 tests</strong>); historic-device queue first pass. <strong>Run as <code>python3 -I test_parsers.py</code> in <code>historic/fp2/</code> — <code>unittest discover</code> collects none</strong>, because the suite is a <code>check()</code> harness, not <code>unittest.TestCase</code> (discover exits 5, "NO TESTS RAN", so it fails loudly rather than silently passing).</td>
+</tr>
+<tr>
+<td><a href="wifi-cpp-fleet/">wifi-cpp-fleet</a></td>
+<td>public <code>msm_cpp.c</code>/<code>msm_cpp.h</code> (GPL-2.0-only, LineageOS msm8953 @ lineage-21) + userspace <code>cpp_hardware.c</code> — <code>cpp_firmware_vN_N_N.fw</code> fixed-window images</td>
+<td>unittest suite passing (88 tests); <strong>not WiFi</strong> — MSM Camera Post-Processing microcode; version = <code>0x1000|BCD(minor)</code> u16, not ASCII</td>
+</tr>
+<tr>
+<td><a href="big-clusters/">big-clusters</a></td>
+<td>metadata + public partition/fstab sources — largest sharing clusters</td>
+<td><code>vm-bootsys.img</code> = Qualcomm Trusted VM image (analysis only, no suite)</td>
+</tr>
 </table>
 <p>Build: <code>gcc -std=c99 -Wall -Wextra -O2 -o test &lt;comp&gt;/test_*.c &lt;comp&gt;/*.c</code> (each</p>
-<p>test binary self-validates and exits non-zero on any failure).</p>
+<p>test binary self-validates and exits non-zero on any failure). The Python</p>
+<p>components (<code>qca-bt</code>, <code>qca-bt-gen2</code>, <code>adsp-fleet</code>, <code>adreno-fleet</code>,</p>
+<p><code>adreno650</code>, <code>adreno650-fleet</code>, <code>data-blob-fleet</code>, <code>pil-manifests</code>, <code>hbt-fleet</code>,</p>
+<p><code>wifi-cpp-fleet</code>, the <code>mediatek/*</code> trio) are stdlib-only;</p>
+<p>run each with <code>cd &lt;comp&gt; &amp;&amp; python3 -m unittest discover -q</code>. **Exception:</p>
+<p><code>historic/fp2</code>** is a plain <code>check()</code> harness rather than <code>unittest.TestCase</code></p>
+<p>classes, so it must be run as <code>cd historic/fp2 &amp;&amp; python3 -I test_parsers.py</code>;</p>
+<p><code>unittest discover</code> collects nothing there and exits 5. Fixtures for the</p>
+<p>Python components are synthetic and regenerated by a committed <code>make_fixture.py</code>;</p>
+<p><code>*.bin</code>/<code>*.tlv</code>/<code>*.fw</code>/<code>*.mbn</code>/<code>*.elf</code>/<code>*.img</code> are gitignored so no vendor</p>
+<p>payload can be committed by accident. Where a component's fixture extension is</p>
+<p>not covered at the repo root (e.g. <code>*.fw</code>), the component carries a</p>
+<p><code>fixtures/.gitignore</code> that excludes its own fixture directory.</p>
 <h2>Liaison target</h2>
 <p><a href="https://codeberg.org/rsavoye/librephone/pulls/58">upstream PR #58</a> ("Add WCN6750</p>
 <p>AMSS Zephyr implementation", state open, author L123123, fetched 2026-11-16)</p>
@@ -111,7 +178,57 @@
 <li><code>"bm2n" bin adsp firmware reverse engineering qualcomm</code> — no direct hits for</li>
 </ul>
 <p>  the bm2nXX fleet; adjacent: linux-msm/hexagon-dsp-binaries, TR25 hexagon RE,</p>
-<p>  SRLabs hexagon fuzzing, bkerler QDSP walkthrough.</p>
+<p>  SRLabs hexagon fuzzing, bkerler QDSP walkthrough. **Partially re-run</p>
+<p>  2026-11-19** once GitHub code search recovered: <code>"ConcreteTensorIN5Tdefs10QuantUint8EE"</code></p>
+<p>  -&gt; 0 results, <code>"1337BEEF" qnn pickle</code> -&gt; 0, <code>"tensor.pickle" qualcomm</code> -&gt; 0;</p>
+<p>  <code>"bm2n13"</code> -&gt; 1,044 hits but all are <code>proprietary-files.txt</code>/<code>*-vendor.mk</code></p>
+<p>  inventory, none is RE. **Prose leg then completed 2026-11-19 through a</p>
+<p>  browser (the <code>websearch</code> tool was returning HTTP 402):** DuckDuckGo gave</p>
+<p>  "No results" for <code>"bm2n" firmware reverse engineering</code>, `"bm2n" adsp</p>
+<p>  firmware qualcomm<code> and the exact RTTI string; XDA and Reddit </code>site:` queries</p>
+<p>  returned only generic flashing threads, none mentioning <code>bm2n</code>. The one</p>
+<p>  genuinely adjacent writeup — "Reverse engineering the Qualcomm NPU</p>
+<p>  compiler" (datavorous, 2026-06) — was read in full and attacks the QNN SDK</p>
+<p>  <code>*.so</code> files with Ghidra, never the serialised container (its counts for</p>
+<p>  <code>1337BEEF</code>, <code>BEEFF00D</code>, <code>ConcreteTensor</code>, <code>pickle</code>, <code>bm2n</code> and <code>0xfa0000fa</code></p>
+<p>  are all zero). **RULE 0 satisfied on both legs: the bm2n fleet is publicly</p>
+<p>  listed and publicly undecoded.**</p>
+<ul>
+<li><code>Qualcomm Bluetooth hpbtfw hmtbtfw QCA2066 WCN7850 firmware format</code> (2026-11-19)</li>
+</ul>
+<p>  — no dedicated RE writeup; the format facts here come from <code>btqca.c</code> plus</p>
+<p>  measurement, as with the <code>cr*</code>/<code>ap*</code> family.</p>
+<ul>
+<li><code>hrtf5c.bin Qualcomm ADSP spatial audio HRTF format</code> (2026-11-19) — no public</li>
+</ul>
+<p>  layout for this filename. Public HRTF <em>formats</em> (SOFA/AES69, OpenAL Soft</p>
+<p>  <code>MinPHR</code>) were checked and excluded by signature/sample-width; the content</p>
+<p>  class is public, the encoding is not.</p>
+<ul>
+<li><code>dax_param.bin Dolby DAX tuning format</code> (2026-11-19) — no public spec for the</li>
+</ul>
+<p>  binary container; the <em>data</em> is public in the same vendor tree as</p>
+<p>  <code>dax-default.xml</code>, which is the actionable finding.</p>
+<ul>
+<li><code>"jsn" Qualcomm image manifest split mdt</code> (2026-11-19) — the premise is</li>
+</ul>
+<p>  refuted by the public sources: mainline's <code>mdt_loader.c</code>/<code>qcom_q6v5_pas.c</code></p>
+<p>  contain zero <code>.jsn</code> handling (<code>grep -c -i jsn</code> → 0). The files are JSON PDR</p>
+<p>  service registries consumed by userspace <code>pd-mapper</code> (BSD-3), and mainline</p>
+<p>  hardcodes the same table as C in <code>qcom_pd_mapper.c</code>.</p>
+<ul>
+<li><code>cpp_firmware_v1_12_0.fw MSM CPP camera post-processing microcode format</code></li>
+</ul>
+<p>  (2026-11-19) — no public RE writeup of the image <em>contents</em>. RULE 0 is</p>
+<p>  nonetheless satisfied from the <em>consumer</em> side: <code>msm_cpp.c</code> (GPL-2.0-only)</p>
+<p>  specifies the load path completely — <code>cpp_load_fw()</code> streams <code>fw-&gt;size/4</code></p>
+<p>  little-endian words and parses no header — and userspace <code>cpp_hardware.c</code></p>
+<p>  specifies the filename (<code>snprintf("cpp_firmware_v%d_%d_%d.fw", …)</code> with the</p>
+<p>  <code>31:28/27:16/15:0</code> major/minor/step bit layout). The Cypress/Infineon WLAN</p>
+<p>  hypothesis was tested against <code>linux-firmware</code> <code>WHENCE</code> + mainline</p>
+<p>  <code>brcmfmac</code> and <strong>refuted</strong>. This also corrects the upstream database's</p>
+<p>  <code>blob_family</code> label for these 12 identities, which reads <code>wifi</code> with an</p>
+<p>  empty subfamily; they are camera, not WiFi.</p>
 <ul>
 <li>`ath11k WMI dispatcher firmware side reference implementation table driven</li>
 </ul>

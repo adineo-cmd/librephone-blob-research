@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>`*.jsn` — the Qualcomm PDR *service registry* manifest family (2026-11-18/19) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>`*.jsn` — the Qualcomm PDR *service registry* manifest family (2026-11-18/19)</h1><p>The lab&#x27;s **second content-level RE**, and the first on the Qualcomm</p><p>Evidence: none</p>
+<h1><code>*.jsn</code> — the Qualcomm PDR <em>service registry</em> manifest family (2026-11-18/19)</h1>
+<p>The lab's <strong>second content-level RE</strong>, and the first on the Qualcomm</p>
+<p>remoteproc control plane. The target was the <code>*.jsn</code> family: tiny text</p>
+<p>files (403-905 B) that dominate the laptop half's sharing clusters —</p>
+<p><code>adspr.jsn</code> alone is <strong>17 devices on one md5</strong>.</p>
+<p><strong>Headline correction to the mission premise.</strong> These are <strong>not</strong> split-MDT</p>
+<p>image manifests. They do not name <code>.mdt</code>/<code>.bNN</code> files, they do not list</p>
+<p>segments or hashes, and they are **not read by the PIL / <code>qcom_q6v5_pas</code> /</p>
+<p><code>qcom_mdt_loader</code> path at all<strong>. They are </strong>JSON PDR service-registry</p>
+<p>(<code>sr_*</code>) manifests*<em> consumed by the </em>PD-mapper*: a lookup table that maps a</p>
+<p>QMI service name to the protection domain that hosts it. §4 gives the</p>
+<p>citation, including the much more interesting finding that **mainline</p>
+<p>Linux carries the same table compiled in as C and never opens the file**.</p>
+<p>Clean-room statement: every claim below comes from (a) GPL-2.0-only kernel</p>
+<p>source or the BSD-3-Clause <code>pd-mapper</code> userspace source, both fetched</p>
+<p>2026-11-18, and (b) the lab's own byte-level measurement of payloads that</p>
+<p>are publicly redistributable (linux-firmware publishes this whole family —</p>
+<p>114 <code>WHENCE</code> entries). No decompiled code, no vendor header, no proprietary</p>
+<p>documentation. All full verbatim payload copies live in</p>
+<p><code>/tmp/astro_u/jsn/</code>; the repo holds excerpts and derived facts only.</p>
+<p>---</p>
+<h2>1. Provenance and md5 verification</h2>
+<p>The DB md5s come from <code>blob-matrix/laptop/sharing-clusters.csv</code> and</p>
+<p><code>upstream-contribution/blob-database/coverage-matrix.csv</code>. Fetches</p>
+<p>2026-11-18 and 2026-11-19.</p>
+<h3>1.1 The 17-device set — all 7 fleet files MATCH byte-exact</h3>
+<p>Source: <code>iLtanaka/firmware-xiaomi-marble</code> @ <code>HEAD</code>, dir <code>marble/</code> — a</p>
+<p>Xiaomi <strong>marble</strong> (POCO F5, SM7475) firmware tree, i.e. a device inside the</p>
+<p>17-device set. This single directory carries the entire fleet set.</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>DB md5</th>
+<th>fetched md5</th>
+<th>status</th>
+</tr>
+<tr>
+<td><code>adspr.jsn</code></td>
+<td>513</td>
+<td><code>5d262bb7661402a8d7ca9724bbb45d46</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>adspua.jsn</code></td>
+<td>703</td>
+<td><code>a43d66d0549e33cf421e25be06260ce0</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>battmgr.jsn</code></td>
+<td>516</td>
+<td><code>0d755b18c24337ebca8313b85f8e8a6c</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cdspr.jsn</code></td>
+<td>513</td>
+<td><code>49003ffcd10ec16dee11caad22b11b42</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>modemr.jsn</code></td>
+<td>710</td>
+<td><code>72b46949d078a4f226394931a4345e61</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>slpir.jsn</code></td>
+<td>513</td>
+<td><code>8167cdcc892464ba0fed63cd439314a2</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>slpius.jsn</code></td>
+<td>515</td>
+<td><code>de25e460ce0debb53db0bb15a122ac6f</code></td>
+<td>same</td>
+<td><strong>MATCH</strong></td>
+</tr>
+</table>
+<h3>1.2 The older generation (403/405/555/713/719 B) — all MATCH</h3>
+<p>Source: <code>TheMuppets</code>-mirrored trees are partly GitHub-blocked (see §1.4);</p>
+<p>these came from <code>Sr-0w/hotdog-linux-bringup</code> (OnePlus 7T, `aports/device/</p>
+<p>testing/firmware-oneplus-hotdog/<code>) and </code>libretro/Lakka-LibreELEC`.</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>DB md5</th>
+<th>status</th>
+</tr>
+<tr>
+<td><code>adspr.jsn</code></td>
+<td>403</td>
+<td><code>40d6edf129dec063ca3fe6cb6837488f</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cdspr.jsn</code></td>
+<td>403</td>
+<td><code>f2bd80d5f0b19b5b0d36d28383948149</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>slpir.jsn</code></td>
+<td>403</td>
+<td><code>2439d6872b39e9c1282c572b266665f0</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>slpius.jsn</code></td>
+<td>405</td>
+<td><code>0039483ebd20685728df72c12d13fee4</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>adspua.jsn</code></td>
+<td>555</td>
+<td><code>d0bd5030a03f631c9af5060a5645d02e</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>adsps.jsn</code></td>
+<td>405</td>
+<td><code>c7253d84bff46e4cf5cb0585e9a851c5</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>modemuw.jsn</code></td>
+<td>713</td>
+<td><code>bad87ccee828ee70d0281db170985738</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>modemr.jsn</code></td>
+<td>719</td>
+<td><code>0492fd466fcf5bf62a3d89ceba83197f</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+</table>
+<h3>1.3 The best public source — linux-firmware publishes this family</h3>
+<p><code>gitlab.com/kernel-firmware/linux-firmware</code> <code>WHENCE</code> carries **114 <code>RawFile:</code></p>
+<p>/ <code>Link:</code> entries for <code>*.jsn</code>** (fetched 2026-11-18). Spot-fetched and</p>
+<p>md5-verified byte-exact:</p>
+<table>
+<tr>
+<th>path</th>
+<th>bytes</th>
+<th>md5</th>
+<th>matches</th>
+</tr>
+<tr>
+<td><code>qcom/sm8250/adspr.jsn</code></td>
+<td>403</td>
+<td><code>40d6edf1…</code></td>
+<td>fleet 403 variant</td>
+</tr>
+<tr>
+<td><code>qcom/sm8250/adspua.jsn</code></td>
+<td>555</td>
+<td><code>d0bd5030…</code></td>
+<td>fleet 555 variant</td>
+</tr>
+<tr>
+<td><code>qcom/sm8250/cdspr.jsn</code></td>
+<td>403</td>
+<td><code>f2bd80d5…</code></td>
+<td>fleet 403 variant</td>
+</tr>
+<tr>
+<td><code>qcom/qcm2290/adspr.jsn</code></td>
+<td>403</td>
+<td><code>40d6edf1…</code></td>
+<td>fleet 403 variant</td>
+</tr>
+<tr>
+<td><code>qcom/qcm2290/adsps.jsn</code></td>
+<td>405</td>
+<td><code>c7253d84…</code></td>
+<td>fleet 405 variant</td>
+</tr>
+<tr>
+<td><code>qcom/sm8250/Thundercomm/RB5/slpir.jsn</code></td>
+<td>403</td>
+<td><code>2439d687…</code></td>
+<td>fleet 403 variant</td>
+</tr>
+</table>
+<p>This is significant for the programme: **the vendor artifacts the DB</p>
+<p>catalogued are already public, redistributable firmware**, and a free</p>
+<p>implementation does not have to reverse anything to obtain them. <code>WHENCE</code></p>
+<p>lists them under <code>Driver: qcom_q6v5_pas - Qualcomm remoteproc firmware</code></p>
+<p>with no version string and no licence line beyond the section header.</p>
+<h3>1.4 Route log (RULE 0 — every probe recorded)</h3>
+<ol>
+<li><code>TheMuppets/proprietary_vendor_xiaomi</code> → **HTTP 451, `"reason":</li>
+</ol>
+<p>   "dmca"<code>** (</code>github.com/github/dmca/blob/master/2019/08/2019-08-09-SenseTime-5.md`).</p>
+<p>   The whole org repo is GitHub-blocked; <code>raw.githubusercontent.com</code> 404s.</p>
+<p>   Per-device spin-offs (<code>…_marble</code>, <code>…_fuxi</code>, <code>…_cupid</code>,</p>
+<p>   <code>…_sm8550-common</code>) exist and are reachable, but their recursive trees</p>
+<p>   contain <strong>zero <code>.jsn</code></strong> — the manifests are not in the vendor tree at</p>
+<p>   all on those branches.</p>
+<ol>
+<li><code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code> → repo reachable,</li>
+</ol>
+<p>   13,122 tree entries, <strong>zero <code>.jsn</code></strong>. Same for <code>lineage-24.0</code> guacamole</p>
+<p>   (TLS timeouts on repeated probes — logged, retried, abandoned).</p>
+<ol>
+<li>Authenticated GitHub <strong>code search</strong> (<code>filename:adspr.jsn</code>, 271 hits;</li>
+</ol>
+<p>   <code>filename:adspua.jsn</code>, 279; <code>filename:battmgr.jsn</code>, 194;</p>
+<p>   <code>filename:modemuw.jsn</code>, 181; <code>filename:slpius.jsn</code>, 251;</p>
+<p>   <code>filename:modemr.jsn</code>, 100+ sampled) redirected the search to the</p>
+<p>   retro-handheld / ARM-distro firmware mirrors — <code>armbian/firmware</code>,</p>
+<p>   <code>batocera-linux</code>, <code>armada-os/armada</code>, <code>libretro/Lakka-LibreELEC</code>,</p>
+<p>   <code>radxa/linux-firmware</code>, <code>aarch64-laptops/firmware-qcom-woa</code> — which is</p>
+<p>   where the byte-exact copies actually live.</p>
+<ol>
+<li><code>/tmp/astro_u/jsn/</code> scratch holds 71 verified manifests across 13</li>
+</ol>
+<p>   SoC/device directories. No Git-LFS pointers were encountered in the</p>
+<p>   files that mattered (the <code>WOA-Project</code> trees returned</p>
+<p>   <code>null</code> sizes in the tree API but were not needed).</p>
+<ol>
+<li>Honest negative: could not verify the <code>modemr.jsn</code> <strong>562 B</strong> and **719 B</li>
+</ol>
+<p>   (laurel_sprout)** sizes against a device-local tree; 562 B was matched</p>
+<p>   from <code>armbian/firmware</code> <code>qcom/qcm2290/modemr.jsn</code> (DB md5</p>
+<p>   <code>a7f71370d2f306a50e2a3476982ad30c</code> for the SM4250 Moto rows — the DB</p>
+<p>   lists <strong>two different md5s at 562 B</strong>, so this size is not</p>
+<p>   content-stable; §5.3).</p>
+<p>---</p>
+<h2>2. The established grammar</h2>
+<p><strong>Verdict: plain JSON</strong> (RFC 8259), UTF-8, <strong>4-space indent</strong>, <strong>LF</strong>, **no</p>
+<p>trailing newline<strong>, </strong>no BOM<strong>, </strong>no tabs**. Three top-level keys, always in</p>
+<p>the same order. This is confirmed three ways: it parses with</p>
+<p><code>json.loads</code>; <code>pd-mapper</code>'s hand-written recursive-descent <code>json.c</code> parses</p>
+<p>it (so it is JSON in the strict sense, not merely JSON-<em>like</em>); and **60 of</p>
+<p>the 61 LF-terminated files re-render byte-identically** from</p>
+<p><code>json.dumps(obj, indent=4)</code> with no trailing newline. The single exception</p>
+<p>is <code>wlanpdr.jsn</code>, which uses an 11-space indent for one nesting level and</p>
+<p>carries a trailing newline (§9 [OPEN] 6-7).</p>
+<pre><code>
+{
+    "sr_version": {
+        "major": 1,
+        "minor": 1,
+        "patch": 1
+    },
+    "sr_domain": {
+        "soc": "msm",
+        "domain": "adsp",
+        "subdomain": "root_pd",
+        "qmi_instance_id": 74
+    },
+    "sr_service": [
+        {
+            "provider": "tms",
+            "service": "servreg",
+            "service_data_valid": 0,
+            "service_data": 0
+        },
+        …
+    ]
+}
+</code></pre>
+<p><code>sr_service</code> is the only array; everything else is a fixed-shape object.</p>
+<p>Every field is a string except <code>sr_version.*</code>, <code>sr_domain.qmi_instance_id</code>,</p>
+<p><code>sr_service[].service_data_valid</code> and <code>sr_service[].service_data</code>, which are</p>
+<p>non-negative integers.</p>
+<h3>2.1 Byte-level framing facts (measured, 71 files)</h3>
+<table>
+<tr>
+<th>property</th>
+<th>value</th>
+<th>evidence</th>
+</tr>
+<tr>
+<td>encoding</td>
+<td>UTF-8, ASCII-only in every sample</td>
+<td>0 non-ASCII bytes in 71 files</td>
+</tr>
+<tr>
+<td>BOM</td>
+<td>none</td>
+<td><code>EF BB BF</code> absent in all 71</td>
+</tr>
+<tr>
+<td>line ending</td>
+<td>LF</td>
+<td>1 file family (<code>sc8280xp</code> <strong>WOA redistributions</strong>) uses CRLF — see §5.4</td>
+</tr>
+<tr>
+<td>indent</td>
+<td>4 spaces</td>
+<td>universal</td>
+</tr>
+<tr>
+<td>tabs</td>
+<td>none</td>
+<td>universal</td>
+</tr>
+<tr>
+<td><strong>trailing newline</strong></td>
+<td><strong>absent</strong> (default)</td>
+<td>present in <code>wlanpdr.jsn</code> and the <code>WOA</code>/<code>aarch64-laptops</code> copies; accounts for the +1 B sizes in §5.4</td>
+</tr>
+<tr>
+<td>terminators</td>
+<td>none; the file ends with <code>}</code></td>
+<td>universal</td>
+</tr>
+</table>
+<p>The "trailing newline" observation explains a whole class of off-by-one</p>
+<p>sizes in other redistributions (514 vs 513, 406 vs 405): verified by</p>
+<p>byte-diff — <code>woa/adspr.jsn</code> (514 B) is <code>marble/adspr.jsn</code> (513 B) plus</p>
+<p>exactly one <code>\n</code>.</p>
+<h3>2.2 The full key table</h3>
+<p>Every key observed across the 71 measured manifests, with the public</p>
+<p>source that pins its meaning. "Consumer" = who reads it.</p>
+<table>
+<tr>
+<th>key</th>
+<th>type</th>
+<th>observed values</th>
+<th>meaning</th>
+<th>backing</th>
+</tr>
+<tr>
+<td><code>sr_version.major</code></td>
+<td>int</td>
+<td><code>1</code> (71/71)</td>
+<td>SERVREG QMI major version</td>
+<td><code>qcom_pd_mapper.c</code>: <code>#define SERVREG_QMI_VERSION 0x101</code> — major is the high byte (<code>1</code>)</td>
+</tr>
+<tr>
+<td><code>sr_version.minor</code></td>
+<td>int</td>
+<td><code>1</code> (71/71)</td>
+<td>SERVREG QMI minor version</td>
+<td>same constant; low byte <code>0x01</code> = <code>1</code></td>
+</tr>
+<tr>
+<td><code>sr_version.patch</code></td>
+<td>int</td>
+<td><code>1</code> (71/71)</td>
+<td>patch level</td>
+<td><strong>not represented</strong> in <code>SERVREG_QMI_VERSION</code>; [OPEN] what consumes it — <code>pd-mapper</code> ignores <code>sr_version</code> entirely</td>
+</tr>
+<tr>
+<td><code>sr_domain.soc</code></td>
+<td>string</td>
+<td><code>"msm"</code> (71/71)</td>
+<td>SoC-family prefix of the domain path</td>
+<td><code>qcom_pd_mapper.c</code> domain strings are all <code>"msm/…"</code>; <code>pd-mapper.c</code> concatenates <code>soc/domain/subdomain</code></td>
+</tr>
+<tr>
+<td><code>sr_domain.domain</code></td>
+<td>string</td>
+<td><code>adsp</code>(28), <code>modem</code>(8), <code>slpi</code>(8), <code>cdsp</code>(9)</td>
+<td>remoteproc subsystem</td>
+<td><code>qcom_pd_mapper.c</code> <code>msm/&lt;domain&gt;/&lt;subdomain&gt;</code> table; <code>qcom_q6v5_pas.c</code> <code>firmware_name</code> fields are <code>adsp.mdt</code>/<code>cdsp.mdt</code>/<code>modem.mdt</code>/<code>slpi.mdt</code></td>
+</tr>
+<tr>
+<td><code>sr_domain.subdomain</code></td>
+<td>string</td>
+<td><code>root_pd</code>(28), <code>audio_pd</code>(10), <code>sensor_pd</code>(7), <code>wlan_pd</code>(4), <code>charger_pd</code>(3), <code>ois_pd</code>(1)</td>
+<td>protection domain <strong>within</strong> that subsystem</td>
+<td><code>qcom_pd_mapper.c</code> hardcodes exactly these six subdomains</td>
+</tr>
+<tr>
+<td><code>sr_domain.qmi_instance_id</code></td>
+<td>int</td>
+<td>adsp/slpi-family <code>74</code>, cdsp <code>76</code>, slpi <code>90</code>, modem <code>180</code></td>
+<td>QMI instance id of the servreg service in that PD</td>
+<td><code>qcom_pd_mapper.c</code> <code>.instance_id</code> per <code>qcom_pdm_domain_data</code>; delivered as <code>instance</code> in the <code>get_domain_list</code> response</td>
+</tr>
+<tr>
+<td><code>sr_service[].provider</code></td>
+<td>string</td>
+<td><code>tms</code>(54), <code>avs</code>(10), <code>gps</code>(3), <code>kernel</code>(4), <code>wlan</code>(4)</td>
+<td>provider half of the service name</td>
+<td><code>pd-mapper.c</code> <code>sprintf(map-&gt;service, "%s/%s", provider, service)</code></td>
+</tr>
+<tr>
+<td><code>sr_service[].service</code></td>
+<td>string</td>
+<td><code>servreg</code>(53), <code>audio</code>(10), <code>gps_service</code>(3), <code>pdr_enabled</code>(1), <code>elf_loader</code>(4), <code>fw</code>(4)</td>
+<td>service half of the name</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>sr_service[].service_data_valid</code></td>
+<td>int</td>
+<td><code>0</code> (75/75)</td>
+<td>flag making <code>service_data</code> meaningful</td>
+<td><code>pdr_interface.c</code> <code>struct pdr_service</code> has <code>u8 service_data_valid</code>; <code>qcom_pd_mapper.c</code> does <strong>not</strong> read it</td>
+</tr>
+<tr>
+<td><code>sr_service[].service_data</code></td>
+<td>int</td>
+<td><code>0</code> (75/75)</td>
+<td>payload (the comment says: ACK timeout in seconds)</td>
+<td>same struct field <code>u32 service_data</code></td>
+</tr>
+<tr>
+<td><code>sr_service[].dcomment</code></td>
+<td>string</td>
+<td>2 distinct texts, 82 B and 10 B</td>
+<td><strong>a comment for humans</strong> — the QMI wire protocol has no comment field</td>
+<td><code>pd-mapper.c</code> never reads it; the text itself says "data can be used to configure ACK timeout. Make data_valid 1 as well. Unit is second", i.e. it documents <code>service_data</code></td>
+</tr>
+</table>
+<p><code>dcomment</code> is <strong>inert</strong>: <code>pd-mapper</code>'s <code>pd_load_map()</code> reads only</p>
+<p><code>provider</code> and <code>service</code> from each array element, and <code>qcom_pd_mapper.c</code></p>
+<p>has no concept of it at all. Its only measurable effect is file size —</p>
+<p>which is exactly what creates the §5 two-generation split.</p>
+<p>---</p>
+<h2>3. The suffix taxonomy — <code>r</code> / <code>s</code> / <code>ua</code> / <code>uw</code></h2>
+<p>*<em>Verdict: the suffix encodes the </em>protection domain* (<code>subdomain</code>), and it</p>
+<p>does so with 100 % consistency across every file measured.** Not</p>
+<p>secure/non-secure, not signed/unsigned, not a generation. This is a</p>
+<p><em>derivable</em> naming scheme, verified by cross-checking 71 files against</p>
+<p><code>qcom_pd_mapper.c</code> with <strong>zero contradictions</strong>.</p>
+<h3>3.1 The mapping</h3>
+<table>
+<tr>
+<th>stem pattern</th>
+<th><code>sr_domain.domain</code></th>
+<th><code>sr_domain.subdomain</code></th>
+<th>instance</th>
+<th>suffix</th>
+</tr>
+<tr>
+<td><code>adspr</code></td>
+<td>adsp</td>
+<td><code>root_pd</code></td>
+<td>74</td>
+<td><code>r</code></td>
+</tr>
+<tr>
+<td><code>adsps</code></td>
+<td>adsp</td>
+<td><code>sensor_pd</code></td>
+<td>74</td>
+<td><code>s</code></td>
+</tr>
+<tr>
+<td><code>adspua</code></td>
+<td>adsp</td>
+<td><code>audio_pd</code></td>
+<td>74</td>
+<td><code>ua</code></td>
+</tr>
+<tr>
+<td><code>adspuo</code></td>
+<td>adsp</td>
+<td><code>ois_pd</code></td>
+<td>74</td>
+<td><code>uo</code></td>
+</tr>
+<tr>
+<td><code>cdspr</code></td>
+<td>cdsp</td>
+<td><code>root_pd</code></td>
+<td>76</td>
+<td><code>r</code></td>
+</tr>
+<tr>
+<td><code>slpir</code></td>
+<td>slpi</td>
+<td><code>root_pd</code></td>
+<td>90</td>
+<td><code>r</code></td>
+</tr>
+<tr>
+<td><code>slpius</code></td>
+<td>slpi</td>
+<td><code>sensor_pd</code></td>
+<td>90</td>
+<td><code>us</code></td>
+</tr>
+<tr>
+<td><code>modemr</code></td>
+<td>modem</td>
+<td><code>root_pd</code></td>
+<td>180</td>
+<td><code>r</code></td>
+</tr>
+<tr>
+<td><code>modemuw</code></td>
+<td>modem</td>
+<td><code>wlan_pd</code></td>
+<td>180</td>
+<td><code>uw</code></td>
+</tr>
+<tr>
+<td><code>battmgr</code></td>
+<td>adsp</td>
+<td><code>charger_pd</code></td>
+<td>74</td>
+<td><em>(role-named)</em></td>
+</tr>
+<tr>
+<td><code>wlanpdr</code></td>
+<td>modem</td>
+<td><code>root_pd</code></td>
+<td>180</td>
+<td><em>(role-named)</em></td>
+</tr>
+</table>
+<p>Read it as <code>&lt;subsystem&gt;&lt;optional u&gt;&lt;role-letter&gt;</code> where the role letter is</p>
+<p><code>r</code>=root, <code>s</code>=sensor, <code>a</code>=audio, <code>o</code>=ois, <code>w</code>=wlan, and the <code>u</code> infix marks</p>
+<p>"not the root PD". <code>modemuw</code> = modem + <strong>u</strong> + <strong>w</strong>lan. <code>adspua</code> = adsp +</p>
+<p><strong>u</strong> + <strong>a</strong>udio. <code>slpius</code> = slpi + <strong>u</strong> + <strong>s</strong>ensor.</p>
+<h3>3.2 The one inconsistency, stated honestly</h3>
+<p><code>adsps.jsn</code> and <code>slpius.jsn</code> declare the <strong>same</strong> <code>msm/*/sensor_pd</code> concept</p>
+<p>with <strong>different spellings</strong> — bare <code>s</code> for adsp, <code>us</code> for slpi. Both forms</p>
+<p>appear in shipped trees, both are accepted by the kernel (<code>adsp_sensor_pd</code></p>
+<p>and <code>slpi_sensor_pd</code> are separate structs but carry no service distinction</p>
+<p>beyond the domain), and the files' contents differ only in the</p>
+<p>domain/instance fields. So the vendor's own generator is inconsistent about</p>
+<p>the <code>u</code> infix. <strong>Why sensor is spelled two ways is [OPEN]</strong> — nothing in the</p>
+<p>kernel or <code>pd-mapper</code> explains it.</p>
+<h3>3.3 What the suffixes do NOT mean (explicitly ruled out)</h3>
+<ul>
+<li><strong>Not secure vs non-secure.</strong> The mission brief suggested this. Refuted:</li>
+</ul>
+<p>  a <code>.jsn</code> contains no signature, no hash, no security flag, and no field</p>
+<p>  that could carry one; the file is a plain lookup table and every one of</p>
+<p>  the 71 samples parses as plain JSON with the same three keys. There is no</p>
+<p>  <code>secure</code>/<code>auth</code>/<code>signed</code> key anywhere in the family.</p>
+<ul>
+<li><strong>Not firmware variant selection.</strong> <code>qcom_q6v5_pas.c</code> picks its firmware</li>
+</ul>
+<p>  by <code>firmware_name</code> in a per-SoC <code>desc</code> struct (<code>"adsp.mdt"</code>,</p>
+<p>  <code>"cdsp.mdt"</code>, <code>"modem.mdt"</code>, <code>"slpi.mdt"</code>, plus <code>dtb_firmware_name</code>) — it</p>
+<p>  never looks at a <code>.jsn</code>.</p>
+<ul>
+<li><strong>Not a generation counter.</strong> The same stem ships at two sizes with</li>
+</ul>
+<p>  identical semantics; §5 shows the delta is a comment field.</p>
+<p>---</p>
+<h2>4. Who actually consumes these — the RULE-0 finding</h2>
+<h3>4.1 Mainline does <strong>not</strong> open the file</h3>
+<p>Fetched 2026-11-18 from <code>torvalds/linux</code> master via the contents API:</p>
+<ul>
+<li><code>drivers/soc/qcom/mdt_loader.c</code> (508 lines) — <code>grep -c -i jsn</code> → <strong>0</strong>.</li>
+<li><code>drivers/remoteproc/qcom_q6v5_pas.c</code> (2,093 lines) — <code>grep -c -i jsn</code></li>
+</ul>
+<p>  → <strong>0</strong>. Its firmware selection is entirely <code>desc-&gt;firmware_name</code>.</p>
+<ul>
+<li>Code search <code>jsn repo:torvalds/linux</code> → <strong>2 hits, both spurious</strong></li>
+</ul>
+<p>  (<code>CREDITS</code>, <code>drivers/gpu/drm/msm/Makefile</code>).</p>
+<p>So the mission's hypothesis — "the kernel's mdt_loader supports a JSON-ish</p>
+<p>image manifest that names the split mdt/bXX segments" — is **false for</p>
+<p><code>*.jsn</code>**. <code>mdt_loader.c</code> does handle split firmware, but it derives the</p>
+<p>segment name arithmetically from the <code>.mdt</code> filename, not from a manifest:</p>
+<pre><code class="language-c">
+/* drivers/soc/qcom/mdt_loader.c, mdt_load_split_segment() */
+	sprintf(seg_name + strlen(fw_name) - 3, "b%02d", segment);
+	ret = request_firmware_into_buf(&amp;seg_fw, seg_name, dev,
+					ptr, phdr-&gt;p_filesz);
+</code></pre>
+<p>That is <code>adsp.mdt</code> → <code>adsp.b00</code>, <code>adsp.b01</code>, … — a 3-character overwrite of</p>
+<p>the extension, the classic split-MDT convention. **No manifest file is</p>
+<p>involved anywhere in the PIL path.** This is an honest negative and it</p>
+<p>matters: anyone expecting <code>*.jsn</code> to describe MDT segments is looking at the</p>
+<p>wrong mechanism.</p>
+<h3>4.2 The real consumer #1: userspace <code>pd-mapper</code></h3>
+<p><code>github.com/linux-msm/pd-mapper</code>, BSD-3-Clause, cloned 2026-11-18</p>
+<p>(<code>5ecd2fe926aca7abfe40724177f63b942cff3947</code>, 2025-12-30). This is the</p>
+<p>component that actually parses the bytes. Its <code>pd-mapper.c</code>:</p>
+<pre><code class="language-c">
+static int pd_load_map(const char *file)
+{
+	root = json_parse_file(file);
+	sr_domain = json_get_child(root, "sr_domain");
+	soc       = json_get_string(sr_domain, "soc");
+	domain    = json_get_string(sr_domain, "domain");
+	subdomain = json_get_string(sr_domain, "subdomain");
+	ret = json_get_number(sr_domain, "qmi_instance_id", &amp;number);
+	…
+	sr_service = json_get_child(root, "sr_service");
+	count = json_count_children(sr_service);
+	for (it = sr_service-&gt;u.value; it; it = it-&gt;next) {
+		provider = json_get_string(it, "provider");
+		service  = json_get_string(it, "service");
+		map-&gt;service = malloc(strlen(provider) + strlen(service) + 2);
+		sprintf((char *)map-&gt;service, "%s/%s", provider, service);
+		map-&gt;domain  = malloc(strlen(soc) + strlen(domain) + strlen(subdomain) + 3);
+		sprintf((char *)map-&gt;domain, "%s/%s/%s", soc, domain, subdomain);
+		map-&gt;instance = number;
+	}
+}
+</code></pre>
+<p>and it <strong>discovers</strong> the files by walking <code>/sys/class/remoteproc/*/firmware</code>,</p>
+<p>taking the <code>dirname()</code> of that path, and listing every entry whose name ends</p>
+<p>in <code>.jsn</code> or <code>.jsn.xz</code>:</p>
+<pre><code class="language-c">
+static char *known_extensions[] = { ".jsn.xz", ".jsn", NULL, };
+…
+	firmware_value_copy = strdup(firmware_value);
+	firmware_path = dirname(firmware_value_copy);
+	fw_dir = opendir_firmware(firmware_path, path, sizeof(path));
+	…
+	if (len &gt; extens_len &amp;&amp;
+	    !strcmp(&amp;fw_de-&gt;d_name[len - extens_len], known_extensions[extens_index]))
+		found = true;
+</code></pre>
+<p><strong>This is the mechanism that explains every naming convention in §3</strong>: a</p>
+<p><code>.jsn</code> is not addressed by name — it is picked up because it sits in the</p>
+<p>same directory as a remoteproc's firmware. Any <code>.jsn</code> in <code>/vendor/firmware</code></p>
+<p>is loaded, and its <em>contents</em> decide which domain it registers. The</p>
+<p>filename is a human convenience; the contract is <code>sr_domain</code>.</p>
+<p>Two consumer-side limits worth recording (the parser enforces them):</p>
+<ul>
+<li><code>json_parse_string()</code> copies into <code>char buf[128]</code> and stops at</li>
+</ul>
+<p>  <code>b - buf &lt; sizeof(buf) - 1</code> → **any string value over 127 bytes is</p>
+<p>  silently truncated**. Every measured value is far below this.</p>
+<ul>
+<li><code>json_parse_number()</code> accepts only <code>isdigit()</code> → **non-negative integers</li>
+</ul>
+<p>  only**, no sign, no decimal point.</p>
+<h3>4.3 The real consumer #2: mainline's <code>qcom_pd_mapper.c</code> — compiled-in, no file</h3>
+<p><code>drivers/soc/qcom/qcom_pd_mapper.c</code> (793 lines, GPL-2.0-only, added</p>
+<p>2023 by Linaro; last touched 2026-08) implements the **same database as C</p>
+<p>data**:</p>
+<pre><code class="language-c">
+#define SERVREG_QMI_VERSION 0x101
+#define TMS_SERVREG_SERVICE "tms/servreg"
+
+static const struct qcom_pdm_domain_data adsp_audio_pd = {
+	.domain = "msm/adsp/audio_pd",
+	.instance_id = 74,
+	.services = { "avs/audio", NULL },
+};
+…
+static const struct qcom_pdm_domain_data *sm8550_domains[] = {
+	&amp;adsp_audio_pd, &amp;adsp_root_pd, &amp;adsp_charger_pd,
+	&amp;adsp_sensor_pd, &amp;cdsp_root_pd, &amp;mpss_root_pd_gps, NULL,
+};
+
+static const struct of_device_id qcom_pdm_domains[] = {
+	…
+	{ .compatible = "qcom,sm8550", .data = sm8550_domains, },
+</code></pre>
+<p>and <code>qcom_pdm_add_domain()</code> adds <code>tms/servreg</code> <strong>implicitly</strong> to every</p>
+<p>domain before the extra services:</p>
+<pre><code class="language-c">
+	ret = qcom_pdm_add_service_domain(data, TMS_SERVREG_SERVICE,
+					  domain-&gt;domain, domain-&gt;instance_id);
+	for (i = 0; domain-&gt;services[i]; i++)
+		ret = qcom_pdm_add_service_domain(data, domain-&gt;services[i],
+						  domain-&gt;domain, domain-&gt;instance_id);
+</code></pre>
+<p><strong>This is the clean-room gold</strong>: the kernel source states, in C, exactly</p>
+<p>what the <code>.jsn</code> files state in JSON. The two are interchangeable</p>
+<p>descriptions of one table, and the kernel chose to ship the table in-tree</p>
+<p>rather than parse vendor text.</p>
+<h3>4.4 Consistency proof: the two tables agree exactly</h3>
+<p>Extracting all 19 <code>qcom_pdm_domain_data</code> structs from <code>qcom_pd_mapper.c</code> and</p>
+<p>all <code>(domain, instance, extra-services)</code> triples from the 71 measured</p>
+<p>manifests:</p>
+<ul>
+<li><strong>12 distinct triples appear in the manifests.</strong></li>
+<li><strong>All 12 are present in the kernel's 19.</strong> Zero contradictions.</li>
+<li>The 7 kernel-only triples (<code>msm/adsp/audio_pd</code> inst 4, <code>msm/adsp/root_pd</code></li>
+</ul>
+<p>  inst 4 → MSM8996; <code>msm/cdsp1/root_pd</code> 125; <code>msm/gpdsp{,1}/root_pd</code></p>
+<p>  192/241; <code>msm/modem/root_pd</code> 100 → MSM8996; <code>msm/adsp/root_pd</code> +</p>
+<p>  <code>tms/pdr_enabled</code>) are older or newer SoCs whose <code>.jsn</code> I did not sample.</p>
+<h3>4.5 Consistency proof #2: the per-directory file set IS the per-SoC kernel table</h3>
+<p>The strongest validation of the whole reading. For each SoC directory, the</p>
+<p>set of <code>.jsn</code> files shipped should equal the set of domains</p>
+<p><code>qcom_pd_mapper.c</code> lists for that <code>compatible</code>:</p>
+<table>
+<tr>
+<th>SoC dir</th>
+<th><code>.jsn</code> shipped</th>
+<th>kernel domains</th>
+<th>verdict</th>
+</tr>
+<tr>
+<td><code>sm8250/xiaomi/elish</code></td>
+<td>adspr, adspua, cdspr, slpir, slpius (5)</td>
+<td>5</td>
+<td><strong>EXACT MATCH</strong></td>
+</tr>
+<tr>
+<td><code>sc8280xp/microsoft/blackrock</code></td>
+<td>adspr, adspua, battmgr, cdspr (4)</td>
+<td>4</td>
+<td><strong>EXACT MATCH</strong></td>
+</tr>
+<tr>
+<td><code>qcm2290</code></td>
+<td>adspr, adsps, adspua, modemr, modemuw (5)</td>
+<td>5</td>
+<td><strong>EXACT MATCH</strong></td>
+</tr>
+<tr>
+<td><code>sm8550/ayn/thor</code></td>
+<td>adspr, adsps, adspua, battmgr (4)</td>
+<td>6</td>
+<td>subset — dir listing is a partial firmware drop; <code>modemr</code>/<code>cdspr</code> absent</td>
+</tr>
+<tr>
+<td><code>sm8750/ayn/odin3</code></td>
+<td>adspr, adsps, adspua, adspuo, battmgr, cdspr (6)</td>
+<td>6</td>
+<td><code>adspuo</code> (<code>ois_pd</code>) shipped but not in the <code>sm8550_domains</code> table; <code>modemr</code> absent</td>
+</tr>
+</table>
+<p>Three exact matches, and the two non-matches are explained by the directory</p>
+<p>not being a complete <code>/vendor/firmware</code> (these are third-party distro</p>
+<p>firmware drops, not device images). The <code>adspuo</code> row is a genuine upstream</p>
+<p>gap: **<code>ois_pd</code> ships on SM8750 hardware but mainline's sm8550 table has no</p>
+<p><code>msm/adsp/ois_pd</code> entry** — so a mainline kernel on that hardware would not</p>
+<p>answer a lookup for the OIS domain. Worth filing upstream.</p>
+<p>---</p>
+<h2>5. The two-generation <code>adspr.jsn</code> split (403 vs 513)</h2>
+<p>**Verdict: pure <code>dcomment</code> addition. 100 % of the delta is one optional</p>
+<p>human-readable comment; the semantics are identical.** Not a firmware</p>
+<p>generation, not a security change, not a schema change.</p>
+<h3>5.1 Byte-level proof</h3>
+<pre><code>
+$ diff hotdog/adspr.jsn(403)  marble/adspr.jsn(513)
+18c18,19
+&lt;             "service_data": 0
+---
+&gt;             "service_data": 0,
+&gt;             "dcomment": "data can be used to configure ACK timeout.Make data_valid 1 as well.Unit is second"
+</code></pre>
+<p>Exactly one added line. Load both as JSON, drop <code>dcomment</code>, compare: they</p>
+<p>are <strong>equal</strong>. The same holds for every other two-size pair:</p>
+<table>
+<tr>
+<th>stem</th>
+<th>small</th>
+<th>large</th>
+<th>delta</th>
+<th>equals-mod-dcomment</th>
+</tr>
+<tr>
+<td><code>adspr</code></td>
+<td>403</td>
+<td>513</td>
+<td>+110</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><code>adsps</code></td>
+<td>405</td>
+<td>515</td>
+<td>+110</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><code>adspua</code></td>
+<td>555</td>
+<td>703</td>
+<td>+148</td>
+<td><strong>yes</strong> (two comments)</td>
+</tr>
+<tr>
+<td><code>cdspr</code></td>
+<td>403</td>
+<td>513</td>
+<td>+110</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><code>slpir</code></td>
+<td>403</td>
+<td>513</td>
+<td>+110</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><code>slpius</code></td>
+<td>405</td>
+<td>515</td>
+<td>+110</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><code>modemr</code></td>
+<td>710</td>
+<td>719</td>
+<td>+9</td>
+<td>no — different service list (§5.3)</td>
+</tr>
+</table>
+<p>The arithmetic is exact and reproducible:</p>
+<pre><code>
+one added "dcomment" with an 82-byte text costs
+    ','  + '\n' + 12 spaces + '"dcomment": "' + 82 + '"'
+  = 1 + 1 + 12 + 13 + 82 + 1 = 110 bytes            # 403 + 110 = 513  ✓
+a 10-byte "No comment" costs 1+1+12+13+10+1 = 38     # 555 + 110 + 38 = 703 ✓
+</code></pre>
+<h3>5.2 Which generation is which</h3>
+<p>The <strong>larger</strong> file is the later/annotated one: it carries the comment that</p>
+<p>documents <code>service_data</code> as an ACK timeout in seconds ("Make data_valid 1 as</p>
+<p>well. Unit is second"). The smaller file is the same table without the</p>
+<p>annotation. Both are accepted identically by <code>pd-mapper</code> (it never reads</p>
+<p><code>dcomment</code>) and both describe the same domain, so <strong>the split is cosmetic</strong>.</p>
+<p>This resolves the mission's observation (i) completely: the two-size</p>
+<p><code>adspr.jsn</code> is not "a two-generation family like other fleets" in any</p>
+<p>functional sense. It is <strong>one manifest with an optional comment field</strong>.</p>
+<h3>5.3 The <code>modemr</code> sizes are NOT a generation split</h3>
+<p><code>modemr.jsn</code> ships at <strong>405, 406, 425, 562, 710, 719 and 905 bytes</strong> across</p>
+<p>the DB (6 distinct md5s at 710/719/905/562×2/…). These are **different</p>
+<p>service lists**, not formatting:</p>
+<table>
+<tr>
+<th>size</th>
+<th>services</th>
+<th>note</th>
+</tr>
+<tr>
+<td>405</td>
+<td><code>tms/servreg</code></td>
+<td>bare, no comment, LF</td>
+</tr>
+<tr>
+<td>406</td>
+<td><code>tms/servreg</code></td>
+<td>405 + one trailing newline</td>
+</tr>
+<tr>
+<td>425</td>
+<td><code>tms/servreg</code></td>
+<td>405 with <strong>CRLF</strong> (20 × +1 B) — verified identical after <code>\r\n</code>→<code>\n</code></td>
+</tr>
+<tr>
+<td>562</td>
+<td><code>tms/servreg</code>, <code>gps/gps_service</code></td>
+<td>2 services</td>
+</tr>
+<tr>
+<td>710</td>
+<td><code>tms/servreg</code>, <code>gps/gps_service</code></td>
+<td>2 services + <code>dcomment</code>s</td>
+</tr>
+<tr>
+<td>719</td>
+<td><code>tms/pdr_enabled</code>, <code>tms/servreg</code>, <code>gps/gps_service</code></td>
+<td><strong>3 services</strong> — the <code>pdr_enabled</code> variant</td>
+</tr>
+<tr>
+<td>905</td>
+<td>[OPEN] — not fetched</td>
+<td>DB md5 <code>e420bddba517a143811164b32ef5c841</code>, 3 Motorola rows</td>
+</tr>
+</table>
+<p>So only three of those sizes are genuine <em>content</em> variants (562 / 710 / 719);</p>
+<p>405↔406 and 405↔425 are the trailing-newline and CRLF artefacts of §5.4. The</p>
+<p>same artefact explains <code>slpir.jsn</code> at <strong>423 B</strong> (403 CRLF) and <code>slpius.jsn</code></p>
+<p>at <strong>425 B</strong> (405 CRLF) — both verified byte-identical to the LF originals</p>
+<p>after <code>\r\n</code>→<code>\n</code>. Note the DB assigns <strong>two different md5s to 562 B</strong></p>
+<p>(<code>17b878530e8306c3777ead5ec2b84aba</code> and <code>a7f71370d2f306a50e2a3476982ad30c</code>),</p>
+<p>proving that size is not a key for this stem.</p>
+<h3>5.4 The trailing-newline class (off-by-one sizes)</h3>
+<table>
+<tr>
+<th>size</th>
+<th>variant</th>
+</tr>
+<tr>
+<td>405</td>
+<td><code>modemr</code> bare, no trailing newline</td>
+</tr>
+<tr>
+<td>406</td>
+<td>the same bytes <strong>plus <code>\n</code></strong> — verified byte-identical after <code>rstrip</code></td>
+</tr>
+<tr>
+<td>513 / 514</td>
+<td>same relation (<code>aarch64-laptops/jsн/adspr.jsn</code> 514 = <code>marble/adspr.jsn</code> 513 + <code>\n</code>)</td>
+</tr>
+<tr>
+<td>534</td>
+<td>the 513 B file with <strong>CRLF</strong> line endings (21 × +1 B) — verified: <code>replace(b'\r\n', b'\n')</code> reproduces the 513 B file exactly</td>
+</tr>
+</table>
+<p>None of these is a semantic variant. They are redistribution artefacts</p>
+<p>(Windows-authored WOA trees wrote CRLF; some packagers append a newline).</p>
+<p>---</p>
+<h2>6. Cross-check: do the files make sense in place?</h2>
+<p>Task 5 asked whether referenced filenames exist alongside. **This family</p>
+<p>references no filenames** — that is the point of §4.3. The real</p>
+<p>consistency test is the domain set, done in §4.5 (3 exact matches, 2</p>
+<p>explained).</p>
+<p>A second, independent spot-check: <code>WHENCE</code> files these under</p>
+<p><code>Driver: qcom_q6v5_pas</code>, alongside <code>adsp.mbn</code>/<code>modem.mbn</code>/<code>cdsp.mbn</code>/etc.</p>
+<p>for the same SoC. The manifests and the MDT images are co-located because</p>
+<p><code>pd-mapper</code> <strong>requires</strong> it (§4.2) — the <code>.jsn</code> is found by listing the</p>
+<p>directory the remoteproc firmware lives in. Verified in the tree:</p>
+<pre><code>
+qcom/sm8250/xiaomi/elish/   adsp.mbn  adspr.jsn  adspua.jsn  cdsp.mbn  cdspr.jsn  slpi.mbn  slpir.jsn  slpius.jsn
+</code></pre>
+<p>Every subsystem with an <code>.mbn</code> has the matching manifest(s), in one flat</p>
+<p>directory. This is the structural validation the task asked for, and it</p>
+<p>confirms both the reading of the format and the discovery mechanism.</p>
+<p>---</p>
+<h2>7. Correcting the upstream database's type labels</h2>
+<p>The DB (<code>coverage-matrix.csv</code>) types these rows as follows, and **all of</p>
+<p>these labels are wrong in a specific, correctable way**:</p>
+<table>
+<tr>
+<th>filename</th>
+<th>DB <code>blob_family</code></th>
+<th>DB <code>db_type</code></th>
+<th>evidence says</th>
+</tr>
+<tr>
+<td><code>adspr.jsn</code>, <code>adsps.jsn</code>, <code>adspua.jsn</code></td>
+<td><code>adsp</code></td>
+<td><strong><code>MODEM</code></strong></td>
+<td>family <code>adsp</code> is right; <strong><code>MODEM</code> is wrong</strong> — these describe the ADSP's protection domains, nothing to do with the modem</td>
+</tr>
+<tr>
+<td><code>cdspr.jsn</code></td>
+<td><code>cdsp</code></td>
+<td><code>UNKNOWN</code></td>
+<td>family right; type should be <strong>PDR-MANIFEST</strong> (not UNKNOWN — it is fully decoded)</td>
+</tr>
+<tr>
+<td><code>modemr.jsn</code>, <code>modemuw.jsn</code>, <code>modemuo.jsn</code></td>
+<td><code>modem</code></td>
+<td><code>UNKNOWN</code></td>
+<td>family right; type <strong>PDR-MANIFEST</strong></td>
+</tr>
+<tr>
+<td><code>battmgr.jsn</code></td>
+<td><strong><code>modem</code></strong></td>
+<td><code>UNKNOWN</code></td>
+<td><strong>family is wrong</strong> — <code>battmgr.jsn</code> declares <code>msm/adsp/charger_pd</code>, instance 74. It is an <strong>ADSP</strong> manifest, not modem</td>
+</tr>
+<tr>
+<td><code>slpir.jsn</code>, <code>slpius.jsn</code></td>
+<td><strong><code>other</code></strong></td>
+<td><code>UNKNOWN</code></td>
+<td><strong>family is wrong</strong> — <code>slpi</code> is a first-class remoteproc (<code>slpi.mdt</code> in <code>qcom_q6v5_pas.c</code>). Should be <strong><code>slpi</code></strong>, not <code>other</code></td>
+</tr>
+<tr>
+<td><code>wlanpdr.jsn</code></td>
+<td><code>wifi</code></td>
+<td><code>UNKNOWN</code></td>
+<td><strong>family is wrong</strong> — it declares <code>msm/modem/root_pd</code> with service <code>tms/pdr_enabled</code>. It is a <strong>modem</strong> PD manifest, not wifi firmware</td>
+</tr>
+</table>
+<p>Recommended <code>db_type</code> for the whole family: <strong><code>PDR-MANIFEST</code></strong> (or</p>
+<p><code>MANIFEST-PDR</code>) — the rows are neither <code>MODEM</code> nor <code>UNKNOWN</code>; they are fully</p>
+<p>specified text manifests. Recommended families: <code>adsp</code> / <code>cdsp</code> / <code>slpi</code> /</p>
+<p><code>modem</code>, derived from <code>sr_domain.domain</code> (which the parser now computes).</p>
+<p>The root cause of the mislabels is visible in the DB: it classifies by</p>
+<p><strong>filename stem and path</strong>, so <code>battmgr</code> (no recognisable prefix, but in</p>
+<p><code>modem/image/</code>) got <code>modem</code>, and <code>slpi*</code> (unrecognised prefix) fell into</p>
+<p><code>other</code>. The manifest's own <code>sr_domain</code> is the authoritative field and the</p>
+<p>DB never parsed it.</p>
+<p>---</p>
+<h2>8. What this means for a free reimplementation</h2>
+<p><strong>Fully specified and writable today, with zero proprietary bytes:</strong></p>
+<ul>
+<li>The exchange format is JSON with three fixed keys — trivially emittable.</li>
+<li>The <em>contents</em> of the table are already stated in GPL kernel C</li>
+</ul>
+<p>  (§4.3). A free implementation can generate a complete, correct <code>.jsn</code></p>
+<p>  for every declared SoC <strong>from <code>qcom_pd_mapper.c</code> alone</strong>, without ever</p>
+<p>  looking at a vendor file.</p>
+<ul>
+<li><code>pd-mapper</code> (BSD-3-Clause) is a complete, licensable reference</li>
+</ul>
+<p>  implementation of the consumer side.</p>
+<ul>
+<li>Validation is mechanical: <code>jsn_probe.py</code> re-derives the domain from the</li>
+</ul>
+<p>  filename and cross-checks it against the QMI instance the kernel</p>
+<p>  hardcodes (§4.4).</p>
+<p><strong>The real lever:</strong> mainline already does not need these files. The kernel</p>
+<p>carries the table in-tree, so a mainline-based free system is</p>
+<p><strong>unaffected</strong> by this family entirely. The family matters only for</p>
+<p>systems that run the vendor's userspace <code>pd-mapper</code> — i.e. Android-derived</p>
+<p>and postmarketOS-style stacks using <code>linux-msm/pd-mapper</code>.</p>
+<p><strong>Honest scope limit:</strong> <code>.jsn</code> is a <em>directory service</em>, not firmware. It</p>
+<p>launches nothing, patches nothing, and contains no code. Freeing it frees</p>
+<p>the control-plane plumbing of an Android userspace on these devices — a</p>
+<p>real but small piece. The DSP/modem images themselves (<code>adsp.mdt</code> +</p>
+<p><code>adsp.bNN</code>, 18 MB for <code>elish</code>'s <code>adsp.mbn</code>) remain the actual blob problem.</p>
+<p>---</p>
+<h2>9. [OPEN] items</h2>
+<ol>
+<li><strong>[OPEN]</strong> What consumes <code>sr_version.patch</code>? It is <code>1</code> in all 71 files.</li>
+</ol>
+<p>   <code>pd-mapper</code> ignores <code>sr_version</code>; <code>qcom_pd_mapper.c</code> encodes only</p>
+<p>   major/minor in <code>SERVREG_QMI_VERSION 0x101</code>. No public consumer reads it.</p>
+<ol>
+<li><strong>[OPEN]</strong> Why does the vendor generator spell <code>sensor_pd</code> as bare <code>s</code></li>
+</ol>
+<p>   for adsp (<code>adsps.jsn</code>) but <code>us</code> for slpi (<code>slpius.jsn</code>)? Both parse; the</p>
+<p>   kernel has separate <code>adsp_sensor_pd</code>/<code>slpi_sensor_pd</code> structs. Unexplained</p>
+<p>   by any public source.</p>
+<ol>
+<li><strong>[OPEN]</strong> <code>modemr.jsn</code> at 905 B (DB md5 <code>e420bddba517a143811164b32ef5c841</code>,</li>
+</ol>
+<p>   3 Motorola rows: Moto G200, Edge 40 Pro, Edge 30 Fusion). Not fetched —</p>
+<p>   no public tree found in the probes. Service list unknown.</p>
+<ol>
+<li><strong>[OPEN]</strong> <code>modemuo.jsn</code> (704 B, OnePlus 13 <code>dodge</code>). Not fetched; name</li>
+</ol>
+<p>   suggests modem + <code>u</code> + <code>o</code>, but <code>o</code> is <code>ois_pd</code> on adsp. Whether</p>
+<p>   <code>msm/modem/ois_pd</code> exists as a domain is unconfirmed — <code>qcom_pd_mapper.c</code></p>
+<p>   has no such entry.</p>
+<ol>
+<li><strong>[OPEN]</strong> Mainline's <code>sm8550_domains[]</code> omits <code>msm/adsp/ois_pd</code>, yet</li>
+</ol>
+<p>   <code>adspuo.jsn</code> ships on SM8750 hardware (odin3/konkr). Whether this is an</p>
+<p>   upstream bug (missing domain entry) or intentional is unresolved.</p>
+<p>   <strong>Flagged for upstream.</strong></p>
+<ol>
+<li><strong>[OPEN]</strong> <code>wlanpdr.jsn</code>'s role. It declares <code>msm/modem/root_pd</code> +</li>
+</ol>
+<p>   <code>tms/pdr_enabled</code> — the same tuple as <code>adsp_root_pd_pdr</code> in the kernel but</p>
+<p>   for the modem domain. Why a separate file (rather than a service entry in</p>
+<p>   <code>modemr.jsn</code>) is unclear; **no public tree in these probes shipped both</p>
+<p>   <code>wlanpdr.jsn</code> and <code>modemr.jsn</code> together**, so co-residence is unverified.</p>
+<ol>
+<li><strong>[OPEN]</strong> Whether the trailing newline / CRLF variants ever shipped from</li>
+</ol>
+<p>   a <em>device</em> (rather than a redistributor). All anomalies trace to</p>
+<p>   <code>aarch64-laptops</code>, <code>WOA-Project</code>, and <code>sc8280xp</code> third-party packs.</p>
+<ol>
+<li><strong>[OPEN]</strong> <code>battmgr.jsn</code> semantics beyond the domain mapping: the name</li>
+</ol>
+<p>   suggests a battery/charger manager service, but its only service entry is</p>
+<p>   the generic <code>tms/servreg</code>. Whether a vendor-specific <code>battmgr/*</code> service</p>
+<p>   ever appears is unverified.</p>
+<p>---</p>
+<h2>10. Scratch artifacts (regeneratable)</h2>
+<ul>
+<li><code>/tmp/astro_u/jsn/marble/</code> — the 7 fleet manifests, md5-verified (§1.1).</li>
+<li><code>/tmp/astro_u/jsn/hotdog/</code> — the 7 older-generation manifests (§1.2).</li>
+<li><code>/tmp/astro_u/jsn/all/</code>, <code>cen/</code>, <code>raw/</code>, <code>woa/</code>, <code>lfw/</code> — 71 total</li>
+</ul>
+<p>  manifests across 13 SoC/device directories, plus the linux-firmware and</p>
+<p>  WOA cross-checks.</p>
+<ul>
+<li><code>/tmp/astro_u/jsn/realall/</code> — the flat 71-file corpus the test suite</li>
+</ul>
+<p>  consumes via <code>JSN_REAL_DIR</code>.</p>
+<ul>
+<li><code>/tmp/astro_u/jsn/qcom_pd_mapper.c</code>, <code>mdt_loader.c</code>, <code>qcom_q6v5_pas.c</code> —</li>
+</ul>
+<p>  kernel sources as fetched.</p>
+<ul>
+<li><code>/tmp/astro_u/jsn/pdmapper/</code> — <code>linux-msm/pd-mapper</code> clone.</li>
+<li><code>/tmp/astro_u/jsn/WHENCE</code> — linux-firmware <code>WHENCE</code> (537,962 B).</li>
+</ul>
+<p>Payload bytes are <strong>not</strong> committed per programme rules; the tool/fixtures</p>
+<p>in <code>implementations/pil-manifests/</code> are synthetic.</p>
+<p>---</p>
+<h2>11. Sources (all accessed 2026-11-18 unless noted)</h2>
+<table>
+<tr>
+<th>#</th>
+<th>source</th>
+<th>what it pins</th>
+</tr>
+<tr>
+<td>1</td>
+<td>https://github.com/torvalds/linux/blob/master/drivers/soc/qcom/qcom_pd_mapper.c</td>
+<td>the domain/instance/service table as C; <code>SERVREG_QMI_VERSION 0x101</code>; implicit <code>tms/servreg</code>; per-SoC <code>compatible</code> lists</td>
+</tr>
+<tr>
+<td>2</td>
+<td>https://github.com/torvalds/linux/blob/master/drivers/soc/qcom/mdt_loader.c</td>
+<td>split-MDT naming <code>b%02d</code>; <strong>no</strong> manifest parsing (the negative)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>https://github.com/torvalds/linux/blob/master/drivers/remoteproc/qcom_q6v5_pas.c</td>
+<td><code>firmware_name</code> per SoC; <strong>no</strong> <code>.jsn</code> reference</td>
+</tr>
+<tr>
+<td>4</td>
+<td>https://github.com/torvalds/linux/blob/master/drivers/soc/qcom/pdr_interface.c</td>
+<td><code>struct pdr_service</code> (<code>service_data_valid</code>, <code>service_data</code>)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>https://github.com/linux-msm/pd-mapper (<code>json.c</code>, <code>json.h</code>, <code>pd-mapper.c</code>, <code>servreg_loc.h</code>)</td>
+<td>the on-disk grammar, <code>pd_load_map()</code>, <code>.jsn</code>/<code>.jsn.xz</code> discovery, 127-byte string cap, digit-only numbers</td>
+</tr>
+<tr>
+<td>6</td>
+<td>https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/WHENCE</td>
+<td>114 <code>*.jsn</code> RawFile/Link entries — public redistribution</td>
+</tr>
+<tr>
+<td>7</td>
+<td>https://github.com/armbian/firmware (trees <code>qcom/*</code>)</td>
+<td>byte-exact 403/405/512/513/515/516/534/555/562/703/713/731 B copies</td>
+</tr>
+<tr>
+<td>8</td>
+<td>https://github.com/iLtanaka/firmware-xiaomi-marble (<code>marble/</code>)</td>
+<td>the <strong>7/7</strong> 17-device-set md5 matches (2026-11-19)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>https://github.com/Sr-0w/hotdog-linux-bringup (<code>aports/.../firmware-oneplus-hotdog/</code>)</td>
+<td>the older-generation 403/405/555/713/719 B fleet md5s</td>
+</tr>
+<tr>
+<td>10</td>
+<td>https://github.com/libretro/Lakka-LibreELEC (<code>projects/Ayn/devices/Odin/firmwares/files/qcom/sdm845/</code>)</td>
+<td>sdm845 baseline seeds (403/555/713/425/423 B)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>https://github.com/aarch64-laptops/firmware-qcom-woa (<code>jsn/</code>)</td>
+<td>the +1-byte trailing-newline variants (514/406 B)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>https://github.com/batocera-linux/batocera.linux, https://github.com/armada-os/armada</td>
+<td>per-SoC file-set census (batocera <code>sm6115/mangmi</code>, armada <code>sm8550/thor</code>, <code>sm8750/odin3</code>)</td>
+</tr>
+</table>
+<p>Not legal advice. Regulatory context for actually replacing radio</p>
+<p>firmware: <code>../../upstream-contribution/radio-regulatory-hurdles.md</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -89,9 +89,10 @@
 </ul>
 <p>  entropy 7.40 bits/byte, 0.5 % zero bytes.</p>
 <ul>
-<li><strong>Exact structure: 160 records of 257 floats</strong> (160 × 257 = 41,120),</li>
+<li><strong>Exact structure: 160 records of 257 floats</strong> (160 × 257 = 41,120 — this</li>
 </ul>
-<p>  followed by a 160-float tail table.</p>
+<p>  consumes the file exactly, with <strong>zero remainder</strong>; there is no trailing</p>
+<p>  table).</p>
 <ul>
 <li>The 160 records <strong>alternate two representations</strong>:</li>
 </ul>
@@ -104,16 +105,20 @@
 <p>  - 80 directions × 2 (the record pairs) matches a binaural HRTF set</p>
 <p>    (left/right ear per direction); 257 floats per record = 256-tap filter</p>
 <p>    + 1 word (scale/delay). Exact direction list and tap semantics [OPEN].</p>
-<ul>
-<li>The trailing 160 floats are all negative (−39.76…−103.67, mean −75.2)</li>
-</ul>
-<p>  — one dB level per record (per direction/ear), e.g. overall response</p>
-<p>  level. Semantics [OPEN].</p>
+<p>  - <strong>Verified parity rule:</strong> all 80 even-indexed records are entirely</p>
+<p>    non-negative and all 80 odd-indexed records are entirely non-positive,</p>
+<p>    with <strong>zero mixed records</strong> out of 160. Magnitude and phase are therefore</p>
+<p>    stored in separate records, not interleaved as complex pairs.</p>
 <p>Byte-range map:</p>
 <pre><code>
-[0,        163840)   160 × 257-float records (80 linear, 80 dB, interleaved)
-[163840,   164480)   160-float dB level table
+[0,        164480)   160 × 257-float records (80 linear, 80 dB, interleaved)
 </code></pre>
+<p><strong>Correction (2026-11-19):</strong> an earlier revision of this section claimed a</p>
+<p>separate <code>[163840, 164480)</code> 160-float dB-level tail table. That is</p>
+<p>arithmetically impossible — <code>160 × 257 × 4 = 164,480</code> consumes the whole file</p>
+<p>with zero remainder — and on measurement the "tail" is simply the last 160</p>
+<p>floats (columns 97–256) of record 159. The map above is the correct one; the</p>
+<p>tail claim is withdrawn.</p>
 <p><strong>Classification: data tables (100 %).</strong> No code, no strings, no framing —</p>
 <p>there is nothing here to reverse except the measurement data itself.</p>
 <h2>3. The 54,180-byte build — a self-describing tagged container</h2>

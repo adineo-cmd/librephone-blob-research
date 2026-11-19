@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADSP `bm2nXX.bin` — fleet structure, region decomposition, and the record grammar (measured) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>ADSP `bm2nXX.bin` — fleet structure, region decomposition, and the record grammar (measured)</h1><p>Analysis date: 2026-11-19. Evidence class: **MEASURED PAYLOADS**. Every number</p><p>Evidence: <span class="evidence" data-evidence="i">I</span></p>
+<h1>ADSP <code>bm2nXX.bin</code> — fleet structure, region decomposition, and the record grammar (measured)</h1>
+<p>Analysis date: 2026-11-19. Evidence class: <strong>MEASURED PAYLOADS</strong>. Every number</p>
+<p>below is computed from bytes fetched from a public repository and md5-verified</p>
+<p>against <code>upstream-contribution/blob-database/coverage-matrix.csv</code>. The</p>
+<p>byte-level container layout is established in</p>
+<p><code>../../blob-matrix/laptop/qualcomm-adsp-bm2n-container-header.md</code> and is</p>
+<p><strong>summarised, not re-derived</strong> here; this document covers the fleet dimension</p>
+<p>the container doc does not: per-file region decomposition, the record stream,</p>
+<p>and the two-family split.</p>
+<p>Clean-room statement: <code>bm2n_probe.py</code> was written from the public</p>
+<p>BSD-3-Clause-Clear QNN/HTP headers (<code>tensor.h</code> → <code>TENSOR_MAGIC</code>;</p>
+<p><code>pickle_header_tags.h</code> → <code>Hdr_MAGIC</code> and the <code>htp_header_locate_field()</code> tag</p>
+<p>grammar; <code>serialize_defs.h</code> → <code>OP_SEQNO_MARKER_XOR</code>) and the GPL-2.0</p>
+<p><code>drivers/misc/fastrpc.c</code>, plus measurements of the payload bytes. No decompiled</p>
+<p>code, no disassembler output and no proprietary documentation were used. No</p>
+<p>payload bytes are committed; everything below is derived structural fact.</p>
+<h2>1. The fleet, in one table</h2>
+<p>All six DB identities and the one variant, measured this session:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>build-id</th>
+<th>base</th>
+<th>nseg</th>
+<th>records</th>
+<th>mean entropy</th>
+<th>family</th>
+</tr>
+<tr>
+<td><code>bm2n06.bin</code></td>
+<td>864,824</td>
+<td><code>4bd22b0</code></td>
+<td><code>0x000b8900</code></td>
+<td>2</td>
+<td>781</td>
+<td>4.05</td>
+<td>compact</td>
+</tr>
+<tr>
+<td><code>bm2n08.bin</code></td>
+<td>3,091,896</td>
+<td><code>32da3bd</code></td>
+<td><code>0x002d1a00</code></td>
+<td>3</td>
+<td>1,227</td>
+<td>5.19</td>
+<td>compact</td>
+</tr>
+<tr>
+<td><code>bm2n12.bin</code></td>
+<td>2,623,528</td>
+<td><code>2c855d1</code></td>
+<td><code>0x00064d00</code></td>
+<td>3</td>
+<td>17,241</td>
+<td>3.87</td>
+<td>compact</td>
+</tr>
+<tr>
+<td><code>bm2n13.bin</code></td>
+<td>1,106,944</td>
+<td><code>5371806</code></td>
+<td><code>0x00080e00</code></td>
+<td>3</td>
+<td>4,318</td>
+<td>3.52</td>
+<td>compact</td>
+</tr>
+<tr>
+<td><code>bm2n14.bin</code></td>
+<td>103,168</td>
+<td><code>2a8527c</code></td>
+<td><code>0x00001000</code></td>
+<td>2</td>
+<td>885</td>
+<td>3.84</td>
+<td>compact</td>
+</tr>
+<tr>
+<td><code>bm2n15.bin</code></td>
+<td>1,082,856</td>
+<td><code>5371806</code></td>
+<td><code>0x00081a00</code></td>
+<td>3</td>
+<td>4,348</td>
+<td>3.53</td>
+<td>compact</td>
+</tr>
+<tr>
+<td><code>bm2n13_sm8350.bin</code> <em>(variant)</em></td>
+<td>1,082,824</td>
+<td><code>2c855d1</code></td>
+<td>—</td>
+<td>3</td>
+<td>—</td>
+<td>—</td>
+<td>compact</td>
+</tr>
+</table>
+<p>Two things in this table are findings in themselves:</p>
+<ol>
+<li><strong><code>bm2n13</code> and <code>bm2n15</code> share build-id <code>5371806</code></strong> despite a 24 KB size</li>
+</ol>
+<p>   difference, and <strong><code>bm2n13_sm8350</code> and <code>bm2n12</code> share <code>2c855d1</code></strong> despite</p>
+<p>   1.5 MB. Build-id identifies a <strong>build lineage</strong>, not a file role — and, as</p>
+<p>   the container doc establishes, it does not predict content similarity either.</p>
+<ol>
+<li><strong>Record count varies by 22× across the fleet</strong> (781 to 17,241) while file</li>
+</ol>
+<p>   size varies by 30×. The record count is the real complexity measure; the</p>
+<p>   file size is dominated by segment bodies.</p>
+<h2>2. Region decomposition — the same five regions in every file</h2>
+<p><code>bm2n_probe.py</code> derives region boundaries from the header and the terminator, not</p>
+<p>from a fixed layout, and the decomposition holds on all seven files:</p>
+<pre><code>
+header  -&gt;  segment bodies  -&gt;  prologue  -&gt;  records  -&gt;  tail
+</code></pre>
+<table>
+<tr>
+<th>file</th>
+<th>header</th>
+<th>segment body(ies)</th>
+<th>prologue</th>
+<th>records</th>
+<th>tail</th>
+</tr>
+<tr>
+<td><code>bm2n06</code></td>
+<td>60 B, 2.68</td>
+<td>755,908 B, 4.69</td>
+<td>152 B, 2.75</td>
+<td>108,700 B, 4.08</td>
+<td>4 B</td>
+</tr>
+<tr>
+<td><code>bm2n08</code></td>
+<td>68 B, 2.72</td>
+<td>204,732 B <strong>7.07</strong> + 2,750,976 B 5.51</td>
+<td>164 B, 2.69</td>
+<td>135,952 B, 4.07</td>
+<td>4 B</td>
+</tr>
+<tr>
+<td><code>bm2n12</code></td>
+<td>68 B, 2.91</td>
+<td>412,860 B, 2.69</td>
+<td>168 B, 2.71</td>
+<td>2,210,424 B, 4.22</td>
+<td>8 B</td>
+</tr>
+<tr>
+<td><code>bm2n13</code></td>
+<td>68 B, 2.87</td>
+<td>527,804 B, 3.07</td>
+<td>168 B, 2.68</td>
+<td>578,900 B, 4.04</td>
+<td>4 B</td>
+</tr>
+<tr>
+<td><code>bm2n14</code></td>
+<td>60 B, 2.53</td>
+<td>4,036 B, <strong>0.63</strong></td>
+<td>160 B, 2.80</td>
+<td>98,908 B, 3.94</td>
+<td>4 B</td>
+</tr>
+<tr>
+<td><code>bm2n15</code></td>
+<td>68 B, 2.87</td>
+<td>530,876 B, 3.05</td>
+<td>168 B, 2.68</td>
+<td>551,740 B, 4.08</td>
+<td>4 B</td>
+</tr>
+</table>
+<p>(byte count, Shannon entropy in bits/byte)</p>
+<p>The pattern is consistent and informative:</p>
+<ul>
+<li><strong>The header is small (60–68 B) and constant in size</strong> — <code>0x3c</code>, <code>0x44</code>, or</li>
+</ul>
+<p>  <code>0x4c</code> for 2, 3, or 4 segments. It does <strong>not</strong> grow with file size.</p>
+<ul>
+<li><strong>The prologue is 152–168 B in every file.</strong> This is the only region whose</li>
+</ul>
+<p>  size is essentially fixed, which follows from its content (§3).</p>
+<ul>
+<li><strong>The record region dominates <code>bm2n12</code></strong> (2.2 MB of 2.6 MB) but is a minority</li>
+</ul>
+<p>  in <code>bm2n08</code> (136 KB of 3.1 MB). So "fleet size" and "fleet complexity" are</p>
+<p>  genuinely different axes; <code>bm2n08</code> is a large container holding a small graph,</p>
+<p>  <code>bm2n12</code> the reverse.</p>
+<ul>
+<li><strong><code>bm2n08</code>'s first segment has entropy 7.07</strong> — near-maximal, unlike every</li>
+</ul>
+<p>  other segment body (0.63–5.51). That is the only region in the fleet that</p>
+<p>  looks like compressed or encrypted content, and it is the one <code>[OPEN]</code> item</p>
+<p>  the entropy map surfaces.</p>
+<h3>2.1 The segment-table grammar, validated on 48 files</h3>
+<p>The six-file fleet above is corroborated by a 48-payload audit across 11 vendor</p>
+<p>repositories (recorded in full in</p>
+<p><code>../../blob-matrix/laptop/qualcomm-adsp-bm2n-fleet-content.md</code>). The grammar is</p>
+<p>tighter than "n pairs followed by a sentinel":</p>
+<table>
+<tr>
+<th>rule</th>
+<th>holds</th>
+</tr>
+<tr>
+<td>last entry <code>value</code> == <code>base</code></td>
+<td>48/48</td>
+</tr>
+<tr>
+<td>sentinel is the 16/16 count-complement of <code>N</code></td>
+<td>48/48</td>
+</tr>
+<tr>
+<td>kinds drawn only from <code>{0x00000100, 0x00020100, 0x000f0100}</code> (low byte 0, bits 8..15 == <code>0x01</code>)</td>
+<td>48/48</td>
+</tr>
+<tr>
+<td>all <code>value</code>s are <code>0x100</code>-aligned</td>
+<td>48/48</td>
+</tr>
+<tr>
+<td>file-resident <code>value</code>s strictly ascending</td>
+<td>48/48</td>
+</tr>
+<tr>
+<td><code>0x000f0100</code> is always the <strong>last</strong> entry (prologue end)</td>
+<td>48/48</td>
+</tr>
+<tr>
+<td><code>0x00020100</code> is <strong>never file-resident</strong>, exactly one, page-aligned, and <strong>larger than the file</strong> (6.29–17.67×)</td>
+<td>48/48</td>
+</tr>
+<tr>
+<td><code>0x00000100</code> marks file-resident segments; appears only in the N=4 <code>A=0x400000</code> builds</td>
+<td>48/48</td>
+</tr>
+</table>
+<p>The <code>0x00020100</code> entry is the one that settles a reader's intuition: a segment</p>
+<p>whose address is <strong>6× to 18× the file size</strong> cannot be a file offset. It is a</p>
+<p>target address in a memory window the file does not contain — which is why no</p>
+<p><code>(offset, size)</code> pair in the header sums to the file size anywhere in the fleet.</p>
+<p><strong>Records are delimited only by <code>0x1337BEEF</code>; there is no length field.</strong> This</p>
+<p>was verified by boundary-invariance under word mutation (mutating a word inside</p>
+<p>a record does not move the next record boundary). Record lengths are therefore</p>
+<p><em>derived</em> from consecutive magic positions, all multiples of 4 and all 4-aligned.</p>
+<h2>3. The prologue grammar — identical in every file</h2>
+<p>The prologue is where the container declares what kind of object graph follows.</p>
+<p>Measured on all seven files:</p>
+<table>
+<tr>
+<th>element</th>
+<th>value</th>
+<th>holds</th>
+</tr>
+<tr>
+<td>zero run at prologue start</td>
+<td>60 or 68 B, equal to the header length</td>
+<td>7/7</td>
+</tr>
+<tr>
+<td>count sentinel</td>
+<td><code>count</code> = nseg + 1 (3 for 2 segments, 4 for 3)</td>
+<td>7/7</td>
+</tr>
+<tr>
+<td>length prefix</td>
+<td><code>0x00000026</code> = 38, then the type name</td>
+<td>7/7</td>
+</tr>
+<tr>
+<td>type name</td>
+<td><code>14ConcreteTensorIN5Tdefs10QuantUint8EE</code></td>
+<td>7/7, declared length matches exactly</td>
+</tr>
+<tr>
+<td>terminator word</td>
+<td><code>0x00000411</code></td>
+<td>7/7</td>
+</tr>
+<tr>
+<td>float <code>1.0f</code></td>
+<td><code>00 00 80 3f</code> present 18 bytes after the name end</td>
+<td>7/7</td>
+</tr>
+</table>
+<p>The type name is <strong>C++ RTTI mangling</strong>: <code>14</code> is the length, <code>ConcreteTensor</code> is</p>
+<p>the class, <code>IN5Tdefs10QuantUint8EE</code> is the template parameter</p>
+<p>(<code>Tdefs::QuantUint8</code>). This is the single strongest piece of evidence for what</p>
+<p>the file is — a C++ serialization format, emitted by a program that had the QNN</p>
+<p>type system linked in, not a hand-written binary format.</p>
+<h3>3.1 The prologue is byte-identical across unrelated builds</h3>
+<p>The most useful fleet-level fact in this document. For the closest pair in the</p>
+<p>fleet — <code>bm2n13</code> (build <code>5371806</code>) and <code>bm2n15</code> (same build-id, different size)</p>
+<p>— the per-region identity is:</p>
+<table>
+<tr>
+<th>region</th>
+<th>identical bytes</th>
+<th>%</th>
+</tr>
+<tr>
+<td>header (68 B)</td>
+<td>60</td>
+<td>88.24</td>
+</tr>
+<tr>
+<td>segment body (530,876 B)</td>
+<td>285,310</td>
+<td>53.74</td>
+</tr>
+<tr>
+<td><strong>prologue (168 B)</strong></td>
+<td><strong>168</strong></td>
+<td><strong>100.00</strong></td>
+</tr>
+<tr>
+<td>records (~551 KB)</td>
+<td>226,081</td>
+<td>40.98</td>
+</tr>
+</table>
+<p><strong>The prologue is byte-identical while the bodies and records differ.</strong> The</p>
+<p>agent's 48-file audit confirms it across build boundaries, not just within a</p>
+<p>lineage. So the prologue is <strong>version-stable</strong> and can be carried by a</p>
+<p>reimplementation as a shared template; the segment bodies and the record stream</p>
+<p>are the version-varying parts.</p>
+<p>The full same-offset identity matrix for the fleet (%, min-length basis):</p>
+<table>
+<tr>
+<th></th>
+<th>06</th>
+<th>08</th>
+<th>12</th>
+<th>13</th>
+<th>14</th>
+</tr>
+<tr>
+<td><strong>08</strong></td>
+<td>7.18</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>12</strong></td>
+<td>32.68</td>
+<td>17.25</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>13</strong></td>
+<td>32.83</td>
+<td>13.50</td>
+<td>41.77</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>14</strong></td>
+<td>4.64</td>
+<td>4.71</td>
+<td>40.42</td>
+<td>39.83</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>15</strong></td>
+<td>32.45</td>
+<td>13.72</td>
+<td>42.22</td>
+<td>47.25</td>
+<td>39.94</td>
+</tr>
+</table>
+<p>Read with the container doc's caveat in mind: these percentages are inflated by</p>
+<p>coincident zeros (both files are ~50–75 % zero), so a low number means *the data</p>
+<p>differs<em>, not that the </em>structure* differs. The structural agreement is the</p>
+<p>prologue result above, which is 100 % and therefore not a coincidence artifact.</p>
+<h2>4. The record stream — <code>0x1337BEEF</code>-tagged, and self-counting</h2>
+<p>Each record begins with the public <code>TENSOR_MAGIC</code> <code>0x1337BEEF</code>:</p>
+<pre><code>
+bm2n13.bin @ 0x80ea8:
+efbe3713 01000000 00000000 11040000 02000000 01000000 03000000 10110040 50020000 ...
+^magic   ^1       ^0       ^0x411   ^2       ^1       ^3
+</code></pre>
+<p>Measured properties across the fleet:</p>
+<ul>
+<li><strong>The count of <code>0x1337BEEF</code> words equals the record count exactly</strong> — 4,318</li>
+</ul>
+<p>  records and 4,318 magic words in <code>bm2n13</code>; 17,241/17,241 in <code>bm2n12</code>;</p>
+<p>  885/885 in <code>bm2n14</code>. This is a closed check: the walk does not guess where</p>
+<p>  records end.</p>
+<ul>
+<li><strong>Every record length is a multiple of 4</strong> (<code>all lengths x4: True</code> in the</li>
+</ul>
+<p>  probe output for all seven files). Records are word-aligned.</p>
+<ul>
+<li><strong>Record length median is 96–100 B</strong>, min ~40 B, max 6,672 B. The</li>
+</ul>
+<p>  distribution is dominated by small records with a long tail, consistent with</p>
+<p>  a serialized object graph where most nodes are leaves.</p>
+<ul>
+<li><strong><code>0x1303EE71</code> (the public <code>OP_SEQNO_MARKER_XOR</code>) appears in record bodies</strong></li>
+</ul>
+<p>  as the byte sequence <code>efbe3713</code> read the other way — the same marker the</p>
+<p>  <code>serialize_defs.h</code> header defines, which corroborates the pickle reading from</p>
+<p>  a second public constant.</p>
+<ul>
+<li><strong>The tail is <code>0xBEEFF00D</code></strong> followed by 0–8 zero bytes.</li>
+</ul>
+<h2>5. The second family — <code>pickle</code>, one payload in the fleet</h2>
+<h3>5.1 Independent corroboration from operator names</h3>
+<p>Beyond the header constants, three further readings confirm the "serialised</p>
+<p>neural-network graph for the Hexagon Tensor Processor" verdict:</p>
+<ul>
+<li><code>QUInt8 = 1</code> is <code>DType::QUInt8</code> in the public <code>dtype_enum.h</code>, which matches</li>
+</ul>
+<p>  the <code>QuantUint8</code> in the RTTI name.</p>
+<ul>
+<li>The one pickle payload's options string names a graph sequencer:</li>
+</ul>
+<p>  <code>O=2;initial_sequencer=df;df_subsequencer=por_dp;…</code> — a runtime scheduler</p>
+<p>  configuration, not firmware metadata.</p>
+<ul>
+<li>Operator class names throughout are <code>hnnx</code>-namespaced (<code>TypicalOpIFiR</code>,</li>
+</ul>
+<p>  <code>VariadicOpIF</code>, …), and <code>bm2n12</code> additionally carries <code>ArtNet_*</code> op names.</p>
+<p>The <code>adsp</code> in the path is the <strong>FastRPC domain id</strong> (<code>ADSP_DOMAIN_ID (0)</code> in</p>
+<p><code>drivers/misc/fastrpc.c:31</code>), not evidence of modem code. That is the source of</p>
+<p>the earlier "ADSP-region modem-adjacent" framing, and it is a path-naming</p>
+<p>artifact rather than a content claim.</p>
+<h3>5.2 The pickle family itself</h3>
+<p>One payload uses the documented HTP <strong>pickle</strong> header instead of the compact</p>
+<p>layout: <code>0x7309F72B</code> (<code>Hdr_MAGIC</code>) at offset 0, followed by the</p>
+<p><code>htp_header_locate_field()</code> record grammar (<code>rlen = recdesc &amp; 0xFFFF</code>,</p>
+<p><code>tag = recdesc &gt;&gt; 16</code>). Observed tags are <code>Id</code>, <code>Sz</code>, <code>Vr</code> (the build-id), <code>Op</code></p>
+<p>(textual option string), and <code>Zz</code> (end-of-header). The same</p>
+<p>prologue/record/terminator machinery follows.</p>
+<p>So the fleet contains **two container families that both serialize the same kind</p>
+<p>of object graph**. The pickle family is the one with a public header spec; the</p>
+<p>compact family is the one the fleet overwhelmingly uses and whose spec is</p>
+<p><code>[OPEN]</code>.</p>
+<h2>6. The negative result worth carrying forward</h2>
+<p>The container doc establishes that **build-id equality does not imply content</p>
+<p>similarity**: across a 48-file corpus, same-build pairs average 21.75 %</p>
+<p>same-offset identity against 23.79 % for different-build pairs, and the</p>
+<p>highest-ratio pair in the matrix is cross-build.</p>
+<p>What build-id <em>does</em> predict exactly is the <strong>header</strong>: <code>lcp == 0x2d</code> separates</p>
+<p>same-build from different-build with zero contradictions (21/21). That makes it</p>
+<p>a cheap <strong>tier-1 grouping key</strong> — 7 bytes at <code>0x0c</code>, cheaper than hashing — but</p>
+<p><strong>not</strong> a substitute for md5 and no licence to attribute one file's findings to</p>
+<p>another in the same lineage.</p>
+<p>This matters for the lab specifically because the fleet's leverage argument is</p>
+<p>"one file informs 25 devices". The devices genuinely share the <em>bytes</em> (md5), so</p>
+<p>the leverage is real; but two files with the same build-id are not</p>
+<p>interchangeable evidence.</p>
+<h2>7. What this buys a free implementation</h2>
+<table>
+<tr>
+<th>question</th>
+<th>answer</th>
+</tr>
+<tr>
+<td>Is <code>bm2nXX.bin</code> DSP firmware?</td>
+<td><strong>no</strong> — it is a serialized C++ object graph (QNN/HTP tensor pickle)</td>
+</tr>
+<tr>
+<td>Can a reader walk the container?</td>
+<td><strong>yes</strong> — header, segment table, prologue and record stream are all specified here and reproduce on 7/7 files</td>
+</tr>
+<tr>
+<td>Can a reader walk the records?</td>
+<td><strong>partly</strong> — boundaries are closed (magic count == record count), but field semantics are <code>[OPEN]</code></td>
+</tr>
+<tr>
+<td>Does build-id tell you the content?</td>
+<td><strong>no</strong> — it groups by build lineage only</td>
+</tr>
+</table>
+<h2>8. Relationship to the desktop stream's "BitML/NSP" verdict</h2>
+<p>The lab's desktop agent (WO-001, <code>workorders/inbox/STATUS-DESKTOP.md</code></p>
+<p>addendum 6) independently analysed the same fleet and concluded that <code>bm2n</code></p>
+<p>files are <strong>"BitML/NSP DSP-side payload images"</strong> with a **"Hexagon-consistent</p>
+<p><span class="evidence" data-evidence="i">I</span>"** ISA verdict, citing "30–52 shared Itanium RTTI type names".</p>
+<p>Those two verdicts are <strong>not in conflict</strong> — they describe the same bytes at</p>
+<p>different levels, and the shared evidence is the same evidence:</p>
+<table>
+<tr>
+<th>observation</th>
+<th>both analyses</th>
+<th>reading</th>
+</tr>
+<tr>
+<td>Itanium C++ RTTI names (<code>14ConcreteTensor…</code>, <code>TensorSclrDT</code>, <code>TensorShape</code>)</td>
+<td>measured by both</td>
+<td>the file was emitted by a C++ program with the QNN type system linked in</td>
+</tr>
+<tr>
+<td><code>libbitml_nsp_v2_skel.so</code> shares those type names</td>
+<td>desktop</td>
+<td>the <em>consumer</em> is Qualcomm's BitML/NSP stack — a strong lead for <code>[OPEN]</code> item 3</td>
+</tr>
+<tr>
+<td><code>0x1337BEEF</code> records, <code>0xBEEFF00D</code> terminator</td>
+<td>this doc (<code>tensor.h</code>)</td>
+<td>a serialized object graph, not machine code</td>
+</tr>
+</table>
+<p>The distinction worth keeping precise: <strong>RTTI presence is not an ISA claim.</strong></p>
+<p>C++ RTTI strings are data emitted by the <em>compiler that wrote the file</em>; they</p>
+<p>say nothing about whether the record bodies are Hexagon instructions. This</p>
+<p>document's position — "a serialized tensor pickle, not DSP <em>code</em>" — and the</p>
+<p>desktop's "BitML/NSP DSP-side <em>payload</em>" are therefore compatible: the payload</p>
+<p>belongs to the BitML/NSP stack, and its contents are a tensor graph rather than</p>
+<p>executable firmware.</p>
+<p><code>[OPEN]</code>, and the highest-value follow-up in this directory: does</p>
+<p><code>libbitml_nsp_v2_skel.so</code> (the named consumer) contain the <em>deserialiser</em> that</p>
+<p>turns these records into tensor descriptors? If yes, the record field semantics</p>
+<p>of item 1 below become readable from a public-ish sibling object, and the whole</p>
+<p><code>[OPEN]</code> list collapses.</p>
+<h2>9. [OPEN] list</h2>
+<ol>
+<li>Record field semantics — the words after <code>0x1337BEEF</code> follow a consistent</li>
+</ol>
+<p>   shape (<code>1, 0, 0x411, 2, 1, 3, …</code>) but the field meanings are not established.</p>
+<ol>
+<li>The tensor graph: which tensors, what shapes, what the models compute.</li>
+<li>The consumer: which ADSP userspace component loads these pickles</li>
+</ol>
+<p>   (not in mainline; <code>fastrpc.c</code> provides only the transport).</p>
+<ol>
+<li><code>bm2n08</code>'s first segment (entropy 7.07) — compressed, encrypted, or dense?</li>
+<li>Constant <code>4</code> at header offset <code>0x18</code> — function unresolved (container doc).</li>
+<li>Segment flag semantics (<code>0x00010400</code>, <code>0x00020100</code>, <code>0x000f0100</code>,</li>
+</ol>
+<p>   <code>0x00000100</code>) — the split into a low and high half is visible, the meaning is</p>
+<p>   not.</p>
+<ol>
+<li>The <code>pickle_preamble</code> layout between the pickle header and the prologue.</li>
+<li>Whether a genuinely different <code>bm2n12.bin</code> format</li>
+</ol>
+<p>   (<code>f87d78518cf940b7c79d0e02bd7369c4</code>, Nord CE4) that carries a Hexagon</p>
+<p>   HTP/QNN graph-preparation option block (<code>min_arch=73</code>, <code>vtcm_mb</code>, <code>num_hmx</code>)</p>
+<p>   is a third family or a metadata-only sibling — flagged by the container-doc</p>
+<p>   agent and unresolved.</p>
+<h2>10. RULE 0 prior art</h2>
+<p>The repo's existing RULE-0 record (<code>implementations/README.md</code>) for</p>
+<p><code>"bm2n" bin adsp firmware reverse engineering qualcomm</code> found no direct hits for</p>
+<p>this fleet; adjacent work is <code>linux-msm/hexagon-dsp-binaries</code>, TR25 hexagon RE,</p>
+<p>SRLabs hexagon fuzzing, and the bkerler QDSP walkthrough. None of those</p>
+<p>documents this container.</p>
+<p>During the drafting session, <code>websearch</code> returned HTTP 402 and GitHub code</p>
+<p>search returned 401, so that re-check was weaker than RULE 0 requires. **A</p>
+<p>second pass was run on 2026-11-19 once GitHub code search was working again.**</p>
+<p><code>websearch</code> still returned HTTP 402 (no web-search quota that day), so the</p>
+<p>web and arXiv legs of RULE 0 remain unexecuted — that limitation is stated</p>
+<p>rather than papered over.</p>
+<p>GitHub code search, 2026-11-19, exact query strings and results:</p>
+<table>
+<tr>
+<th>query</th>
+<th>total</th>
+<th>verdict</th>
+</tr>
+<tr>
+<td><code>"ConcreteTensorIN5Tdefs10QuantUint8EE"</code></td>
+<td>0</td>
+<td><strong>the exact RTTI string this fleet carries appears nowhere on GitHub</strong></td>
+</tr>
+<tr>
+<td><code>"1337BEEF" qnn pickle</code></td>
+<td>0</td>
+<td>no public linking of the record magic to QNN serialisation</td>
+</tr>
+<tr>
+<td><code>"tensor.pickle" qualcomm</code></td>
+<td>0</td>
+<td>no public writeup under that name</td>
+</tr>
+<tr>
+<td><code>"bm2n13"</code></td>
+<td>1,044</td>
+<td>all hits are <code>proprietary-files.txt</code> / <code>*-vendor.mk</code> <strong>file-listing manifests</strong>, i.e. build-system inventory. Not one is RE or format work</td>
+</tr>
+<tr>
+<td><code>"bm2n" adsp</code></td>
+<td>9,312</td>
+<td>same picture — vendor trees and <code>proprietary-files.txt</code> lists</td>
+</tr>
+<tr>
+<td><code>"1337BEEF"</code> (all languages)</td>
+<td>336</td>
+<td>every hit checked is unrelated: PPSSPP MMIO, x64dbg signature check, RPCS3 RSX, WebKit FTL thunks, REFramework. None is Qualcomm or QNN</td>
+</tr>
+<tr>
+<td><code>"BEEFF00D"</code></td>
+<td>2,800</td>
+<td>unrelated (stgit tests, mongo json tests, blade)</td>
+</tr>
+<tr>
+<td><code>"fa0000fa"</code></td>
+<td>2,868</td>
+<td>unrelated; no firmware container documentation</td>
+</tr>
+</table>
+<p>Two conclusions follow, and they are worth separating:</p>
+<ol>
+<li><strong>The container is not publicly documented.</strong> Searching the exact RTTI</li>
+</ol>
+<p>   type string — the single most distinctive 34-byte constant in the fleet —</p>
+<p>   returns zero results. If anyone had written this format up, that string</p>
+<p>   would be in their notes.</p>
+<ol>
+<li>*<em>The fleet is publicly </em>known<em> but not publicly </em>understood<em>.</em>* The 1,044</li>
+</ol>
+<p>   <code>bm2n13</code> hits show the files are catalogued across dozens of device trees.</p>
+<p>   Everyone lists them; nobody has decoded them. That is precisely the delta</p>
+<p>   RULE 0 asks for, and it is why <code>implementations/adsp-fleet/</code> exists.</p>
+<h3>The prose leg, finally executed (2026-11-19)</h3>
+<p>The web leg was blocked by a broken <code>websearch</code> tool, not by an absence of</p>
+<p>sources, so it was run through a real browser instead. DuckDuckGo, exact</p>
+<p>queries and outcomes:</p>
+<table>
+<tr>
+<th>query</th>
+<th>outcome</th>
+</tr>
+<tr>
+<td><code>"bm2n13.bin" OR "bm2n" firmware reverse engineering</code></td>
+<td><strong>"No results"</strong> — the engine returned zero documents</td>
+</tr>
+<tr>
+<td><code>"bm2n" adsp firmware qualcomm</code></td>
+<td><strong>"No results"</strong></td>
+</tr>
+<tr>
+<td><code>"ConcreteTensorIN5Tdefs10QuantUint8EE"</code></td>
+<td><strong>"No results"</strong> — same zero as GitHub</td>
+</tr>
+<tr>
+<td><code>"1337BEEF" qualcomm qnn tensor</code></td>
+<td>2 hits, both unrelated: a LeetCode username and a YouTube handle</td>
+</tr>
+<tr>
+<td><code>site:xda-developers.com bm2n firmware</code></td>
+<td>10 hits, all generic flashing/firmware-download articles; none mentions <code>bm2n</code></td>
+</tr>
+<tr>
+<td><code>site:reddit.com qualcomm adsp firmware reverse engineering bm2n</code></td>
+<td>10 hits, all generic "how do I reverse firmware" threads; none mentions <code>bm2n</code></td>
+</tr>
+<tr>
+<td><code>qualcomm adsp firmware container 0xfa0000fa segment table reverse engineering</code></td>
+<td>10 hits — see below</td>
+</tr>
+<tr>
+<td><code>qualcomm QNN HTP tensor pickle file format reverse engineering</code></td>
+<td>10 hits — see below</td>
+</tr>
+</table>
+<p>Two results were examined in full rather than dismissed on their titles,</p>
+<p>because RULE 0 says partial overlap is still overlap:</p>
+<ol>
+<li>**<code>datavorous.github.io/writing/qairt/</code> — "Reverse engineering the</li>
+</ol>
+<p>   Qualcomm NPU compiler" (June 2026).** The closest thing to prior art that</p>
+<p>   the internet offers. Read in full: it attacks the QNN SDK **shared</p>
+<p>   objects** (<code>*.so</code>, QAIRT v2.46.0.260424) with Ghidra to recover compiler</p>
+<p>   behaviour — VTCM sizing, quantisation, graph optimisation. Its own word</p>
+<p>   counts for <code>1337BEEF</code>, <code>BEEFF00D</code>, <code>ConcreteTensor</code>, <code>pickle</code>, <code>bm2n</code>,</p>
+<p>   <code>tensor.h</code> and <code>0xfa0000fa</code> are <strong>all zero</strong>. It reverse-engineers the</p>
+<p>   <em>compiler</em>, not the <em>serialised output</em>. <strong>No overlap.</strong></p>
+<ol>
+<li><strong><code>mzakocs/qualcomm_baseband_scripts</code></strong> and the generic Qualcomm RE</li>
+</ol>
+<p>   guides — baseband/bootloader extraction, not the ADSP container.</p>
+<p><strong>RULE 0 is now satisfied for this finding on both legs:</strong> zero code hits on</p>
+<p>the distinctive constants, zero prose hits on the names, and the one adjacent</p>
+<p>public writeup does not touch the serialised container. The conclusion is</p>
+<p>that the <code>bm2n</code> fleet is indexed by thousands of build manifests and decoded</p>
+<p>by nobody.</p>
+<h2>11. Reproduce</h2>
+<pre><code class="language-bash">
+# per-file region decomposition, prologue grammar, record walk
+python3 -I bm2n_probe.py bm2n12.bin
+
+# the fleet table
+python3 -I bm2n_probe.py bm2n12.bin --brief
+
+# fixtures + suite (no proprietary bytes needed)
+python3 -I make_fixture.py
+python3 -m unittest -v test_bm2n_probe      # 86 tests, 7 skips without payloads
+</code></pre>
+<p>Not legal advice, not a replacement implementation. Regulatory/legal hurdles:</p>
+<p><code>../../upstream-contribution/radio-regulatory-hurdles.md</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

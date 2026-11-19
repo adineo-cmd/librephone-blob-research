@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Content-level anatomy of the QCA Bluetooth &quot;h-prefix&quot; fleet — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Content-level anatomy of the QCA Bluetooth &quot;h-prefix&quot; fleet</h1><p>**Finding F-76** — the second chip generation of the Qualcomm Bluetooth</p><p>Evidence: none</p>
+<h1>Content-level anatomy of the QCA Bluetooth "h-prefix" fleet</h1>
+<p><strong>Finding F-76</strong> — the second chip generation of the Qualcomm Bluetooth</p>
+<p>firmware family, <code>hp*</code> (QCA2066) and <code>hmt*</code> (WCN7850), analysed at the byte</p>
+<p>level and compared against F-75 (<code>cr*</code>/<code>ap*</code>, WCN399x/WCN3988) in</p>
+<p><a href="research/implementations/qca-bt/fleet-analysis.html"><code>../../implementations/qca-bt/fleet-analysis.md</code></a>.</p>
+<p>All facts below come from either <strong>(a)</strong> public GPL-2.0 kernel sources, or</p>
+<p><strong>(b)</strong> my own measurements of the payload bytes. Every measurement is</p>
+<p>reproducible with the probe in this directory. Nothing here was derived from</p>
+<p>decompiled code, disassembly, or a proprietary document.</p>
+<table>
+<tr>
+<th></th>
+<th></th>
+</tr>
+<tr>
+<td>Sources fetched</td>
+<td>2026-11-18 / 2026-11-19</td>
+</tr>
+<tr>
+<td>Files measured</td>
+<td>12 distinct gen-2 patch byte-identities, 5 NVM files</td>
+</tr>
+<tr>
+<td>Probe</td>
+<td><a href="hp_fleet_probe.py"><code>hp_fleet_probe.py</code></a></td>
+</tr>
+<tr>
+<td>Tests</td>
+<td><a href="test_hp_fleet_probe.py"><code>test_hp_fleet_probe.py</code></a> — 58 passing</td>
+</tr>
+<tr>
+<td>Payloads</td>
+<td>never stored in this repository (see "Fixture policy")</td>
+</tr>
+</table>
+<p>---</p>
+<h2>0. Ground truth read <em>before</em> asserting anything (RULE 0)</h2>
+<p>The F-75 report established a layout rule for <code>cr*</code>/<code>ap*</code> files. The honest</p>
+<p>first question here is whether that rule is a property of <em>the QCA BT format</em></p>
+<p>or of <em>one build era</em>. So the kernel source was re-read from scratch rather</p>
+<p>than trusting the earlier note.</p>
+<p><strong>What the kernel actually documents</strong> — <code>drivers/bluetooth/btqca.h</code>, struct</p>
+<p><code>tlv_type_patch</code> (lines 120–132), verbatim:</p>
+<pre><code class="language-c">
+struct tlv_type_patch {
+	__le32 total_size;
+	__le32 data_length;
+	__u8   format_version;
+	__u8   signature;
+	__u8   download_mode;
+	__u8   reserved1;
+	__le16 product_id;
+	__le16 rom_build;
+	__le16 patch_version;
+	__le16 reserved2;
+	__le32 entry;
+} __packed;
+</code></pre>
+<p>That struct is <strong>24 bytes</strong> and it is <strong>all</strong> the kernel knows about the</p>
+<p>patch header. <code>btqca.c</code> reads exactly those fields and nothing else</p>
+<p>(<code>btqca.c:322-360</code>): it validates `fw_size &gt;= sizeof(tlv_type_hdr) +</p>
+<p>sizeof(tlv_type_patch)<code>, then copies </code>total_size<code>, </code>data_length`,</p>
+<p><code>format_version</code>, <code>signature</code>, <code>download_mode</code>, <code>product_id</code>, <code>rom_build</code>,</p>
+<p><code>patch_version</code>, <code>entry</code> into the download config.</p>
+<p>**Consequence, and the single most important structural fact in this</p>
+<p>report:** the kernel never validates the file's total length, never looks at</p>
+<p>anything past <code>4 + 24</code>, and never checks a trailer. The 32-byte vendor</p>
+<p>header and the 36-byte trailer are <em>not</em> kernel concepts. They are on-disk</p>
+<p>facts that must be <strong>measured</strong>, and the measurement is what follows in</p>
+<p>§2. This is why the report says "measured" everywhere rather than</p>
+<p>"documented".</p>
+<p><strong>Chip-to-filename mapping</strong> — <code>btqca.c</code> <code>qca_uart_setup()</code>, verbatim:</p>
+<table>
+<tr>
+<th>line</th>
+<th>code</th>
+<th>meaning</th>
+</tr>
+<tr>
+<td>788–791</td>
+<td><code>case QCA_QCA2066: snprintf(..., "qca/hpbtfw%02x.tlv", rom_ver)</code></td>
+<td><code>hp</code> → <strong>QCA2066</strong></td>
+</tr>
+<tr>
+<td>792–795</td>
+<td><code>case QCA_QCA6390: ... "qca/htbtfw%02x.tlv"</code></td>
+<td><code>ht</code> → <strong>QCA6390</strong></td>
+</tr>
+<tr>
+<td>823–825</td>
+<td><code>case QCA_WCN6855: ... "qca/wcnhpbtfw%02x.tlv"</code></td>
+<td><code>wcnhp</code> → <strong>WCN6855</strong></td>
+</tr>
+<tr>
+<td>826–829</td>
+<td><code>case QCA_WCN7850: ... "qca/hmtbtfw%02x.tlv"</code></td>
+<td><code>hmt</code> → <strong>WCN7850</strong></td>
+</tr>
+<tr>
+<td>848–850</td>
+<td><code>else if (err &lt; 0 &amp;&amp; ... soc_type == QCA_WCN6855)</code> → <code>"qca/hpbtfw%02x.tlv"</code></td>
+<td>documented WCN6855 <strong>fallback to <code>hp</code></strong></td>
+</tr>
+</table>
+<p>NVM naming goes through <code>qca_get_nvm_name_by_board()</code> (<code>btqca.c:716-747</code>),</p>
+<p>with <code>stem = "hpnv"</code> for QCA2066 (line 882) and the <code>variant</code>/<code>prefix</code> rules:</p>
+<pre><code class="language-c">
+variant = ""; prefix = "b";
+if (soc_type == QCA_QCA2066) prefix = "";
+if (soc_type == QCA_WCN6855 || soc_type == QCA_QCA2066) {
+	if ((le32_to_cpu(ver.soc_id) &amp; QCA_HSP_GF_SOC_MASK) == QCA_HSP_GF_SOC_ID)
+		variant = "g";
+}
+if (rom_ver != 0) {
+	if (bid == 0x0 || bid == 0xffff)
+		snprintf(fwname, max_size, "qca/%s%02x%s.bin", stem, rom_ver, variant);
+	else
+		snprintf(fwname, max_size, "qca/%s%02x%s.%s%02x", stem, rom_ver,
+					variant, prefix, bid);
+}
+</code></pre>
+<p>That is the <em>complete</em> public account of the naming scheme, and it is</p>
+<p>reproduced exactly in the probe's <code>expected_nvm_name()</code>.</p>
+<p><strong>Second independent confirmation</strong> — linux-firmware <code>WHENCE</code> gives a</p>
+<p>per-file version string inside a per-chip driver section (fetched</p>
+<p>2026-11-18 from</p>
+<p><code>https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/WHENCE?h=main</code>):</p>
+<table>
+<tr>
+<th>WHENCE section</th>
+<th>file</th>
+<th>Version string</th>
+</tr>
+<tr>
+<td><code>... Bluetooth support for QCA2066 chips</code></td>
+<td><code>qca/hpbtfw21.tlv</code></td>
+<td><code>BTFW.HSP.2.1.0-00680-VER_PATCHZ-1</code></td>
+</tr>
+<tr>
+<td><code>... Bluetooth support for WCN7850 chips</code></td>
+<td><code>qca/hmtbtfw20.tlv</code></td>
+<td><code>BTFW.HAMILTON.2.0.1-00349-WOS_PATCHZ-2</code></td>
+</tr>
+<tr>
+<td><code>... Bluetooth support for QCA6390 chips</code></td>
+<td><code>qca/htbtfw20.tlv</code></td>
+<td><code>BTFM.HST.2.0.0-00943-QCACHROM-1</code></td>
+</tr>
+<tr>
+<td><code>... WCN685x uart interface chips</code></td>
+<td><code>qca/wcnhpbtfw21.tlv</code></td>
+<td><code>BTFW.HSP.2.1.0-00660-USB_UART_PATCHZ-6</code></td>
+</tr>
+</table>
+<p>So the two sources agree, independently, that <code>hp</code> = QCA2066 and</p>
+<p><code>hmt</code> = WCN7850: the kernel's <code>switch</code> says it, and the firmware repo's own</p>
+<p>section headers say it. Note that <code>hp</code> and <code>wcnhp</code> share the <strong><code>HSP</code></strong></p>
+<p>codename — they are the same silicon family in different package/interface</p>
+<p>variants, which is exactly why the kernel has a WCN6855→<code>hp</code> fallback.</p>
+<blockquote><strong>Caveat recorded honestly.</strong> <code>hp</code> is <em>not</em> unique to QCA2066 across all of</blockquote>
+<blockquote>linux-firmware: there is also <code>qca/QCA6698/hpbtfw21.tlv</code></blockquote>
+<blockquote>(<code>Version: BTFW.HSP.2.1.2-00079-PATCH-1</code>), i.e. a QCA6698 part shipped</blockquote>
+<blockquote>under the same basename in a different directory. The mapping</blockquote>
+<blockquote><code>basename prefix → chip</code> therefore holds for the <em>flat</em> <code>qca/</code> namespace</blockquote>
+<blockquote>that <code>btqca.c</code> constructs, not for every path in the firmware tree. I</blockquote>
+<blockquote>measured that QCA6698 file too (§2) and it obeys the same gen-2 layout.</blockquote>
+<p>---</p>
+<h2>1. Fleet scope and provenance</h2>
+<p>Six DB byte-identities were fetched and md5-verified. Every one <strong>MATCHES</strong></p>
+<p>the <code>sharing-clusters.csv</code> record — no near-misses, no silent substitutions.</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>devices</th>
+<th><code>product_id</code></th>
+<th>gen-2 rule</th>
+<th>F-75 rule</th>
+<th>source</th>
+</tr>
+<tr>
+<td><code>hpbtfw20.tlv</code></td>
+<td>201,560</td>
+<td><code>922473448ce287c8bb5e849998b9ffb7</code></td>
+<td>11</td>
+<td>19</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+<td><code>sm8450-mainline/firmware-xiaomi-cupid</code> → <code>bluetooth/</code></td>
+</tr>
+<tr>
+<td><code>hpbtfw21.tlv</code></td>
+<td>146,068</td>
+<td><code>fac75b203eb19dec5ae026a0e72c7be0</code></td>
+<td>8</td>
+<td>19</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+<td><code>iLtanaka/firmware-xiaomi-marble</code> → <code>generic/qca/</code></td>
+</tr>
+<tr>
+<td><code>hpbtfw10.tlv</code></td>
+<td>178,532</td>
+<td><code>4f28663fa156321c8c8810bca6bb1549</code></td>
+<td>3</td>
+<td>19</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+<td><code>sm8350-mainline/firmware-oneplus-lemonade</code> @ <code>338eca8f</code></td>
+</tr>
+<tr>
+<td><code>hmtbtfw10.tlv</code></td>
+<td>91,308</td>
+<td><code>95bb0d97772c767ee21c0a9253df3caa</code></td>
+<td>5</td>
+<td>25</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+<td><code>VIKAS9793/vendor_oneplus_giulia</code> (Git-LFS via <code>media.</code>)</td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.tlv</code></td>
+<td>232,348</td>
+<td><code>380da1869e03fc4950d8f067482bec48</code></td>
+<td>4</td>
+<td>25</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+<td>FAT16 extract from <code>TheMuppets/..._fuxi</code> <code>radio/bluetooth.img</code></td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.tlv</code></td>
+<td>280,628</td>
+<td><code>7c8ee5968e701c07d605e750b3a72d44</code></td>
+<td>1</td>
+<td>25</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+<td><code>VIKAS9793/vendor_oneplus_giulia</code> (Git-LFS via <code>media.</code>)</td>
+</tr>
+</table>
+<p>Four independent upstream sources, two chip families, and — importantly —</p>
+<p>what the DB calls one filename (<code>hmtbtfw20.tlv</code>) is **two different</p>
+<p>byte-identities** of different sizes. That is not a fetching error: see §5.</p>
+<p><strong>Also measured, outside the DB</strong> (linux-firmware <code>main</code>, to widen the</p>
+<p>structural sample):</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th><code>product_id</code></th>
+<th>gen-2</th>
+<th>F-75</th>
+</tr>
+<tr>
+<td><code>hpbtfw21.tlv</code></td>
+<td>163,332</td>
+<td><code>9a6b0cb34a82a7015141dd19b2d779da</code></td>
+<td>19</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+</tr>
+<tr>
+<td><code>qca/QCA6698/hpbtfw21.tlv</code></td>
+<td>167,276</td>
+<td><code>eafd32d10ffe85c06f3782cec03a5241</code></td>
+<td>19</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.tlv</code></td>
+<td>270,120</td>
+<td><code>9f728e4a31c495d911e3c429b2152aa2</code></td>
+<td>25</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+</tr>
+<tr>
+<td><code>htbtfw20.tlv</code></td>
+<td>210,704</td>
+<td><code>109ce4287557f1789f2e0ed41e08b5ce</code></td>
+<td>16</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+</tr>
+<tr>
+<td><code>wcnhpbtfw21.tlv</code></td>
+<td>152,784</td>
+<td><code>fce856f8409759e7855a988bff7b70c4</code></td>
+<td>19</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+</tr>
+<tr>
+<td><code>crbtfw32.tlv</code></td>
+<td>117,664</td>
+<td><code>f3cc84610d4a55aa8ab6f6c953772f22</code></td>
+<td>10</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (−212)</td>
+</tr>
+<tr>
+<td><code>crbtfw21.tlv</code></td>
+<td>177,060</td>
+<td><code>4fceacf111c621d93666aaeafc1eaf56</code></td>
+<td>10</td>
+<td>FAIL (+212)</td>
+<td><strong>PASS</strong></td>
+</tr>
+</table>
+<p>That is <strong>12 gen-2 files</strong> in total, spanning <code>hp</code>, <code>hmt</code>, <code>ht</code>, <code>wcnhp</code>,</p>
+<p><code>cr</code> and the QCA6698 subdirectory. Plus the one gen-1 control,</p>
+<p><code>crbtfw21.tlv</code>, which is the direct counter-example.</p>
+<p><strong>NVM files measured</strong> (5):</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>tags</th>
+<th><code>type</code></th>
+<th>source</th>
+</tr>
+<tr>
+<td><code>hpnv20.bin</code></td>
+<td>6,319</td>
+<td><code>5de36001f431a4d60c641d494a75bb60</code></td>
+<td>61</td>
+<td>2</td>
+<td>cupid (DB MATCH, 11 devices)</td>
+</tr>
+<tr>
+<td><code>hpnv10.bin</code></td>
+<td>5,753</td>
+<td><code>02b62ecd32ed33449b2d0cbec16c9023</code></td>
+<td>56</td>
+<td>2</td>
+<td>lemonade (DB MATCH, 3 devices)</td>
+</tr>
+<tr>
+<td><code>hpnv21.bin</code></td>
+<td>6,610</td>
+<td><code>a3314439a3a607df70ba207aee60414b</code></td>
+<td>67</td>
+<td>2</td>
+<td>linux-firmware</td>
+</tr>
+<tr>
+<td><code>hpnv21g.bin</code></td>
+<td>6,450</td>
+<td><code>f304700cae244f47fd4dd13643b05a5e</code></td>
+<td>65</td>
+<td>2</td>
+<td>linux-firmware</td>
+</tr>
+<tr>
+<td><code>hmtnv20.bin</code></td>
+<td>9,508</td>
+<td><code>c04972ef999748e51cd6798a4505dc6d</code></td>
+<td>95</td>
+<td>2</td>
+<td>linux-firmware</td>
+</tr>
+</table>
+<blockquote><strong>Discrepancy recorded, not smoothed over.</strong> The DB lists <code>hmtnv20.bin</code> at</blockquote>
+<blockquote><strong>9,036 B</strong> / <code>55dd12492cfde0d8239a67b8e6681e2c</code> (4 devices) <em>and</em>, for</blockquote>
+<blockquote><code>caihong</code>, at 9,480 B / <code>68ae344ac1c3</code>. The linux-firmware copy is</blockquote>
+<blockquote><strong>9,508 B</strong> — a third size. All three parse as clean type-2 single-set</blockquote>
+<blockquote>NVM with <code>consumed == declared</code>. So <code>hmtnv20.bin</code> is a filename with at</blockquote>
+<blockquote>least three distinct builds in circulation, and the DB's 9,036 B is <em>not</em></blockquote>
+<blockquote>the version linux-firmware ships. I did not obtain the exact 9,036 B</blockquote>
+<blockquote>bytes; the tag census below is therefore from the 9,508 B build, and the</blockquote>
+<blockquote>difference is flagged <strong>[OPEN]</strong> rather than claimed away.</blockquote>
+<p>---</p>
+<h2>2. The gen-2 patch layout — measured, and it is not F-75's</h2>
+<p>F-75's rule for <code>cr*</code>/<code>ap*</code> is <code>file_size == 4 + 24 + data_length + 256</code>.</p>
+<p>Applied to the gen-2 fleet it fails on **every single file by exactly −212</p>
+<p>bytes**:</p>
+<pre><code>
+4 + 24 + data_length + 256   →  212 bytes too many (delta −212)
+4 + 32 + data_length + 36    →  exact match, every time (delta 0)
+</code></pre>
+<p><code>256 − 36 = 220</code> and <code>32 − 24 = 8</code>; <code>220 − 8 = 212</code>. The delta is the same</p>
+<p>constant everywhere because both the header and the trailer changed size by</p>
+<p>fixed amounts. That is the signature of a <strong>format revision</strong>, not of</p>
+<p>per-file variation.</p>
+<p>So the measured gen-2 layout is:</p>
+<pre><code>
+offset 0        : 4    tlv_type_hdr   (type=1 in low byte, length in bits 8..31)
+offset 4        : 24   upstream tlv_type_patch (btqca.h, verbatim)
+offset 28       : 8    vendor extension — all zero on every file measured
+offset 36       : L    patch body (opaque)
+offset 36+L     : 4    trailer tag
+offset 40+L     : 32   SHA-256 digest
+                        where L = data_length
+</code></pre>
+<p>with</p>
+<pre><code>
+total_size  == 4 + 32 + data_length      (note: includes the leading 4)
+file_size   == 4 + 32 + data_length + 36
+</code></pre>
+<p>**Verification that the 32-byte header really is "24 + 8 zeros", and not a</p>
+<p>different struct:** on every gen-2 file, bytes <code>[28:36]</code> are eight <code>0x00</code>.</p>
+<p>The probe reports per-range statistics; the <code>[4,36)</code> range is 62.5% zero</p>
+<p>bytes on all of them, which is exactly <code>8/32</code> — i.e. the only zeros in that</p>
+<p>range are the extension. The 24 upstream bytes are <em>not</em> mostly zero, so</p>
+<p>the split is real and not an artefact of an all-zero region.</p>
+<p><strong>Region statistics</strong> (a statistical description of opaque bytes — no</p>
+<p>disassembly performed), <code>hpbtfw20.tlv</code> as the example:</p>
+<table>
+<tr>
+<th>range</th>
+<th>role</th>
+<th>len</th>
+<th>entropy</th>
+<th>printable</th>
+<th>zero %</th>
+<th><code>0xFF</code> %</th>
+</tr>
+<tr>
+<td><code>[0,4)</code></td>
+<td><code>tlv_type_hdr</code></td>
+<td>4</td>
+<td>2.000</td>
+<td>0.250</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td><code>[4,36)</code></td>
+<td>24-B struct + 8-B extension</td>
+<td>32</td>
+<td>2.002</td>
+<td>0.062</td>
+<td>62.50</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td><code>[36,201524)</code></td>
+<td>patch body, opaque</td>
+<td>201,488</td>
+<td>6.872</td>
+<td>0.431</td>
+<td>8.44</td>
+<td>0.50</td>
+</tr>
+<tr>
+<td><code>[201524,201560)</code></td>
+<td>tag + SHA-256</td>
+<td>36</td>
+<td>4.892</td>
+<td>0.306</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+</table>
+<p>Body entropy ~6.8–7.0 bits/byte across the fleet is consistent with</p>
+<p>compressed or dense code/data; it is <em>not</em> a claim about what the code does.</p>
+<p><code>hmt*</code> bodies are slightly denser (6.97–6.99) than <code>hp*</code> (6.84–6.87), but</p>
+<p>this is a weak, descriptive signal and I do not build any argument on it.</p>
+<p><strong>Honest negative on the 4-byte trailer tag.</strong> I tested whether</p>
+<p><code>trailer[0:4]</code> is a checksum or digest prefix of the body. It is <strong>not</strong></p>
+<p>CRC-32, CRC-32C, Adler-32, or a prefix of SHA-256/SHA-1/MD5 over either the</p>
+<p>body or the digested span, on any file tested. Its semantics are <strong>[OPEN]</strong>.</p>
+<p>The one thing that <em>is</em> established is that the tag lies <strong>inside</strong> the</p>
+<p>SHA-256's covered span (next section), which is an unusual but verifiable</p>
+<p>design choice.</p>
+<p>---</p>
+<h3>2.9 Reconciliation with the sibling <code>hbt-fleet</code> "44-byte footer"</h3>
+<p><code>implementations/hbt-fleet/hpbtfw20-analysis.md</code> describes the tail of the same</p>
+<p>generation as a <strong>44-byte footer</strong> (8 build-varying bytes + 36 bytes of</p>
+<p>hash-class content). That framing is superseded by the layout measured here, and</p>
+<p>the disagreement is worth recording because both documents are committed.</p>
+<p>The header settles it. <code>total_size</code> declares where the data region ends:</p>
+<table>
+<tr>
+<th>boundary source</th>
+<th>value on <code>hpbtfw20.tlv</code></th>
+<th>implied trailer</th>
+</tr>
+<tr>
+<td>header <code>total_size</code> field</td>
+<td><code>201,524</code></td>
+<td><code>file_size − total_size = **36 B**</code></td>
+</tr>
+<tr>
+<td>sibling doc ("last 44 bytes")</td>
+<td><code>201,516</code></td>
+<td><code>44 B</code></td>
+</tr>
+</table>
+<p>The 8 bytes at <code>[28:36)</code> are <strong>all zero on every gen-2 file</strong> and sit <em>inside</em></p>
+<p>the 32-byte vendor header (24-byte upstream struct + 8-byte extension), i.e.</p>
+<p>before the body starts. They are not part of the footer. The sibling doc's</p>
+<p>"build-varying prologue" observation concerns bytes inside <code>[4,28)</code>, which is</p>
+<p>the upstream struct — a different field.</p>
+<p>**Resolution: the header is <code>4 + 32</code> and the trailer is 36; the "44-byte</p>
+<p>footer" mis-assigns 8 header bytes to the tail.** The substantive finding both</p>
+<p>documents share — a SHA-256 digest where F-75 had a 256-byte signature-class</p>
+<p>tail — is unaffected and is verified here on 12 files.</p>
+<h2>3. The one invariant that does hold everywhere: a payload SHA-256</h2>
+<pre><code>
+trailer[4:36] == SHA-256( file[4 : file_size-32] )
+</code></pre>
+<p>This is the strongest, cleanest result in the report. It holds on **all 12</p>
+<p>gen-2 files**, across all five prefixes, across both families, and across</p>
+<p>different <code>rom_build</code> values, <code>product_id</code> values and build versions. It is</p>
+<p>absent from the gen-1 control (<code>crbtfw21.tlv</code>), which carries a 256-byte</p>
+<p>signature-class tail instead and no digest at that position.</p>
+<p>The subtle part, and the reason this is worth stating carefully:</p>
+<ul>
+<li>the covered span starts at <strong>4</strong> (after <code>tlv_type_hdr</code>, so the header is</li>
+</ul>
+<p>  protected);</p>
+<ul>
+<li>it ends at <code>file_size - 32</code> (so the <strong>digest itself</strong> is excluded —</li>
+</ul>
+<p>  necessarily, since it cannot cover itself);</p>
+<ul>
+<li>therefore the 4-byte <strong>tag at <code>file_size-36</code> is inside the digest</strong>.</li>
+</ul>
+<p>A naive implementation that digests <code>file[4 : file_size-36]</code> — i.e. stops</p>
+<p>before the tag — <strong>fails on every real file</strong>. I verified both directions</p>
+<p>explicitly:</p>
+<pre><code>
+sha256(file[4 : n-32]) == trailer[4:36]   →  True   (all 12 files)
+sha256(file[4 : n-36]) == trailer[4:36]   →  False  (all 12 files)
+</code></pre>
+<p>This is a genuine correctness trap, and the test suite pins it</p>
+<p>(<code>test_trailer_digest_and_covered_span</code>, including the negative assertion).</p>
+<p>The kernel does not check this digest. It is therefore presumably produced by</p>
+<p>Qualcomm's signing/packaging tool and consumed by the controller or by a</p>
+<p>production-line tool, not by Linux. That inference is marked <strong>[OPEN]</strong> —</p>
+<p>what is <em>measured</em> is only the byte relation.</p>
+<p>---</p>
+<h2>4. Header field behaviour: gen-2 vs gen-1</h2>
+<p>Decoding the 24-byte struct on all 12 gen-2 files:</p>
+<table>
+<tr>
+<th>field</th>
+<th>gen-2 value</th>
+<th>gen-1 (<code>cr*</code>/<code>ap*</code>, F-75)</th>
+<th>verdict</th>
+</tr>
+<tr>
+<td><code>format_version</code></td>
+<td>1</td>
+<td>1</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>signature</code></td>
+<td>0</td>
+<td>0</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>download_mode</code></td>
+<td>3 (<code>QCA_SKIP_EVT_VSE_CC</code>)</td>
+<td>3</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>reserved1</code></td>
+<td>0</td>
+<td>0</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>reserved2</code></td>
+<td><code>0x0000</code></td>
+<td><code>0x8000</code></td>
+<td><strong>differs</strong></td>
+</tr>
+<tr>
+<td><code>entry</code></td>
+<td><code>0x00000000</code></td>
+<td>real Thumb entry (e.g. <code>0x000209e4</code>)</td>
+<td><strong>differs</strong></td>
+</tr>
+<tr>
+<td><code>product_id</code></td>
+<td>19 <code>hp</code> / 25 <code>hmt</code> / 16 <code>ht</code> / 10 <code>cr</code></td>
+<td>21 <code>cr</code> / 21 <code>ap</code></td>
+<td>family-dependent</td>
+</tr>
+<tr>
+<td><code>patch_version</code></td>
+<td>varies per build (<code>0x3ed8</code>, <code>0x5e81</code>, <code>0x2f3e</code>, <code>0x4a38</code>, <code>0x694d</code>, <code>0x5e21</code>, <code>0x3a98</code>, <code>0x43fc</code>, <code>0x3ac0</code>, <code>0x8674</code>, <code>0x9e3e</code>, <code>0x528a</code>)</td>
+<td>constant <code>0x0002</code></td>
+<td><strong>differs</strong></td>
+</tr>
+</table>
+<p>Two of these are worth dwelling on because they are the <em>behavioural</em></p>
+<p>differences between the generations, beyond mere sizes:</p>
+<p><strong><code>entry</code> is zero on every gen-2 file.</strong> On gen-1 the <code>entry</code> field carries</p>
+<p>the load/entry address the controller jumps to. On gen-2 it is zero</p>
+<p>throughout the fleet. A plausible Thumb-looking word does sit immediately</p>
+<p>after the header, at file offset <strong>36</strong> — the first four bytes of the body</p>
+<p>(e.g. <code>0x000260f8</code>, <code>0x00025b50</code>, <code>0x00028b78</code>, <code>0x00020010</code>, <code>0x000222cc</code></p>
+<p>on various files). But I have <strong>not</strong> established that the kernel or the</p>
+<p>controller reads an entry point from there, and <code>btqca.c</code> certainly does</p>
+<p>not: it passes the whole file to <code>qca_download_firmware</code> and never</p>
+<p>interprets a body word. So the statement I can defend is only: *gen-2 sets</p>
+<p><code>entry = 0</code> and the body begins with a code-like word at <code>+36</code>*. What the</p>
+<p>controller does with it is <strong>[OPEN]</strong>.</p>
+<p><strong><code>patch_version</code> stops being a constant.</strong> On gen-1/F-75 it is always</p>
+<p><code>0x0002</code> — effectively a format marker. On gen-2 it varies per build across</p>
+<p>at least 12 distinct values. Combined with the varying <code>data_length</code>, this</p>
+<p>says the gen-2 header is <em>build metadata</em> rather than a fixed format</p>
+<p>stamp. That is consistent with (and probably the reason for) the SHA-256</p>
+<p>trailer: once headers carry real per-build data, a payload digest becomes</p>
+<p>worth having.</p>
+<p>---</p>
+<h2>5. The generation split is temporal, not family-based</h2>
+<p>This is the finding that most changes the picture, and it is a correction to</p>
+<p>a natural but wrong assumption.</p>
+<p>The tempting story is "<code>hp</code>/<code>hmt</code> are the new generation, <code>cr</code>/<code>ap</code> are the</p>
+<p>old one". The bytes say otherwise:</p>
+<table>
+<tr>
+<th>file</th>
+<th>family</th>
+<th>F-75 rule</th>
+<th>gen-2 rule</th>
+</tr>
+<tr>
+<td><code>crbtfw21.tlv</code> (177,060 B)</td>
+<td>WCN399x</td>
+<td><strong>PASS</strong></td>
+<td>FAIL (+212)</td>
+</tr>
+<tr>
+<td><code>crbtfw32.tlv</code> (117,664 B)</td>
+<td>WCN399x</td>
+<td>FAIL (−212)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr>
+<td><code>hpbtfw10.tlv</code> (178,532 B)</td>
+<td>QCA2066</td>
+<td>FAIL (−212)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr>
+<td><code>htbtfw20.tlv</code> (210,704 B)</td>
+<td>QCA6390</td>
+<td>FAIL (−212)</td>
+<td><strong>PASS</strong></td>
+</tr>
+</table>
+<p><code>crbtfw32.tlv</code> is a <strong><code>cr</code> file that uses the gen-2 layout</strong>. So the split</p>
+<p>is not <code>hp</code>/<code>hmt</code> vs <code>cr</code>/<code>ap</code>; it is <strong><code>rom_build</code>-era / build-date based</strong>.</p>
+<p><code>crbtfw21</code> (rom_build <code>0x0201</code>, <code>patch_version</code> <code>0x0002</code>) is an older build</p>
+<p>in the old format; <code>crbtfw32</code> (rom_build <code>0x0302</code>, <code>patch_version</code> <code>0x528a</code>)</p>
+<p>is a newer build of the <em>same</em> chip family in the new format. The format</p>
+<p>revision tracks <em>when the firmware was built</em>, not which chip it targets.</p>
+<p>This matters practically: any parser that keys the layout off the filename</p>
+<p>prefix will mis-parse <code>crbtfw32.tlv</code>. The probe therefore keys off the</p>
+<p><em>header arithmetic</em> (<code>total_size - data_length</code> ∈ {24, 36}) and uses the</p>
+<p>file size only as a corroborating second check — never the filename.</p>
+<p><strong>Cross-family byte identity</strong> (F-75 method: identical bytes at the same</p>
+<p>offset over the common prefix, plus 16-byte-block overlap):</p>
+<table>
+<tr>
+<th>pair</th>
+<th>identity</th>
+<th>shared 16-B blocks</th>
+</tr>
+<tr>
+<td><code>hmtbtfw20</code> (270,120) ↔ <code>hmtbtfw20</code> (280,628)</td>
+<td>3.21%</td>
+<td>2,409</td>
+</tr>
+<tr>
+<td><code>hpbtfw21</code> (146,068) ↔ <code>wcnhpbtfw21</code></td>
+<td>2.94%</td>
+<td>1,140</td>
+</tr>
+<tr>
+<td><code>hpbtfw21</code> (163,332) ↔ <code>wcnhpbtfw21</code></td>
+<td>2.87%</td>
+<td>1,260</td>
+</tr>
+<tr>
+<td><code>hpbtfw21</code> (146,068) ↔ <code>hpbtfw21</code> (163,332)</td>
+<td>2.80%</td>
+<td>1,440</td>
+</tr>
+<tr>
+<td><code>hpbtfw20</code> ↔ <code>hpbtfw10</code></td>
+<td>2.67%</td>
+<td>201</td>
+</tr>
+<tr>
+<td><code>hpbtfw20</code> ↔ <code>hpbtfw21</code></td>
+<td>2.60%</td>
+<td>46</td>
+</tr>
+<tr>
+<td><code>hmtbtfw20</code> (280,628) ↔ <code>hmtbtfw10</code></td>
+<td>2.34%</td>
+<td>41</td>
+</tr>
+<tr>
+<td><code>hpbtfw20</code> ↔ <code>hmtbtfw20</code></td>
+<td>2.15%</td>
+<td>49</td>
+</tr>
+</table>
+<p>Every pair sits at <strong>2–3%</strong>, i.e. chance level for unrelated byte streams.</p>
+<p>There is <strong>no shared base image</strong> to find here — not between <code>hpbtfw20</code> and</p>
+<p><code>hpbtfw21</code> (a <code>rom_build</code> bump), and not between <code>hp</code> and <code>hmt</code> (a family</p>
+<p>change). This reproduces F-75's negative result for <code>crbtfw20</code> vs</p>
+<p><code>crbtfw11</code> (2.60%) and, importantly, does <strong>not</strong> reproduce F-75's positive</p>
+<p>result (<code>crbtfw20</code>↔<code>apbtfw10</code> at 44% shared base). So:</p>
+<blockquote><strong>Verdict on the F-75 "shared base" question for gen-2: negative.</strong> The</blockquote>
+<blockquote><code>hp</code>/<code>hmt</code> fleet shows no evidence of a common compiled base across</blockquote>
+<blockquote>builds or families. Each build is a substantially different binary. This</blockquote>
+<blockquote>is reported as a negative because that is what the bytes show.</blockquote>
+<p>The <code>hmtbtfw20</code> (270,120) ↔ (280,628) pair is the highest at 3.21% with</p>
+<p>2,409 shared blocks — same chip, same <code>rom_build</code>, different vendors</p>
+<p>(OnePlus giulia vs linux-firmware). Still far from a shared base.</p>
+<p>---</p>
+<h2>6. The version story, tested across families</h2>
+<p>F-75's version conclusion was: the filename's hex digit is the controller's</p>
+<p><code>rom_ver</code>, derived from <code>soc_ver</code> by the kernel's default formula. Does that</p>
+<p>survive on gen-2? The honest way to test it is to apply the <em>same</em> default</p>
+<p>formula to the file's own 16-bit <code>rom_build</code> and see whether it reproduces</p>
+<p>the filename digit.</p>
+<p>The kernel formula (<code>btqca.c:777</code>, default branch):</p>
+<pre><code class="language-c">
+rom_ver = ((soc_ver &amp; 0x00000f00) &gt;&gt; 0x04) | (soc_ver &amp; 0x0000000f);
+</code></pre>
+<p>Result on every gen-2 file:</p>
+<table>
+<tr>
+<th>file</th>
+<th><code>rom_build</code></th>
+<th>formula →</th>
+<th>filename digit</th>
+<th>match</th>
+</tr>
+<tr>
+<td><code>hpbtfw20.tlv</code></td>
+<td><code>0x0200</code></td>
+<td><code>0x20</code></td>
+<td>20</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>hpbtfw21.tlv</code></td>
+<td><code>0x0201</code></td>
+<td><code>0x21</code></td>
+<td>21</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>hpbtfw10.tlv</code></td>
+<td><code>0x0100</code></td>
+<td><code>0x10</code></td>
+<td>10</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>hmtbtfw10.tlv</code></td>
+<td><code>0x0100</code></td>
+<td><code>0x10</code></td>
+<td>10</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.tlv</code></td>
+<td><code>0x0200</code></td>
+<td><code>0x20</code></td>
+<td>20</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>crbtfw32.tlv</code></td>
+<td><code>0x0302</code></td>
+<td><code>0x32</code></td>
+<td>32</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>htbtfw20.tlv</code></td>
+<td><code>0x0200</code></td>
+<td><code>0x20</code></td>
+<td>20</td>
+<td>✔</td>
+</tr>
+<tr>
+<td><code>wcnhpbtfw21.tlv</code></td>
+<td><code>0x0201</code></td>
+<td><code>0x21</code></td>
+<td>21</td>
+<td>✔</td>
+</tr>
+</table>
+<p><strong>The F-75 conclusion HOLDS on gen-2</strong>, on both families. The filename digit</p>
+<p>is the low half of <code>soc_ver</code> in the default encoding.</p>
+<p>But the caveat from F-75 must be carried forward honestly, and it is not</p>
+<p>cosmetic: <strong>the kernel never feeds <code>rom_build</code> to this formula.</strong> It applies</p>
+<p>the formula to the 32-bit <code>soc_ver</code> the <em>controller reports at runtime</em></p>
+<p>(<code>get_soc_ver()</code>), then looks for the resulting filename, and — separately —</p>
+<p>parses <code>rom_build</code> out of whichever file it got. These are two independent</p>
+<p>sources that happen to agree, which is strong <em>correlational</em> evidence that</p>
+<p><code>rom_build</code> is a stored copy of the ROM low half. It is not a derivation.</p>
+<p>The probe's <code>rom_ver_from_rom_build()</code> docstring says exactly this, and the</p>
+<p>report repeats it so nobody cites it as more than it is.</p>
+<p>Additional cross-check: the <code>.ver</code> sidecar files, read as text, corroborate</p>
+<p>the generation and family without any parsing trickery:</p>
+<table>
+<tr>
+<th>sidecar</th>
+<th>bytes</th>
+<th>md5</th>
+<th>content</th>
+</tr>
+<tr>
+<td><code>hpbtfw20.ver</code></td>
+<td>33</td>
+<td><code>4d9090849c302b106c34e8539bcb245b</code></td>
+<td><code>BTFW.HSP.2.0.1-00252-HSP_PATCH-1</code></td>
+</tr>
+<tr>
+<td><code>hmtbtfw10.ver</code></td>
+<td>34</td>
+<td><code>60429040cd6a15f655528604a1564414</code></td>
+<td><code>BTFW.HAMILTON.1.0.0-00214-PATCH-1</code></td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.ver</code> (giulia)</td>
+<td>52</td>
+<td><code>0fad36bab1fded1af9c196ef2a371d24</code></td>
+<td><code>BTFW.HAMILTON.2.0.1-00265-PATCHZ-1.62251.12.95457.2</code></td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.ver</code> (fuxi)</td>
+<td>51</td>
+<td><code>40854415614d31f1035ba57bf60b7d67</code></td>
+<td><code>BTFW.HAMILTON.2.0.0-00613-PATCHZ-1.35836.5.36233.9</code></td>
+</tr>
+</table>
+<p>All four MATCH the DB. Note <code>2.0.1</code> vs <code>2.0.0</code> between the two</p>
+<p><code>hmtbtfw20.ver</code> files — two builds of the same named firmware — which is</p>
+<p>consistent with §5's "no shared base" result and with the DB having two</p>
+<p><code>hmtbtfw20.tlv</code> identities. <code>HSP</code> = the QCA2066/QCA6698/WCN6855 family</p>
+<p>codename; <code>HAMILTON</code> = WCN7850; both are public strings from WHENCE.</p>
+<p>---</p>
+<h2>7. NVM: a <em>simpler</em> shape than F-75, and a different tag map</h2>
+<p>F-75 found that <code>cr*</code>/<code>ap*</code> NVMs use a <strong>type-4 multi-NVM enclosing</strong> header</p>
+<p>with several adjacent type-2 sets and a trailing type-3 record, and that the</p>
+<p>kernel parses only the first set.</p>
+<p><strong>All five gen-2 NVMs measured are plain type-2 single-set.</strong> There is no</p>
+<p>type-4 enclosing header, no adjacent second set, and no trailing type-3</p>
+<p>record. The declared length is consumed exactly:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>declared</th>
+<th>consumed</th>
+<th>tags</th>
+<th>trailing</th>
+</tr>
+<tr>
+<td><code>hpnv20.bin</code></td>
+<td>6,319</td>
+<td>6,315</td>
+<td>6,315</td>
+<td>61</td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>hpnv10.bin</code></td>
+<td>5,753</td>
+<td>5,749</td>
+<td>5,749</td>
+<td>56</td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>hpnv21.bin</code></td>
+<td>6,610</td>
+<td>6,606</td>
+<td>6,606</td>
+<td>67</td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>hpnv21g.bin</code></td>
+<td>6,450</td>
+<td>6,446</td>
+<td>6,446</td>
+<td>65</td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>hmtnv20.bin</code></td>
+<td>9,508</td>
+<td>9,504</td>
+<td>9,504</td>
+<td>95</td>
+<td>none</td>
+</tr>
+</table>
+<p><code>consumed == declared</code> exactly in all five, with no tag overrun and no</p>
+<p>residue. This is a <strong>structural simplification</strong> relative to F-75, and it is</p>
+<p>a real difference, not a measurement gap. (The probe still handles the type-4</p>
+<p>shape correctly — see the <code>hpnv20_multi_synthetic.bin</code> fixture — so the</p>
+<p>capability is not lost, it simply is not exercised by real gen-2 bytes.)</p>
+<p><strong>Kernel-known tags are present and behave differently from F-75:</strong></p>
+<table>
+<tr>
+<th>tag</th>
+<th>kernel constant</th>
+<th><code>hpnv20</code></th>
+<th><code>hpnv10</code></th>
+<th><code>hpnv21</code></th>
+<th><code>hmtnv20</code></th>
+<th>F-75 (<code>cr</code>/<code>ap</code>)</th>
+</tr>
+<tr>
+<td>2</td>
+<td><code>EDL_TAG_ID_BD_ADDR</code> (must be 6)</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>EDL_TAG_ID_HCI</code> (≥3)</td>
+<td><strong>6</strong></td>
+<td><strong>6</strong></td>
+<td><strong>6</strong></td>
+<td><strong>6</strong></td>
+<td>8 or 9</td>
+</tr>
+<tr>
+<td>27</td>
+<td><code>EDL_TAG_ID_DEEP_SLEEP</code> (≥1)</td>
+<td><strong>9</strong></td>
+<td><strong>9</strong></td>
+<td><strong>11</strong></td>
+<td><strong>12</strong></td>
+<td>1</td>
+</tr>
+</table>
+<p>Two family-level differences worth stating plainly:</p>
+<ul>
+<li><strong>Tag 17 is 6 bytes here, vs 8–9 on <code>cr</code>/<code>ap</code>.</strong> The kernel's documented</li>
+</ul>
+<p>  mutation is <code>data[0] |= 0x80</code> (inband-sleep) plus a baud byte at <code>data[1]</code></p>
+<p>  for WCN3950/WCN3991+ — a class that includes QCA2066 and WCN7850 — so a</p>
+<p>  6-byte payload is long enough for the mutation to be meaningful, but the</p>
+<p>  field is <em>shorter</em> than the older family's. I did not establish what the</p>
+<p>  remaining bytes encode. <strong>[OPEN]</strong></p>
+<ul>
+<li><strong>Tag 27 is 9–12 bytes here, vs 1 byte on <code>cr</code>/<code>ap</code>.</strong> The kernel only</li>
+</ul>
+<p>  requires ≥1 and ORs <code>data[0] |= 0x01</code>. On F-75 the payload is literally</p>
+<p>  one byte; here it is a structured blob of 9–12. The extra content is</p>
+<p>  <strong>[OPEN]</strong>, but the <em>length difference is a hard family signal</em>. Within</p>
+<p>  <code>hp</code> it grows with <code>rom_build</code> (<code>hpnv10</code> 9 → <code>hpnv20</code> 9 → <code>hpnv21</code> 11);</p>
+<p>  <code>hmtnv20</code> is longer again at 12.</p>
+<p><strong>Tag-map comparison</strong> (by tag id, content compared by SHA-1 of the payload):</p>
+<table>
+<tr>
+<th>pair</th>
+<th>shared ids</th>
+<th>byte-identical content</th>
+<th>ids only in first</th>
+<th>ids only in second</th>
+</tr>
+<tr>
+<td><code>hpnv20</code> ↔ <code>hpnv10</code></td>
+<td>55</td>
+<td>16</td>
+<td>31, 73, 79, 116, 154, 199</td>
+<td>204</td>
+</tr>
+<tr>
+<td><code>hpnv20</code> ↔ <code>hpnv21</code></td>
+<td>61</td>
+<td>23</td>
+<td>— (subset)</td>
+<td>1, 204, 205, 208, 217, 218</td>
+</tr>
+<tr>
+<td><code>hpnv20</code> ↔ <code>hmtnv20</code></td>
+<td>49</td>
+<td><strong>2</strong></td>
+<td>40, 43, 50, 51, 84, 90, 92, 150, 174, 179, 196, 200</td>
+<td>46 ids incl. 54, 60, 146, 152, 157…254</td>
+</tr>
+<tr>
+<td><code>hpnv21</code> ↔ <code>hmtnv20</code></td>
+<td>53</td>
+<td>8</td>
+<td>40, 43, 50, 51, 84, 90, 92, 150, 174, 179, 196, 200, 204, 218</td>
+<td>42 ids</td>
+</tr>
+</table>
+<p>Reading this honestly:</p>
+<ul>
+<li>Within <code>hp</code>, the tag map is <strong>stable and incremental</strong>: <code>hpnv21</code> is a</li>
+</ul>
+<p>  strict superset of <code>hpnv20</code>'s tag ids, adding 1, 204, 205, 208, 217, 218.</p>
+<p>  <code>hpnv10</code>→<code>hpnv20</code> is <em>not</em> a superset (six ids dropped, one added), which</p>
+<p>  is consistent with a generation-boundary change rather than a monotone</p>
+<p>  extension.</p>
+<ul>
+<li>Across families (<code>hp</code> ↔ <code>hmt</code>), only <strong>2 of 49</strong> shared tag ids have</li>
+</ul>
+<p>  identical content, and <code>hmtnv20</code> carries 46 further ids in the</p>
+<p>  <code>198–254</code> range that <code>hp</code> never uses. So the NVM format is <em>shared</em>, but</p>
+<p>  the NVM <strong>content is family-specific</strong>. An <code>hmtnv20.bin</code> is not a</p>
+<p>  superset of an <code>hpnv20.bin</code>; they are different configuration sets.</p>
+<ul>
+<li>Only 16 of 55 shared ids are byte-identical between <code>hpnv20</code> and <code>hpnv10</code>.</li>
+</ul>
+<p>  Those 16 are the candidates for cross-build constants — but note that</p>
+<p>  includes tag 2 (BD_ADDR) and tag 17 (HCI), which one would <em>expect</em> to be</p>
+<p>  device/build-specific. I am not going to claim those are "shared</p>
+<p>  constants" without knowing what they mean; the honest statement is that</p>
+<p>  16 payloads coincide and the semantics of most are <strong>[OPEN]</strong>.</p>
+<p>The probe reports every tag with a SHA-1 of its payload and a 16-byte</p>
+<p>preview, and marks anything outside {2, 17, 27} as "unknown to upstream</p>
+<p><code>btqca.c</code>" rather than guessing. 95 tags for <code>hmtnv20</code> means 95 unknowns;</p>
+<p>that is the honest score, not a failure.</p>
+<p>---</p>
+<h2>8. Download protocol (documented behaviour, computed not executed)</h2>
+<p>From <code>btqca.c</code>, <code>qca_download_firmware()</code> sends the <strong>whole file</strong> — container</p>
+<p>header and trailer included — in <code>MAX_SIZE_PER_TLV_SEGMENT = 243</code>-byte</p>
+<p>segments, each framed with a sub-command byte and a length. So the trailer</p>
+<p>digest is <em>transmitted to the controller</em>, even though the kernel itself</p>
+<p>never verifies it. That is another hint (not proof) that the digest is meant</p>
+<p>for the controller or a production tool. <strong>[OPEN]</strong></p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>segments</th>
+<th>last segment</th>
+</tr>
+<tr>
+<td><code>hpbtfw20.tlv</code></td>
+<td>201,560</td>
+<td>829 × 243 + 113</td>
+<td>113</td>
+</tr>
+<tr>
+<td><code>hpbtfw21.tlv</code></td>
+<td>146,068</td>
+<td>601 × 243 + 25</td>
+<td>25</td>
+</tr>
+<tr>
+<td><code>hpbtfw10.tlv</code></td>
+<td>178,532</td>
+<td>734 × 243 + 170</td>
+<td>170</td>
+</tr>
+<tr>
+<td><code>hmtbtfw10.tlv</code></td>
+<td>91,308</td>
+<td>375 × 243 + 183</td>
+<td>183</td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.tlv</code> (fuxi)</td>
+<td>232,348</td>
+<td>956 × 243 + 40</td>
+<td>40</td>
+</tr>
+<tr>
+<td><code>hmtbtfw20.tlv</code> (giulia)</td>
+<td>280,628</td>
+<td>1,154 × 243 + 206</td>
+<td>206</td>
+</tr>
+</table>
+<p><code>hmtbtfw20.tlv</code> at 280,628 B is the largest single BT blob in the fleet —</p>
+<p>1,155 segments, i.e. 1,155 round-trips for one firmware download. That is a</p>
+<p>concrete, user-visible cost of the format.</p>
+<p>---</p>
+<h2>9. Fixture policy and clean-room discipline</h2>
+<p>The repo's <code>.gitignore</code> excludes <code>*.bin</code>, <code>*.mbn</code>, <code>*.b[0-9][0-9]</code>, so no</p>
+<p>proprietary payload can be committed by accident. This directory therefore</p>
+<p>ships <strong>no real firmware bytes at all</strong>. Instead:</p>
+<ul>
+<li><a href="make_fixture.py"><code>make_fixture.py</code></a> generates nine fixtures whose bytes</li>
+</ul>
+<p>  are a deterministic SHA-256 counter-stream tagged per fixture, at the</p>
+<p>  <em>real fleet magnitudes</em> (201,560 / 146,068 / 280,628 / 6,319 B …) so that</p>
+<p>  segment counts and tag counts are realistic rather than toy;</p>
+<ul>
+<li>the trailer digest in each fixture is a <strong>real SHA-256</strong> over that</li>
+</ul>
+<p>  fixture's own bytes, computed with the same covered span as the real</p>
+<p>  files — so the digest-positive path is genuinely tested, not stubbed;</p>
+<ul>
+<li><code>hpbtfw20_badtrailer.tlv</code> has an all-zero digest (error path) and</li>
+</ul>
+<p>  <code>hpbtfw20_truncated.tlv</code> declares more than it holds (error path);</p>
+<ul>
+<li><code>hpbtfw20_gen1_synthetic.tlv</code> is an F-75-shaped file, proving the probe</li>
+</ul>
+<p>  distinguishes the generations from bytes alone;</p>
+<ul>
+<li><code>hpnv20_multi_synthetic.bin</code> is a type-4 multi-set NVM, so the type-4</li>
+</ul>
+<p>  code path is tested even though real gen-2 bytes never exercise it.</p>
+<p>Regeneration is <strong>byte-exact</strong> and the suite asserts it</p>
+<p>(<code>test_regeneration_is_byte_identical</code>), so the fixtures are auditable</p>
+<p>without shipping a single Qualcomm byte.</p>
+<p>I also deliberately avoided the tempting shortcut of treating "it parses"</p>
+<p>as "it is correct": every structural claim in this document is paired with a</p>
+<p>falsifiable negative — F-75 rule fails by −212, the naive digest span fails,</p>
+<p>the cross-family identity is chance-level, <code>crbtfw32</code> breaks the</p>
+<p>prefix-based story. Those negatives are the load-bearing evidence.</p>
+<p>---</p>
+<h2>10. Summary of findings</h2>
+<table>
+<tr>
+<th>#</th>
+<th>finding</th>
+<th>confidence</th>
+</tr>
+<tr>
+<td>1</td>
+<td>gen-2 layout is <code>4 + 32 + data_length + 36</code>, measured on 12 files; F-75's <code>+256</code> fails by exactly −212 on all of them</td>
+<td><strong>measured, high</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>trailer[4:36] == SHA-256(file[4 : file_size-32])</code> on all 12 gen-2 files; the 4-byte tag is inside the span; the naive span fails</td>
+<td><strong>measured, high</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>the 32-byte header is the 24-byte upstream <code>tlv_type_patch</code> + 8 zero bytes; the kernel knows only the first 24</td>
+<td><strong>measured + source, high</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>the generation split is <strong>temporal, not family-based</strong> — <code>crbtfw32.tlv</code> is gen-2, <code>crbtfw21.tlv</code> is gen-1</td>
+<td><strong>measured, high</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>hp</code> = QCA2066, <code>hmt</code> = WCN7850 (kernel <code>switch</code> + WHENCE section headers agree)</td>
+<td><strong>source, high</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>the F-75 version story <strong>holds</strong>: default formula on <code>rom_build</code> reproduces the filename digit on every gen-2 file</td>
+<td><strong>measured, high</strong> (correlational by construction)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>no shared base image: every cross-file identity is 2–3%; the F-75 44% <code>cr</code>↔<code>ap</code> positive result does <strong>not</strong> recur</td>
+<td><strong>measured, high (negative)</strong></td>
+</tr>
+<tr>
+<td>8</td>
+<td>gen-2 NVMs are plain type-2 single-set with <code>consumed == declared</code>; no type-4, no trailing type-3</td>
+<td><strong>measured, high</strong></td>
+</tr>
+<tr>
+<td>9</td>
+<td>tag 17 is 6 B (vs 8–9) and tag 27 is 9–12 B (vs 1) — hard family signals</td>
+<td><strong>measured, high</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>entry = 0</code> on all gen-2; a code-like word sits at <code>+36</code>; what consumes it is unknown</td>
+<td><strong>measured / [OPEN]</strong></td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>patch_version</code> varies per build on gen-2 (vs constant <code>0x0002</code> on gen-1)</td>
+<td><strong>measured, high</strong></td>
+</tr>
+<tr>
+<td>12</td>
+<td>the 4-byte trailer tag is not CRC-32/C/Adler-32/SHA-x/MD5 prefix</td>
+<td><strong>measured (negative)</strong></td>
+</tr>
+</table>
+<h3>[OPEN] items, stated as open</h3>
+<ol>
+<li>Semantics of the 4-byte trailer tag — not any common checksum tested.</li>
+<li>Whether the controller or a production tool verifies the SHA-256 trailer</li>
+</ol>
+<p>   (the kernel does not).</p>
+<ol>
+<li>Meaning of the code-like dword at body offset <code>+36</code>, and of <code>entry = 0</code>.</li>
+<li>Payload meaning of tags 17 (6 B) and 27 (9–12 B) beyond the kernel's</li>
+</ol>
+<p>   documented bit-OR mutations; and of the 92–95 tags unknown to</p>
+<p>   <code>btqca.c</code> in each NVM.</p>
+<ol>
+<li>Which of the ≥3 circulating <code>hmtnv20.bin</code> builds (9,036 / 9,480 / 9,508 B)</li>
+</ol>
+<p>   is canonical; only the 9,508 B build was measured here.</p>
+<ol>
+<li>The DB's third <code>hpbtfw21.tlv</code> identity (130,680 B /</li>
+</ol>
+<p>   <code>856b729705f932f80677a947634d5daa</code>, 3 devices: lemonade/lemonadep/martini)</p>
+<p>   was <strong>not</strong> obtained. The closest public candidate</p>
+<p>   (<code>sm8450-mainline/firmware-xiaomi-cupid</code> → <code>bluetooth/hpbtfw21.tlv</code>,</p>
+<p>   125,468 B / <code>1b5ef707ce41e6e8b569c94a34da63a7</code>) is <strong>not</strong> DB-identical, so</p>
+<p>   it is a different build and cannot stand in for it.</p>
+<ol>
+<li>Why <code>rom_build</code> agrees with the runtime <code>soc_ver</code> formula — whether the</li>
+</ol>
+<p>   file is generated from <code>soc_ver</code> or <code>soc_ver</code> is read from the ROM the file</p>
+<p>   was built for. The correlation is solid; the causal direction is not</p>
+<p>   established here.</p>
+<h3>Fetch failures, recorded rather than hidden</h3>
+<ul>
+<li><code>TheMuppets/proprietary_vendor_xiaomi</code> → <strong>HTTP 451</strong> (DMCA, 2019-08-09).</li>
+<li><code>TheMuppets/proprietary_vendor_xiaomi_{marble,cupid}</code>: branches are</li>
+</ul>
+<p>  <code>lineage-22.2</code>/<code>23.0</code>/<code>24.0</code> only; their firmware dirs contain no</p>
+<p>  <code>hp*</code>/<code>hmt*</code> files.</p>
+<ul>
+<li><code>TheMuppets/proprietary_vendor_oneplus_{lemonade,lemonadep}</code> in-tree</li>
+</ul>
+<p>  <code>hpnv10.bin</code> is 5,737 B / <code>2e03f8f0110c870189f173de93e61c9b</code>, which the DB</p>
+<p>  lists for <strong>one</strong> device; the 3-device <code>hpnv10.bin</code> (5,753 B) came from the</p>
+<p>  GitLab sm8350-mainline tree instead.</p>
+<ul>
+<li>linux-firmware ships <strong>no</strong> <code>qca/hpbtfw20.tlv</code> or <code>qca/hpnv20.bin</code></li>
+</ul>
+<p>  (both requests returned a 404 HTML page, not a blob) — so the 11-device</p>
+<p>  <code>hpbtfw20</code> is <em>not</em> in linux-firmware, only in vendor trees.</p>
+<ul>
+<li>The lemonade <code>hpbtfw10.ver</code> URL returned a GitLab HTML error page</li>
+</ul>
+<p>  (2,699 B of <code>&lt;!DOCTYPE html&gt;</code>), so that sidecar was not measured; the</p>
+<p>  <code>hpbtfw10.tlv</code> itself fetched correctly.</p>
+<p>---</p>
+<h2>11. Reproducing</h2>
+<pre><code class="language-bash">
+cd implementations/qca-bt-gen2
+python3 -I make_fixture.py                  # regenerate fixtures (byte-exact)
+python3 -m unittest test_hp_fleet_probe -v  # 58 tests
+python3 -I hp_fleet_probe.py &lt;file&gt; --brief # one file
+python3 -I hp_fleet_probe.py --fleet f1 f2 f3 --json out.json
+</code></pre>
+<p>Exit status is <code>0</code> when only facts/info diagnostics are produced and <code>1</code> when</p>
+<p>an error-class diagnostic fires (truncation, bad digest, tag overflow). The</p>
+<p>gen-1 control <code>crbtfw21.tlv</code> exits <strong><code>0</code></strong>: the gen-2 rule fails on it, but</p>
+<p>the probe recognises it as gen-1 and reports that as a fact rather than an</p>
+<p>error — the discriminator working, not a bug.</p>
+<p>Cross-checking against the F-75 parser is optional and one-way, so this</p>
+<p>module's claims stand alone:</p>
+<pre><code class="language-bash">
+python3 -I hp_fleet_probe.py &lt;file&gt; --cross-check ../qca-bt/qca_tlv.py
+</code></pre>
+<p>On gen-2 bytes that reports <code>returncode: 0</code> plus the F-75 parser's two</p>
+<p>informational notes, i.e. the older parser does not <em>fail</em> on gen-2 (it never</p>
+<p>validates total length either) — it just doesn't describe the trailer. Worth</p>
+<p>remembering when comparing the two tools' output.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

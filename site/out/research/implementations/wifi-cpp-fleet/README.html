@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/wifi-cpp-fleet — clean-room Qualcomm MSM CPP firmware probe — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/wifi-cpp-fleet — clean-room Qualcomm MSM CPP firmware probe</h1><p>A structural probe for the `cpp_firmware_vN_N_N.fw` family — the twelve</p><p>Evidence: none</p>
+<h1>implementations/wifi-cpp-fleet — clean-room Qualcomm MSM CPP firmware probe</h1>
+<p>A structural probe for the <code>cpp_firmware_vN_N_N.fw</code> family — the twelve</p>
+<p>identities the upstream database records under the <code>wifi</code> family label, 9</p>
+<p>devices each (<code>v1_12_1</code>: 4). The probe answers what metadata could not: **what</p>
+<p>is actually inside the fixed 16 KiB window, and where does the version live?**</p>
+<p>Two answers, both measured:</p>
+<ol>
+<li><strong>These are not WiFi blobs.</strong> <code>cpp</code> is <strong>Camera Post-Processing</strong> (MSM CPP).</li>
+</ol>
+<p>   The <code>wifi</code> family label in <code>sharing-clusters.csv</code> is a labelling error. The</p>
+<p>   consumer is GPL-2.0-only <code>msm_cpp.c</code>; the producer is <code>cpp_hardware.c</code>. The</p>
+<p>   Cypress/Infineon hypothesis was tested and refuted (§1.3 of the analysis).</p>
+<ol>
+<li><strong>The version is not ASCII.</strong> It is one little-endian <code>u16</code>,</li>
+</ol>
+<p>   <code>0x1000 | BCD(minor)</code>, sitting immediately beneath a</p>
+<p>   <code>MSM_CPP_MSG_ID_TRAILER</code> record. The <code>v1.1</code> a <code>strings</code> run finds at <code>0x3F80</code></p>
+<p>   is a fixed literal of the shared epilogue, present in 11/12 files regardless</p>
+<p>   of version.</p>
+<p><strong>RULE 0 was satisfied before any structural claim was made:</strong> the public</p>
+<p>source that consumes these files (<code>cpp_load_fw()</code> in <code>msm_cpp.c</code>) was read</p>
+<p>first. It parses <em>nothing</em> — no magic, no length, no checksum; it streams</p>
+<p><code>fw-&gt;size / 4</code> LE words — so every structural fact below is a payload</p>
+<p>property, not a loader contract. That distinction is load-bearing and is</p>
+<p>repeated everywhere it matters.</p>
+<p>Labels used in the documents: <strong>[S]</strong> quoted from public source (file, symbol) ·</p>
+<p><strong>[M]</strong> own measurement of payload bytes · <strong>[OPEN]</strong> not established, gap named.</p>
+<h3>RULE 0 prior-art record (searches 2026-11-19)</h3>
+<p>The <code>websearch</code> tool returned HTTP 402, so the prose leg was run through a</p>
+<p>real browser (DuckDuckGo) rather than skipped. Exact queries and outcomes:</p>
+<table>
+<tr>
+<th>query</th>
+<th>outcome</th>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_12_0.fw MSM camera CPP post-processing microcode</code></td>
+<td>10 hits. The only relevant ones are <strong>mirrors of the file itself</strong> (<code>firmware-xiaomi-rosy</code>, <code>proprietary_vendor_xiaomi_msm8998-common</code>). Everything else is a name collision with unrelated products: Bosch "CPP4" CCTV camera firmware, Canon Production Printing (<code>cpp.canon</code>). Nobody has written up the format.</td>
+</tr>
+<tr>
+<td><code>"cpp_firmware" qualcomm camera CPP firmware load</code></td>
+<td><strong>"No results"</strong></td>
+</tr>
+</table>
+<p>The <strong>"CPP" name is a genuine search hazard</strong> and is recorded here as a</p>
+<p>finding in its own right: it collides with Canon Production Printing and with</p>
+<p>Bosch's CPP-series camera firmware, so a careless search produces confident</p>
+<p>false positives. In this family <code>cpp</code> means the MSM **Camera</p>
+<p>Post-Processor**, and the disambiguating terms are <code>msm_cpp.c</code> and</p>
+<p><code>MSM_CPP_CMD_FW_LOAD</code>, not the token <code>cpp</code>.</p>
+<p>Conclusion: no public reverse-engineering writeup of these image contents</p>
+<p>exists. The consumer-side specification below is therefore the <em>only</em> public</p>
+<p>account of this family, which is what makes the <code>wifi</code> -&gt; camera correction</p>
+<p>worth contributing upstream.</p>
+<h2>Clean-room statement</h2>
+<p>Written 2026-11-19 from public sources only:</p>
+<table>
+<tr>
+<th>what</th>
+<th>where</th>
+</tr>
+<tr>
+<td>kernel consumer</td>
+<td><code>drivers/media/platform/msm/camera_v2/pproc/cpp/msm_cpp.c</code> + <code>msm_cpp.h</code>, GPL-2.0-only, <code>LineageOS/android_kernel_xiaomi_msm8953</code> @ <code>lineage-21</code></td>
+</tr>
+<tr>
+<td>userspace producer</td>
+<td><code>cpp_hardware.c</code>, <code>cpp_hw_params.h</code>, <code>cpp_hardware.h</code>, <code>Sushrut1101/android_vendor_qcom_proprietary</code> @ <code>master</code></td>
+</tr>
+<tr>
+<td>protocol constants</td>
+<td><code>MSM_CPP_MSG_ID_CMD</code> <code>0x3E646D63</code>, <code>MSM_CPP_MSG_ID_OK</code> <code>0x0A0A4B4F</code>, <code>MSM_CPP_MSG_ID_TRAILER</code> <code>0xABCDEFAA</code></td>
+</tr>
+<tr>
+<td>version bitfield</td>
+<td><code>CPP_FW_VERSION_*</code> in <code>cpp_hw_params.h</code> — 31:28 major, 27:16 minor, 15:0 step</td>
+</tr>
+</table>
+<p>No decompiled code, no proprietary documentation, no vendor datasheet. All</p>
+<p>numbers in the analysis are computed from payload bytes on disk by</p>
+<p><code>cpp_probe.py</code>, or quoted from the files above.</p>
+<h2>Documents</h2>
+<table>
+<tr>
+<th>document</th>
+<th>owns</th>
+</tr>
+<tr>
+<td><code>cpp-version-matrix-analysis.md</code></td>
+<td>the full analysis: provenance, the 16 KiB layout, invariant-vs-varying by range, the version story, the N×N matrix, the hardware→firmware map, cross-fleet verdict, <code>[OPEN]</code> register</td>
+</tr>
+<tr>
+<td><code>../../blob-matrix/laptop/wifi-cpp-firmware-family.md</code></td>
+<td>the laptop-half summary: the family-identity correction, the window contract, the matrix verdict</td>
+</tr>
+<tr>
+<td>this README</td>
+<td>scope, usage, test status, value statement</td>
+</tr>
+</table>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>cpp_probe.py</code></td>
+<td>the probe. Single file, stdlib only.</td>
+</tr>
+<tr>
+<td><code>make_fixture.py</code></td>
+<td>deterministic synthetic fixtures built from the measured layout only (no proprietary bytes)</td>
+</tr>
+<tr>
+<td><code>fixtures/*.fw</code></td>
+<td>15 synthetic fixtures; excluded from git by <code>fixtures/.gitignore</code> (see "Fixtures" below)</td>
+</tr>
+<tr>
+<td><code>test_cpp_probe.py</code></td>
+<td>unittest suite</td>
+</tr>
+</table>
+<h2>Usage</h2>
+<pre><code class="language-bash">
+# one file, human summary
+python3 cpp_probe.py &lt;file&gt;.fw --brief
+
+# one file, full JSON to stdout
+python3 cpp_probe.py &lt;file&gt;.fw
+
+# N x N identity matrix over a fleet (three variants: whole / code / content)
+python3 cpp_probe.py --matrix f1.fw f2.fw ... --json matrix.json
+python3 cpp_probe.py --matrix f1.fw f2.fw ... --brief   # closest-neighbour table
+
+# ladder diff: first-diff offset and run census per consecutive pair
+python3 cpp_probe.py --versions f1.fw f2.fw ... --brief
+
+# skip hashing (faster on big fleets)
+python3 cpp_probe.py --matrix ... --no-hash
+</code></pre>
+<p>Exit status: <strong>0</strong> clean, <strong>1</strong> error-class diagnostic (wrong size, not</p>
+<p>word-aligned, all-fill, I/O), <strong>2</strong> usage error.</p>
+<p>Brief output for one real identity:</p>
+<pre><code>
+cpp_firmware_v1_12_0.fw: 16384 bytes
+  window: exact16K=True short16K=False words=4096
+  header: lead=0x7140 vectors 0x1359..0x140a (6 distinct, even=False)
+  version: name=1.12.0 enum=0x100c0000 marker=0x1012 @ 0x01f2  build-counter 0x0007
+  ascii version string in image: False
+  layout: code_end=0x28d4 fill=0xff (+5674 B) epilogue=0x3efe tail_fill=True
+  trailer: u16@0x3efc=0x1411 -&gt; 2*(w+1)=0x2824, code_end=0x28d4 (residual 176 B)
+  entropy: code region 4.66 bits/byte, 35.8% 0xFF
+  protocol magics present: MSM_CPP_MSG_ID_CMD x2, MSM_CPP_MSG_ID_OK x1, MSM_CPP_MSG_ID_TRAILER x2
+</code></pre>
+<h2>What the probe actually checks</h2>
+<p>Every check is either a measurement rule or a public constant. Nothing is</p>
+<p>inferred from a filename alone.</p>
+<table>
+<tr>
+<th>check</th>
+<th>basis</th>
+</tr>
+<tr>
+<td>window is exactly 16,384 B, or the 16,128 B outlier</td>
+<td>[M] 11/12 + 1/12</td>
+</tr>
+<tr>
+<td>size is a multiple of 4</td>
+<td>[S] <code>cpp_load_fw()</code> divides by 4</td>
+</tr>
+<tr>
+<td>lead word at <code>0x0000</code> is <code>0x7140</code></td>
+<td>[M] invariant in 12/12</td>
+</tr>
+<tr>
+<td>16 × <code>u16</code> vector table at <code>[0x0002, 0x0022)</code></td>
+<td>[M] reported with parity and equality pattern, not assumed</td>
+</tr>
+<tr>
+<td>no ASCII string encodes the file's own version</td>
+<td>[M] honest negative, 12/12</td>
+</tr>
+<tr>
+<td>exactly one <code>u16 == 0x1000 | BCD(minor)</code></td>
+<td>[M] 12/12; BCD proven by 1.10 → <code>0x1010</code></td>
+</tr>
+<tr>
+<td>the <code>u16</code> below the marker is a <strong>build counter</strong>, not the step</td>
+<td>[M] disagrees with the filename step in 9/12</td>
+</tr>
+<tr>
+<td>filename version ↔ <code>CPP_FW_VERSION_*</code> enum</td>
+<td>[S] <code>cpp_hw_params.h</code> bitfield; the payload carries <strong>no</strong> enum word</td>
+</tr>
+<tr>
+<td>three <code>msm_cpp.h</code> magics found by search</td>
+<td>[S] header values as needles</td>
+</tr>
+<tr>
+<td>fill byte is <code>0xFF</code>, never <code>0x00</code> (scoped to the pad window)</td>
+<td>[M] 12/12</td>
+</tr>
+<tr>
+<td>epilogue <code>[0x3EFE, 0x3FCA)</code> invariant</td>
+<td>[M] byte-identical 11/12, absent in 1.1.1</td>
+</tr>
+<tr>
+<td><code>u16@0x3EFC</code> is a halfword count: <code>code_end == 2*(w+1)</code></td>
+<td>[M] exact in 6/12, erased in 3, +176 B in 3</td>
+</tr>
+<tr>
+<td>the 176-byte residual decodes as 14 B prologue + 8 × 20 B records + 2 B tail</td>
+<td>[M] identical shape in all 3 that carry it</td>
+</tr>
+<tr>
+<td><code>code_end</code> = last non-fill byte before the epilogue</td>
+<td>[M]</td>
+</tr>
+<tr>
+<td>entropy / <code>0xFF</code>% / zero% per region</td>
+<td>[M]</td>
+</tr>
+<tr>
+<td>three identity matrices, plus adjacent first-diff</td>
+<td>[M]</td>
+</tr>
+</table>
+<p>The three matrices exist because one number is misleading for a padded</p>
+<p>fixed-window format: <code>whole</code> is inflated by shared <code>0xFF</code> fill, <code>code_region</code></p>
+<p>restricts to <code>min(code_end)</code>, and <code>content_only</code> excludes positions where</p>
+<p>either side is <code>0xFF</code>/<code>0x00</code> — that last one is the honest similarity number.</p>
+<p>Example: 1.5.0↔1.6.0 reads <strong>67.24</strong> whole and <strong>15.14</strong> content.</p>
+<h2>Fixtures</h2>
+<p><code>make_fixture.py</code> writes:</p>
+<pre><code>
+fixtures/cpp_firmware_v1_1_1.fw      16,128 B   the short-window outlier
+fixtures/cpp_firmware_v1_1_6.fw      16,384 B
+fixtures/cpp_firmware_v1_2_0.fw      16,384 B
+fixtures/cpp_firmware_v1_4_0.fw      16,384 B
+fixtures/cpp_firmware_v1_5_0.fw      16,384 B
+fixtures/cpp_firmware_v1_5_1.fw      16,384 B   modelled 2-byte step delta
+fixtures/cpp_firmware_v1_5_2.fw      16,384 B
+fixtures/cpp_firmware_v1_6_0.fw      16,384 B
+fixtures/cpp_firmware_v1_8_0.fw      16,384 B
+fixtures/cpp_firmware_v1_10_0.fw     16,384 B   modelled 176-byte stride block
+fixtures/cpp_firmware_v1_12_0.fw     16,384 B   modelled 176-byte stride block
+fixtures/cpp_firmware_v1_12_1.fw     16,384 B   modelled partial rewrite
+fixtures/bad_size_synthetic.fw       16,383 B   not word-aligned -&gt; exit 1
+fixtures/truncated_synthetic.fw          16 B   unreadable        -&gt; exit 1
+fixtures/all_fill_synthetic.fw       16,384 B   no payload        -&gt; exit 1
+</code></pre>
+<p>Every payload byte is a SHA-256 counter stream keyed by a per-fixture tag, so</p>
+<p>re-running the script reproduces every byte (the suite asserts this). The</p>
+<p>fixtures reproduce the <strong>layout and the measured deltas</strong> only — never the</p>
+<p>vendor content. <code>test_fixtures_carry_no_vendor_bytes</code> asserts none of the 15</p>
+<p>matches any of the twelve real md5s.</p>
+<p><strong>Note on <code>.gitignore</code>:</strong> the repo root excludes <code>*.bin</code> but not <code>*.fw</code>, and</p>
+<p>this family ships as <code>.fw</code>. The root file is outside this work's write scope,</p>
+<p>so <code>fixtures/.gitignore</code> excludes everything in that directory (with</p>
+<p><code>.gitignore</code> itself un-ignored). The fixtures are regenerable by a committed</p>
+<p>script and are not tracked. Regenerate with:</p>
+<pre><code class="language-bash">
+cd implementations/wifi-cpp-fleet &amp;&amp; rm -f fixtures/*.fw &amp;&amp; python3 make_fixture.py
+</code></pre>
+<h2>Tests</h2>
+<pre><code class="language-bash">
+cd implementations/wifi-cpp-fleet &amp;&amp; python3 -m unittest -v test_cpp_probe
+</code></pre>
+<p><strong>88 tests, all passing</strong> (79 run against the committed fixtures plus 9</p>
+<p>real-fleet assertions; those 9 <strong>skip cleanly</strong> when the payloads are absent,</p>
+<p>so the suite runs from a fresh clone with no proprietary bytes).</p>
+<p>The real-fleet class reads <code>/tmp/astro_u/cpp/{real,payloads}/</code> if present and</p>
+<p>asserts the md5s, sizes, <code>code_end</code> values, epilogue sha1, the 2-byte 1.5.0→1.5.1</p>
+<p>delta, marker presence, the adjacent build counter, and the absence of any</p>
+<p>in-file <code>CPP_FW_VERSION_*</code> word, directly against the fetched bytes. It never</p>
+<p>becomes a prerequisite.</p>
+<p>Covers: fixture determinism and size fidelity; the window check including the</p>
+<p>16,128 B outlier; header/vector-table probing (including the corrected</p>
+<p>"not all even" result); the ASCII-version honest negative and the <code>v1.1</code></p>
+<p>decoy; the BCD marker rule and the adjacent build counter; protocol-magic</p>
+<p>detection; padding characterisation</p>
+<p>(0xFF scoping, epilogue invariance, trailer field); the trailer <code>u16</code></p>
+<p>halfword-count rule in all three of its observed shapes; entropy profile shape;</p>
+<p>adjacent first-diff; all three matrix variants (dimensions, diagonal, symmetry,</p>
+<p>range, padding inflation, step-pair near-identity, outlier detection);</p>
+<p>malformed/truncated input; the CLI and JSON contracts; exit statuses.</p>
+<h2>Fleet scope (12/12 md5 MATCH)</h2>
+<p>All twelve fetched 2026-11-19 from</p>
+<p><code>TheMuppets/proprietary_vendor_xiaomi_ginkgo</code> @ <code>lineage-22.2</code>,</p>
+<p><code>proprietary/vendor/firmware/</code>. Full table with sha256 and DB status in</p>
+<p><code>cpp-version-matrix-analysis.md</code> §2.</p>
+<table>
+<tr>
+<th>version</th>
+<th>bytes</th>
+<th>md5</th>
+<th>devices</th>
+</tr>
+<tr>
+<td>1.1.1</td>
+<td><strong>16,128</strong></td>
+<td><code>4d145d5a13a3956bf33aec94a8e7fe62</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.1.6</td>
+<td>16,384</td>
+<td><code>738a83a673dd45fa5852b5cc9519ee94</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.2.0</td>
+<td>16,384</td>
+<td><code>3f078c3d1658679a762f7d77c99517cd</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.4.0</td>
+<td>16,384</td>
+<td><code>b6f54efc4675040f7b7e99398905646e</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.5.0</td>
+<td>16,384</td>
+<td><code>e51087ba19409150103faafaff849627</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.5.1</td>
+<td>16,384</td>
+<td><code>ed1f2071b61447924f50fe8670cd51be</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.5.2</td>
+<td>16,384</td>
+<td><code>02e4044179d7dfc069aa9a42db690642</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.6.0</td>
+<td>16,384</td>
+<td><code>de85a5f8196ec73cffc61382b3e0d5f6</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.8.0</td>
+<td>16,384</td>
+<td><code>04423a29e78bb01d9be62256a65354a6</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.10.0</td>
+<td>16,384</td>
+<td><code>8d08bfdf92db5b1df58af9b6adf61eae</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.12.0</td>
+<td>16,384</td>
+<td><code>ef031a3f24f877242621ba695d8dcbd2</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td>1.12.1</td>
+<td>16,384</td>
+<td><code>a59e732fcbf71cb5fcc6c54fef0124d6</code></td>
+<td><strong>4</strong></td>
+</tr>
+</table>
+<p><code>linux-firmware</code> ships <strong>none</strong> of them (<code>WHENCE</code>, 537,962 B, zero</p>
+<p><code>cpp_firmware</code> hits, fetched 2026-11-19) — honest negative, consistent with</p>
+<p>F-74's pattern for device-vendor-partition blobs.</p>
+<h2>Value statement</h2>
+<p>What the programme gains:</p>
+<ul>
+<li><strong>One matrix label corrected with evidence.</strong> <code>cpp_firmware_*</code> is not WiFi;</li>
+</ul>
+<p>  it is the MSM camera post-processor. Anyone budgeting this fleet as a WiFi</p>
+<p>  target was budgeting the wrong subsystem, and the refutation is now written</p>
+<p>  down with the public sources that settle it.</p>
+<ul>
+<li><strong>The loader is fully specified and trivial.</strong> <code>cpp_load_fw()</code> needs no RE:</li>
+</ul>
+<p>  three words and a blind stream. A free loader is a few lines.</p>
+<ul>
+<li><strong>The version contract is pinned to an exact byte rule</strong> —</li>
+</ul>
+<p>  <code>0x1000 | BCD(minor)</code>, one occurrence, immediately below a trailer record —</p>
+<p>  and two traps are documented so they are not rediscovered later: the ASCII</p>
+<p>  <code>v1.1</code> at <code>0x3F80</code> is a shared epilogue literal, and the <code>u16</code> under the</p>
+<p>  marker is a <strong>build counter</strong>, not the step (it disagrees with the filename</p>
+<p>  step in 9/12 files).</p>
+<ul>
+<li><strong>A third container philosophy is on record.</strong> F-75 is</li>
+</ul>
+<p>  <code>4 + 24 + data_length + 256</code>; gen-2 is <code>4 + 32 + data_length + 36</code>; CPP is a</p>
+<p>  <strong>padded fixed window with no length field at all</strong>, whose only length signal</p>
+<p>  (<code>u16@0x3EFC</code> = a halfword count of the region it terminates) is ignored by</p>
+<p>  the loader. Three families, three answers to "how big am I".</p>
+<ul>
+<li><strong>The remaining unknown is bounded.</strong> The opaque surface is the code region</li>
+</ul>
+<p>  plus a 204-byte invariant epilogue plus a 176-byte stride block in three</p>
+<p>  identities — each pinned to exact offsets and labelled <code>[OPEN]</code>. It is no</p>
+<p>  longer "twelve opaque 16 KiB binaries".</p>
+<p>What it does <strong>not</strong> claim: no disassembly, no ISA identification, no statement</p>
+<p>about what the microcode computes, and no suggestion that a free replacement</p>
+<p>exists today. The <code>[OPEN]</code> register in the analysis names every gap.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

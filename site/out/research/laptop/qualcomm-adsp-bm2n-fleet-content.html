@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualcomm ADSP `bm2nNN` fleet — content-level results (laptop half) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Qualcomm ADSP `bm2nNN` fleet — content-level results (laptop half)</h1><p>Companion to `blob-matrix/laptop/qualcomm-adsp-bm2n-fleet.md`, which is</p><p>Evidence: none</p>
+<h1>Qualcomm ADSP <code>bm2nNN</code> fleet — content-level results (laptop half)</h1>
+<p>Companion to <code>blob-matrix/laptop/qualcomm-adsp-bm2n-fleet.md</code>, which is</p>
+<p><strong>metadata-only</strong> (upstream md5/size, no payload RE) and is left untouched.</p>
+<p>This file carries what the payload bytes actually contain. Evidence class:</p>
+<p><strong>CONTENT</strong> — real payloads fetched, md5-verified, and structurally parsed.</p>
+<p>Full method, provenance and <code>[OPEN]</code> list live in</p>
+<p><a href="research/implementations/adsp-fleet/bm2n-fleet-analysis.html"><code>implementations/adsp-fleet/bm2n-fleet-analysis.md</code></a>;</p>
+<p>the parser and test suite live in</p>
+<p><a href="../../implementations/adsp-fleet/"><code>implementations/adsp-fleet/</code></a>.</p>
+<h2>Scope</h2>
+<p>Upstream database: 446 <code>bm2n*</code> rows, 35 devices, 65 distinct filenames</p>
+<p><code>bm2n00</code>–<code>bm2n71</code> (non-contiguous), all <code>blob_family=adsp</code>, all</p>
+<p><code>interface_documented=n</code>.</p>
+<p>This work measured <strong>49 payloads</strong> (50 fetched, 1 was 0 bytes) from **11</p>
+<p>vendor repositories<strong>, giving </strong>13 distinct md5s<strong> and </strong>8 distinct</p>
+<p>build-ids**. Six brief files were md5-verified against the database; the rest</p>
+<p>came from public TheMuppets/LineageOS vendor trees. **48 of 48 non-empty</p>
+<p>payloads parse clean** under one layout.</p>
+<p>The laptop half covers 118 devices. Its six leverage filenames are the same</p>
+<p>six as the full database (the half holds one device per filename at the</p>
+<p>canonical md5), so the content results below apply to it directly.</p>
+<h2>Verdict on the file type</h2>
+<p>These are <strong>not modem firmware</strong>, despite the earlier "ADSP-region</p>
+<p>modem-adjacent" framing in the metadata doc. The evidence is a serialised</p>
+<p>neural-network graph for the Hexagon Tensor Processor:</p>
+<ul>
+<li>the record tag is <code>TENSOR_MAGIC = 0x1337beef</code> from the public</li>
+</ul>
+<p>  <code>QNN/HTP/core/tensor.h:100</code>;</p>
+<ul>
+<li>the prologue embeds the C++ RTTI name</li>
+</ul>
+<p>  <code>14ConcreteTensorIN5Tdefs10QuantUint8EE</code>, and <code>QUInt8 = 1</code> is</p>
+<p>  <code>DType::QUInt8</code> in the public <code>dtype_enum.h</code>;</p>
+<ul>
+<li>one payload is a standard HTP <strong>pickle</strong> (<code>Hdr_MAGIC = 0x7309F72B</code>) whose</li>
+</ul>
+<p>  options string names a graph sequencer:</p>
+<p>  <code>O=2;initial_sequencer=df;df_subsequencer=por_dp;...</code>;</p>
+<ul>
+<li>operator class names throughout are <code>hnnx</code>-namespaced</li>
+</ul>
+<p>  (<code>TypicalOpIFiR</code>, <code>VariadicOpIF</code>, …), and <code>bm2n12</code> additionally carries</p>
+<p>  <code>ArtNet_*</code> op names.</p>
+<p>The <code>adsp</code> in the path is the FastRPC domain id (<code>ADSP_DOMAIN_ID (0)</code> in</p>
+<p><code>drivers/misc/fastrpc.c:31</code>), not evidence of modem code.</p>
+<h2>The container layout (validated 48/48)</h2>
+<h3>Compact family</h3>
+<pre><code>
+0x00 u32  A            window: 0x200000 (26 files) / 0x400000 (11) / 0x800000 (12)
+0x04 u32  0            constant 48/48
+0x08 u32  7            constant 48/48
+0x0c 8B   build-id, 7 ASCII + NUL
+0x14 u32  0xfa0000fa   constant 48/48
+0x18 u32  4            constant 48/48
+0x1c u32  A            repeat of 0x00
+0x20 u32  N            segment-table pair count (2/3/4)
+0x24 u32  A            repeat of 0x00
+0x28 u32  0x10400      constant 48/48
+0x2c      (N-1) x { u32 value, u32 kind }
+          sentinel { ((~N &amp; 0xffff) &lt;&lt; 16) | N , base }
+hlen = 0x2c + 8*N      =&gt; 0x3c / 0x44 / 0x4c      48/48
+</code></pre>
+<p>Region order: header → segment bodies (boundaries = ascending file-resident</p>
+<p>table values, last = <code>base</code>) → prologue → <code>0x1337BEEF</code> records →</p>
+<p><code>0xBEEFF00D</code> terminator → 0–8 pad bytes (all-zero or all-<code>0x55</code>).</p>
+<p><strong>Segment-table grammar (48/48):</strong> last entry <code>value</code> == <code>base</code>; sentinel is</p>
+<p>the 16/16 count-complement of <code>N</code>; kinds only from</p>
+<p>{<code>0x00000100</code>, <code>0x00020100</code>, <code>0x000f0100</code>} (low byte 0, bits 8..15 == <code>0x01</code>);</p>
+<p>all values <code>0x100</code>-aligned; resident values strictly ascending; <code>0x000f0100</code></p>
+<p>always last (prologue end); <code>0x00020100</code> never file-resident, exactly one,</p>
+<p>page-aligned, always <strong>larger than the file</strong> (6.29–17.67×); <code>0x00000100</code></p>
+<p>marks file-resident segments and appears only in the N=4 <code>A=0x400000</code></p>
+<p>builds.</p>
+<p><strong>Prologue (48/48):</strong> <code>hlen</code> bytes of zero padding (absent → run of 0 in some</p>
+<p><code>A=0x400000</code>/<code>0x800000</code> builds), then <code>count_complement(N+1)</code>, <code>1</code>, a small</p>
+<p>word, <code>38</code>, the 38-byte type name</p>
+<p><code>14ConcreteTensorIN5Tdefs10QuantUint8EE</code>, 2 pad bytes, then 9–11 u32 fields</p>
+<p>always including <code>0x00000411</code> and <code>1.0f</code>. The header sentinel counts <code>N</code>; the</p>
+<p>prologue sentinel counts <code>N+1</code>.</p>
+<p><strong>Records:</strong> delimited only by <code>0x1337BEEF</code>; no length field (verified by</p>
+<p>boundary-invariance under word mutation); lengths all multiples of 4; offsets</p>
+<p>all 4-aligned.</p>
+<h3>Pickle family</h3>
+<p>1 of 49. Standard HTP pickle: <code>0x7309F72B</code> at 0, header word count in word 1,</p>
+<p>tags <code>Id</code>/<code>Sz</code>/<code>Vr</code>/<code>Op</code>/<code>Zz</code> by the documented</p>
+<p><code>htp_header_locate_field()</code> grammar, then the same prologue/record/</p>
+<p>terminator machinery. The preamble between header and prologue is <code>[OPEN]</code>.</p>
+<h2>Per-file content summary (the six brief payloads)</h2>
+<table>
+<tr>
+<th>brief file</th>
+<th>bytes</th>
+<th>build-id</th>
+<th>N</th>
+<th>base</th>
+<th>records</th>
+<th>DB identity</th>
+</tr>
+<tr>
+<td><code>bm2n06.bin</code></td>
+<td>864,824</td>
+<td><code>4bd22b0</code></td>
+<td>2</td>
+<td>0x000b8900</td>
+<td>781</td>
+<td><code>bm2n06.bin</code></td>
+</tr>
+<tr>
+<td><code>bm2n08.bin</code></td>
+<td>3,091,896</td>
+<td><code>32da3bd</code></td>
+<td>3</td>
+<td>0x002d1a00</td>
+<td>1,227</td>
+<td><code>bm2n08.bin</code></td>
+</tr>
+<tr>
+<td><code>bm2n12.bin</code></td>
+<td>2,623,528</td>
+<td><code>2c855d1</code></td>
+<td>3</td>
+<td>0x00064d00</td>
+<td>17,241</td>
+<td><code>bm2n12.bin</code></td>
+</tr>
+<tr>
+<td><code>bm2n13_sm8350.bin</code></td>
+<td>1,082,824</td>
+<td><code>2c855d1</code></td>
+<td>3</td>
+<td>0x00081a00</td>
+<td>4,348</td>
+<td><strong><code>bm2n54.bin</code></strong></td>
+</tr>
+<tr>
+<td><code>bm2n14.bin</code></td>
+<td>103,168</td>
+<td><code>2a8527c</code></td>
+<td>2</td>
+<td>0x00001000</td>
+<td>885</td>
+<td><code>bm2n14.bin</code></td>
+</tr>
+<tr>
+<td><code>bm2n15.bin</code></td>
+<td>1,082,856</td>
+<td><code>5371806</code></td>
+<td>3</td>
+<td>0x00081a00</td>
+<td>4,348</td>
+<td><code>bm2n15.bin</code></td>
+</tr>
+</table>
+<p>All six pass the probe with zero structural violations.</p>
+<h2>Fleet-diff matrix (same-offset byte identity, %)</h2>
+<table>
+<tr>
+<th></th>
+<th>06</th>
+<th>08</th>
+<th>12</th>
+<th>13</th>
+<th>14</th>
+</tr>
+<tr>
+<td><strong>08</strong></td>
+<td>7.18</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>12</strong></td>
+<td>32.68</td>
+<td>17.25</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>13</strong></td>
+<td>32.83</td>
+<td>13.50</td>
+<td>41.77</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>14</strong></td>
+<td>4.64</td>
+<td>4.71</td>
+<td>40.42</td>
+<td>39.83</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>15</strong></td>
+<td>32.45</td>
+<td>13.72</td>
+<td>42.22</td>
+<td>47.25</td>
+<td>39.94</td>
+</tr>
+</table>
+<p>Low percentages mean the <em>data</em> differs, not that the structure differs. The</p>
+<p>per-region breakdown for the closest pair (bm2n13 vs bm2n15) is the important</p>
+<p>one:</p>
+<table>
+<tr>
+<th>region</th>
+<th>identical</th>
+<th>%</th>
+</tr>
+<tr>
+<td>header (68 B)</td>
+<td>60</td>
+<td>88.24</td>
+</tr>
+<tr>
+<td>body (530,876 B)</td>
+<td>285,310</td>
+<td>53.74</td>
+</tr>
+<tr>
+<td><strong>prologue (168 B)</strong></td>
+<td><strong>168</strong></td>
+<td><strong>100.00</strong></td>
+</tr>
+<tr>
+<td>records (~551 KB)</td>
+<td>226,081</td>
+<td>40.98</td>
+</tr>
+</table>
+<p><strong>The prologue is byte-identical across two unrelated builds.</strong> It is</p>
+<p>version-stable; the bodies and records are version-varying. For a</p>
+<p>reimplementation this means the prologue can be carried as a shared template.</p>
+<h2>Filename is not identity (F-75, confirmed at scale)</h2>
+<p>16 of the 65 DB filenames carry more than one md5, and single md5s span many</p>
+<p>filenames. Highlights:</p>
+<table>
+<tr>
+<th>md5</th>
+<th>bytes</th>
+<th>filenames</th>
+</tr>
+<tr>
+<td><code>bf635d9084b54633526f9ad8a84d299b</code></td>
+<td>1,106,944</td>
+<td>14 names incl. <code>bm2n13.bin</code>, <code>v_pong_bm2n54.bin</code></td>
+</tr>
+<tr>
+<td><code>2d267761f3291c9ca4a7850ab0ef1966</code></td>
+<td>1,082,824</td>
+<td>5 names incl. <code>v_pong_bm2n54.bin</code></td>
+</tr>
+<tr>
+<td><code>281755c08b98e757f00586d0052132b1</code></td>
+<td>1,339,032</td>
+<td>7 names incl. <code>bm2n14</code>/<code>bm2n15</code>/<code>bm2n16</code></td>
+</tr>
+<tr>
+<td><code>5c86c8fcc7451f51e11d38276253aac8</code></td>
+<td>2,623,528</td>
+<td>3 names incl. <code>bm2n12</code></td>
+</tr>
+<tr>
+<td><code>2ce8163cda60f33cbf2b50f03a3d0ea1</code></td>
+<td>1,082,856</td>
+<td>2 names incl. <code>bm2n15</code></td>
+</tr>
+</table>
+<p>Notably <code>281755c0…</code> serves three DB filename slots at once, and</p>
+<p><code>bm2n14.bin</code> in the DB has two entirely different payloads (103,168 B and</p>
+<p>1,339,032 B).</p>
+<p>The brief's <code>bm2n13_sm8350.bin</code> (<code>2d267761…</code>) is DB-canonical <strong><code>bm2n54.bin</code></strong>,</p>
+<p>not DB <code>bm2n13.bin</code> (<code>bf635d90…</code>). It is a genuine non-DB-identical variant,</p>
+<p>not a fetch failure, and it parses clean under the same layout — the variant</p>
+<p>differs in content, not structure.</p>
+<h2>Entropy shape</h2>
+<p>64 KiB-block entropy separates the files: bm2n06 has long near-zero stretches</p>
+<p>(0.35–0.4 bits/byte) consistent with large zeroed bodies and low records; bm2n08</p>
+<p>reaches 7.56 bits/byte in its body; bm2n12/13/15 sit around 3.5–4.0 mean.</p>
+<p>Nothing hits 8.0 uniformly, so these are structured data, not encrypted or</p>
+<p>compressed containers — consistent with the record stream being walkable.</p>
+<h2>What a reimplementation can and cannot do</h2>
+<p><strong>Can build now, zero proprietary bytes:</strong> family detection (including the</p>
+<p>documented pickle magic), the compact header and its five constants, the</p>
+<p>segment table with its full invariant set, the prologue grammar (and its</p>
+<p>byte-identical template), and the record/terminator framing.</p>
+<p><strong>Cannot yet:</strong> decode record payload semantics, the three <code>kind</code> values, the</p>
+<p>window field <code>A</code>, <code>0xBEEFF00D</code>'s origin, the prologue's 9–11 scalar fields,</p>
+<p>the pickle preamble, the sequence-number field's meaning, or anything at</p>
+<p>instruction level.</p>
+<p>See the analysis doc's §10 for the complete <code>[OPEN]</code> list, and</p>
+<p><code>implementations/adsp-fleet/README.md</code> for tool usage and the 86-test status.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -41,8 +41,9 @@ No header, no strings, no code — a dense float32 array:
 
 - 41,120 float32 values, **zero NaN/Inf**, range −185.35…+12.30,
   entropy 7.40 bits/byte, 0.5 % zero bytes.
-- **Exact structure: 160 records of 257 floats** (160 × 257 = 41,120),
-  followed by a 160-float tail table.
+- **Exact structure: 160 records of 257 floats** (160 × 257 = 41,120 — this
+  consumes the file exactly, with **zero remainder**; there is no trailing
+  table).
 - The 160 records **alternate two representations**:
   - 80 *linear-domain* records (every even record): floats ≈ 0…8.2 with a
     scale word first (f0 ≈ 1.07–1.10), mean |v| ≈ 1.3–2.3 — filter
@@ -53,16 +54,23 @@ No header, no strings, no code — a dense float32 array:
   - 80 directions × 2 (the record pairs) matches a binaural HRTF set
     (left/right ear per direction); 257 floats per record = 256-tap filter
     + 1 word (scale/delay). Exact direction list and tap semantics [OPEN].
-- The trailing 160 floats are all negative (−39.76…−103.67, mean −75.2)
-  — one dB level per record (per direction/ear), e.g. overall response
-  level. Semantics [OPEN].
+  - **Verified parity rule:** all 80 even-indexed records are entirely
+    non-negative and all 80 odd-indexed records are entirely non-positive,
+    with **zero mixed records** out of 160. Magnitude and phase are therefore
+    stored in separate records, not interleaved as complex pairs.
 
 Byte-range map:
 
 ```
-[0,        163840)   160 × 257-float records (80 linear, 80 dB, interleaved)
-[163840,   164480)   160-float dB level table
+[0,        164480)   160 × 257-float records (80 linear, 80 dB, interleaved)
 ```
+
+**Correction (2026-11-19):** an earlier revision of this section claimed a
+separate `[163840, 164480)` 160-float dB-level tail table. That is
+arithmetically impossible — `160 × 257 × 4 = 164,480` consumes the whole file
+with zero remainder — and on measurement the "tail" is simply the last 160
+floats (columns 97–256) of record 159. The map above is the correct one; the
+tail claim is withdrawn.
 
 **Classification: data tables (100 %).** No code, no strings, no framing —
 there is nothing here to reverse except the measurement data itself.

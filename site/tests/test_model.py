@@ -77,8 +77,8 @@ class FamiliesTest(unittest.TestCase):
 
 
 class DocumentsTest(unittest.TestCase):
-    def test_118_documents(self):
-        self.assertEqual(len(model.build_documents(REPO)), 118)
+    def test_141_documents(self):
+        self.assertEqual(len(model.build_documents(REPO)), 141)
 
     def test_title_from_h1(self):
         docs = {d["path"]: d for d in model.build_documents(REPO)}

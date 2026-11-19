@@ -1,0 +1,10 @@
+# Synthetic fixtures only — no vendor payload may ever land here.
+#
+# The repo root .gitignore excludes *.bin but not *.fw, and this family ships
+# as .fw. That root file is outside this work's write scope, so the exclusion
+# is made local instead: nothing under this directory is tracked.
+#
+# Regenerate at any time with:
+#     python3 -I make_fixture.py
+*
+!.gitignore

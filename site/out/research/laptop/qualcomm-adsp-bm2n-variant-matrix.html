@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualcomm ADSP `bm2nXX.bin` — variant matrix (measured) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Qualcomm ADSP `bm2nXX.bin` — variant matrix (measured)</h1><p>Evidence class: **MEASURED PAYLOADS**. Every md5 in Table 2 was computed locally over bytes fetched</p><p>Evidence: none</p>
+<h1>Qualcomm ADSP <code>bm2nXX.bin</code> — variant matrix (measured)</h1>
+<p>Evidence class: <strong>MEASURED PAYLOADS</strong>. Every md5 in Table 2 was computed locally over bytes fetched</p>
+<p>from a public repository on 2026-11-18; nothing in the matrix is copied from a manifest. Sizes in</p>
+<p>Table 2 are the sizes of the fetched files (and match the git tree entry sizes reported by the</p>
+<p>GitHub tree API for the same path/branch). Table 1's "DB" column is metadata from</p>
+<p><code>upstream-contribution/blob-database/coverage-matrix.csv</code> and is labelled as such. Payload bytes were</p>
+<p>kept outside the repo in <code>/tmp/astro_u/hunt/</code>; only this document is committed.</p>
+<h2>Table 1 — the six DB identities, and whether the DB-identical payload exists publicly</h2>
+<p><code>upstream-contribution/blob-database/coverage-matrix.csv</code> records these identities under</p>
+<p><code>vendor/lib/rfsa/adsp/</code>:</p>
+<table>
+<tr>
+<th>file</th>
+<th>DB bytes</th>
+<th>DB md5 (<code>md5_db</code>)</th>
+<th>DB devices</th>
+<th>DB-identical payload located publicly?</th>
+<th>source</th>
+</tr>
+<tr>
+<td>bm2n06.bin</td>
+<td>864,824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+<td>25</td>
+<td><strong>YES</strong></td>
+<td><code>TheMuppets/proprietary_vendor_oneplus@lineage-19.1</code> — <code>sm8350-common/proprietary/vendor/lib/rfsa/adsp/bm2n06.bin</code></td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>3,091,896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+<td>25</td>
+<td><strong>YES</strong></td>
+<td><code>TheMuppets/proprietary_vendor_oneplus@lineage-19.1</code> — same dir</td>
+</tr>
+<tr>
+<td>bm2n12.bin</td>
+<td>2,623,528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+<td>26</td>
+<td><strong>YES</strong></td>
+<td><code>TheMuppets/proprietary_vendor_oneplus@lineage-19.1</code> — same dir</td>
+</tr>
+<tr>
+<td>bm2n13.bin</td>
+<td>1,106,944</td>
+<td>bf635d9084b54633526f9ad8a84d299b</td>
+<td>25</td>
+<td><strong>YES (found this run)</strong></td>
+<td><code>TheMuppets/proprietary_vendor_motorola@lineage-19.1</code> — <code>sm7325-common/proprietary/vendor/lib/rfsa/adsp/bm2n13.bin</code></td>
+</tr>
+<tr>
+<td>bm2n14.bin</td>
+<td>103,168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+<td>26</td>
+<td><strong>YES</strong></td>
+<td><code>TheMuppets/proprietary_vendor_oneplus@lineage-19.1</code> — same dir</td>
+</tr>
+<tr>
+<td>bm2n15.bin</td>
+<td>1,082,856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+<td>26</td>
+<td><strong>YES</strong></td>
+<td><code>TheMuppets/proprietary_vendor_oneplus@lineage-19.1</code> — same dir</td>
+</tr>
+</table>
+<p>The OnePlus <code>sm8350-common</code> tree supplied five of the six but ships a <em>different</em> <code>bm2n13.bin</code></p>
+<p>(1,082,824 B / <code>2d267761f3291c9ca4a7850ab0ef1966</code>) — that is why one identity was missing.</p>
+<p>The DB-identical <code>bm2n13.bin</code> was found in the Motorola <code>sm7325-common</code> tree and independently</p>
+<p>confirmed in Sony, Nothing, Fairphone, OnePlus (<code>lineage-22.0+</code>) and ArrowOS trees.</p>
+<p>Verification of the recovered file:</p>
+<pre><code>
+size    1,106,944
+md5     bf635d9084b54633526f9ad8a84d299b   &lt;- equals md5_db
+sha256  90f4d8b0fe1b20f99d15b34f61dab558bec5e37b0ce72f94c16fa5e3eb8b9dc9
+</code></pre>
+<h2>Table 2 — full variant matrix (measured)</h2>
+<p>Every distinct <code>(filename, bytes, md5)</code> observed. "DB?" = whether that exact md5 appears in</p>
+<p><code>coverage-matrix.csv</code> for that filename. All fetches 2026-11-18.</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>DB?</th>
+<th>representative source (repo @ branch → path suffix)</th>
+</tr>
+<tr>
+<td>bm2n06.bin</td>
+<td>864,824</td>
+<td>9010bb1a7c08222a058aaef7edd938c6</td>
+<td>yes</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code> (<code>sm8350-common/…/rfsa/adsp/</code>); also <code>proprietary_vendor_motorola</code> @ <code>lineage-19.1</code> (<code>sm7325-common/…</code>), <code>_sony_sm8350-common</code> @ <code>lineage-20</code>..<code>24.0</code>, <code>_sony_sm6375-common</code> @ <code>24.0</code>, <code>_oneplus_sm6375-common</code> @ <code>24.0</code>, <code>TheMuppets/proprietary_vendor_oneplus_dre</code> @ <code>22.1</code></td>
+</tr>
+<tr>
+<td>bm2n06.bin</td>
+<td>836,968</td>
+<td>8f8a96f2647444582a68f50d6dace25a</td>
+<td>yes (Xiaomi/Nothing family)</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code> @ <code>lineage-22.2</code>; <code>_xiaomi_diting</code> @ <code>24.0</code>; <code>_motorola_sm8475-common</code> @ <code>lineage-20</code></td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>3,091,896</td>
+<td>1275a2d212e5bccce734d3055ff10156</td>
+<td>yes</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code>; <code>_motorola_sm7325-common</code> @ <code>20</code>..<code>24.0</code>; <code>_sony_sm8350-common</code> @ <code>20</code>..<code>24.0</code></td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>3,059,736</td>
+<td>44e31e18b0c9b35ca3522ba9d2b180fc</td>
+<td>yes (Mi 12S/12T Pro/Poco F5 class)</td>
+<td><code>TheMuppets/proprietary_vendor_motorola_sm8475-common</code> @ <code>lineage-20</code>; <code>_xiaomi_marble</code> @ <code>22.2</code>; <code>_xiaomi_diting</code> @ <code>24.0</code></td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>3,059,736</td>
+<td>d3e4f74372a9a418bdba3b5d34ac3515</td>
+<td>yes (Mi 12 / Mi 12 Pro)</td>
+<td><code>TheMuppets/proprietary_vendor_xiaomi_cupid</code> @ <code>lineage-22.2</code> — <strong>same size as the row above, different bytes</strong></td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>3,063,776</td>
+<td>aabcad457a39a05e7c336002562f607d</td>
+<td>yes (Phone 2)</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code> @ <code>lineage-22.2</code>..<code>23.2</code></td>
+</tr>
+<tr>
+<td>bm2n12.bin</td>
+<td>2,623,528</td>
+<td>5c86c8fcc7451f51e11d38276253aac8</td>
+<td>yes</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code>; <code>_motorola_sm7325-common</code> @ <code>24.0</code>; <code>_fairphone_FP5</code> @ <code>lineage-21</code>; <code>_nothing_Spacewar</code> @ <code>22.1</code>; <code>_sony_sm8350-common</code> @ <code>20</code>..<code>24.0</code></td>
+</tr>
+<tr>
+<td>bm2n12.bin</td>
+<td>1,638,360</td>
+<td>b92a2ba4418d76c2132242342789a5e4</td>
+<td>yes (SM8475 class)</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code> @ <code>22.2</code>; <code>_motorola_sm8475-common</code> @ <code>20</code>; <code>_xiaomi_mayfly</code> @ <code>22.2</code>; <code>_xiaomi_diting</code> @ <code>24.0</code></td>
+</tr>
+<tr>
+<td>bm2n12.bin</td>
+<td>2,359,272</td>
+<td>f87d78518cf940b7c79d0e02bd7369c4</td>
+<td>yes (Nord CE4 / <code>benz</code>)</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus_benz</code> @ <code>lineage-22.2</code>..<code>24.0</code></td>
+</tr>
+<tr>
+<td>bm2n13.bin</td>
+<td>1,106,944</td>
+<td><strong>bf635d9084b54633526f9ad8a84d299b</strong></td>
+<td><strong>yes</strong></td>
+<td><code>TheMuppets/proprietary_vendor_motorola</code> @ <code>lineage-19.1</code> (<code>sm7325-common/…</code>); confirmed in <code>_motorola_sm7325-common</code> @ <code>20</code>..<code>24.0</code>, <code>_motorola_sm6375-common</code> @ <code>22.2</code>..<code>24.0</code>, <code>_sony_sm8350-common</code> @ <code>20</code>..<code>24.0</code>, <code>_sony_sm6375-common</code> @ <code>24.0</code>, <code>_fairphone_FP5</code> @ <code>lineage-21</code>, <code>_nothing_Spacewar</code> @ <code>20</code>..<code>24.0</code>, <code>_oneplus_dre</code> @ <code>22.1</code>..<code>24.0</code>, <code>_oneplus_sm8350-common</code> @ <code>22.0</code>..<code>24.0</code>, <code>sony-sagamidev/vendor_sony_sm8350-common</code> @ <code>lineage-20</code>, <code>ArrowOS-Devices/android_vendor_motorola_sm7325-common</code> @ <code>arrow-13.1</code></td>
+</tr>
+<tr>
+<td>bm2n13.bin</td>
+<td>1,082,824</td>
+<td>2d267761f3291c9ca4a7850ab0ef1966</td>
+<td><strong>no</strong> (see note)</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code>; <code>_oneplus_sm8350-common</code> @ <code>lineage-20</code>,<code>21</code>; <code>bheatleyyy/vendor_oneplus_oneplus9rt</code> @ <code>topaz</code>; <code>Kscope-Devices/android_vendor_oneplus_sm8350-common</code> @ <code>sunflowerleaf</code>; <code>nattolecats/proprietary_vendor_xiaomi_veux</code> @ <code>lineage-21</code></td>
+</tr>
+<tr>
+<td>bm2n13.bin</td>
+<td>1,339,032</td>
+<td>ea1abfc1dcb0cfd5aab2055ccb5bb4a3</td>
+<td>yes (SM8475 class)</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code> @ <code>22.2</code>..<code>23.2</code>; <code>_motorola_sm8475-common</code> @ <code>20</code>..<code>23.2</code>; <code>_xiaomi_mayfly</code> @ <code>22.2</code>; <code>xiaomi_marble</code> @ <code>22.2</code></td>
+</tr>
+<tr>
+<td>bm2n14.bin</td>
+<td>103,168</td>
+<td>805176afaae27821520b79647fa5d498</td>
+<td>yes</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code>; <code>_motorola_sm7325-common</code> @ <code>20</code>..<code>24.0</code>; <code>_nothing_Spacewar</code> @ <code>22.1</code>; <code>_fairphone_FP5</code> @ <code>lineage-21</code>; <code>_sony_sm8350-common</code> @ <code>20</code>..<code>24.0</code></td>
+</tr>
+<tr>
+<td>bm2n14.bin</td>
+<td>1,339,032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+<td>yes (SM8475 class)</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code> @ <code>22.2</code>; <code>_motorola_sm8475-common</code> @ <code>20</code>; <code>_xiaomi_mayfly</code> @ <code>22.2</code></td>
+</tr>
+<tr>
+<td>bm2n15.bin</td>
+<td>1,082,856</td>
+<td>2ce8163cda60f33cbf2b50f03a3d0ea1</td>
+<td>yes</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code> @ <code>lineage-19.1</code>; <code>_motorola_sm6375-common</code> @ <code>24.0</code>; <code>_nothing_Spacewar</code> @ <code>22.1</code>; <code>_sony_sm8350-common</code> @ <code>20</code>..<code>24.0</code></td>
+</tr>
+<tr>
+<td>bm2n15.bin</td>
+<td>1,339,032</td>
+<td>281755c08b98e757f00586d0052132b1</td>
+<td>yes (SM8475 class)</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code> @ <code>22.2</code>; <code>_motorola_sm8475-common</code> @ <code>20</code>; <code>_xiaomi_diting</code> @ <code>24.0</code></td>
+</tr>
+<tr>
+<td><em>(cross-file)</em> bm2n54.bin</td>
+<td>1,082,824</td>
+<td>2d267761f3291c9ca4a7850ab0ef1966</td>
+<td>yes, but under a different filename</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code> @ <code>lineage-22.2</code> — byte-identical to the 1,082,824 B <code>bm2n13.bin</code> above</td>
+</tr>
+</table>
+<p>Notes on the "no" row: <code>2d267761f3291c9ca4a7850ab0ef1966</code> is <em>not</em> recorded against <code>bm2n13.bin</code> in</p>
+<p>the DB, but it <em>is</em> in the DB — as <code>bm2n54.bin</code> (1082824 B) on <code>nothing/Pong</code>. Measured directly</p>
+<p>against the Pong tree: identical bytes. So the OnePlus/SM8350 <code>bm2n13.bin</code> revision is a live blob</p>
+<p>in the same fleet, recorded upstream under a different name.</p>
+<p>Distinct measured byte-identities per filename:</p>
+<table>
+<tr>
+<th>file</th>
+<th>distinct md5 measured</th>
+<th>DB claims</th>
+</tr>
+<tr>
+<td>bm2n06.bin</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>bm2n08.bin</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>bm2n12.bin</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>bm2n13.bin</td>
+<td>3 (two of them DB-<code>bm2n13</code>, one re-used as <code>bm2n54</code>)</td>
+<td>2</td>
+</tr>
+<tr>
+<td>bm2n14.bin</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>bm2n15.bin</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</table>
+<p>15 distinct md5s total across the 16 measured rows (<code>281755c08b98e757f00586d0052132b1</code> is shared by</p>
+<p>the bm2n14 and bm2n15 SM8475 rows, and by bm2n16 on the same tree).</p>
+<h2>What this means</h2>
+<ul>
+<li><strong>Filename ≠ identity, again.</strong> <code>bm2n13.bin</code> has at least three public byte-identities</li>
+</ul>
+<p>  (1,106,944 / 1,082,824 / 1,339,032 bytes, three different md5s) under one name. Same shape as</p>
+<p>  F-75 for <code>crbtfw21.tlv</code>. Size alone is also unsafe: <code>bm2n08.bin</code> exists at 3,059,736 bytes with</p>
+<p>  <strong>two different md5s</strong> (<code>44e31e18…</code> on SM8475/Xiaomi 12S-class vs <code>d3e4f743…</code> on Xiaomi 12/12 Pro),</p>
+<p>  so even <code>(name, size)</code> is not a key. Only the md5 is.</p>
+<ul>
+<li><strong>Branch is a version axis, not just a build axis.</strong> <code>TheMuppets/proprietary_vendor_oneplus_sm8350-common</code></li>
+</ul>
+<p>  ships <code>bm2n13.bin</code> at 1,082,824 B on <code>lineage-20</code>/<code>21</code> and at 1,106,944 B from <code>lineage-22.0</code> onward —</p>
+<p>  the <em>same repo</em> moved to the other revision. Anyone who probes one branch of a tree and generalises</p>
+<p>  gets the wrong answer; this is exactly how the 1,082,824 variant got mistaken for "the" file.</p>
+<ul>
+<li><strong>For the "one RE pass informs N devices" argument:</strong> an md5 covers exactly the devices that carry</li>
+</ul>
+<p>  that md5 — no more. Here the DB's 25 <code>bf635d90…</code> rows are one binary and one RE pass genuinely serves</p>
+<p>  all 25 devices. A <em>filename</em> covers up to 32-34 devices but spans 2-4 distinct binaries, so a</p>
+<p>  filename-scoped claim would overstate coverage by 7-9 devices and, worse, attribute findings from one</p>
+<p>  binary to devices running a different one. Leverage should be quoted per-md5 (25 devices for</p>
+<p>  <code>bf635d90…</code>), with the filename as a <em>search</em> key only.</p>
+<ul>
+<li>The fleet is also not monolithic in count: <code>bm2n00</code>-<code>bm2n58</code> appear on the SM8475 trees while the</li>
+</ul>
+<p>  SM7325/SM8350/SM6375 trees carry only <code>bm2n06</code>/<code>08</code>/<code>12</code>-<code>15</code>. The six files in scope are a small</p>
+<p>  intersection of a much larger per-SoC set.</p>
+<h2>Mission 1 attempt log — finding the DB-identical bm2n13.bin</h2>
+<p>Objective: a public file named <code>bm2n13.bin</code>, 1,106,944 B, md5 <code>bf635d9084b54633526f9ad8a84d299b</code>.</p>
+<p>Method: <code>gh api repos/&lt;owner&gt;/&lt;repo&gt;/git/trees/&lt;branch&gt;?recursive=1</code> and filter paths matching</p>
+<p><code>bm2n</code>, using the DB size as the candidate filter; then raw-fetch via the contents API with retries.</p>
+<p>DB-derived target devices (from <code>coverage-matrix.csv</code>, column <code>device</code>): OnePlus 9 / 9 Pro / 9RT /</p>
+<p>Nord 200 / Nord CE2 / Nord CE3, Sony Xperia 5 III / 10 IV / 10 V, Motorola Edge 20 / Edge 2021 /</p>
+<p>Edge 30 / 30 Fusion / 30 Neo / G200 / G34 5G / G82 5G / G84 5G / G Stylus 5G / G 5G 2024 / G Stylus</p>
+<p>5G (2022) / Edge 30 Fusion, Realme 9 Pro / 10 Pro, Fairphone FP5, Nothing Phone (1).</p>
+<table>
+<tr>
+<th>#</th>
+<th>repo</th>
+<th>branch(es) probed</th>
+<th>result</th>
+</tr>
+<tr>
+<td>1</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code></td>
+<td><code>lineage-18.0</code>, <code>18.1</code>, <code>19.0</code></td>
+<td>no <code>bm2n*</code> at all (pre-SM8350 trees)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus</code></td>
+<td><code>lineage-19.1</code></td>
+<td><code>sm8350-common/…/bm2n13.bin</code> = 1,082,824 → md5 <code>2d267761…</code> <strong>mismatch</strong> (this is the known near-miss)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>TheMuppets/proprietary_vendor_sony</code></td>
+<td><code>lineage-18.0</code>, <code>18.1</code>, <code>19.0</code>, <code>19.1</code></td>
+<td>no <code>bm2n*</code> (monolithic repo only carries older devices; Xperia trees are in split <code>_sm8350-common</code>)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>TheMuppets/proprietary_vendor_motorola</code></td>
+<td><code>lineage-18.0</code>, <code>18.1</code>, <code>19.0</code></td>
+<td>no <code>bm2n*</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>TheMuppets/proprietary_vendor_motorola</code></td>
+<td><code>lineage-19.1</code></td>
+<td><code>sm7325-common/…/bm2n13.bin</code> = <strong>1,106,944</strong> → md5 <code>bf635d9084b54633526f9ad8a84d299b</code> <strong>MATCH</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>TheMuppets/proprietary_vendor_fairphone</code></td>
+<td><code>lineage-18.1</code>, <code>19.1</code></td>
+<td>no <code>bm2n*</code> (FP2/FP3/FP4 only; FP5 is a split repo)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>TheMuppets/proprietary_vendor_realme</code></td>
+<td><code>lineage-17.1</code></td>
+<td>no <code>bm2n*</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>TheMuppets/proprietary_vendor_motorola_sm7325-common</code></td>
+<td><code>lineage-20</code>,<code>21</code>,<code>22.0</code>,<code>22.1</code>,<code>22.2</code>,<code>23.0</code>,<code>23.1</code>,<code>23.2</code>,<code>24.0</code></td>
+<td>1,106,944 on every branch; fetched <code>20</code> and <code>24.0</code> → <code>bf635d90…</code> confirm</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>TheMuppets/proprietary_vendor_motorola_sm6375-common</code></td>
+<td><code>lineage-22.2</code>,<code>23.0</code>,<code>23.1</code>,<code>23.2</code>,<code>24.0</code> (<code>22.1</code> tree 404)</td>
+<td>1,106,944; fetched <code>22.2</code> and <code>24.0</code> → <code>bf635d90…</code> confirm</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>TheMuppets/proprietary_vendor_sony_sm8350-common</code></td>
+<td><code>lin-20</code>..<code>24.0</code></td>
+<td>1,106,944; fetched <code>20</code> and <code>24.0</code> → <code>bf635d90…</code> confirm</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>TheMuppets/proprietary_vendor_sony_sm6375-common</code></td>
+<td><code>lineage-24.0</code></td>
+<td>1,106,944; fetched → <code>bf635d90…</code> confirm</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus_sm8350-common</code></td>
+<td><code>20</code>,<code>21</code>,<code>22.0</code>..<code>24.0</code></td>
+<td><strong>1082824 on 20/21, 1106944 from 22.0</strong>; fetched <code>21</code>,<code>22.0</code> → both variants measured</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Spacewar</code></td>
+<td><code>20</code>,<code>22.1</code>,<code>22.2</code>,<code>23.0</code>,<code>23.2</code>,<code>24.0</code></td>
+<td>1,106,944; fetched <code>20</code>,<code>22.1</code>,<code>23.2</code> → <code>bf635d90…</code> confirm</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>TheMuppets/proprietary_vendor_nothing_Pong</code></td>
+<td><code>22.2</code>,<code>23.0</code>..<code>23.2</code></td>
+<td>1,339,032 (different generation); fetched <code>22.2</code>,<code>23.2</code> → <code>ea1abfc…</code> (DB <code>bm2n13</code> yes, but not the 1.1 MB identity)</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus_dre</code></td>
+<td><code>22.1</code>..<code>24.0</code></td>
+<td>1,106,944; fetched <code>22.1</code> → <code>bf635d90…</code> confirm</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>TheMuppets/proprietary_vendor_fairphone_FP5</code></td>
+<td><code>21</code>,<code>22.0</code></td>
+<td>1,106,944; fetched <code>21</code> → <code>bf635d90…</code> confirm</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>sony-sagamidev/vendor_sony_sm8350-common</code></td>
+<td><code>lineage-20</code></td>
+<td>1,106,944; fetched → <code>bf635d90…</code> confirm (independent org)</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>ArrowOS-Devices/android_vendor_motorola_sm7325-common</code></td>
+<td><code>arrow-13.1</code></td>
+<td>1,106,944; fetched → <code>bf635d90…</code> confirm (independent org)</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>schqiushui/android_vendor_motorola_sm8350-common</code></td>
+<td><code>fourteen</code></td>
+<td>1,106,944 (tree; not fetched — match already established)</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>moto-corfur/vendor_motorola_corfur</code>, <code>random-stuffimpasta/vendor_motorola_sm6375-common</code></td>
+<td><code>lineage-20</code>, <code>YAAP</code></td>
+<td>1,106,944 (tree entries only)</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus_benz</code></td>
+<td><code>22.2</code>..<code>24.0</code></td>
+<td>no <code>bm2n13</code>; only <code>bm2n12</code> at 2,359,272</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>TheMuppets/proprietary_vendor_realme_luigi</code>, <code>_realme_oscar</code>, <code>_realme_oscarru</code></td>
+<td><code>21</code>..<code>24.0</code></td>
+<td>no <code>rfsa/adsp/bm2n*</code> in tree</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus_larry</code>, <code>_xiaomi_diting</code>, <code>_motorola_denver</code>, <code>_milanf</code>, <code>_tundra</code></td>
+<td>default (<code>24.0</code>)</td>
+<td><code>diting</code> has the SM8475 set; others no <code>bm2n*</code></td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>TheMuppets/proprietary_vendor_xiaomi_*</code> (<code>mayfly</code>,<code>marble</code>,<code>cupid</code>,<code>unicorn</code>,<code>zeus</code>), <code>_xiaomi_sm8250-common</code>, <code>_xiaomi_sm8450-common</code>, <code>_xiaomi_sm8550-common</code></td>
+<td><code>20</code>..<code>24.0</code>, <code>main</code></td>
+<td>SM8475 set on mayfly/marble/diting/cupid; <code>sm8250</code>/<code>sm8450</code> trees have no <code>bm2n*</code>; <code>sm8550-common</code> empty; <code>TheMuppets/proprietary_vendor_xiaomi</code> itself is HTTP 451 (DMCA)</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>TheMuppets/proprietary_vendor_oneplus_sm8250-common</code>, <code>_oneplus_sm8450-common</code>, <code>_oneplus_sm8550-common</code>, <code>_sm8650</code>, <code>_sm8750</code>, <code>_sony_sm8250-common</code>, <code>_sony_sm8550-common</code>, <code>_asus</code>, <code>_google*</code>, <code>_samsung*</code></td>
+<td>all listed branches</td>
+<td>no <code>bm2n*</code> in tree paths (empty or file-less repos; <code>sm8650</code> repo 404; <code>sm8450</code> repo is empty, 409)</td>
+</tr>
+<tr>
+<td>26</td>
+<td><code>xiaomi-sm8250-devs/proprietary_vendor_xiaomi_sm8250-common</code>, <code>crdroidandroid/proprietary_vendor_xiaomi_sm8250-common</code>, <code>PocoF3Releases/vendor_xiaomi_sm8250-common</code>, <code>ProjectElixir-Devices/vendor_xiaomi_sm8450-common</code>, <code>Evolution-X-Devices/vendor_xiaomi_sm8450-common</code></td>
+<td>default</td>
+<td>no <code>bm2n*</code></td>
+</tr>
+<tr>
+<td>27</td>
+<td><code>bheatleyyy/vendor_oneplus_oneplus9rt</code></td>
+<td><code>topaz</code></td>
+<td>1,082,824 → <code>2d267761…</code> (the other revision, from a third-party org)</td>
+</tr>
+<tr>
+<td>28</td>
+<td><code>Kscope-Devices/android_vendor_oneplus_sm8350-common</code></td>
+<td><code>sunflowerleaf</code></td>
+<td>1,082,824 → <code>2d267761…</code></td>
+</tr>
+<tr>
+<td>29</td>
+<td><code>nattolecats/proprietary_vendor_xiaomi_veux</code></td>
+<td><code>lineage-21</code></td>
+<td>1,082,824 → <code>2d267761…</code> (cross-vendor reuse of the same revision)</td>
+</tr>
+<tr>
+<td>30</td>
+<td><code>TheMuppets/proprietary_vendor_xiaomi_cupid</code></td>
+<td><code>22.2</code></td>
+<td><code>bm2n00</code>-<code>11</code> only; <code>bm2n12</code>-<code>15</code> absent (contents API 404 on those paths)</td>
+</tr>
+<tr>
+<td>31</td>
+<td><code>Paranoid-Xperia/vendor_sony_pdx225</code></td>
+<td><code>main</code></td>
+<td>tree request failed: <code>read: connection reset by peer</code> (retried once, same). Not needed — match already established.</td>
+</tr>
+<tr>
+<td>32</td>
+<td><code>DonkeyCoyote/proprietary_vendor_{motorola,sony,asus}</code>, <code>travarilo/proprietary_vendor_asus</code>, <code>Vendor-Blobs/android_vendor_tree_asus_AI2201</code>, <code>Evolution-X-Devices/vendor_oneplus_benz</code>, <code>Project-Benz/vendor_oneplus_benz</code></td>
+<td>default</td>
+<td>no <code>bm2n*</code> paths</td>
+</tr>
+</table>
+<p>Cross-check search: GitHub code search <code>"bm2n13.bin"</code> returns 909 hits, essentially all</p>
+<p><code>proprietary-files.txt</code> / <code>*-vendor.mk</code> <em>manifests</em>, not payloads — confirming the blob only lands in</p>
+<p>the vendor trees above. <code>filename:bm2n13.bin</code> (path search) returns 0.</p>
+<p>Failures, honestly:</p>
+<ul>
+<li><code>gh api</code> contents fetches were rate-limited/flaky on large files. <code>TheMuppets/proprietary_vendor_sony_sm8350-common@lineage-20</code></li>
+</ul>
+<p>  <code>bm2n06.bin</code> returned <strong>0 bytes</strong> and <code>bm2n08.bin</code> <strong>138,675 bytes</strong> (truncated) before timeouts; both</p>
+<p>  were discarded as unusable and are not in the matrix. Retry + <code>timeout</code> wrapper was needed</p>
+<p>  throughout; every md5 in Table 2 comes from a fetch whose byte count matched the tree-reported size.</p>
+<ul>
+<li>Direct <code>raw.githubusercontent.com</code> fetches stalled from this network; <code>gh api -H "Accept: application/vnd.github.raw"</code></li>
+</ul>
+<p>  against the contents endpoint was reliable and is what the reproduce section uses.</p>
+<ul>
+<li><code>TheMuppets/proprietary_vendor_xiaomi</code> → HTTP 451 (DMCA takedown, 2019). Xiaomi blobs had to be</li>
+</ul>
+<p>  reached through split <code>proprietary_vendor_xiaomi_&lt;device&gt;</code> repos instead.</p>
+<ul>
+<li><code>TheMuppets/proprietary_vendor_motorola_sm6375-common@lineage-22.1</code> tree → 404 (branch exists, tree</li>
+</ul>
+<p>  object missing); branch skipped.</p>
+<p>Outcome: <strong>FOUND.</strong> The DB-identical <code>bm2n13.bin</code> is not in the OnePlus tree that supplied the other</p>
+<p>five; it is in the Motorola <code>sm7325-common</code> tree (<code>lineage-19.1</code> through <code>lineage-24.0</code>), and</p>
+<p>independently in Sony SM8350/SM6375, Nothing Spacewar, Fairphone FP5, OnePlus <code>dre</code> and</p>
+<p><code>sm8350-common@22.0+</code>, plus two non-Muppets orgs.</p>
+<h2>Reproduce</h2>
+<p>Prerequisites: <code>gh</code> authenticated (<code>gh auth status</code>), <code>python3</code>, <code>md5sum</code>, <code>curl</code>. Nothing is cloned;</p>
+<p>all work goes through the GitHub tree/contents API. Work dir: <code>/tmp/astro_u/hunt/</code>.</p>
+<pre><code class="language-bash">
+mkdir -p /tmp/astro_u/hunt &amp;&amp; cd /tmp/astro_u/hunt
+
+# 1. DB target list and the identity we are hunting
+grep -i "bm2n13" upstream-contribution/blob-database/coverage-matrix.csv \
+  | awk -F, '{print $1"|"$2"|"$7"|"$8}' | sort | uniq -c
+
+# 2. Enumerate branches of a candidate vendor repo
+gh api "repos/TheMuppets/proprietary_vendor_motorola/branches?per_page=100" --jq '.[].name'
+
+# 3. Tree search without cloning — size is the candidate filter
+gh api "repos/TheMuppets/proprietary_vendor_motorola/git/trees/lineage-19.1?recursive=1" \
+  --jq '.tree[]|select(.path|test("bm2n"))|"\(.path)|\(.size)"'
+
+# 4. Fetch a candidate with retries (contents API; raw.githubusercontent was flaky here)
+cat &gt; get.sh &lt;&lt;'EOS'
+#!/bin/bash
+repo="$1"; br="$2"; p="$3"; out="$4"
+for i in 1 2 3 4; do
+  gh api -H "Accept: application/vnd.github.raw" "repos/$repo/contents/$p?ref=$br" &gt; "$out" 2&gt;/dev/null
+  rc=$?; sz=$(stat -c%s "$out" 2&gt;/dev/null || echo 0)
+  if [ $rc -eq 0 ] &amp;&amp; [ "$sz" -gt 500 ]; then break; fi
+  sleep $((i*2))
+done
+echo "OK|$repo|$br|$p|$sz|$(md5sum "$out"|cut -d' ' -f1)"
+EOS
+chmod +x get.sh
+
+# 5. The file that satisfies the DB identity
+P=sm7325-common/proprietary/vendor/lib/rfsa/adsp
+./get.sh TheMuppets/proprietary_vendor_motorola lineage-19.1 "$P/bm2n13.bin" bm2n13.bin
+# OK|TheMuppets/proprietary_vendor_motorola|lineage-19.1|.../bm2n13.bin|1106944|bf635d9084b54633526f9ad8a84d299b
+
+# 6. Verify against the DB row
+md5sum bm2n13.bin            # bf635d9084b54633526f9ad8a84d299b
+sha256sum bm2n13.bin         # 90f4d8b0fe1b20f99d15b34f61dab558bec5e37b0ce72f94c16fa5e3eb8b9dc9
+stat -c%s bm2n13.bin         # 1106944
+
+# 7. The near-miss revision, for contrast (same filename, different bytes)
+./get.sh TheMuppets/proprietary_vendor_oneplus_sm8350-common lineage-21 \
+  proprietary/vendor/lib/rfsa/adsp/bm2n13.bin bm2n13_sm8350.bin
+# 1082824 | 2d267761f3291c9ca4a7850ab0ef1966
+
+# 8. Branch-as-version-axis check on one repo
+for b in lineage-20 lineage-21 lineage-22.0 lineage-22.1 lineage-24.0; do
+  printf "%s " "$b"
+  gh api "repos/TheMuppets/proprietary_vendor_oneplus_sm8350-common/git/trees/$b?recursive=1" \
+    --jq '.tree[]|select(.path|test("bm2n13"))|.size'
+done
+
+# 9. Sweep the SM8475 generation (Pong / sm8475-common / mayfly / diting)
+./get.sh TheMuppets/proprietary_vendor_nothing_Pong lineage-22.2 \
+  proprietary/vendor/lib/rfsa/adsp/bm2n13.bin v_pong_bm2n13.bin     # 1339032 | ea1abfc1…
+
+# 10. Cross-filename identity: Pong bm2n54.bin is the OnePlus bm2n13.bin revision
+./get.sh TheMuppets/proprietary_vendor_nothing_Pong lineage-22.2 \
+  proprietary/vendor/lib/rfsa/adsp/bm2n54.bin v_pong_bm2n54.bin     # 1082824 | 2d267761…
+</code></pre>
+<p>Fetch URLs (raw form, for citation):</p>
+<pre><code>
+https://github.com/TheMuppets/proprietary_vendor_motorola/raw/lineage-19.1/sm7325-common/proprietary/vendor/lib/rfsa/adsp/bm2n13.bin
+https://github.com/TheMuppets/proprietary_vendor_sony_sm8350-common/raw/lineage-20/proprietary/vendor/lib/rfsa/adsp/bm2n13.bin
+https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8350-common/raw/lineage-21/proprietary/vendor/lib/rfsa/adsp/bm2n13.bin   (the 1,082,824 variant)
+https://github.com/TheMuppets/proprietary_vendor_nothing_Pong/raw/lineage-22.2/proprietary/vendor/lib/rfsa/adsp/bm2n13.bin      (the 1,339,032 variant)
+</code></pre>
+<p>Local payload store (not committed): <code>/tmp/astro_u/hunt/</code> — 56 files, ~70 MB, one file per fetched</p>
+<p><code>(repo, branch, path)</code>; the canonical recovered blob is <code>/tmp/astro_u/hunt/bm2n13.bin</code>.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

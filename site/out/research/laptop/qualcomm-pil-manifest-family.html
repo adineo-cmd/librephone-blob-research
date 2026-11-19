@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualcomm PIL / PDR manifest family (`*.jsn`) — laptop half — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Qualcomm PIL / PDR manifest family (`*.jsn`) — laptop half</h1><p>The `*.jsn` files are the **most widely shared small blobs** in the laptop</p><p>Evidence: none</p>
+<h1>Qualcomm PIL / PDR manifest family (<code>*.jsn</code>) — laptop half</h1>
+<p>The <code>*.jsn</code> files are the <strong>most widely shared small blobs</strong> in the laptop</p>
+<p>half: one md5 covers <strong>17 devices</strong> for five different filenames. They are</p>
+<p>tiny (403-905 B) text manifests, and until 2026-11-18 the programme</p>
+<p>believed they were split-MDT image manifests. <strong>They are not.</strong></p>
+<ul>
+<li><strong>What they are:</strong> JSON <strong>PDR service-registry manifests</strong> — a lookup</li>
+</ul>
+<p>  table mapping a QMI <em>service</em> (<code>provider/service</code>, e.g. <code>tms/servreg</code>,</p>
+<p>  <code>avs/audio</code>, <code>wlan/fw</code>) to the <em>protection domain</em> that hosts it</p>
+<p>  (<code>soc/domain/subdomain</code> + a QMI instance id).</p>
+<ul>
+<li><strong>Who reads them:</strong> userspace <strong><code>pd-mapper</code></strong> (<code>linux-msm/pd-mapper</code>,</li>
+</ul>
+<p>  BSD-3-Clause). It finds them by <strong>directory adjacency</strong> to a remoteproc's</p>
+<p>  firmware path — any <code>.jsn</code> in <code>/vendor/firmware</code> is loaded, and the</p>
+<p>  <em>contents</em> decide the domain. The filename is a human convenience.</p>
+<ul>
+<li><strong>Mainline does NOT read them.</strong> <code>torvalds/linux</code> ships the identical</li>
+</ul>
+<p>  table compiled in as C (<code>drivers/soc/qcom/qcom_pd_mapper.c</code>). `grep -c -i</p>
+<p>  jsn<code> is **0** in both </code>mdt_loader.c<code> and </code>qcom_q6v5_pas.c`.</p>
+<p>Full analysis, citations, byte-level proofs and the [OPEN] list:</p>
+<p><strong><a href="research/implementations/pil-manifests/jsn-manifest-analysis.html"><code>implementations/pil-manifests/jsn-manifest-analysis.md</code></a></strong>.</p>
+<p>Parser, fixtures and tests:</p>
+<p><strong><a href="research/implementations/pil-manifests/README.html"><code>implementations/pil-manifests/</code></a></strong>.</p>
+<h2>Family table (fleet md5s from <code>sharing-clusters.csv</code>)</h2>
+<p>Every row below was fetched and <strong>md5-verified byte-exact</strong> from public</p>
+<p>repositories (7/7 of the 17-device set from a single Xiaomi <code>marble/</code></p>
+<p>firmware dir; the older generation from <code>hotdog</code>, <code>Lakka-LibreELEC</code>,</p>
+<p><code>armbian/firmware</code>). All of them are also published by <strong>linux-firmware</strong></p>
+<p>(<code>WHENCE</code>, 114 <code>*.jsn</code> entries) — already-redistributable firmware.</p>
+<table>
+<tr>
+<th>md5 (short)</th>
+<th>file</th>
+<th>bytes</th>
+<th>devices</th>
+<th>declared domain (instance)</th>
+</tr>
+<tr>
+<td><code>5d262bb7…</code></td>
+<td><code>adspr.jsn</code></td>
+<td>513</td>
+<td><strong>17</strong></td>
+<td><code>msm/adsp/root_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>a43d66d0…</code></td>
+<td><code>adspua.jsn</code></td>
+<td>703</td>
+<td><strong>17</strong></td>
+<td><code>msm/adsp/audio_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>49003ffc…</code></td>
+<td><code>cdspr.jsn</code></td>
+<td>513</td>
+<td><strong>17</strong></td>
+<td><code>msm/cdsp/root_pd</code> (76)</td>
+</tr>
+<tr>
+<td><code>0d755b18…</code></td>
+<td><code>battmgr.jsn</code></td>
+<td>516</td>
+<td><strong>17</strong></td>
+<td><code>msm/adsp/charger_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>72b46949…</code></td>
+<td><code>modemr.jsn</code></td>
+<td>710</td>
+<td>15</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>8167cdcc…</code></td>
+<td><code>slpir.jsn</code></td>
+<td>513</td>
+<td>11</td>
+<td><code>msm/slpi/root_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>de25e460…</code></td>
+<td><code>slpius.jsn</code></td>
+<td>515</td>
+<td>11</td>
+<td><code>msm/slpi/sensor_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>40d6edf1…</code></td>
+<td><code>adspr.jsn</code></td>
+<td>403</td>
+<td>6</td>
+<td><code>msm/adsp/root_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>cddb3285…</code></td>
+<td><code>adsps.jsn</code></td>
+<td>515</td>
+<td>6</td>
+<td><code>msm/adsp/sensor_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>f2bd80d5…</code></td>
+<td><code>cdspr.jsn</code></td>
+<td>403</td>
+<td>6</td>
+<td><code>msm/cdsp/root_pd</code> (76)</td>
+</tr>
+<tr>
+<td><code>d0bd5030…</code></td>
+<td><code>adspua.jsn</code></td>
+<td>555</td>
+<td>6</td>
+<td><code>msm/adsp/audio_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>bad87cce…</code></td>
+<td><code>modemuw.jsn</code></td>
+<td>713</td>
+<td>4</td>
+<td><code>msm/modem/wlan_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>0492fd46…</code></td>
+<td><code>modemr.jsn</code></td>
+<td>719</td>
+<td>3</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>c7253d84…</code></td>
+<td><code>adsps.jsn</code></td>
+<td>405</td>
+<td>3</td>
+<td><code>msm/adsp/sensor_pd</code> (74)</td>
+</tr>
+<tr>
+<td><code>0039483e…</code></td>
+<td><code>slpius.jsn</code></td>
+<td>405</td>
+<td>3</td>
+<td><code>msm/slpi/sensor_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>2439d687…</code></td>
+<td><code>slpir.jsn</code></td>
+<td>403</td>
+<td>3</td>
+<td><code>msm/slpi/root_pd</code> (90)</td>
+</tr>
+<tr>
+<td><code>17b87853…</code></td>
+<td><code>modemr.jsn</code></td>
+<td>562</td>
+<td>2</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>6acb8c83…</code></td>
+<td><code>modemr.jsn</code></td>
+<td>719</td>
+<td>1</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+<tr>
+<td><code>1a4a6904…</code></td>
+<td><code>wlanpdr.jsn</code></td>
+<td>405</td>
+<td>2</td>
+<td><code>msm/modem/root_pd</code> (180)</td>
+</tr>
+</table>
+<p>The 17-device set: caihong, cupid, diting, erhai, fuxi, lemonade,</p>
+<p>lemonadep, marble, martini, mayfly, mondrian, nuwa, socrates, thor,</p>
+<p>unicorn, vermeer, zeus — Xiaomi + OnePlus on SM8250/SM8350/SM8450/SM8550.</p>
+<h2>Three findings that change how the fleet is read</h2>
+<ol>
+<li><strong>The two-size <code>adspr.jsn</code> (403 vs 513) is cosmetic.</strong> The delta is</li>
+</ol>
+<p>   exactly one optional <code>dcomment</code> string field (110 B: <code>,</code> + newline + 12</p>
+<p>   spaces + <code>"dcomment": "</code> + 82 + <code>"</code>). After dropping <code>dcomment</code> the two</p>
+<p>   JSON documents are <strong>equal</strong>. The same holds for <code>adsps</code> (405/515),</p>
+<p>   <code>adspua</code> (555/703), <code>cdspr</code> (403/513), <code>slpir</code> (403/513), <code>slpius</code></p>
+<p>   (405/515). Other off-by-one sizes are a trailing newline (514 vs 513) or</p>
+<p>   CRLF (534 vs 513) from third-party redistributors.</p>
+<ol>
+<li><strong>The <code>r</code>/<code>s</code>/<code>ua</code>/<code>uw</code> suffixes name the protection domain</strong>, not a</li>
+</ol>
+<p>   security variant. <code>&lt;subsystem&gt;&lt;optional u&gt;&lt;role letter&gt;</code>: <code>r</code>=root,</p>
+<p>   <code>s</code>=sensor, <code>a</code>=audio, <code>o</code>=ois, <code>w</code>=wlan. Verified against</p>
+<p>   <code>qcom_pd_mapper.c</code> across 71 files with <strong>zero contradictions</strong>. A <code>.jsn</code></p>
+<p>   has no signature, hash or security field at all.</p>
+<ol>
+<li><strong>Mainline replaced the file with C.</strong> <code>qcom_pd_mapper.c</code> hardcodes 19</li>
+</ol>
+<p>   <code>(domain, instance, services)</code> tuples; the 12 distinct tuples found in 71</p>
+<p>   real manifests are a strict <strong>subset</strong> of those 19. For sm8250, sc8280xp</p>
+<p>   and qcm2290 the set of shipped <code>.jsn</code> files matches the kernel's per-SoC</p>
+<p>   domain list <strong>exactly</strong>.</p>
+<h2>Database corrections</h2>
+<p><code>coverage-matrix.csv</code> mislabels this whole family (<code>jsn-manifest-analysis.md</code></p>
+<p>§7). <code>adspr/adsps/adspua</code> are typed <code>MODEM</code> (wrong — they describe the ADSP);</p>
+<p><code>battmgr.jsn</code> sits in family <code>modem</code> but declares <code>msm/adsp/charger_pd</code> (it</p>
+<p>is <strong>adsp</strong>); <code>slpir/slpius</code> are family <code>other</code> but SLPI is a first-class</p>
+<p>remoteproc (should be <strong>slpi</strong>); <code>wlanpdr.jsn</code> is family <code>wifi</code> but declares</p>
+<p><code>msm/modem/root_pd</code> (it is <strong>modem</strong>). Recommended <code>db_type</code> for the family:</p>
+<p><strong><code>PDR-MANIFEST</code></strong>, not <code>UNKNOWN</code>/<code>MODEM</code>.</p>
+<h2>Why it matters (and how much)</h2>
+<p>One md5 covers 17 devices, so a single parse frees five-and-a-bit files</p>
+<p>across the flagship set at once — and because the table is *in the GPL</p>
+<p>kernel source*, a free implementation can generate a correct manifest for</p>
+<p>any declared SoC without a vendor artifact.</p>
+<p>Be honest about the size of the win: a <code>.jsn</code> launches nothing, patches</p>
+<p>nothing, contains no code. It is a <strong>directory service</strong> for a userspace</p>
+<p>daemon. And a mainline-based system does not need it at all, because the</p>
+<p>kernel already has the table. The real blob problem on these devices stays</p>
+<p>where it was — the DSP/modem images (<code>adsp.mdt</code> + <code>adsp.bNN</code>, ~18 MB for</p>
+<p><code>elish</code>'s <code>adsp.mbn</code>) that the manifest merely points at.</p>
+<h2>Cross-links</h2>
+<ul>
+<li><code>blob-matrix/laptop/sharing-clusters.csv</code> — source of the md5/device rows</li>
+<li><code>blob-matrix/laptop/fragmentation-half.md</code> — the manifest clusters filtered</li>
+</ul>
+<p>  out of the top-15; this doc explains them</p>
+<ul>
+<li><code>upstream-contribution/blob-database/recon.md</code> — noted <code>adspr.jsn</code> ×30</li>
+</ul>
+<p>  "dominates the raw top-by-count"; now explained</p>
+<ul>
+<li><code>blob-matrix/desktop/fleet-re/oneplus6-partition-map.md</code> — spotted that</li>
+</ul>
+<p>  <code>image_adspr.jsn</code> equals the fleet blob; this doc identifies what it is</p>
+<ul>
+<li><code>implementations/pil-manifests/</code> — the parser, fixtures, tests and analysis</li>
+</ul>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>implementations/adreno-fleet — clean-room Adreno GMU microcode probe — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>implementations/adreno-fleet — clean-room Adreno GMU microcode probe</h1><p>A structural probe for Qualcomm Adreno **GMU** (GPU Management Unit) microcode</p><p>Evidence: none</p>
+<h1>implementations/adreno-fleet — clean-room Adreno GMU microcode probe</h1>
+<p>A structural probe for Qualcomm Adreno <strong>GMU</strong> (GPU Management Unit) microcode</p>
+<p>images — the <code>*_gmu.bin</code> files shipped in <code>vendor/firmware/</code> on every Adreno</p>
+<p>device. The component's fleet scope is the top-20 leverage blob</p>
+<p><code>a619_gmu.bin</code> (recon.md row 10): **26 DB rows share the bytes; 13 devices</p>
+<p>actually load them** (the distinction is a finding — see §"Fleet scope").</p>
+<p>The probe answers the question the metadata matrix could not: *what is actually</p>
+<p>inside the 32 KB* — and it answers a second, sharper one first, because the</p>
+<p>answer changes everything downstream: **does mainline's documented firmware</p>
+<p>header apply to this file at all?**</p>
+<p>It does not. <code>a619_gmu.bin</code> carries <strong>no container header of any kind</strong>. It is</p>
+<p>a flat ARMv7-M memory image — ITCM in the first half, DTCM in the second — and</p>
+<p>its first word is not a magic, a size or a version, but the **initial stack</p>
+<p>pointer**. The driver that loads it never parses it (<code>a6xx_gmu.c:894-904</code>).</p>
+<p><strong>Ground truth (fetched 2026-11-18 from torvalds/linux master + linux-firmware):</strong></p>
+<table>
+<tr>
+<th>what</th>
+<th>where</th>
+<th>what it settles</th>
+</tr>
+<tr>
+<td><code>struct block_header</code> (<code>addr,size,type,value,data[]</code>)</td>
+<td><code>a6xx_gmu.c:857-863</code></td>
+<td>the only firmware <em>container</em> struct mainline has</td>
+</tr>
+<tr>
+<td>non-legacy load path (walk the block chain)</td>
+<td><code>a6xx_gmu.c:906-930</code></td>
+<td>how a640/a650/a660/a623/a663 are loaded</td>
+</tr>
+<tr>
+<td><code>gmu-&gt;legacy</code> raw path (bulk-write whole file, cap 0x8000)</td>
+<td><code>a6xx_gmu.c:894-904</code></td>
+<td>how a619/a618/a630 <strong>are</strong> loaded</td>
+</tr>
+<tr>
+<td><code>gmu-&gt;legacy = true</code> for <code>ADRENO_6XX_GEN1</code></td>
+<td><code>a6xx_gmu.c:2412-2414</code></td>
+<td>a619 is in that class (<code>a6xx_catalog.c</code>, <code>.family = ADRENO_6XX_GEN1</code>)</td>
+</tr>
+<tr>
+<td><code>GMU_CM3_ITCM_START</code> / <code>GMU_CM3_DTCM_START</code> exactly SZ_16K apart</td>
+<td><code>a6xx_gmu.xml:45-46</code></td>
+<td>why a flat 32 KiB file is a <em>contiguous</em> ITCM+DTCM dump</td>
+</tr>
+<tr>
+<td><code>GMU_CORE_FW_VERSION</code> MAJOR/MINOR/STEP</td>
+<td><code>a6xx_gmu.xml:55-58</code></td>
+<td>the printed "GMU firmware vX.Y.Z" is a <strong>register</strong>, not a file field</td>
+</tr>
+<tr>
+<td>DTCM probe at <code>DTCM_START+0xff8</code>, magic <code>0xbabeface</code></td>
+<td><code>a6xx_gmu.c:311-318</code></td>
+<td>corroborates the image's own <code>0xbabeface</code> constant</td>
+</tr>
+</table>
+<h2>Files</h2>
+<table>
+<tr>
+<th>file</th>
+<th>role</th>
+</tr>
+<tr>
+<td><code>gmu_probe.py</code></td>
+<td>the probe: tries the mainline <code>block_header</code> walk <strong>first</strong>, then the raw ITCM+DTCM layout. CLI <code>python3 -I gmu_probe.py &lt;file&gt; [--json out.json] [--brief]</code>; exit 1 on structural violations</td>
+</tr>
+<tr>
+<td><code>make_fixture.py</code></td>
+<td>deterministic synthetic fixtures from the established layout (no proprietary bytes; every byte generated)</td>
+</tr>
+<tr>
+<td><code>fixtures/*.bin</code></td>
+<td>synthetic fixtures — 6 files, both branches + 4 error paths. <strong><code>*.bin</code> is gitignored</strong>: regenerate with <code>python3 -I make_fixture.py</code></td>
+</tr>
+<tr>
+<td><code>test_gmu_probe.py</code></td>
+<td>unittest suite: <code>python3 -m unittest -v test_gmu_probe</code> — <strong>62 tests, all passing</strong></td>
+</tr>
+<tr>
+<td><code>gmu-analysis.md</code></td>
+<td>the analysis: per-byte-range findings, the public-header verdict, entropy map, ISA hypothesis, [OPEN] list</td>
+</tr>
+</table>
+<h2>Fleet scope (verified against <code>coverage-matrix.csv</code>, 2026-11-18)</h2>
+<p><code>a619_gmu.bin</code>, 32,768 B, md5 <code>9e23c52057bb573dee9ba31f1fdba4fa</code>.</p>
+<table>
+<tr>
+<th>quantity</th>
+<th>value</th>
+<th>how verified</th>
+</tr>
+<tr>
+<td>rows named <code>a619_gmu.bin</code></td>
+<td><strong>24</strong></td>
+<td><code>grep -c ",a619_gmu.bin,"</code></td>
+</tr>
+<tr>
+<td>rows named <code>a618_gmu.bin</code>, <strong>same md5</strong></td>
+<td><strong>2</strong></td>
+<td>Samsung Galaxy A71 (a71), Xiaomi Mi A3 (laurel_sprout)</td>
+</tr>
+<tr>
+<td><strong>rows sharing this md5</strong></td>
+<td><strong>26</strong></td>
+<td><code>grep -c 9e23c520…</code> → 26; 24 + 2 aliases</td>
+</tr>
+<tr>
+<td>laptop-half devices carrying this md5</td>
+<td><strong>7</strong></td>
+<td>the 5 below + a71 + laurel_sprout</td>
+</tr>
+<tr>
+<td><strong>devices that actually load it</strong></td>
+<td><strong>13</strong></td>
+<td>see below — 15 co-resident copies are never loaded</td>
+</tr>
+</table>
+<p>The filename alias is a real finding, not a bookkeeping quirk: the <em>same bytes</em></p>
+<p>ship as <code>a618_gmu.bin</code> on two devices and as <code>a619_gmu.bin</code> on twenty-four.</p>
+<p>Adreno 618 and 619 are both <code>ADRENO_6XX_GEN1</code> (<code>adreno_is_a615_family()</code> groups</p>
+<p>them explicitly, <code>adreno_gpu.h:512-515</code>), so one microcode image serves both —</p>
+<p>consistent with mainline's own model.</p>
+<p><strong>Leverage is 13 devices, not 26.</strong> A device <em>carrying</em> the file is not a device</p>
+<p><em>running</em> it: mainline loads <code>a619_gmu.bin</code> only for <code>revn = 619</code></p>
+<p>(<code>a6xx_catalog.c:872-876, 898-901, 920-925</code>), so on an Adreno 650/660 device the</p>
+<p><code>a619</code> copy is a co-resident leftover. 11 devices are 619-class SoCs, 2</p>
+<p>(<code>Edge_20</code>, <code>Edge_2021</code>) have no competing GMU blob, and 11 are co-resident</p>
+<p><code>a650</code>/<code>a660</code> devices that never load it. Full per-device table:</p>
+<p><code>../../blob-matrix/laptop/qualcomm-adreno-gmu-content.md</code> §5.</p>
+<p>Laptop-half cluster detail (<code>sharing-clusters.csv</code>): md5 cluster of <strong>7</strong></p>
+<p>devices = the 5 laptop-half + <code>a71</code> + <code>laurel_sprout</code>, i.e. the two alias rows.</p>
+<h2>Usage</h2>
+<pre><code>
+python3 -I gmu_probe.py a619_gmu.bin --brief
+python3 -I gmu_probe.py a619_gmu.bin --json report.json
+python3 -I gmu_probe.py a640_gmu.bin --brief         # container branch
+</code></pre>
+<p>Real-payload result for <code>a619_gmu.bin</code> (md5-verified, exit 0, 0 errors):</p>
+<pre><code>
+format    : raw-tcm-image  [measured-and-cross-checked]
+header    : ABSENT — flat memory image; u32[0] is the ARMv7-M initial SP
+initial SP: 0x00043f80 (DTCM=True, == DTCM top 0x44000 - 0x80)
+reset vec : 0x00000009
+vector tbl: 0x200, 16 architectural vectors + 64 external IRQs (1 target)
+dtcm table: 50 x {addr,value} at 0x44d8 (all values zero)
+region tbl: 8 {start,end} address pairs at 0x3ea4
+entropy   : whole 3.87 — ITCM 6.34 (17% zero), DTCM 0.15 (99% zero)
+</code></pre>
+<h2>Why this is worth doing</h2>
+<ul>
+<li><strong>13 live devices from one md5.</strong> Per-file RE (not per-device RE) is the</li>
+</ul>
+<p>  multiplier. The naive count is 26 DB rows; the correction is that only 13 of</p>
+<p>  those devices actually load the image (§"Fleet scope"), and both numbers</p>
+<p>  matter — 26 for dedup, 13 for impact.</p>
+<ul>
+<li><strong>The header question is settled, negatively and usefully.</strong> Anyone building</li>
+</ul>
+<p>  a free loader now knows a619 needs the <em>raw bulk-write</em> path and a</p>
+<p>  ITCM+DTCM image, not a parsed container. That is a smaller job than the</p>
+<p>  container family, and it is the same job for a618.</p>
+<ul>
+<li><strong>The layout is cross-checked three ways</strong>, not asserted: the register map</li>
+</ul>
+<p>  (TCMs exactly SZ_16K apart), the image's own startup stub (which sets VTOR</p>
+<p>  and loads the SP the vector table repeats), and the driver's <code>0xbabeface</code></p>
+<p>  init magic (which appears twice in the microcode's own code).</p>
+<ul>
+<li><strong>The sibling generation is scoped.</strong> The other linux-firmware Adreno GMU</li>
+</ul>
+<p>  blobs use the <em>container</em> format; a619/a630 do not. That boundary is now</p>
+<p>  measured rather than guessed.</p>
+<h2>Honest boundaries</h2>
+<p>The probe reports <strong>structure only</strong>. It does not decode a single microcode</p>
+<p>function, and it makes no claim about what the firmware computes. The Thumb</p>
+<p>census is a <em>census</em>, not a disassembly. Full [OPEN] list in</p>
+<p><code>gmu-analysis.md</code> §8.</p>
+<p>Not legal advice, not a replacement implementation. Regulatory/legal hurdles</p>
+<p>for actually replacing GPU firmware: <code>../../upstream-contribution/radio-regulatory-hurdles.md</code></p>
+<p>(same class of question — signed/attested firmware loading).</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

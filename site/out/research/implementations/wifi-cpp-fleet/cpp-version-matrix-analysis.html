@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fleet analysis — clean-room RE of the Qualcomm MSM CPP firmware fleet (2026-11-19) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>Fleet analysis — clean-room RE of the Qualcomm MSM CPP firmware fleet (2026-11-19)</h1><p>The `cpp_firmware_v*_*_*.fw` family has sat in the upstream database under the</p><p>Evidence: none</p>
+<h1>Fleet analysis — clean-room RE of the Qualcomm MSM CPP firmware fleet (2026-11-19)</h1>
+<p>The <code>cpp_firmware_v*_*_*.fw</code> family has sat in the upstream database under the</p>
+<p><code>wifi</code> family label since the laptop matrix was built. This work settles what</p>
+<p>it actually is, verifies all twelve identities byte-exact against that matrix,</p>
+<p>characterises the fixed 16 KiB window end to end, and produces the N×N version</p>
+<p>matrix. Every claim below is either a <strong>measurement of payload bytes on disk</strong></p>
+<p>or a quote from <strong>public GPL-2.0-only source</strong>; nothing comes from a</p>
+<p>decompiler, a proprietary SDK, or a vendor datasheet.</p>
+<p>Two headline corrections up front, because both change how the fleet should be</p>
+<p>read:</p>
+<ol>
+<li><strong><code>cpp</code> is not a wireless firmware and it is not Cypress/Infineon.</strong> It is</li>
+</ol>
+<p>   the <strong>Camera Post-Processing</strong> block of the Qualcomm MSM camera pipeline.</p>
+<p>   The label in the matrix is wrong, and the naming collision with the Cypress</p>
+<p>   <code>cpp</code>-prefixed WiFi parts is coincidental. Evidence in §1.</p>
+<ol>
+<li><strong>The version string is not in the file as text.</strong> It is one little-endian</li>
+</ol>
+<p>   <code>u16</code>, <code>0x1000 | BCD(minor)</code>, inside the code region, immediately beneath a</p>
+<p>   fixed <code>MSM_CPP_MSG_ID_TRAILER</code> record. The ASCII <code>v1.1</code> at <code>0x3F80</code> that a</p>
+<p>   naive <code>strings</code> run finds is a <strong>fixed literal of the shared epilogue</strong>,</p>
+<p>   present in 11/12 files regardless of version. Evidence in §5.</p>
+<p>Labels: <strong>[S]</strong> quoted from public source (file, symbol) · <strong>[M]</strong> my own</p>
+<p>measurement of payload bytes · <strong>[OPEN]</strong> not established, gap named.</p>
+<p>Payload bytes live only in <code>/tmp/astro_u/cpp/</code>; **no proprietary content is</p>
+<p>committed**. Fixtures are synthetic and regenerable by a committed script.</p>
+<p>---</p>
+<h2>1. What consumes these files (RULE 0)</h2>
+<p>RULE 0 says: read the public source that <em>consumes</em> the file before asserting</p>
+<p>anything about its structure. That source exists, and it settles the identity</p>
+<p>question outright.</p>
+<h3>1.1 The consumer — kernel side</h3>
+<p><code>drivers/media/platform/msm/camera_v2/pproc/cpp/msm_cpp.c</code>, GPL-2.0-only,</p>
+<p><code>LineageOS/android_kernel_xiaomi_msm8953</code> @ <code>lineage-21</code></p>
+<p>(<a href="https://raw.githubusercontent.com/LineageOS/android_kernel_xiaomi_msm8953/lineage-21/drivers/media/platform/msm/camera_v2/pproc/cpp/msm_cpp.c">source</a>,</p>
+<p>accessed 2026-11-19). <strong>[S]</strong></p>
+<p>The load path is <code>cpp_load_fw()</code>, and it is startlingly thin:</p>
+<ul>
+<li>it requests the file from userspace by name;</li>
+<li>it sends <code>MSM_CPP_CMD_FW_LOAD</code> (magnitude <code>2</code>) through the command queue;</li>
+<li>it sends <code>fw-&gt;size</code> and <code>MSM_CPP_START_ADDRESS</code> (<code>0x0</code>);</li>
+<li>then it streams the payload as <code>fw-&gt;size / 4</code> little-endian 32-bit words.</li>
+</ul>
+<p>**There is no header parse, no magic check, no checksum, and no length field</p>
+<p>the kernel reads.** The kernel asserts only that <code>fw-&gt;size</code> is a multiple of</p>
+<p>four (it divides by 4). Everything else about the layout is a property of the</p>
+<p>payload, not a contract with the loader.</p>
+<p>This is the single most important structural fact in the whole analysis: it</p>
+<p>means the <code>[OPEN]</code> items below cannot be resolved by reading the kernel, and</p>
+<p>it means a free replacement mainly has to satisfy the <em>microcode's</em> own</p>
+<p>expectations, not the driver's.</p>
+<p><code>msm_cpp.h</code> in the same tree supplies the three protocol magic words the</p>
+<p>microcode is expected to emit:</p>
+<table>
+<tr>
+<th>symbol</th>
+<th>value</th>
+</tr>
+<tr>
+<td><code>MSM_CPP_MSG_ID_CMD</code></td>
+<td><code>0x3E646D63</code></td>
+</tr>
+<tr>
+<td><code>MSM_CPP_MSG_ID_OK</code></td>
+<td><code>0x0A0A4B4F</code></td>
+</tr>
+<tr>
+<td><code>MSM_CPP_MSG_ID_TRAILER</code></td>
+<td><code>0xABCDEFAA</code></td>
+</tr>
+</table>
+<h3>1.2 The producer — userspace side</h3>
+<p><code>mm-camera/mm-camera2/media-controller/modules/pproc-new/cpp/cpp_hardware.c</code></p>
+<p>and <code>cpp_hw_params.h</code>, <code>Sushrut1101/android_vendor_qcom_proprietary</code> @</p>
+<p><code>master</code></p>
+<p>(<a href="https://raw.githubusercontent.com/Sushrut1101/android_vendor_qcom_proprietary/master/mm-camera/mm-camera2/media-controller/modules/pproc-new/cpp/cpp_hardware.c">source</a>,</p>
+<p>accessed 2026-11-19). <strong>[S]</strong></p>
+<p>Two things matter here:</p>
+<ul>
+<li><code>cpp_hardware_select_fw_version()</code> maps a hardware version to a firmware</li>
+</ul>
+<p>  version. That mapping is reproduced in §7 and it explains the fleet's shape.</p>
+<ul>
+<li><code>cpp_hw_params.h</code> defines the version as a <strong>bitfield</strong>, not a string:</li>
+</ul>
+<p>  <code>CPP_FW_VERSION_*</code> packs major in bits 31:28, minor in 27:16, step in 15:0.</p>
+<h3>1.3 The refuted hypothesis, recorded honestly</h3>
+<p>The matrix files this family under <code>wifi</code>, and <code>cpp</code> reads like a Cypress /</p>
+<p>Infineon part prefix. That hypothesis was tested and refuted:</p>
+<ul>
+<li><code>linux-firmware</code> <code>WHENCE</code> (537,962 B, fetched 2026-11-19) contains <strong>zero</strong></li>
+</ul>
+<p>  <code>cpp_firmware</code> hits. <strong>[M]</strong></p>
+<ul>
+<li><code>brcmfmac/firmware.c</code> (mainline) implements a <code>brcmf_fw</code> name-composition</li>
+</ul>
+<p>  scheme with no notion of a <code>cpp_firmware_vN_N_N.fw</code> payload. <strong>[S]</strong></p>
+<ul>
+<li>The files live at <code>vendor/firmware/</code> beside <code>msm_cpp</code>-consumed siblings, and</li>
+</ul>
+<p>  they contain MSM CPP protocol magics — which is decisive.</p>
+<p>The <code>wifi</code> family label in <code>sharing-clusters.csv</code> is therefore a **matrix</p>
+<p>labelling error**, not a finding about the bytes. It is not corrected here</p>
+<p>(the CSV is outside this work's write scope); it is recorded so the next</p>
+<p>person does not re-derive the wrong hypothesis from the label.</p>
+<p>---</p>
+<h2>2. Provenance and md5 verification (12/12 MATCH)</h2>
+<p>Source of truth: <code>blob-matrix/laptop/sharing-clusters.csv</code>. Extracting the</p>
+<p><code>cpp_firmware_*</code> rows yields <strong>12 identities, not 13</strong> — worth stating because</p>
+<p>counting the ladder by eye suggests 13. All twelve are 9-device rows except</p>
+<p><code>v1_12_1</code>, which is a 4-device row (<code>Mi8917;Mi8937;ginkgo;laurel_sprout</code>).</p>
+<p>Every identity was fetched from</p>
+<p><code>TheMuppets/proprietary_vendor_xiaomi_ginkgo</code> @ <code>lineage-22.2</code>,</p>
+<p><code>proprietary/vendor/firmware/</code>, on 2026-11-19. All twelve are <strong>MATCH</strong> — no</p>
+<p>NON-DB-IDENTICAL members, no fetch failures.</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5 (DB = fetched)</th>
+<th>status</th>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_1_1.fw</code></td>
+<td><strong>16,128</strong></td>
+<td><code>4d145d5a13a3956bf33aec94a8e7fe62</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_1_6.fw</code></td>
+<td>16,384</td>
+<td><code>738a83a673dd45fa5852b5cc9519ee94</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_2_0.fw</code></td>
+<td>16,384</td>
+<td><code>3f078c3d1658679a762f7d77c99517cd</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_4_0.fw</code></td>
+<td>16,384</td>
+<td><code>b6f54efc4675040f7b7e99398905646e</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_5_0.fw</code></td>
+<td>16,384</td>
+<td><code>e51087ba19409150103faafaff849627</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_5_1.fw</code></td>
+<td>16,384</td>
+<td><code>ed1f2071b61447924f50fe8670cd51be</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_5_2.fw</code></td>
+<td>16,384</td>
+<td><code>02e4044179d7dfc069aa9a42db690642</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_6_0.fw</code></td>
+<td>16,384</td>
+<td><code>de85a5f8196ec73cffc61382b3e0d5f6</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_8_0.fw</code></td>
+<td>16,384</td>
+<td><code>04423a29e78bb01d9be62256a65354a6</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_10_0.fw</code></td>
+<td>16,384</td>
+<td><code>8d08bfdf92db5b1df58af9b6adf61eae</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_12_0.fw</code></td>
+<td>16,384</td>
+<td><code>ef031a3f24f877242621ba695d8dcbd2</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+<tr>
+<td><code>cpp_firmware_v1_12_1.fw</code></td>
+<td>16,384</td>
+<td><code>a59e732fcbf71cb5fcc6c54fef0124d6</code></td>
+<td><strong>MATCH</strong></td>
+</tr>
+</table>
+<p>sha256 of the verified bytes, for future re-download cross-checks:</p>
+<table>
+<tr>
+<th>file</th>
+<th>sha256</th>
+</tr>
+<tr>
+<td>1.1.1</td>
+<td><code>09fd81eb95b3187b731c201f99c5b6176df01e6d459c78fbe7bf4f0ef480e578</code></td>
+</tr>
+<tr>
+<td>1.1.6</td>
+<td><code>2533f6819be2ee4ba61ed4e1e8cbf76be93ae9f06d98a5a259fcc6165da47782</code></td>
+</tr>
+<tr>
+<td>1.2.0</td>
+<td><code>6f28bbb64cf8441fc33ee41ffb035f781488fd523b641d237cdaf840769b0689</code></td>
+</tr>
+<tr>
+<td>1.4.0</td>
+<td><code>17446858b9adad536f3da2d0130182708624b87fa0915b9ab719c313865a5674</code></td>
+</tr>
+<tr>
+<td>1.5.0</td>
+<td><code>d8599bbb0bff57b7ac5404f361c8ce72b4b1a1cbd6bf894f3acc67bf5145285f</code></td>
+</tr>
+<tr>
+<td>1.5.1</td>
+<td><code>026c5a88bc6eba3229681fc1ac5b915be674ac9ce36d9c639e9972ad97d2d7cc</code></td>
+</tr>
+<tr>
+<td>1.5.2</td>
+<td><code>7fb5366b1e52a3317d0c840821da5f85359768b9379f517a4271ed1eded552b7</code></td>
+</tr>
+<tr>
+<td>1.6.0</td>
+<td><code>22514c99720c889d4426b291aa5c9648e72901e57efb6e27bd2f90a8f1c1a2cd</code></td>
+</tr>
+<tr>
+<td>1.8.0</td>
+<td><code>f454bfaa137d2b52e235b41a2181f707c5cc421fed261095d39a1b6d852c76cc</code></td>
+</tr>
+<tr>
+<td>1.10.0</td>
+<td><code>59c1a0118f2ebe43a49a442e1273c0a794b059ccb75d6311d67f54db73da9017</code></td>
+</tr>
+<tr>
+<td>1.12.0</td>
+<td><code>9e1618c277f0f686b29a9c85e59911d0a83b81861612892eed1d9a1ba145051d</code></td>
+</tr>
+<tr>
+<td>1.12.1</td>
+<td><code>e95df96697e4de59f9d9b0f4d31179e80e60563b910dad174300990da1376e11</code></td>
+</tr>
+</table>
+<h3>2.1 Two independent publishers corroborate the set</h3>
+<p><code>LineageOS/android_device_xiaomi_msm8953-common</code> @ <code>lineage-19.1</code></p>
+<p><code>proprietary-files.txt</code> lists <strong>eleven</strong> of the twelve under</p>
+<p><code>vendor/firmware/</code> — <code>v1_12_1</code> is absent. <code>trinket-devs/device_xiaomi_ginkgo</code></p>
+<p>@ <code>master</code> lists <strong>all twelve</strong>, including <code>v1_12_1</code>. So the twelve-member set</p>
+<p>is not an artefact of one vendor tree, and <code>v1_12_1</code>'s late arrival (4 devices</p>
+<p>vs 9) matches its position at the end of the ladder rather than contradicting</p>
+<p>it.</p>
+<h3>2.2 Honest negative</h3>
+<p><code>linux-firmware</code> does <strong>not</strong> ship this family. F-74-style absence holds here</p>
+<p>too, and for the same structural reason: these are per-SoC camera microcode</p>
+<p>blobs distributed only inside device vendor partitions.</p>
+<p>---</p>
+<h2>3. The 16 KiB layout (measured)</h2>
+<p>Eleven of the twelve are exactly 16,384 B. <code>v1_1_1</code> is 16,128 B — exactly</p>
+<p>256 B short — and that is not a fetch error (its md5 matches the DB row whose</p>
+<p><code>bytes</code> column says 16128).</p>
+<p>The window decomposes as follows. Offsets are shared across the ladder; the</p>
+<p><code>code_end</code> boundary moves per version, so the fill region changes length.</p>
+<pre><code>
+0x0000            0x0002                                      0x0022
+  |--lead word----||--- 16 x u16 vector table -----------------||
+                                                               |
+                                         code / table region   |
+                                                               |
+                      code_end (per version, 0x19B6..0x3B02) ---+
+                                                               |
+                                          0xFF fill (erased)   |
+                                                               |
+0x3EFC  0x3EFE                                                0x3FCA   0x4000
+  |u16---||------------ 204-byte invariant epilogue -----------||0xFF---|
+</code></pre>
+<h3>3.1 Per-file region table</h3>
+<p><code>pad</code> is <code>[code_end, 0x3EFE)</code>; <code>epilogue</code> is <code>[0x3EFE, 0x3FCA)</code>; <code>tail pad</code> is</p>
+<p><code>[0x3FCA, 0x4000)</code>. Entropy is the code region's Shannon entropy in bits/byte.</p>
+<table>
+<tr>
+<th>version</th>
+<th>bytes</th>
+<th>code_end</th>
+<th>pad B</th>
+<th>epilogue</th>
+<th>entropy</th>
+<th>0xFF% in code</th>
+</tr>
+<tr>
+<td>1.1.1</td>
+<td><strong>16,128</strong></td>
+<td><code>0x3B02</code></td>
+<td>1,020</td>
+<td><strong>ABSENT</strong></td>
+<td>3.32</td>
+<td>59.1</td>
+</tr>
+<tr>
+<td>1.1.6</td>
+<td>16,384</td>
+<td><code>0x3B02</code></td>
+<td>1,020</td>
+<td>yes</td>
+<td>3.29</td>
+<td>59.3</td>
+</tr>
+<tr>
+<td>1.2.0</td>
+<td>16,384</td>
+<td><code>0x1B36</code></td>
+<td>9,160</td>
+<td>yes</td>
+<td>3.34</td>
+<td>58.3</td>
+</tr>
+<tr>
+<td>1.4.0</td>
+<td>16,384</td>
+<td><code>0x1AFE</code></td>
+<td>9,216</td>
+<td>yes</td>
+<td>3.33</td>
+<td>58.5</td>
+</tr>
+<tr>
+<td>1.5.0</td>
+<td>16,384</td>
+<td><code>0x1A5E</code></td>
+<td>9,376</td>
+<td>yes</td>
+<td>3.31</td>
+<td>59.0</td>
+</tr>
+<tr>
+<td>1.5.1</td>
+<td>16,384</td>
+<td><code>0x1A5E</code></td>
+<td>9,376</td>
+<td>yes</td>
+<td>3.31</td>
+<td>59.0</td>
+</tr>
+<tr>
+<td>1.5.2</td>
+<td>16,384</td>
+<td><code>0x1B4E</code></td>
+<td>9,136</td>
+<td>yes</td>
+<td>3.44</td>
+<td>57.4</td>
+</tr>
+<tr>
+<td>1.6.0</td>
+<td>16,384</td>
+<td><code>0x19B6</code></td>
+<td>9,544</td>
+<td>yes</td>
+<td>3.26</td>
+<td>59.8</td>
+</tr>
+<tr>
+<td>1.8.0</td>
+<td>16,384</td>
+<td><code>0x3B02</code></td>
+<td>1,020</td>
+<td>yes</td>
+<td>3.83</td>
+<td>50.9</td>
+</tr>
+<tr>
+<td>1.10.0</td>
+<td>16,384</td>
+<td><code>0x2704</code></td>
+<td>6,138</td>
+<td>yes</td>
+<td>4.48</td>
+<td>38.6</td>
+</tr>
+<tr>
+<td>1.12.0</td>
+<td>16,384</td>
+<td><code>0x28D4</code></td>
+<td>5,674</td>
+<td>yes</td>
+<td>4.66</td>
+<td>35.8</td>
+</tr>
+<tr>
+<td>1.12.1</td>
+<td>16,384</td>
+<td><code>0x287C</code></td>
+<td>5,762</td>
+<td>yes</td>
+<td>4.62</td>
+<td>36.4</td>
+</tr>
+</table>
+<h3>3.2 The lead word</h3>
+<p><code>[0x0000, 0x0002)</code> is <code>0x7140</code> in <strong>all twelve</strong> — the only invariant</p>
+<p>non-trivial constant outside the epilogue. <strong>[M]</strong></p>
+<p>It is <em>not</em> a magic the kernel checks (§1.1): the kernel never looks at it. It</p>
+<p>is reported here as a measured constant only.</p>
+<h3>3.3 The u16 vector table <code>[0x0002, 0x0022)</code></h3>
+<p>Sixteen little-endian <code>u16</code> values. Measured properties:</p>
+<ul>
+<li>They are <strong>not all even</strong>. An earlier reading of this table claimed</li>
+</ul>
+<p>  "all even"; that was wrong and is corrected here. Parity is <em>not</em> invariant:</p>
+<p>  slot 15 is odd in 10/12 files, slot 9 in 9/12, slot 0 in 6/12, others in 3–4.</p>
+<p>  No slot is odd in all twelve. <strong>[M]</strong></p>
+<ul>
+<li><strong>11/12 share one equality pattern</strong>, and it has 6 distinct values: one</li>
+</ul>
+<p>  value occupies slot 1 <strong>and</strong> slots 4–8 and 10–14 (11 slots in all), and</p>
+<p>  slots 0, 2, 3, 9, 15 each hold their own. <code>v1_2_0</code> alone splits slot 10 off</p>
+<p>  that block, giving a 7th distinct value. <strong>[M]</strong></p>
+<ul>
+<li>Every value, doubled, lands <strong>below that file's code_end</strong>. That is</li>
+</ul>
+<p>  consistent with halfword offsets into the payload, but the odd slots mean</p>
+<p>  the field width (or the doubling) cannot be taken as settled. <strong>[OPEN]</strong></p>
+<p>Values are not reproduced here (they are payload content). The probe reports</p>
+<p>them per file, plus the equality pattern and the odd-slot list.</p>
+<h3>3.4 The 0xFF fill</h3>
+<p>Every pad byte in every file is <code>0xFF</code>, never <code>0x00</code>. <strong>[M]</strong> This is the</p>
+<p>erased-state pattern of NOR flash, and it is the reason whole-file similarity</p>
+<p>numbers in §6 are inflated: two files with very different code lengths both</p>
+<p>end up mostly <code>0xFF</code> in the same high offsets.</p>
+<p>Interior <code>0x00</code> runs <strong>do</strong> exist (a 472-byte run at <code>[0x1F4, 0x3CC)</code> in the</p>
+<p>1.10/1.12 family, shorter runs elsewhere) — but those are payload, not</p>
+<p>padding. The probe therefore scopes its "zero-fill used" test to the pad</p>
+<p>window <code>[code_end, EOF)</code>, where the answer is a clean <strong>no</strong> for all twelve.</p>
+<h3>3.5 The 204-byte invariant epilogue <code>[0x3EFE, 0x3FCA)</code></h3>
+<p>Byte-identical in 11/12 files:</p>
+<pre><code>
+sha1 = f81d97b070307896ce03469472c85d6d443a5d15
+</code></pre>
+<p><code>v1_1_1</code> does not contain it at all — that file ends at <code>0x3F00</code>, i.e. two</p>
+<p>bytes <em>into</em> the epilogue region <code>[0x3EFE, 0x3FCA)</code>, and those two bytes are</p>
+<p><code>0xFF</code> fill like the pad before them. Its 256-byte shortfall is exactly the</p>
+<p><code>[0x3F00, 0x4000)</code> remainder of the window.</p>
+<p>The epilogue carries two ASCII literals and one protocol magic:</p>
+<table>
+<tr>
+<th>offset</th>
+<th>bytes</th>
+<th>note</th>
+</tr>
+<tr>
+<td><code>0x3F6C</code></td>
+<td><code>4F 4B 0A 0A</code></td>
+<td>little-endian <code>MSM_CPP_MSG_ID_OK</code> (<code>0x0A0A4B4F</code>) <strong>[S]</strong></td>
+</tr>
+<tr>
+<td><code>0x3F80</code></td>
+<td><code>v1.1</code></td>
+<td><strong>fixed literal, not a version field</strong> — see §5.2</td>
+</tr>
+<tr>
+<td><code>0x3FB4</code></td>
+<td><code>cmd&gt;</code></td>
+<td>part of the same literal cluster</td>
+</tr>
+</table>
+<p>The <code>MSM_CPP_MSG_ID_OK</code> word at <code>0x3F6C</code> explains a detail that would otherwise</p>
+<p>look arbitrary: every windowed file reports exactly <strong>one</strong> <code>MSM_CPP_MSG_ID_OK</code></p>
+<p>hit, and <code>v1_1_1</code> reports <strong>zero</strong>. The single hit is this epilogue constant,</p>
+<p>not a second emitter in the code region — and <code>v1_1_1</code> has no epilogue. So the</p>
+<p>"OK" census is a proxy for epilogue presence, not an independent protocol</p>
+<p>signal. <code>MSM_CPP_MSG_ID_TRAILER</code> does occur in the code region itself (1–11</p>
+<p>occurrences, version-dependent) and is a genuine in-code emitter;</p>
+<p><code>MSM_CPP_MSG_ID_CMD</code> is 2 in eleven files and 1 in <code>v1_1_1</code> (its trailer</p>
+<p>records are the epilogue-free variant).</p>
+<p>The epilogue's byte mix (<code>0xFF</code> ×16, <code>0x00</code> ×15, and repeated</p>
+<p>instruction-looking 16-bit words such as <code>21 60</code>, <code>A1 60</code>, <code>27 60</code>, <code>A0 60</code>,</p>
+<p><code>10 80</code>, <code>30 60</code>) is consistent with a small fixed code stub, which is why a</p>
+<p>naive "all-fill run" census splits the block into several sub-runs. <code>21 60</code></p>
+<p>and <code>A1 60</code> each occur three times in the 204 bytes, <code>27 60</code> four times.</p>
+<p>Its semantics remain <strong>[OPEN]</strong>.</p>
+<h3>3.6 The <code>u16</code> at <code>0x3EFC</code> is a halfword length field</h3>
+<p>This is the strongest structural contract found in the family, and it was not</p>
+<p>in the earlier structural sketch. <strong>[M]</strong></p>
+<pre><code>
+code_end == 2 * (u16@0x3EFC + 1)
+</code></pre>
+<table>
+<tr>
+<th>version</th>
+<th><code>u16@0x3EFC</code></th>
+<th><code>2*(w+1)</code></th>
+<th><code>code_end</code></th>
+<th>residual</th>
+</tr>
+<tr>
+<td>1.1.1</td>
+<td><code>0xFFFF</code></td>
+<td><code>0x20000</code></td>
+<td><code>0x3B02</code></td>
+<td>erased</td>
+</tr>
+<tr>
+<td>1.1.6</td>
+<td><code>0xFFFF</code></td>
+<td><code>0x20000</code></td>
+<td><code>0x3B02</code></td>
+<td>erased</td>
+</tr>
+<tr>
+<td>1.2.0</td>
+<td><code>0x0D9A</code></td>
+<td><code>0x1B36</code></td>
+<td><code>0x1B36</code></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>1.4.0</td>
+<td><code>0x0D7E</code></td>
+<td><code>0x1AFE</code></td>
+<td><code>0x1AFE</code></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>1.5.0</td>
+<td><code>0x0D2E</code></td>
+<td><code>0x1A5E</code></td>
+<td><code>0x1A5E</code></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>1.5.1</td>
+<td><code>0x0D2E</code></td>
+<td><code>0x1A5E</code></td>
+<td><code>0x1A5E</code></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>1.5.2</td>
+<td><code>0x0DA6</code></td>
+<td><code>0x1B4E</code></td>
+<td><code>0x1B4E</code></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>1.6.0</td>
+<td><code>0x0CDA</code></td>
+<td><code>0x19B6</code></td>
+<td><code>0x19B6</code></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>1.8.0</td>
+<td><code>0xFFFF</code></td>
+<td><code>0x20000</code></td>
+<td><code>0x3B02</code></td>
+<td>erased</td>
+</tr>
+<tr>
+<td>1.10.0</td>
+<td><code>0x1329</code></td>
+<td><code>0x2654</code></td>
+<td><code>0x2704</code></td>
+<td><strong>176</strong></td>
+</tr>
+<tr>
+<td>1.12.0</td>
+<td><code>0x1411</code></td>
+<td><code>0x2824</code></td>
+<td><code>0x28D4</code></td>
+<td><strong>176</strong></td>
+</tr>
+<tr>
+<td>1.12.1</td>
+<td><code>0x13E5</code></td>
+<td><code>0x27CC</code></td>
+<td><code>0x287C</code></td>
+<td><strong>176</strong></td>
+</tr>
+</table>
+<p>Three observations:</p>
+<ol>
+<li><strong>It is a region length, not the file length.</strong> <code>2*(w+1)</code> never equals</li>
+</ol>
+<p>   16,384 for any populated file. So it describes the payload's own extent, and</p>
+<p>   the 16 KiB window is a <em>container</em> size imposed outside the payload.</p>
+<ol>
+<li><strong>Three identities leave it erased</strong> (<code>0xFFFF</code>): 1.1.1, 1.1.6, 1.8.0. These</li>
+</ol>
+<p>   are exactly the three whose code_end is <code>0x3B02</code>. <strong>[OPEN]</strong> why that</p>
+<p>   generation does not populate the field; plausibly a format revision, but the</p>
+<p>   public producer source does not show it.</p>
+<ol>
+<li><strong>Three identities have a 176-byte residual</strong>: 1.10.0, 1.12.0, 1.12.1. In</li>
+</ol>
+<p>   each, the 176 bytes after <code>2*(w+1)</code> are a fixed-stride table:</p>
+<p>   ```</p>
+<p>   14-byte prologue</p>
+<p>   8 x 20-byte record:</p>
+<p>       [+0,  +12)  12-byte body  — identical in all 8 records</p>
+<p>       [+12, +14)  u16 advancing by 0x0A per record</p>
+<p>       [+14, +16)  u16 advancing by 8    per record (0x0700, 0x0708, ...)</p>
+<p>       [+16, +20)  4-byte constant 00 80 20 64</p>
+<p>   2-byte tail  01 70</p>
+<p>   ```</p>
+<p>   <code>14 + 8*20 + 2 = 176</code>. All three identities decode identically: 8 records,</p>
+<p>   all bodies identical, <code>a_step</code> <code>0x0A</code>, <code>b_step</code> <code>8</code>. That is a counted</p>
+<p>   table appended after the length-described region, which is why the field</p>
+<p>   cannot simply be <code>code_end/2 - 1</code> for those three. Semantics <strong>[OPEN]</strong>.</p>
+<p>The kernel never reads this field (§1.1), so it is a payload-internal</p>
+<p>structure, not a loader contract.</p>
+<h3>3.7 Interior zero table</h3>
+<p>All twelve contain a long interior <code>0x00</code> run inside the code region — 284 to</p>
+<p>472 bytes depending on version. It is payload (a zeroed table), and for that</p>
+<p>reason the earlier draft's "<code>zero_fill_used</code>" flag (which tested the whole</p>
+<p>file) was a false positive for every real file. It is now scoped correctly.</p>
+<p>---</p>
+<h2>4. Invariant vs varying, by range</h2>
+<p>Over the twelve-file common prefix (16,128 B = <code>0x3F00</code>), counting positions</p>
+<p>where all twelve agree and are not <code>0xFF</code>. The last two rows lie beyond that</p>
+<p>prefix, so they are computed over the eleven full-window files only — their</p>
+<p>scope is called out in the note below the table.</p>
+<table>
+<tr>
+<th>range</th>
+<th>bytes</th>
+<th>invariant</th>
+<th><code>0xFF</code></th>
+<th>varying</th>
+<th>scope</th>
+</tr>
+<tr>
+<td><code>[0x0000, 0x0022)</code> header</td>
+<td>34</td>
+<td>2</td>
+<td>0</td>
+<td>32</td>
+<td>12 files</td>
+</tr>
+<tr>
+<td><code>[0x0022, 0x19B6)</code> shared-code window</td>
+<td>6,548</td>
+<td>35</td>
+<td>2</td>
+<td>6,511</td>
+<td>12 files</td>
+</tr>
+<tr>
+<td><code>[0x19B6, 0x3B02)</code> version-specific</td>
+<td>8,524</td>
+<td>0</td>
+<td>354</td>
+<td>8,170</td>
+<td>12 files</td>
+</tr>
+<tr>
+<td><code>[0x3B02, 0x3EFE)</code> pad</td>
+<td>1,020</td>
+<td>0</td>
+<td>1,018</td>
+<td>2</td>
+<td>12 files</td>
+</tr>
+<tr>
+<td><code>[0x3EFE, 0x3FCA)</code> epilogue</td>
+<td>204</td>
+<td>204</td>
+<td>0</td>
+<td>0</td>
+<td>11 files</td>
+</tr>
+<tr>
+<td><code>[0x3FCA, 0x4000)</code> tail pad</td>
+<td>54</td>
+<td>0</td>
+<td>54</td>
+<td>0</td>
+<td>11 files</td>
+</tr>
+</table>
+<p>The epilogue row is the 11-file result. In the strict 12-file intersection it</p>
+<p>collapses to the 2-byte slice <code>[0x3EFE, 0x3F00)</code>, which is <code>0xFF</code> in all</p>
+<p>twelve, because <code>v1_1_1</code> ends at <code>0x3F00</code> and carries no epilogue at all — a</p>
+<p>good illustration of why a whole-fleet "invariant" test can undercount a real</p>
+<p>204-byte invariant (§3.5).</p>
+<p>The table makes the honest picture obvious: <strong>almost nothing is invariant</strong>.</p>
+<p>Only 37 non-fill bytes hold the same value across all twelve, and 35 of those</p>
+<p>are zero bytes scattered through <code>[0x019F, 0x02B7]</code>. They are <strong>not</strong> a</p>
+<p>contiguous run: 30 are the most-significant byte of an aligned 32-bit</p>
+<p>little-endian word in the small-value/offset table spanning</p>
+<p><code>0x019C–0x02B4</code> (so those 30 words are all <code>&lt; 2^24</code> in every file), and the</p>
+<p>other 5 are single zero bytes at <code>0x1DD, 0x1E1, 0x1ED, 0x1F1, 0x1F9</code>, inside</p>
+<p>the trailer/command record cluster. The remaining two invariant bytes are the</p>
+<p><code>0x7140</code> lead word. Everything that identifies a version lives in the varying</p>
+<p>bytes. **This is a microcode family, not a header format with a version field</p>
+<p>bolted on.**</p>
+<p>---</p>
+<h2>5. The version story</h2>
+<h3>5.1 Filename version = the public bitfield</h3>
+<p><code>cpp_hw_params.h</code> defines the version as a bitfield: **31:28 major, 27:16</p>
+<p>minor, 15:0 step<strong>. </strong>[S]** Applying it:</p>
+<table>
+<tr>
+<th>filename</th>
+<th><code>CPP_FW_VERSION_*</code></th>
+</tr>
+<tr>
+<td>1.1.1</td>
+<td><code>0x10010001</code></td>
+</tr>
+<tr>
+<td>1.1.6</td>
+<td><code>0x10010006</code></td>
+</tr>
+<tr>
+<td>1.2.0</td>
+<td><code>0x10020000</code></td>
+</tr>
+<tr>
+<td>1.4.0</td>
+<td><code>0x10040000</code></td>
+</tr>
+<tr>
+<td>1.5.0</td>
+<td><code>0x10050000</code></td>
+</tr>
+<tr>
+<td>1.5.1</td>
+<td><code>0x10050001</code></td>
+</tr>
+<tr>
+<td>1.5.2</td>
+<td><code>0x10050002</code></td>
+</tr>
+<tr>
+<td>1.6.0</td>
+<td><code>0x10060000</code></td>
+</tr>
+<tr>
+<td>1.8.0</td>
+<td><code>0x10080000</code></td>
+</tr>
+<tr>
+<td>1.10.0</td>
+<td><code>0x100A0000</code></td>
+</tr>
+<tr>
+<td>1.12.0</td>
+<td><code>0x100C0000</code></td>
+</tr>
+<tr>
+<td>1.12.1</td>
+<td><code>0x100C0001</code></td>
+</tr>
+</table>
+<p>Note <code>1.10</code> → minor <code>0x00A</code>, so the enum value is <code>0x100A0000</code>, not a decimal</p>
+<p>concatenation. The fixtures' synthetic images carry these words so the probe's</p>
+<p>name→enum mapping is exercised — but **no real file contains its own enum</p>
+<p>word** as a version field: searching <code>v1_5_0</code> for <code>0x10050000</code> yields zero</p>
+<p>hits. Only 1.1.1, 1.1.6 and 1.6.0 contain their enum value anywhere, and in</p>
+<p>each case it is the 32-bit word formed by the marker plus the build counter</p>
+<p>(§6.3) reading <code>0x2B7C</code>, <code>0x0CB4</code>, <code>0x0100</code> — i.e. the three files whose</p>
+<p>adjacent counter happens to equal the filename step (1, 6, 0). The enum is a</p>
+<p><em>userspace</em> identifier; the payload does not carry it. <strong>[M]</strong></p>
+<h3>5.2 The in-file marker: <code>0x1000 | BCD(minor)</code></h3>
+<p>Every one of the twelve files contains <strong>exactly one</strong> 16-bit little-endian</p>
+<p>word of the form <code>0x1000 | BCD(minor)</code>:</p>
+<table>
+<tr>
+<th>version</th>
+<th>marker</th>
+<th>offset(s)</th>
+</tr>
+<tr>
+<td>1.1.1</td>
+<td><code>0x1001</code></td>
+<td><code>0x2B7E</code></td>
+</tr>
+<tr>
+<td>1.1.6</td>
+<td><code>0x1001</code></td>
+<td><code>0x0CB6</code></td>
+</tr>
+<tr>
+<td>1.2.0</td>
+<td><code>0x1002</code></td>
+<td><code>0x0CBA</code></td>
+</tr>
+<tr>
+<td>1.4.0</td>
+<td><code>0x1004</code></td>
+<td><code>0x0CD6</code></td>
+</tr>
+<tr>
+<td>1.5.0</td>
+<td><code>0x1005</code></td>
+<td><code>0x00C6</code></td>
+</tr>
+<tr>
+<td>1.5.1</td>
+<td><code>0x1005</code></td>
+<td><code>0x00C6</code></td>
+</tr>
+<tr>
+<td>1.5.2</td>
+<td><code>0x1005</code></td>
+<td><code>0x011A</code></td>
+</tr>
+<tr>
+<td>1.6.0</td>
+<td><code>0x1006</code></td>
+<td><code>0x0102</code></td>
+</tr>
+<tr>
+<td>1.8.0</td>
+<td><code>0x1008</code></td>
+<td><code>0x015A</code></td>
+</tr>
+<tr>
+<td>1.10.0</td>
+<td><code>0x1010</code></td>
+<td><code>0x01F2</code>, <strong><code>0x247A</code></strong></td>
+</tr>
+<tr>
+<td>1.12.0</td>
+<td><code>0x1012</code></td>
+<td><code>0x01F2</code></td>
+</tr>
+<tr>
+<td>1.12.1</td>
+<td><code>0x1012</code></td>
+<td><code>0x01F2</code></td>
+</tr>
+</table>
+<p>The <code>1.10.0</code> double hit is worth being precise about, because it looks like a</p>
+<p>second version field and is not one. The second occurrence sits at the head of</p>
+<p>an eight-<code>u16</code> <strong>offset table</strong> at <code>0x246A</code>:</p>
+<pre><code>
+0x246a: 80 10  c8 10  34 11  66 11  a2 11  06 0b  ba 11  e4 11
+        └────── eight u16 code offsets, all landing inside the code region
+0x247a: 10 10  &lt;- the second 0x1010, i.e. table slot 8 read as a marker
+</code></pre>
+<p>Doubled, those values are `0x2100, 0x2190, 0x2268, 0x22CC, 0x2344, 0x160C,</p>
+<p>0x2374, 0x23C8<code> — all inside the code region, and the </code>0x160C` slot is the</p>
+<p>outlier that makes the table look irregular. The coincidence is that this</p>
+<p>particular table's ninth <code>u16</code> happens to equal the version marker. <code>1.12.0</code></p>
+<p>and <code>1.12.1</code> carry no such table at that offset (<code>0x246A</code> holds ordinary code),</p>
+<p>which is why they report a single hit. The probe deliberately reports <strong>all</strong></p>
+<p>offsets rather than asserting uniqueness, precisely so this cannot be</p>
+<p>mistaken for a second version field.</p>
+<p>Two design details fall out:</p>
+<ul>
+<li><strong>BCD, not binary.</strong> <code>1.10</code> encodes as <code>0x1010</code>, not <code>0x100A</code>. Without BCD,</li>
+</ul>
+<p>  minor 10 would collide with... nothing, actually — but BCD does prevent</p>
+<p>  <code>1.10</code> from being read as <code>1.1</code> by a decimal-minded parser, and it makes the</p>
+<p>  field visually match the filename. It also means that if a reader assumes</p>
+<p>  the payload's marker and the public <code>CPP_FW_VERSION_*</code> constant encode the</p>
+<p>  same way, <code>1.10</code>/<code>1.12</code> will be misread — the constant packs minor as a</p>
+<p>  plain binary field (<code>0x00A</code>, <code>0x00C</code>), the payload as BCD.</p>
+<ul>
+<li><strong>The marker sits immediately below a <code>MSM_CPP_MSG_ID_TRAILER</code> record.</strong> The</li>
+</ul>
+<p>  marker offset minus the nearest preceding trailer offset is <code>+14</code> in 10/12</p>
+<p>  files and <code>+10</code> in exactly two: 1.5.0 and 1.5.1. It is <em>not</em> an</p>
+<p>  old/new-template split — 1.5.2 and 1.6.0, which sit between 1.5.1 and 1.10.0</p>
+<p>  in the ladder, are back at <code>+14</code>, as are 1.10.0/1.12.x. <strong>[M]</strong> The</p>
+<p>  relationship is still positional rather than coincidental (the version word</p>
+<p>  is a field of a trailer-terminated command record), but the two <code>+10</code> files</p>
+<p>  are a local variant, not a generation boundary.</p>
+<h3>5.3 The ASCII decoy at <code>0x3F80</code></h3>
+<p><code>strings</code> on any of the eleven windowed files finds <code>v1.1</code>. It is <strong>not</strong> a</p>
+<p>version field:</p>
+<ul>
+<li>it is present in 11/12 files — including 1.12.0 and 1.12.1;</li>
+<li>its offset is fixed (<code>0x3F80</code>), inside the invariant epilogue;</li>
+<li>the byte immediately before it is <code>0xFF</code> and the byte after it is <code>0x8D</code>, so</li>
+</ul>
+<p>  it is an exact printable run, not part of a longer string.</p>
+<p>It is a literal of the shared microcode epilogue. The probe reports both facts</p>
+<p>(<code>self_version_string_present: false</code>, plus the literal's offset and</p>
+<p>classification) so the distinction cannot be lost in a future reading.</p>
+<p><strong>Honest negative: no file carries its own version as ASCII text.</strong> The</p>
+<p>numeric marker of §5.2 is the only self-identification, and it encodes minor</p>
+<p>only — major and step are not recoverable from the payload by this rule alone.</p>
+<p>The step difference between 1.5.0 and 1.5.1 is two bytes of code (§6.2), not a</p>
+<p>marker change.</p>
+<p>---</p>
+<h2>6. The N×N version matrix</h2>
+<p>Three matrices are computed, because for a padded fixed-window format one</p>
+<p>number is misleading:</p>
+<ul>
+<li><strong><code>matrix_whole</code></strong> — same-offset byte equality over the common prefix.</li>
+<li><strong><code>matrix_code_region</code></strong> — same equality restricted to <code>min(code_end)</code>.</li>
+<li><strong><code>matrix_content_only</code></strong> — equality over positions where <em>neither</em> side is</li>
+</ul>
+<p>  <code>0xFF</code> or <code>0x00</code>; this is the honest similarity number.</p>
+<h3>6.1 Whole-file identity (%)</h3>
+<p>Rows and columns in ladder order. Diagonal omitted.</p>
+<table>
+<tr>
+<th></th>
+<th>1.1.6</th>
+<th>1.2.0</th>
+<th>1.4.0</th>
+<th>1.5.0</th>
+<th>1.5.1</th>
+<th>1.5.2</th>
+<th>1.6.0</th>
+<th>1.8.0</th>
+<th>1.10.0</th>
+<th>1.12.0</th>
+<th>1.12.1</th>
+</tr>
+<tr>
+<td><strong>1.1.1</strong></td>
+<td>26.21</td>
+<td>22.22</td>
+<td>22.25</td>
+<td>23.26</td>
+<td>23.26</td>
+<td>22.35</td>
+<td>23.90</td>
+<td>15.87</td>
+<td>10.78</td>
+<td>10.90</td>
+<td>10.82</td>
+</tr>
+<tr>
+<td><strong>1.1.6</strong></td>
+<td></td>
+<td>64.48</td>
+<td>62.65</td>
+<td>63.96</td>
+<td>63.96</td>
+<td>62.85</td>
+<td>63.48</td>
+<td>56.76</td>
+<td>43.62</td>
+<td>40.69</td>
+<td>41.24</td>
+</tr>
+<tr>
+<td><strong>1.2.0</strong></td>
+<td></td>
+<td></td>
+<td>65.37</td>
+<td>64.18</td>
+<td>64.18</td>
+<td>62.31</td>
+<td>64.08</td>
+<td>56.37</td>
+<td>43.56</td>
+<td>40.57</td>
+<td>41.17</td>
+</tr>
+<tr>
+<td><strong>1.4.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td>64.12</td>
+<td>64.13</td>
+<td>63.20</td>
+<td>64.20</td>
+<td>56.88</td>
+<td>43.78</td>
+<td>40.59</td>
+<td>40.97</td>
+</tr>
+<tr>
+<td><strong>1.5.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>99.99</strong></td>
+<td>65.36</td>
+<td>67.24</td>
+<td>58.39</td>
+<td>44.89</td>
+<td>42.18</td>
+<td>42.35</td>
+</tr>
+<tr>
+<td><strong>1.5.1</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>65.37</td>
+<td>67.24</td>
+<td>58.39</td>
+<td>44.89</td>
+<td>42.18</td>
+<td>42.35</td>
+</tr>
+<tr>
+<td><strong>1.5.2</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>65.33</td>
+<td>59.34</td>
+<td>45.73</td>
+<td>42.40</td>
+<td>43.10</td>
+</tr>
+<tr>
+<td><strong>1.6.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>58.53</td>
+<td>45.39</td>
+<td>42.18</td>
+<td>42.58</td>
+</tr>
+<tr>
+<td><strong>1.8.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>48.55</td>
+<td>45.17</td>
+<td>46.14</td>
+</tr>
+<tr>
+<td><strong>1.10.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>50.10</td>
+<td>50.65</td>
+</tr>
+<tr>
+<td><strong>1.12.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>61.06</td>
+</tr>
+</table>
+<h3>6.2 Content-only identity (%), the honest measure</h3>
+<table>
+<tr>
+<th></th>
+<th>1.1.6</th>
+<th>1.2.0</th>
+<th>1.4.0</th>
+<th>1.5.0</th>
+<th>1.5.1</th>
+<th>1.5.2</th>
+<th>1.6.0</th>
+<th>1.8.0</th>
+<th>1.10.0</th>
+<th>1.12.0</th>
+<th>1.12.1</th>
+</tr>
+<tr>
+<td><strong>1.1.1</strong></td>
+<td>89.22</td>
+<td>20.14</td>
+<td>10.24</td>
+<td>6.40</td>
+<td>6.40</td>
+<td>8.37</td>
+<td>4.35</td>
+<td>2.90</td>
+<td>2.57</td>
+<td>4.22</td>
+<td>3.45</td>
+</tr>
+<tr>
+<td><strong>1.1.6</strong></td>
+<td></td>
+<td>14.98</td>
+<td>8.16</td>
+<td>8.18</td>
+<td>8.18</td>
+<td>6.73</td>
+<td>7.35</td>
+<td>7.16</td>
+<td>5.55</td>
+<td>5.19</td>
+<td>5.19</td>
+</tr>
+<tr>
+<td><strong>1.2.0</strong></td>
+<td></td>
+<td></td>
+<td>13.23</td>
+<td>12.35</td>
+<td>12.35</td>
+<td>8.23</td>
+<td>11.11</td>
+<td>8.31</td>
+<td>8.09</td>
+<td>7.52</td>
+<td>7.72</td>
+</tr>
+<tr>
+<td><strong>1.4.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td>10.83</td>
+<td>10.85</td>
+<td>10.81</td>
+<td>10.56</td>
+<td>9.80</td>
+<td>8.63</td>
+<td>7.35</td>
+<td>6.79</td>
+</tr>
+<tr>
+<td><strong>1.5.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>99.97</strong></td>
+<td>13.95</td>
+<td>15.14</td>
+<td>11.44</td>
+<td>9.39</td>
+<td>9.76</td>
+<td>8.66</td>
+</tr>
+<tr>
+<td><strong>1.5.1</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>13.96</td>
+<td>15.14</td>
+<td>11.44</td>
+<td>9.39</td>
+<td>9.76</td>
+<td>8.66</td>
+</tr>
+<tr>
+<td><strong>1.5.2</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>14.55</td>
+<td>12.13</td>
+<td>9.95</td>
+<td>8.45</td>
+<td>8.95</td>
+</tr>
+<tr>
+<td><strong>1.6.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>11.87</td>
+<td>11.00</td>
+<td>9.94</td>
+<td>9.52</td>
+</tr>
+<tr>
+<td><strong>1.8.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>13.42</td>
+<td>12.22</td>
+<td>13.32</td>
+</tr>
+<tr>
+<td><strong>1.10.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>14.90</td>
+<td>14.93</td>
+</tr>
+<tr>
+<td><strong>1.12.0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>32.95</td>
+</tr>
+</table>
+<p>The padding inflation is large and systematic: 1.5.0↔1.6.0 is <strong>67.24</strong> whole</p>
+<p>but <strong>15.14</strong> content. Any conclusion drawn from the whole-file number alone</p>
+<p>is wrong by a factor of four.</p>
+<p><strong>One caveat about the <code>1.1.1</code> row, stated so it is not over-read.</strong> Its</p>
+<p><code>89.22</code> against <code>1.1.6</code> rests on only <strong>334</strong> eligible positions. The reason</p>
+<p>is that the two files' erase windows are almost exactly complementary:</p>
+<p><code>v1_1_1</code> is <strong>100% <code>0xFF</code></strong> through <code>[0x02C4, 0x2204)</code> while <code>v1_1_6</code> is</p>
+<p><strong>100% <code>0xFF</code></strong> through <code>[0x2204, 0x3B00)</code>. Every position in either span</p>
+<p>therefore has one side at fill, and nothing there survives the "neither side</p>
+<p>is fill or zero" filter. The 334 survivors sit in <code>[0x0000, 0x0198)</code> (329 of</p>
+<p>them, the shared code prologue), plus 3 bytes in <code>[0x0198, 0x02C4)</code> and 2 at</p>
+<p><code>0x3B00</code>. 298 of those 334 match, and the differences are exactly three runs:</p>
+<p>the 32-byte vector table (<code>[0x0002, 0x0022)</code>), one 2-byte spot at <code>0x02C0</code>,</p>
+<p>and a 2-byte word at <code>0x3B00</code>. So "1.1.1 is 89% identical to 1.1.6" means</p>
+<p>"the tiny part of both files that is neither fill nor zero agrees 89% of the</p>
+<p>time" — consistent with them being siblings, but not comparable in weight to</p>
+<p>the 5,903-position comparison behind 1.5.0↔1.5.1. The probe reports the</p>
+<p>denominator (<code>positions</code>) alongside every cell for this reason.</p>
+<h3>6.3 Adjacent-version first diff</h3>
+<table>
+<tr>
+<th>pair</th>
+<th>common span</th>
+<th>differing B</th>
+<th>runs</th>
+<th>first diff</th>
+</tr>
+<tr>
+<td>1.1.1 → 1.1.6</td>
+<td>16,128</td>
+<td>11,901</td>
+<td>175</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.1.6 → 1.2.0</td>
+<td>16,384</td>
+<td>5,820</td>
+<td>577</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.2.0 → 1.4.0</td>
+<td>16,384</td>
+<td>5,674</td>
+<td>464</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.4.0 → 1.5.0</td>
+<td>16,384</td>
+<td>5,878</td>
+<td>481</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td><strong>1.5.0 → 1.5.1</strong></td>
+<td>16,384</td>
+<td><strong>2</strong></td>
+<td><strong>2</strong></td>
+<td><code>0x0034</code></td>
+</tr>
+<tr>
+<td>1.5.1 → 1.5.2</td>
+<td>16,384</td>
+<td>5,674</td>
+<td>508</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.5.2 → 1.6.0</td>
+<td>16,384</td>
+<td>5,680</td>
+<td>558</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.6.0 → 1.8.0</td>
+<td>16,384</td>
+<td>6,795</td>
+<td>526</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.8.0 → 1.10.0</td>
+<td>16,384</td>
+<td>8,429</td>
+<td>690</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.10.0 → 1.12.0</td>
+<td>16,384</td>
+<td>8,176</td>
+<td>673</td>
+<td><code>0x0002</code></td>
+</tr>
+<tr>
+<td>1.12.0 → 1.12.1</td>
+<td>16,384</td>
+<td>6,380</td>
+<td>387</td>
+<td><code>0x0002</code></td>
+</tr>
+</table>
+<p>**The 1.5.0 → 1.5.1 pair is the anomaly, and it is the most informative row in</p>
+<p>this document.** Exactly two bytes differ:</p>
+<table>
+<tr>
+<th>offset</th>
+<th>1.5.0</th>
+<th>1.5.1</th>
+<th>context</th>
+</tr>
+<tr>
+<td><code>0x0034</code></td>
+<td><code>0x58</code></td>
+<td><code>0x08</code></td>
+<td>inside the code region, in a run of <code>u16</code> immediates</td>
+</tr>
+<tr>
+<td><code>0x00C4</code></td>
+<td><code>0x10</code></td>
+<td><code>0x02</code></td>
+<td>low half of the 32-bit word that carries the version marker</td>
+</tr>
+</table>
+<p>The second byte deserves care, because the obvious reading of it is wrong.</p>
+<p><code>0x00C4</code> is at marker offset <code>0x00C6</code> <strong>minus 2</strong>, i.e. it is the <em>low</em> <code>u16</code></p>
+<p>of the same little-endian 32-bit word whose high <code>u16</code> is the <code>0x1005</code> marker.</p>
+<p>This fleet contains <strong>no</strong> <code>CPP_FW_VERSION_*</code> enum word — the values</p>
+<p><code>0x10010001</code>…<code>0x100C0001</code> never appear as a version field (<code>v1_5_0</code>'s own enum</p>
+<p><code>0x10050000</code> has zero hits in <code>v1_5_0</code>). So <code>0x00C4</code> is a build counter</p>
+<p>adjacent to the marker, not the step digit: it reads <code>0x10</code> in 1.5.0 and</p>
+<p><code>0x02</code> in 1.5.1 while the filename step goes 0→1, and it disagrees with the</p>
+<p>filename step in <strong>9 of the 12 files</strong> — the only three where it agrees are</p>
+<p>1.1.1 (<code>0x01</code>), 1.1.6 (<code>0x06</code>) and 1.6.0 (<code>0x00</code>), i.e. precisely the three</p>
+<p>files whose enum value happens to appear in the payload at all (§5.1).</p>
+<p><strong>[M]</strong> Its semantics are <strong>[OPEN]</strong>; what is established is only that it</p>
+<p>moves when the build moves.</p>
+<p>So a <strong>step bump is a two-byte change</strong>: one code byte plus one byte of the</p>
+<p>marker's own word. This is still the cleanest evidence that the ladder is a</p>
+<p>genuine code lineage with in-band identification — it just isn't evidence of a</p>
+<p>step field, because there is no step field to bump.</p>
+<p><strong>1.12.0 → 1.12.1 is the opposite extreme</strong>: 6,380 differing bytes, only 32.95</p>
+<p>content identity. A step bump that is a near-total rewrite means the "step"</p>
+<p>digit is not a semantic patch level — it is a build revision, and 1.12.1 was a</p>
+<p>substantive rework. Note also that 1.12.1 ships to only 4 devices while 1.12.0</p>
+<p>ships to 9; a rework that did not roll out fleet-wide is consistent with that.</p>
+<h3>6.4 Clustering</h3>
+<p>Threshold-clustering on the whole-file matrix:</p>
+<table>
+<tr>
+<th>threshold</th>
+<th>clusters</th>
+</tr>
+<tr>
+<td>≥70%</td>
+<td><code>{1.1.1}</code>, <code>{1.1.6}</code>, <code>{1.2.0}</code>, <code>{1.4.0}</code>, <code>{1.5.0, 1.5.1}</code>, <code>{1.5.2}</code>, <code>{1.6.0}</code>, <code>{1.8.0}</code>, <code>{1.10.0}</code>, <code>{1.12.0}</code>, <code>{1.12.1}</code></td>
+</tr>
+<tr>
+<td>≥60%</td>
+<td><code>{1.1.1}</code>, <code>{1.1.6 … 1.6.0}</code>, <code>{1.8.0}</code>, <code>{1.10.0}</code>, <code>{1.12.0, 1.12.1}</code></td>
+</tr>
+<tr>
+<td>≥50%</td>
+<td><code>{1.1.1}</code>, <code>{1.1.6 … 1.8.0}</code>, <code>{1.10.0, 1.12.0, 1.12.1}</code></td>
+</tr>
+</table>
+<p>Verdict: <strong>clustering is monotone in semantic version distance.</strong> The</p>
+<p><code>{1.1.6 … 1.6.0}</code> block, the <code>{1.10.0, 1.12.0, 1.12.1}</code> block, and the isolated</p>
+<p><code>1.1.1</code> and <code>1.8.0</code> are exactly what a version-ordered lineage with two</p>
+<p>structural jumps should produce. Version sort order <strong>does</strong> match byte-identity</p>
+<p>clustering — worth stating explicitly because it is the assumption most likely</p>
+<p>to fail, and here it holds.</p>
+<p><code>1.1.1</code> is the structural outlier throughout (content identity 2.57–20.14</p>
+<p>against everything, 89.22 only against 1.1.6, and it is the only file that</p>
+<p>lacks the epilogue and is 256 B short).</p>
+<p><strong>No file is a byte-prefix of another.</strong> Checked explicitly. The 16 KiB window</p>
+<p>is filled independently per version, not by extending an older image.</p>
+<p>---</p>
+<h2>7. Which hardware gets which firmware</h2>
+<p>From <code>cpp_hardware_select_fw_version()</code> <strong>[S]</strong>:</p>
+<table>
+<tr>
+<th>hardware version</th>
+<th>firmware</th>
+</tr>
+<tr>
+<td>1.1.x, 2.0.0</td>
+<td>1.2.0</td>
+</tr>
+<tr>
+<td>4.0.0, 4.2.0</td>
+<td>1.4.0</td>
+</tr>
+<tr>
+<td>4.1.0</td>
+<td>1.6.0</td>
+</tr>
+<tr>
+<td>4.3.2, 4.3.3, 4.3.4</td>
+<td>1.5.0</td>
+</tr>
+<tr>
+<td>4.3.0</td>
+<td>1.5.1</td>
+</tr>
+<tr>
+<td>5.0.0, 5.1.0</td>
+<td>1.8.0</td>
+</tr>
+<tr>
+<td>6.0.0</td>
+<td>1.10.0</td>
+</tr>
+<tr>
+<td>6.1.0, 6.1.2</td>
+<td>1.12.0</td>
+</tr>
+<tr>
+<td>6.1.4</td>
+<td>1.12.1</td>
+</tr>
+</table>
+<p>The mapping is <strong>non-monotone in one place, and the exception is real</strong>:</p>
+<p>hardware 4.3.0 (MSM8952) takes 1.5.1, while 4.3.3 (MSM8953) takes 1.5.0. A</p>
+<p>newer hardware minor gets an <em>older</em> firmware minor. Since the 1.5.0→1.5.1</p>
+<p>delta is those two bytes (§6.3), 1.5.1 is a targeted fix for the MSM8952</p>
+<p>variant, not a general successor. Anyone building a version-choice table from</p>
+<p>"higher hardware ⇒ higher firmware" will get 4.3.x wrong.</p>
+<p>This also explains the fleet's device counts: nine devices share the same</p>
+<p>eight-plus firmware identities because they share the same CPP hardware</p>
+<p>generations, and <code>v1_12_1</code> (4 devices) is the newest hardware 6.1.4 population.</p>
+<p>---</p>
+<h2>8. Cross-fleet verdict</h2>
+<h3>8.1 vs F-75 (<code>cr*</code>/<code>ap*</code> QCA BT, gen 1)</h3>
+<table>
+<tr>
+<th>aspect</th>
+<th>F-75 (QCA BT gen 1)</th>
+<th>this family (MSM CPP)</th>
+</tr>
+<tr>
+<td>declared length</td>
+<td><code>4 + 24 + data_length + 256</code></td>
+<td><strong>none declared</strong>; <code>u16</code> at <code>0x3EFC</code> counts a region, not the file</td>
+</tr>
+<tr>
+<td>container magic checked by loader</td>
+<td>yes (TLV type)</td>
+<td><strong>no</strong> — kernel streams words blindly</td>
+</tr>
+<tr>
+<td>size</td>
+<td>1,243 – 56,180 B (variable)</td>
+<td><strong>fixed 16 KiB window</strong> (one 16,128 B outlier)</td>
+</tr>
+<tr>
+<td>filename digit meaning</td>
+<td>ROM build targeted (a <em>target</em> id)</td>
+<td>true semantic <code>major.minor.step</code></td>
+</tr>
+<tr>
+<td>version in file</td>
+<td>header <code>patch_version</code> = format rev, not the filename digit</td>
+<td>numeric marker <code>0x1000|BCD(minor)</code> (+ adjacent build counter)</td>
+</tr>
+<tr>
+<td>padding</td>
+<td>256-byte signature-class tail</td>
+<td><code>0xFF</code> erase fill in a padded window</td>
+</tr>
+<tr>
+<td>kernel validates</td>
+<td>container framing, segments</td>
+<td>nothing but word alignment</td>
+</tr>
+</table>
+<p>Three distinct philosophies now on record across the programme: F-75's</p>
+<p><code>4 + 24 + data_length + 256</code>, gen-2's <code>4 + 32 + data_length + 36</code></p>
+<p>(see <code>implementations/qca-bt-gen2/fleet-analysis.md</code>), and CPP's **padded</p>
+<p>fixed window with no length field at all**. CPP is the odd one out in the</p>
+<p>strongest sense: the other two are <em>self-describing</em> containers, CPP is a</p>
+<p><em>placed</em> image whose only length signal is a payload-internal <code>u16</code> the loader</p>
+<p>ignores.</p>
+<p>The filename-semantics inversion is the finding worth carrying forward: in F-75</p>
+<p>the filename digit <strong>misleads</strong> (it names a target ROM, and the same ROM build</p>
+<p>appears under two different digits for different chips), whereas in CPP the</p>
+<p>filename <strong>is</strong> the bitfield value, verifiable against a public header and</p>
+<p>against a marker word inside the payload. F-75 taught "don't trust the</p>
+<p>filename digit"; CPP teaches "here the filename digit is trustworthy, but the</p>
+<p><code>v1.1</code> string inside the file is not." Both are traps, in opposite directions.</p>
+<h3>8.2 vs the ADSP <code>bm2n</code> fleet</h3>
+<p>Superficial similarity (fixed vendor path, Qualcomm, per-variant family) but</p>
+<p>nothing structural in common: <code>bm2n</code> is a serialized QNN/HTP object graph with</p>
+<p>a real load header and record grammar; CPP is position-dependent microcode in</p>
+<p>an erased-flash window with no in-band grammar beyond the trailer records.</p>
+<p>---</p>
+<h2>9. What this means for a free reimplementation</h2>
+<p><strong>Writable today, with zero proprietary bytes:</strong></p>
+<ul>
+<li>The loader side is <em>trivial</em>: <code>cpp_load_fw()</code> semantics are fully specified by</li>
+</ul>
+<p>  GPL source and need no reverse engineering. Send <code>MSM_CPP_CMD_FW_LOAD</code>, send</p>
+<p>  size and <code>MSM_CPP_START_ADDRESS</code> 0, stream <code>size/4</code> LE words.</p>
+<ul>
+<li>The window contract: any replacement payload must be a multiple of 4 bytes;</li>
+</ul>
+<p>  the fleet's own convention is a 16,384-byte window (16,128 seen once). A</p>
+<p>  free build can pick its own size as far as the kernel is concerned.</p>
+<ul>
+<li>The version-reporting convention is now known: to look like this family, a</li>
+</ul>
+<p>  free image should carry <code>0x7140</code> at <code>0x0000</code>, a <code>0x1000|BCD(minor)</code> marker</p>
+<p>  word inside the code region, and the three <code>msm_cpp.h</code> magic words so the</p>
+<p>  protocol handshake can complete.</p>
+<p><strong>Opaque — needs synthesis or further RE:</strong></p>
+<ul>
+<li>The code region itself (<code>[0x0022, code_end)</code>), 3.3–4.7 bits/byte, 35–60%</li>
+</ul>
+<p>  <code>0xFF</code> interleaved. It is microcode for an undocumented CPP core. Its ISA is</p>
+<p>  <strong>[OPEN]</strong>; no disassembly was performed and none is claimed.</p>
+<ul>
+<li>The 204-byte invariant epilogue. It is byte-identical across 11/12 files,</li>
+</ul>
+<p>  which makes it a <em>constant</em> a free build could carry verbatim only if its</p>
+<p>  semantics were known — they are not. <strong>[OPEN]</strong></p>
+<ul>
+<li>The 176-byte fixed-stride block in 1.10.0/1.12.x. 14 B prologue + 8 × 20 B</li>
+</ul>
+<p>  records + 2 B tail; the 12-byte record body is identical in all 8, with two</p>
+<p>  <code>u16</code> counters advancing by <code>0x0A</code> and <code>8</code>. Counted table, semantics</p>
+<p>  <strong>[OPEN]</strong>.</p>
+<ul>
+<li>Whether the core verifies anything at all. No checksum was found: crc32,</li>
+</ul>
+<p>  sum32, and 16-bit halfword sums over the code region do not match any</p>
+<p>  trailer field in any file. <strong>[OPEN]</strong> — but the kernel certainly does not</p>
+<p>  verify anything (§1.1), so any verification would be core-side.</p>
+<p>---</p>
+<h2>10. <code>[OPEN]</code> register</h2>
+<table>
+<tr>
+<th>#</th>
+<th>question</th>
+<th>range</th>
+<th>why it is still open</th>
+</tr>
+<tr>
+<td>1</td>
+<td>semantics of the 16×<code>u16</code> vector table</td>
+<td><code>[0x0002, 0x0022)</code></td>
+<td>undocumented in public source; odd slots refute a plain halfword-offset read</td>
+</tr>
+<tr>
+<td>2</td>
+<td>semantics of the 204-byte invariant epilogue</td>
+<td><code>[0x3EFE, 0x3FCA)</code></td>
+<td>byte-identical but unexplained; contains <code>v1.1</code> and <code>cmd&gt;</code> literals</td>
+</tr>
+<tr>
+<td>3</td>
+<td>why 1.1.1/1.1.6/1.8.0 leave the length <code>u16</code> erased and use <code>code_end</code> 0x3B02</td>
+<td><code>0x3EFC</code></td>
+<td>no public source shows the format revision</td>
+</tr>
+<tr>
+<td>4</td>
+<td>semantics of the 176-byte fixed-stride block</td>
+<td>1.10.0/1.12.x, after <code>2*(w+1)</code></td>
+<td>measured stride only</td>
+</tr>
+<tr>
+<td>5</td>
+<td>why 1.1.1 is 256 B short and lacks the epilogue</td>
+<td>whole file</td>
+<td>one-off; no sibling to compare</td>
+</tr>
+<tr>
+<td>6</td>
+<td>microcode ISA / core architecture</td>
+<td><code>[0x0022, code_end)</code></td>
+<td>no disassembly performed, none claimed</td>
+</tr>
+<tr>
+<td>7</td>
+<td>does the core verify a checksum?</td>
+<td>whole payload</td>
+<td>crc32/sum32/halfword sums tested, no match</td>
+</tr>
+<tr>
+<td>8</td>
+<td>why 1.12.0→1.12.1 is a near-total rewrite while 1.5.0→1.5.1 is 2 bytes</td>
+<td>—</td>
+<td>build process question, not a byte question</td>
+</tr>
+<tr>
+<td>9</td>
+<td>does anything consume the <code>0x7140</code> lead word?</td>
+<td><code>0x0000</code></td>
+<td>kernel does not; core-side unverified</td>
+</tr>
+<tr>
+<td>10</td>
+<td>what the build counter beside the marker means (and why it disagrees with the filename step in 9/12 files)</td>
+<td><code>marker-2</code></td>
+<td>measured to move with the build; no public source names it</td>
+</tr>
+</table>
+<p>---</p>
+<h2>11. Scratch artefacts (regeneratable)</h2>
+<ul>
+<li><code>/tmp/astro_u/cpp/payloads/</code>, <code>/tmp/astro_u/cpp/real/</code> — the twelve verified</li>
+</ul>
+<p>  payloads (<strong>never committed</strong>).</p>
+<ul>
+<li><code>/tmp/astro_u/cpp/analysis/matrix.json</code>, <code>summary.json</code> — probe output.</li>
+<li><code>/tmp/astro_u/cpp/{msm_cpp.c,msm_cpp.h,cpp_hardware.c,cpp_hw_params.h,cpphw.h,WHENCE,brcm_fw.c}</code></li>
+</ul>
+<p>  — the public sources quoted above, as fetched on 2026-11-19.</p>
+<p>Everything in this document is reproducible with:</p>
+<pre><code>
+python3 implementations/wifi-cpp-fleet/cpp_probe.py --matrix &lt;12 paths&gt; --json m.json
+python3 implementations/wifi-cpp-fleet/cpp_probe.py --versions &lt;12 paths&gt; --brief
+</code></pre>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>

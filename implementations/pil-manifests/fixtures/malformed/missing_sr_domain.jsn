@@ -1,0 +1,13 @@
+{
+    "sr_version": {
+        "major": 1,
+        "minor": 1,
+        "patch": 1
+    },
+    "sr_service": [
+        {
+            "provider": "tms",
+            "service": "servreg"
+        }
+    ]
+}

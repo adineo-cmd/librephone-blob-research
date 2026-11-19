@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GMU microcode analysis — real-payload RE of `a619_gmu.bin` (2026-11-18) — Open Device</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header><h1>Open Device</h1>
+<nav>
+    <a href="../index.html">Home</a>
+    <a href="../devices/index.html">Devices</a>
+    <a href="../families/index.html">Families</a>
+    <a href="../research/index.html">Research</a>
+    <a href="../links/index.html">External code</a>
+    <a href="../methodology/index.html">Methodology</a>
+    <a href="../build-report.html">Build report</a>
+</nav></header>
+<main>
+<h1>GMU microcode analysis — real-payload RE of `a619_gmu.bin` (2026-11-18)</h1><p>Content-level RE of the Adreno GMU microcode blob at recon.md row 10</p><p>Evidence: none</p>
+<h1>GMU microcode analysis — real-payload RE of <code>a619_gmu.bin</code> (2026-11-18)</h1>
+<p>Content-level RE of the Adreno GMU microcode blob at recon.md row 10</p>
+<p>(26 DB rows share these bytes; <strong>13 devices actually load them</strong> — the</p>
+<p>correction is §2.2). Payload <code>a619_gmu.bin</code> — 32,768 B, md5</p>
+<p><code>9e23c52057bb573dee9ba31f1fdba4fa</code>, sha256</p>
+<p><code>9ef10b2b179054fb57af25008e29feb24300c2eaaeabf907bd741786bbacbf2e</code> —</p>
+<p>fetched and md5-verified by the lead against the upstream database, then</p>
+<p>measured here. Source:</p>
+<p><code>raw.githubusercontent.com/TheMuppets/proprietary_vendor_oneplus/lineage-19.1/dre/proprietary/vendor/firmware/a619_gmu.bin</code></p>
+<p>(dre = OnePlus Nord N200 5G). Payload bytes live only in</p>
+<p><code>/tmp/astro_u/payloads/</code>; nothing proprietary is committed.</p>
+<p>Clean-room statement: every claim below rests on (a) public GPL-2.0 kernel</p>
+<p>sources and (b) this session's structural measurements of the payload bytes.</p>
+<p>No decompiler, disassembler, vendor datasheet or leaked document was used.</p>
+<p>No code was interpreted beyond ARMv7-M architectural encodings that are</p>
+<p>publicly specified. Claims are labelled:</p>
+<ul>
+<li><strong>[S]</strong> source-cited — quoted from public GPL source, file + line.</li>
+<li><strong>[M]</strong> measurement — my own count/offset/hash over the payload bytes.</li>
+<li><strong>[OPEN]</strong> not established; the specific gap is named.</li>
+</ul>
+<h2>1. The public-header verdict — the premise is false, and here is what is true</h2>
+<h3>1.1 What was claimed, and what the sources actually say</h3>
+<p>The task premise was that Adreno GMU firmware begins with a documented</p>
+<p><code>struct a6xx_gmu_fw_header</code> in <code>a6xx_gmu.h</code>. <strong>That struct does not exist.</strong></p>
+<p>Checked by fetching the real file (authenticated <code>gh api ... ?ref=&lt;tag&gt;</code> +</p>
+<p>base64-decode, 2026-11-18):</p>
+<table>
+<tr>
+<th>ref</th>
+<th><code>a6xx_gmu.h</code> lines</th>
+<th>occurrences of <code>fw_header</code></th>
+</tr>
+<tr>
+<td><code>master</code></td>
+<td>245</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>v6.1</code></td>
+<td>190</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>v5.15</code></td>
+<td>190</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>v5.10</code></td>
+<td>203</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>v5.4</code></td>
+<td>168</td>
+<td><strong>0</strong></td>
+</tr>
+</table>
+<p>An authenticated GitHub code search for <code>a6xx_gmu_fw_header</code> returns</p>
+<p><code>total_count: 0</code>. Fetching succeeded (each file parses as C and begins with</p>
+<p>its SPDX header); these are real negatives, not rate-limit pages.</p>
+<p>What mainline <strong>does</strong> document, in <code>a6xx_gmu.c</code>, is the only firmware</p>
+<p>container struct it has [S]:</p>
+<pre><code class="language-c">
+/* drivers/gpu/drm/msm/adreno/a6xx_gmu.c:857-863 */
+struct block_header {
+	u32 addr;
+	u32 size;
+	u32 type;
+	u32 value;
+	u32 data[];
+};
+</code></pre>
+<p>with the chain advance defined as [S]:</p>
+<pre><code class="language-c">
+/* a6xx_gmu.c:869-871 */
+#define NEXT_BLK(blk) \
+	((const struct block_header *)((const char *)(blk) + sizeof(*(blk)) + (blk)-&gt;size))
+</code></pre>
+<p>So a container record is a 16-byte header plus <code>size</code> bytes of payload.</p>
+<h3>1.2 Why this particular file is not a container — the load path decides</h3>
+<p>mainline has <strong>two</strong> GMU load paths, and which one runs is decided by</p>
+<p><code>gmu-&gt;legacy</code> [S]:</p>
+<pre><code class="language-c">
+/* a6xx_gmu.c:894-904 */
+	if (gmu-&gt;legacy) {
+		/* Sanity check the size of the firmware that was loaded */
+		if (fw_image-&gt;size &gt; 0x8000) {
+			DRM_DEV_ERROR(gmu-&gt;dev,
+				"GMU firmware is bigger than the available region\n");
+			return -EINVAL;
+		}
+
+		gmu_write_bulk(gmu, REG_A6XX_GMU_CM3_ITCM_START,
+			       (u32*) fw_image-&gt;data, fw_image-&gt;size);
+		return 0;
+	}
+</code></pre>
+<p><code>gmu-&gt;legacy</code> is set for the <code>ADRENO_6XX_GEN1</code> family [S]:</p>
+<pre><code class="language-c">
+/* a6xx_gmu.c:2412-2414 */
+	} else if (adreno_is_a630_family(adreno_gpu)) {
+		/* HFI v1, has sptprac */
+		gmu-&gt;legacy = true;
+</code></pre>
+<p>and a619 is <code>ADRENO_6XX_GEN1</code> [S] — <code>a6xx_catalog.c:872-876</code> and again at</p>
+<p>898-901 and 920-925 (three a619 entries: sm4350, sm6375, and a generic</p>
+<p>chip-id entry), each with <code>.family = ADRENO_6XX_GEN1</code> and</p>
+<p><code>[ADRENO_FW_GMU] = "a619_gmu.bin"</code>. <code>adreno_is_a630_family()</code> tests</p>
+<p><code>gpu-&gt;info-&gt;family == ADRENO_6XX_GEN1</code> (<code>adreno_gpu.h:517-522</code>), and</p>
+<p><code>adreno_is_a615_family()</code> explicitly groups a618 with a619</p>
+<p>(<code>adreno_gpu.h:512-515</code>).</p>
+<p><strong>So for a619 the driver never parses the file at all.</strong> It checks one size</p>
+<p>bound and DMA-writes all 32,768 bytes to <code>GMU_CM3_ITCM_START</code>. There is no</p>
+<p>header to find, because the loader does not look for one.</p>
+<p>This is confirmed negatively on the bytes: running mainline's own walk on</p>
+<p><code>a619_gmu.bin</code> fails on the first record [M] —</p>
+<pre><code>
+@0x00000 addr=00043f80 size=00000009 type=f3804805 value=48058808
+-&gt; next = 0x19 + 0x9 = 0x22 ... chain overflows the file
+</code></pre>
+<p><code>size = 9</code> is not a payload length; it is the raw byte <code>0x09</code> of a Thumb</p>
+<p>branch. The chain desynchronises immediately. **Verdict: <code>a619_gmu.bin</code></p>
+<p>carries no container header.** It is a raw memory image.</p>
+<h3>1.3 But the sibling generation <em>does</em> have the container — measured</h3>
+<p>The same walk, run on the linux-firmware siblings, lands on <strong>exact EOF</strong></p>
+<p>[M]:</p>
+<table>
+<tr>
+<th>file</th>
+<th>bytes</th>
+<th>md5</th>
+<th>walk result</th>
+<th>records</th>
+</tr>
+<tr>
+<td><code>a623_gmu.bin</code></td>
+<td>53,516</td>
+<td><code>7906b8a180c11d48d882bb9ff5c90ba5</code></td>
+<td>EXACT EOF</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>a640_gmu.bin</code></td>
+<td>37,680</td>
+<td><code>99d0c614ab7ca1e4f5ab9281aaee2f11</code></td>
+<td>EXACT EOF</td>
+<td>7</td>
+</tr>
+<tr>
+<td><code>a650_gmu.bin</code></td>
+<td>41,548</td>
+<td><code>a2b9504e3d1cb8686ae7fcca21a11e1a</code></td>
+<td>EXACT EOF</td>
+<td>16</td>
+</tr>
+<tr>
+<td><code>a660_gmu.bin</code></td>
+<td>55,252</td>
+<td><code>cd3a235218418f51360888637c1cb2ac</code></td>
+<td>EXACT EOF</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>a663_gmu.bin</code></td>
+<td>55,892</td>
+<td><code>bcd60be9a312caf37e3575776c0a4d3f</code></td>
+<td>EXACT EOF</td>
+<td>15</td>
+</tr>
+<tr>
+<td><code>a630_gmu.bin</code></td>
+<td>32,768</td>
+<td><code>ab20135f7adf48e0f344282a37da80e4</code></td>
+<td><strong>overflow</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong><code>a619_gmu.bin</code></strong></td>
+<td><strong>32,768</strong></td>
+<td><strong><code>9e23c52057bb573dee9ba31f1fdba4fa</code></strong></td>
+<td><strong>overflow</strong></td>
+<td>—</td>
+</tr>
+</table>
+<p>All six fetched from</p>
+<p><code>git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qcom/&lt;name&gt;</code></p>
+<p>(2026-11-18). a640's walk in full [M]:</p>
+<pre><code>
+@0x00000 addr=00000000 size=00000030
+@0x00040 addr=00000200 size=00000140
+@0x00190 addr=00000400 size=000038bc
+@0x03a5c addr=00004000 size=00003a58
+@0x074c4 addr=00040000 size=00001b20
+@0x08ff4 addr=00043fe0 size=00000014
+@0x09018 addr=00057000 size=00000308
+end 0x9330 / 0x9330   &lt;- exact
+</code></pre>
+<p>This splits the family cleanly and is a <strong>stronger</strong> result than either</p>
+<p>answer alone: the container format is real and documented and used — just</p>
+<p>not by the 6XX_GEN1 generation, which is precisely the generation the driver</p>
+<p>marks <code>legacy</code>. <code>a630_gmu.bin</code> (also 6XX_GEN1, also 32,768 B) fails the walk</p>
+<p>exactly as a619 does. <strong>The boundary is the load path, not the filename.</strong></p>
+<h3>1.4 The <code>0x43f80</code> question, settled</h3>
+<p>The lead's probe noted <code>0x43f80</code> at u32[0] and u32[8] and asked whether it is</p>
+<p>a load address, a size, or a magic. It is <strong>none of those</strong> — it is the</p>
+<p><strong>initial stack pointer</strong>, and the evidence is decisive [M]:</p>
+<ol>
+<li>It sits in the DTCM window: <code>0x40000 &lt;= 0x43f80 &lt; 0x44000</code>.</li>
+<li>It equals <strong>DTCM top − 0x80</strong> exactly (<code>0x44000 - 0x80</code>), the conventional</li>
+</ol>
+<p>   reserved slot immediately below a Cortex-M vector table.</p>
+<ol>
+<li>The reset stub <strong>loads it into MSP</strong> and loads the same value as the first</li>
+</ol>
+<p>   word of the vector table it points VTOR at (below).</p>
+<ol>
+<li>The same value appears at u32[0] (the architectural initial-SP slot) and</li>
+</ol>
+<p>   at vector-table word 0 — <strong>that repetition is the ARMv7-M contract</strong>, not</p>
+<p>   a self-referential pointer.</p>
+<p>The <code>0x8000</code> size is separately explained: `0x8000 == ITCM(0x4000) +</p>
+<p>DTCM(0x4000)<code>, and </code>0x8000` is exactly the loader's cap [S]. The file is not</p>
+<p>"32 KiB of code"; it is two 16 KiB TCM images laid end to end.</p>
+<h2>2. Provenance and fleet scope (verified this session)</h2>
+<p>md5 re-verified: <code>9e23c52057bb573dee9ba31f1fdba4fa</code> — <strong>MATCH</strong> vs the</p>
+<p>upstream DB. sha256 recorded above.</p>
+<p>Counts re-derived from <code>upstream-contribution/blob-database/coverage-matrix.csv</code> [M]:</p>
+<table>
+<tr>
+<th>query</th>
+<th>result</th>
+</tr>
+<tr>
+<td>rows with filename <code>a619_gmu.bin</code></td>
+<td><strong>24</strong></td>
+</tr>
+<tr>
+<td>rows with filename <code>a618_gmu.bin</code></td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td>rows with md5 <code>9e23c520…</code> (any filename)</td>
+<td><strong>26</strong></td>
+</tr>
+<tr>
+<td>distinct devices for that md5</td>
+<td><strong>26</strong></td>
+</tr>
+<tr>
+<td>laptop-half devices carrying this md5</td>
+<td><strong>7</strong> (luigi, oscar, pdx215, pdx206, pdx214, a71, laurel_sprout)</td>
+</tr>
+<tr>
+<td><strong>devices that actually load it</strong></td>
+<td><strong>13</strong> — see §2.2</td>
+</tr>
+</table>
+<p>The two <code>a618_gmu.bin</code> rows are <strong>Samsung Galaxy A71</strong> (<code>samsung/a71</code>) and</p>
+<p><strong>Xiaomi Mi A3</strong> (<code>xiaomi/laurel_sprout</code>) — same md5, same size. So the</p>
+<p><strong>byte-identical</strong> footprint is 26 devices spanning both names.</p>
+<p><code>sharing-clusters.csv</code> line 494 records the cluster as 7 devices</p>
+<p>(<code>a71; laurel_sprout; luigi; oscar; pdx206; pdx214; pdx215</code>) — the 5</p>
+<p>metadata-listed laptop devices plus the 2 aliases.</p>
+<p>Why one image serves 618 and 619: both are <code>ADRENO_6XX_GEN1</code>, and</p>
+<p><code>adreno_is_a615_family()</code> groups them [S].</p>
+<h3>2.2 Correction: 26 rows share the bytes, 13 devices load them</h3>
+<p><strong>A device carrying the file is not a device running it.</strong> <code>a619_gmu.bin</code> is</p>
+<p>only loaded by hardware mainline models as <code>revn = 619</code></p>
+<p>(<code>a6xx_catalog.c:872-876, 898-901, 920-925</code>, all <code>ADRENO_6XX_GEN1</code>). On a</p>
+<p>device whose GPU is an Adreno 650 or 660 — different <code>revn</code>, different</p>
+<p>family — the driver requests <code>a650_gmu.bin</code>/<code>a660_gmu.bin</code> and the <code>a619</code></p>
+<p>copy is a co-resident leftover from a shared BSP firmware directory.</p>
+<p>Grouping the 26 by the SoC recorded in the DB [M]:</p>
+<table>
+<tr>
+<th>class</th>
+<th>devices</th>
+</tr>
+<tr>
+<td>SoC is Adreno-619-class (SM4350/SM4375/SM6375/SM7225)</td>
+<td><strong>11</strong></td>
+</tr>
+<tr>
+<td><code>a619</code> is the only GMU blob present (SoC field unrecorded; both SM7325)</td>
+<td><strong>2</strong> (<code>Edge_20</code>, <code>Edge_2021</code>)</td>
+</tr>
+<tr>
+<td>co-resident with <code>a650</code>/<code>a660</code>, <strong>not</strong> 619-class → never loaded</td>
+<td><strong>11</strong></td>
+</tr>
+<tr>
+<td><code>a618</code> alias rows (carry <code>a630</code>/<code>a640</code>) → never loaded</td>
+<td><strong>2</strong> (<code>Galaxy_A71</code>, <code>Mi_A3</code>)</td>
+</tr>
+<tr>
+<td><strong>total</strong></td>
+<td><strong>26</strong></td>
+</tr>
+<tr>
+<td><strong>live union</strong></td>
+<td><strong>13</strong></td>
+</tr>
+</table>
+<p>Not loaded on: <code>Edge_30</code>, <code>Edge_30_Fusion</code>, <code>G_Stylus_5G-2-2022</code>,</p>
+<p><code>Galaxy_A71</code>, <code>Mi_A3</code>, <code>Moto_G200</code>, <code>Moto_G_Stylus_5G</code>, <code>Pixel_4A_5G</code>,</p>
+<p><code>Pixel_5</code>, <code>Pixel_5A</code>, <code>Xperia_1_II</code>, <code>Xperia_5_II</code>, <code>Xperia_5_III</code>.</p>
+<p>(<code>Galaxy_A71</code>/<code>Mi_A3</code> carry <code>a630</code> as well, and mainline binds</p>
+<p><code>a630_gmu.bin</code> to <code>revn = 618</code>/sm7150 at <code>a6xx_catalog.c:846-852</code>.)</p>
+<p><strong>One RE pass informs 13 devices, not 26.</strong> The <code>26</code> stays correct as a</p>
+<p>dedup/bandwidth figure — "how many DB rows share these exact bytes" — and is</p>
+<p>retained for that purpose. The laptop-half live count is <strong>2</strong></p>
+<p>(<code>Realme_10_Pro</code>, <code>Realme_9_Pro</code>), not 5; <code>pdx215</code>/<code>pdx206</code>/<code>pdx214</code> are</p>
+<p>co-resident cases. Details and the per-device table:</p>
+<p><code>../../blob-matrix/laptop/qualcomm-adreno-gmu-content.md</code> §5.</p>
+<h3>2.1 linux-firmware absence — a second F-74-class finding</h3>
+<p><code>a619_gmu.bin</code> is <strong>not</strong> in linux-firmware's <code>WHENCE</code> [M]. Fetched</p>
+<p><code>WHENCE</code> (11,885 lines) and grepped: the <code>qcom/*_gmu.bin</code> entries are</p>
+<p><code>a623, a630, a640, a650, a660, a663</code> plus the `gen70500/71300/71500/71600/</p>
+<p>71700/80000/80200/80100/81100/81400<code> Gen7/8 series. **No </code>a615<code>, </code>a618` or</p>
+<p><code>a619</code> GMU blob exists there.** So this microcode is device-vendor-only,</p>
+<p>exactly like the <code>crbtfw20.tlv</code>/<code>crnv20.bin</code> quartet in the QCA BT work —</p>
+<p>same structural situation, different subsystem. One consequence: a free</p>
+<p>reimplementation cannot source a reference image from the standard firmware</p>
+<p>package; it must come from a vendor tree (as this one did).</p>
+<p>Context for the present ones [S, from WHENCE]:</p>
+<p><code>a623 v3.06.01</code>, <code>a630</code> (no version), <code>a640 v1.05</code>, <code>a650 v2.1.8</code>,</p>
+<p><code>a660 v3.01.0A</code>, <code>a663 v3.05.01</code>.</p>
+<h2>3. The layout, established</h2>
+<p>Everything below is [M] unless marked. File offsets are decimal-hex; load</p>
+<p>addresses follow the driver's model <code>itcm_base = 0x0</code>,</p>
+<p><code>dtcm_base = 0x40000</code>, each <code>SZ_16K</code> [S <code>a6xx_gmu.c:886-887</code>].</p>
+<pre><code>
+file offset      load address      content
+0x00000-0x00004  0x00000           initial SP = 0x00043f80
+0x00004-0x00008  0x00004           Reset vector = 0x00000009 (Thumb)
+0x00008-0x00020  0x00008           reset stub (18 bytes; see 3.1)
+0x00020-0x00030  0x00020           literal pool: SP, PSP, 0x200, 0xe000ed08
+0x00030-0x000D0  0x00030           10 fault/trap counter stubs
+0x000D0-0x00200  0x000D0           early code, sparse, zero-padded
+0x00200-0x00340  0x00200           Cortex-M vector table (16 + 64 entries)
+0x00340-0x03E90  0x00340           microcode body (dense Thumb-2)
+0x03E90-0x03EA4  0x03E90           tail code + literal
+0x03EA4-0x03EE4  0x03EA4           region descriptor table (8 pairs)
+0x03EE4-0x04000  0x03EE4           zero pad to ITCM boundary
+0x04000-0x04010  0x40000           DTCM header (2 halfwords + zeros)
+0x04040-0x04100  0x40040           DTCM config words
+0x04100-0x044D8  0x40100           all zero
+0x044D8-0x04668  0x404D8           50 x {addr, value} pairs, values all 0
+0x04668-0x08000  0x40668           zero to EOF (14,744 B)
+</code></pre>
+<h3>3.1 The reset stub — the piece that proves the ISA and the layout</h3>
+<p>Bytes at <code>0x08</code>, decoded by hand from ARMv7-M encodings [M, plus ARM DDI 0403</p>
+<p>for the encodings]:</p>
+<pre><code>
+0x08  4805        ldr  r0,[pc,#0x14]     ; PC=0x0c -&gt; lit@0x20 = 0x00043f80
+0x0a  f380 8808   msr  msp,r0
+0x0e  4805        ldr  r0,[pc,#0x14]     ; -&gt; lit@0x24 = 0x00041440
+0x10  f380 8809   msr  psp,r0
+0x14  4804        ldr  r0,[pc,#0x10]     ; -&gt; lit@0x28 = 0x00000200
+0x16  4905        ldr  r1,[pc,#0x14]     ; -&gt; lit@0x2c = 0xe000ed08
+0x18  6008        str  r0,[r1,#0]        ; *SCB-&gt;VTOR = 0x200
+0x1a  f000 b9f1   b.w  0x400
+0x1e  bf00        nop
+</code></pre>
+<p>Every literal resolves; the <code>b.w</code> immediate decodes to **+994 → target</p>
+<p>0x400**, which is inside ITCM and is where the dense code begins. <code>0xe000ed08</code></p>
+<p>is <code>SCB-&gt;VTOR</code> in the ARMv7-M System Control Space [ARM DDI 0403]. This one</p>
+<p>32-byte window does four things at once: it identifies the core class, it</p>
+<p>confirms <code>u32[0]</code> is an SP, it confirms the vector table lives at <code>0x200</code>,</p>
+<p>and it explains the <code>0x200</code> constant the lead flagged.</p>
+<p>**This is an ARMv7-M Cortex-M-class image — stated as a hypothesis supported</p>
+<p>by these encodings, which is the honest strength of the claim.** It is not</p>
+<p>read off any vendor document.</p>
+<h3>3.2 The vector table at 0x200 — self-consistency anchor</h3>
+<p>16 architectural vectors + 64 external entries, <code>0x200-0x340</code> [M]:</p>
+<table>
+<tr>
+<th>idx</th>
+<th>name</th>
+<th>value</th>
+<th>idx</th>
+<th>name</th>
+<th>value</th>
+</tr>
+<tr>
+<td>0</td>
+<td>Initial SP</td>
+<td><code>0x00043f80</code></td>
+<td>11</td>
+<td>SVCall</td>
+<td><code>0x000000a1</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>Reset</td>
+<td><code>0x00000009</code></td>
+<td>12</td>
+<td>DebugMonitor</td>
+<td><code>0x00000041</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>NMI</td>
+<td><code>0x00000081</code></td>
+<td>13</td>
+<td>Reserved</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>HardFault</td>
+<td><code>0x00000051</code></td>
+<td>14</td>
+<td>PendSV</td>
+<td><code>0x00000091</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>MemManage</td>
+<td><code>0x00000071</code></td>
+<td>15</td>
+<td>SysTick</td>
+<td><code>0x000000b1</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>BusFault</td>
+<td><code>0x00000031</code></td>
+<td>16-79</td>
+<td>IRQ0-63</td>
+<td>all <code>0x00000061</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>UsageFault</td>
+<td><code>0x000000c1</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+<p>Two independent checks pass:</p>
+<ul>
+<li>word 0 <strong>equals the SP the stub loaded</strong> — a real Cortex-M vector table must.</li>
+<li>every handler value is <strong>odd</strong> (Thumb bit set) and points into the low ITCM</li>
+</ul>
+<p>  region where the trap stubs at <code>0x30-0xC8</code> actually sit.</p>
+<p>All 64 external interrupts collapse onto <strong>one</strong> handler (<code>0x61</code>) [M] — the</p>
+<p>microcode does not use discrete IRQ dispatch.</p>
+<h3>3.3 The trap stubs at 0x30 — a 10-entry array</h3>
+<p>Ten 16-byte stubs, offsets <code>0x30,0x40,…,0xC0</code> (the handler targets above):</p>
+<p>`ldr r0,[pc,#8]; ldr r1,[r0,#0x10]; adds r1,#1; str r1,[r0,#0x10]; b .;</p>
+<p>&lt;literal&gt;<code>, all literals </code>0x00041200` [M]. A fault handler that increments a</p>
+<p>counter in DTCM and then hangs — i.e. **each vector latches a distinct</p>
+<p>counter at the same base**. Which counter is which vector is [OPEN]; the</p>
+<p><code>ldr r1,[r0,#0x10]</code> displacement is identical in all ten, so the distinction</p>
+<p>is in the vector index, not the code.</p>
+<h3>3.4 The region descriptor table at 0x3EA4</h3>
+<p>8 pairs of ascending <code>{start, end}</code> addresses, <code>0x3EA4-0x3EE4</code> [M]:</p>
+<p><code>0x406cc→0x42000</code>, <code>0x404→0x43c</code>, <code>0x40000→0x41200</code>, <code>0x244→0x458</code>,</p>
+<p><code>0x406cc→0x41e00</code>, <code>0x16c→0x458</code>, <code>0x40ad0→0x43f80</code>, <code>0x4→0x458</code></p>
+<p>Every value is either an ITCM address (<code>&lt; 0x4000</code>) or a DTCM address</p>
+<p>(<code>0x40000-0x44000</code>), the pairs are strictly ascending, and the regions</p>
+<p>alternate DTCM/ITCM. This is structurally a **memory-region descriptor</p>
+<p>table<strong> — 8 regions, retry/limit-style pairs. Semantics </strong>[OPEN]**: nothing</p>
+<p>in public source names it.</p>
+<h3>3.5 The DTCM address table at 0x44D8</h3>
+<p>50 entries, stride 8, <code>{address, value}</code> with <strong>every value zero</strong> [M].</p>
+<p>Addresses span <code>0x44000060-0x44034008</code> — inside the <code>0x44000000</code> window that</p>
+<p>the microcode's own code uses as a register base. 49 distinct addresses</p>
+<p>(<code>0x4402381c</code> appears twice). Structurally a **register initialisation</p>
+<p>table<strong> (address + zero initial value). </strong>[OPEN]**: which peripheral block</p>
+<p><code>0x44000000</code> denotes.</p>
+<h3>3.6 The DTCM header at 0x4000</h3>
+<p><code>0x4002: 0x1011</code>, <code>0x4004: 0x3d79</code> [M]. On <code>a630_gmu.bin</code> the same slots read</p>
+<p><code>0x1006</code> / <code>0x3d61</code> [M] — so the first halfword **differs between the two</p>
+<p>builds** and is plausibly a build/revision id; the second also differs. No</p>
+<p>public source names either field. <strong>[OPEN]</strong> — and note this is the only</p>
+<p>place in the file where a build identifier could plausibly live, which</p>
+<p>matters for §4.</p>
+<h2>4. Strings — including the version question, answered negatively</h2>
+<p>193 printable ASCII runs ≥4 chars, <strong>zero UTF-16LE runs</strong> [M]. Almost all are</p>
+<p>incidental instruction-byte coincidences (<code>"HAhI"</code>, <code>")F F"</code>, <code>"pG"</code>), which</p>
+<p>is expected in dense Thumb-2 and is itself evidence the region is code.</p>
+<p><strong>Exactly one semantic string</strong> [M]:</p>
+<pre><code>
+0x00634  "SIGABRT: Abnormal termination"
+</code></pre>
+<p>Null-terminated, embedded in the code stream at a <code>str</code>/literal site — an</p>
+<p>assert/abort path banner. It is the sole human-readable message in the image.</p>
+<p><strong>The GMU firmware version is NOT in this file.</strong> The driver prints</p>
+<p><code>"Loaded GMU firmware v%u.%u.%u"</code> [S <code>a6xx_gmu.c:934-938</code>], but it reads</p>
+<p><code>REG_A6XX_GMU_CORE_FW_VERSION</code> — a <strong>register</strong> at <code>0x1d3f8</code> with</p>
+<p>MAJOR/MINOR/STEP bitfields [S <code>a6xx_gmu.xml:55-58</code>] — populated by the</p>
+<p>microcode <strong>at runtime</strong>. There is no version string to find, and its absence</p>
+<p>is correct behaviour, not a parsing failure. Corroborating detail: the exact</p>
+<p>word the driver reads to choose its init handshake, <code>DTCM_START + 0xff8</code>,</p>
+<p>coincides numerically with <code>GMU_CORE_FW_VERSION</code> [S; verified</p>
+<p><code>0x1c400 + 0xff8 == 0x1d3f8</code>], and the corresponding file word</p>
+<p>(DTCM+0xff8 = file <code>0x4ff8</code>) is <code>0x00000000</code> [M] — i.e. zero in the image,</p>
+<p>produced at runtime.</p>
+<p><strong>Also absent: any <code>0xefbeadde</code>/<code>0xdeadbeef</code> container marker</strong> [M]. The</p>
+<p>sibling container files carry 8-14 of them; a619 and a630 carry <strong>zero</strong>.</p>
+<p>A cheap, decisive discriminator, and the probe reports it.</p>
+<h2>5. Entropy map — code vs data, cleanly separated</h2>
+<p>Whole-file 3.87 bits/byte, which is meaningless on its own; the split is the</p>
+<p>finding [M]:</p>
+<table>
+<tr>
+<th>region</th>
+<th>file range</th>
+<th>bytes</th>
+<th>entropy</th>
+<th>zero %</th>
+</tr>
+<tr>
+<td>ITCM (all)</td>
+<td><code>0x0000-0x4000</code></td>
+<td>16,384</td>
+<td><strong>6.34</strong></td>
+<td>16.9</td>
+</tr>
+<tr>
+<td>— startup stub</td>
+<td><code>0x0000-0x0020</code></td>
+<td>32</td>
+<td>3.76</td>
+<td>18.8</td>
+</tr>
+<tr>
+<td>— vector table</td>
+<td><code>0x0200-0x0340</code></td>
+<td>320</td>
+<td>1.10</td>
+<td>75.9</td>
+</tr>
+<tr>
+<td>— code body</td>
+<td><code>0x00D0-0x3E90</code></td>
+<td>15,808</td>
+<td><strong>6.41</strong></td>
+<td>15.2</td>
+</tr>
+<tr>
+<td>— descriptor table</td>
+<td><code>0x3E90-0x3EF0</code></td>
+<td>96</td>
+<td>3.13</td>
+<td>47.9</td>
+</tr>
+<tr>
+<td>DTCM (all)</td>
+<td><code>0x4000-0x8000</code></td>
+<td>16,384</td>
+<td><strong>0.15</strong></td>
+<td>98.8</td>
+</tr>
+<tr>
+<td>— address table</td>
+<td><code>0x44D8-0x4668</code></td>
+<td>400</td>
+<td>2.69</td>
+<td>56.2</td>
+</tr>
+</table>
+<p>512-byte block profile: <code>0x0400-0x3E00</code> sits at <strong>5.5-6.5</strong> bits (uniform</p>
+<p>code), then <code>0x3E00</code> drops to 2.95, <code>0x4000</code> to 0.50, and **0x4200 onward is</p>
+<p>exactly 0.00 for 30 consecutive blocks** (15 KB of zeros, <code>0x4668-0x8000</code>).</p>
+<p>The ITCM/DTCM boundary at <code>0x4000</code> is sharp in the entropy profile — one of</p>
+<p>the cleanest code/data splits in the program so far. 6.41 bits is consistent</p>
+<p>with Thumb-2 code (dense but not compressed); it is well above the 6.85-6.91</p>
+<p>seen on the QCA BT patch bodies, consistent with a different toolchain.</p>
+<h2>6. Thumb-2 census — and how strong the ISA claim is</h2>
+<p>Region <code>0x340-0x3E90</code> (the body, excluding the vector table and tables),</p>
+<p>7,592 halfwords [M]. Counted by exact bit-mask match on the 16-bit encodings,</p>
+<p>each of which is a one-line predicate from the ARMv7-M ARM:</p>
+<table>
+<tr>
+<th>encoding</th>
+<th>count</th>
+<th>rate</th>
+</tr>
+<tr>
+<td><code>bl</code>/<code>blx</code> prefix (<code>0xF0xx</code>/<code>0xF8xx</code>)</td>
+<td>1,539</td>
+<td>20.3%</td>
+</tr>
+<tr>
+<td><code>movs Rd,#imm8</code></td>
+<td>765</td>
+<td>10.1%</td>
+</tr>
+<tr>
+<td><code>str Rt,[Rn,#imm5]</code></td>
+<td>566</td>
+<td>7.5%</td>
+</tr>
+<tr>
+<td><code>ldr Rt,[pc,#imm8]</code></td>
+<td>496</td>
+<td>6.5%</td>
+</tr>
+<tr>
+<td><code>ldr Rt,[Rn,#imm5]</code></td>
+<td>465</td>
+<td>6.1%</td>
+</tr>
+<tr>
+<td><code>b&lt;cond&gt;</code></td>
+<td>282</td>
+<td>3.7%</td>
+</tr>
+<tr>
+<td><code>mov Rd,Rm</code></td>
+<td>147</td>
+<td>1.9%</td>
+</tr>
+<tr>
+<td><code>push {…,lr}</code></td>
+<td>129</td>
+<td>1.7%</td>
+</tr>
+<tr>
+<td><code>pop {…,pc}</code></td>
+<td>104</td>
+<td>1.4%</td>
+</tr>
+<tr>
+<td><code>bx lr</code></td>
+<td>49</td>
+<td>0.6%</td>
+</tr>
+<tr>
+<td><code>b .</code> (infinite loop)</td>
+<td>2</td>
+<td>0.03%</td>
+</tr>
+<tr>
+<td><code>nop</code></td>
+<td>0</td>
+<td>0.0%</td>
+</tr>
+</table>
+<p>Reading: a normal compiled Cortex-M function mix — call-heavy (20% <code>bl</code></p>
+<p>prefixes), immediate-heavy, with matched <code>push {…,lr}</code> / <code>pop {…,pc}</code> at</p>
+<p>roughly 1:0.8. The ten <code>b .</code> sites are the trap stubs; <code>nop</code> appears in the</p>
+<p>stub area but not in the body (padding is zeros, not <code>nop</code>).</p>
+<p><strong>Honest strength of the ISA claim.</strong> The 16-bit predicates above are exact,</p>
+<p>but this is a <em>census over a 2-byte stride</em>, not a disassembly: halfwords</p>
+<p>belonging to the second half of a 32-bit Thumb-2 instruction, and immediate</p>
+<p>data that happens to match a pattern, are counted too. So the **rates are</p>
+<p>approximate**, and no instruction-level meaning is claimed for any specific</p>
+<p>site. What <em>is</em> established beyond reasonable doubt: the vector table</p>
+<p>(§3.2), the reset stub (§3.1, every encoding hand-verified and every literal</p>
+<p>resolving), and the <code>0xbabeface</code> constant (§6.1). Those three are decoded,</p>
+<p>not inferred.</p>
+<h3>6.1 An independent corroboration: the driver's init magic is in the code</h3>
+<p><code>a6xx_gmu.c:311-318</code> polls for <code>0xbabeface</code> in <code>GMU_CM3_FW_INIT_RESULT</code></p>
+<p>after reset [S]. That constant occurs <strong>twice</strong> in the microcode's own code,</p>
+<p>at file <code>0x1AF4</code> and <code>0x2EC8</code> [M] — i.e. the image contains the literal it is</p>
+<p>expected to report back. This closes the loop between the public driver and</p>
+<p>the payload without reading a single instruction's semantics: the driver</p>
+<p>documents a handshake value, and the firmware carries it.</p>
+<h2>7. What this buys a free reimplementation</h2>
+<p><strong>Specified and writable today, with zero proprietary bytes:</strong></p>
+<ul>
+<li>The <strong>load contract</strong>: 32,768 B, image = ITCM[0,0x4000) then</li>
+</ul>
+<p>  DTCM[0x4000,0x8000), bulk-written to <code>GMU_CM3_ITCM_START</code>; ≤ <code>0x8000</code> or</p>
+<p>  the driver refuses [S]. A replacement must produce this shape.</p>
+<ul>
+<li>The <strong>entry contract</strong>: u32[0] = initial SP inside DTCM at top−0x80;</li>
+</ul>
+<p>  u32[1] = odd (Thumb) Reset vector inside ITCM; a stub that sets</p>
+<p>  <code>SCB-&gt;VTOR</code> to an in-image Cortex-M table whose word 0 repeats the SP.</p>
+<ul>
+<li>The <strong>handshake contract</strong>: <code>0xbabeface</code> in <code>FW_INIT_RESULT</code>, and</li>
+</ul>
+<p>  <code>DTCM+0xff8</code> = 0 to select the legacy branch [S+M].</p>
+<ul>
+<li>The <strong>runtime tables</strong>: vector table (16+64), region descriptor pairs,</li>
+</ul>
+<p>  DTCM address/zero-value table — all enumerated above with offsets.</p>
+<p><strong>Opaque — needs synthesis or further RE:</strong></p>
+<ul>
+<li>The ~15.8 KB Thumb-2 body: what any function <em>does</em>. This is the bulk of</li>
+</ul>
+<p>  the work for a functional replacement and is not attempted here [OPEN].</p>
+<ul>
+<li>The DTCM header halfwords at <code>0x4002</code> (build id?) [OPEN].</li>
+<li>The <code>0x44000000</code> register window's identity [OPEN].</li>
+<li>The region descriptor table's semantics [OPEN].</li>
+</ul>
+<p><strong>Program-level:</strong> the RE surface went from "a 32 KB opaque blob" to "a</p>
+<p>two-window memory image with a fully specified load/entry/init contract, an</p>
+<p>enumerated vector table, two enumerated runtime tables, and one opaque code</p>
+<p>body". The format question — the one that gates any reimplementation — is</p>
+<p><strong>answered</strong>, and answered negatively in a useful direction: a619 does not</p>
+<p>need a container parser at all.</p>
+<h2>8. [OPEN] list</h2>
+<ol>
+<li><strong>[OPEN]</strong> Microcode body semantics (<code>0x340-0x3E90</code>) — what the functions</li>
+</ol>
+<p>   compute. Not attempted; would need real disassembly, which is out of scope</p>
+<p>   for a clean-room pass.</p>
+<ol>
+<li><strong>[OPEN]</strong> DTCM+0x02 halfwords (<code>0x1011</code>/<code>0x3d79</code> on a619,</li>
+</ol>
+<p>   <code>0x1006</code>/<code>0x3d61</code> on a630). Differ per build; plausibly a version; unnamed</p>
+<p>   in public source.</p>
+<ol>
+<li><strong>[OPEN]</strong> Region descriptor table at <code>0x3EA4</code> — 8 ascending</li>
+</ol>
+<p>   <code>{start,end}</code> TCM pairs. Structure clear, meaning not.</p>
+<ol>
+<li><strong>[OPEN]</strong> DTCM <code>{addr, 0}</code> table at <code>0x44D8</code> — 50 entries; which</li>
+</ol>
+<p>   peripheral block <code>0x44000000</code> is, and why all values are zero.</p>
+<ol>
+<li><strong>[OPEN]</strong> Trap-stub counter mapping — all 10 stubs use the same DTCM base</li>
+</ol>
+<p>   <code>0x41200</code> and same displacement; which vector increments which counter is</p>
+<p>   not determinable from the stubs alone.</p>
+<ol>
+<li><strong>[OPEN]</strong> Whether the 26-device fleet is byte-identical across <em>all</em> vendor</li>
+</ol>
+<p>   trees, or whether on-device builds differ from this LineageOS-sourced copy.</p>
+<p>   The DB md5 is one value for 26 rows, but only one vendor tree was fetched,</p>
+<p>   and §1.2 shows vendor vs packaged builds of the same filename already differ.</p>
+<ol>
+<li><strong>[OPEN]</strong> a618 vs a619 attribution: the same bytes ship under both names;</li>
+</ol>
+<p>   whether any device ships a <em>different</em> a618/a619 image is not established</p>
+<p>   (the DB records exactly one md5).</p>
+<ol>
+<li><strong>[OPEN]</strong> Occupancy of the 13 live devices vs the 26 byte-sharing rows: the</li>
+</ol>
+<p>   co-residency classification (§2.2) rests on the DB <code>soc</code> column and mainline</p>
+<p>   <code>revn</code> bindings. Two devices (<code>Edge_20</code>, <code>Edge_2021</code>, both SM7325) keep their</p>
+<p>   <code>a619</code> only because no competing GMU blob is present; SM7325 has no mainline</p>
+<p>   catalog entry at all, so their support status is unestablished.</p>
+<ol>
+<li><strong>[OPEN]</strong> <code>SIGABRT: Abnormal termination</code> at <code>0x634</code> — the abort path it</li>
+</ol>
+<p>   guards is not identifiable without body RE.</p>
+<h2>9. Scratch artifacts (regeneratable)</h2>
+<ul>
+<li><code>/tmp/astro_u/payloads/a619_gmu.bin</code> — verified payload (md5 9e23c520…).</li>
+<li><code>/tmp/astro_u/peers/*.bin</code> — the six linux-firmware siblings compared in §1.3.</li>
+<li><code>/tmp/astro_u/kernelsrc/</code> — the fetched GPL sources (<code>a6xx_gmu.c/.h/.xml</code>,</li>
+</ul>
+<p>  <code>adreno_gpu.h</code>, <code>a6xx_catalog.c</code>, <code>a6xx_gpu.c</code>, plus v5.4/5.10/5.15/6.1</p>
+<p>  <code>a6xx_gmu.c/.h</code> for the history check in §1.1).</p>
+<ul>
+<li><code>/tmp/astro_u/WHENCE</code> — linux-firmware manifest used for §2.1.</li>
+<li>Probe reports: <code>--json</code> output from <code>gmu_probe.py</code>.</li>
+<li>Payload bytes are NOT committed (repo policy).</li>
+</ul>
+<h2>10. RULE 0 route log (2026-11-18)</h2>
+<ol>
+<li><code>raw.githubusercontent.com</code> for torvalds/linux was rate-limited from this</li>
+</ol>
+<p>   network (HTTP 429 / short HTML body), as the lead warned. Switched to</p>
+<p>   authenticated `gh api "repos/torvalds/linux/contents/&lt;path&gt;?ref=&lt;ref&gt;" --jq</p>
+<p>   .content | base64 -d`; every fetched file verified to be real C (SPDX</p>
+<p>   header + <code>#include</code>) before use. All kernel citations above come from that</p>
+<p>   route.</p>
+<ol>
+<li>History check for the <code>a6xx_gmu_fw_header</code> premise: fetched <code>a6xx_gmu.h</code> at</li>
+</ol>
+<p>   <code>v5.4</code>, <code>v5.10</code>, <code>v5.15</code>, <code>v6.1</code>, <code>master</code> — 0 occurrences at every ref.</p>
+<p>   Authenticated code search <code>a6xx_gmu_fw_header</code> → <code>total_count: 0</code>.</p>
+<ol>
+<li>Register documentation: <code>a6xx.xml.h</code> no longer exists at master (404); the</li>
+</ol>
+<p>   register definitions moved to `drivers/gpu/drm/msm/registers/adreno/</p>
+<p>   a6xx_gmu.xml<code>, which is where </code>GMU_CM3_ITCM_START<code>, </code>GMU_CM3_DTCM_START`</p>
+<p>   and <code>GMU_CORE_FW_VERSION</code> were read from.</p>
+<ol>
+<li>linux-firmware siblings: fetched six <code>qcom/*_gmu.bin</code> from</li>
+</ol>
+<p>   <code>git.kernel.org/.../linux-firmware.git/plain/</code>; md5s recorded in §1.3.</p>
+<p>   <code>WHENCE</code> fetched from the same tree for the absence finding (§2.1).</p>
+<ol>
+<li>Negative recorded honestly: no public source names the DTCM header fields,</li>
+</ol>
+<p>   the region descriptor table, or the <code>0x44000000</code> window. Those stay [OPEN]</p>
+<p>   rather than being guessed.</p>
+<ol>
+<li>Prior art: this component's <code>gmu_probe.py</code> was already committed on branch</li>
+</ol>
+<p>   <code>main</code> (commit <code>4b1a547</code>, prior F-76 batch) with the same RULE-0 reading of</p>
+<p>   <code>struct block_header</code> and the legacy raw path. This session's contribution</p>
+<p>   is the <em>content-level</em> measurement layer on top of it: the fleet-count</p>
+<p>   verification, the linux-firmware sibling comparison (§1.3), the</p>
+<p>   linux-firmware absence finding (§2.1), the string/version negative result</p>
+<p>   (§4), the entropy and census tables (§5-6), the <code>0xbabeface</code> corroboration</p>
+<p>   (§6.1), and the synthetic-fixture + test suite.</p>
+</main>
+<footer>Facts, not blobs. Every claim carries its evidence class.</footer>
+</body>
+</html>
