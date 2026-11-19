@@ -17,8 +17,8 @@ Companion docs (new, in `qualcomm-fp6/docs/`):
 
 | doc | issue(s) | file |
 |---|---|---|
-| BT driver ↔ blob interface, API-doc style | #15 | [interface-bt-driver.md](../qualcomm-fp6/docs/interface-bt-driver.md) |
-| User space vs loaded firmware split table | #19 | [userspace-vs-firmware-split.md](../qualcomm-fp6/docs/userspace-vs-firmware-split.md) |
+| BT driver ↔ blob interface, API-doc style | #15 | [interface-bt-driver.md](../research/qualcomm/docs/interface-bt-driver.md) |
+| User space vs loaded firmware split table | #19 | [userspace-vs-firmware-split.md](../research/qualcomm/docs/userspace-vs-firmware-split.md) |
 
 Fresh-state check (RULE 1, re-swept 2026-11-17, API
 `https://codeberg.org/api/v1/repos/rsavoye/librephone/issues?state=open&limit=50&page=1..3`
@@ -360,7 +360,7 @@ itself is audit row C-5 (OPEN-B, not lab-actionable), not an issue.
    (client-registration layer) + `qcom_scm.c` SCM ABI — NOT
    `drivers/tee/qcom/qseecom.c` (404 in torvalds/master, checked
    twice 2026-11-17); the Android-style TA-image loader is not
-   mainlined. The new [userspace-vs-firmware-split.md](../qualcomm-fp6/docs/userspace-vs-firmware-split.md)
+   mainlined. The new [userspace-vs-firmware-split.md](../research/qualcomm/docs/userspace-vs-firmware-split.md)
    states the corrected paths; R-2 above carries the corrected
    TrustZone kernel row.
 

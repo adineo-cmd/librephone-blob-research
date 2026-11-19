@@ -1,7 +1,7 @@
 # Upstream contribution draft — LibrePhone (codeberg.org/rsavoye/librephone)
 
 > **Status update (2026-11-12):** superseded by the full upstream
-> contribution package in [`upstream-contribution/`](../../upstream-contribution/README.md)
+> contribution package in [`upstream-contribution/`](../../upstream/README.md)
 > (PR-1 = this draft's `docs/wireless.md` fix, carried forward; PR-2 = new
 > `docs/wmi-dispatch.md`; PR-3 = per-segment `wpss.bXX.md` corrections;
 > PR-4 = `docs/files.md` BT + boot-chain pointers). **All claims below

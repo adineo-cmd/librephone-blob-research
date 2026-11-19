@@ -30,6 +30,28 @@ Improvements are first-class deliverables: list them in your report with
 before/after. The lab compounds: every session must leave the repos better
 than it found them.
 
+## Rule 2 — ISSUE CLAIMS ARE EXCLUSIVE (owner directive, 2026-11-19)
+
+The repo's work is decomposed into atomic GitHub issues in
+`adineo-cmd/librephone-blob-research`. Every agent — opencode on key 1 or key 2,
+or zcode on any model — MUST claim an issue before touching files for it.
+
+Before any file work, post the first comment on the issue:
+
+```
+CLAIM <agent-id> <provider> <UTC ISO-8601 timestamp>
+```
+
+Then re-read the comments. The FIRST valid claim wins. If yours is not first,
+comment `RELEASE <agent-id> conflict` and pick another issue. One agent holds
+one issue at a time in this repository. A claim older than 24 h with no `DONE`
+comment is stale; the first `STALE` comment releases it. Finish with
+`DONE <commit-sha> <one-line result>`.
+
+No agent may work an issue claimed by another agent, on any provider or in any
+harness. A commit made without a winning claim is a protocol violation. The
+lead verifies by reading issue comments and may reassign violating commits.
+
 ## Fleet rules
 
 - Two agents run concurrently (account cap = 2; a third launch is
@@ -38,6 +60,8 @@ than it found them.
   files are edited by the lead when merging agent reports.
 - Pushes go through the GitHub MCP (push_files); verify large files
   byte-for-byte after push.
+- The account cap is per harness. The issue-claim rule (Rule 2) is what
+  prevents two harnesses from colliding; file walls alone do not.
 
 ## Repo principles (unchanged — see README.md)
 

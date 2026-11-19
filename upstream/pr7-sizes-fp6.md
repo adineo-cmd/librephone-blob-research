@@ -809,15 +809,15 @@ Every row carries its byte size from the lab's committed censuses
 
 | rows (CSV path) | count | source doc (committed) | sha256 status |
 |---|---|---|---|
-| `modem/image` core (modem/adsp/cdsp/ipa_fws/cpusys_vm families, TA `.mdt+.bXX` splits, adsp/cdsp dtb + jsn) | 281 | [results/census.md](../qualcomm-fp6/results/census.md) table "All files" | full sha256 in lab census; 16-hex in the committed table |
+| `modem/image` core (modem/adsp/cdsp/ipa_fws/cpusys_vm families, TA `.mdt+.bXX` splits, adsp/cdsp dtb + jsn) | 281 | [results/census.md](../research/qualcomm/results/census.md) table "All files" | full sha256 in lab census; 16-hex in the committed table |
 | `modem/image/qca6750` (wpss family, bdwlan, regdb, Data.msc, qdss cfg, wpss.qdb) | 76 | results/census.md | full sha256 in lab census |
 | `modem/image/modem_pr/**` (mcfg hw/sw configs, so/ libs) + `modem/image/milos/qdsp6m.qdb` | 173 | results/census.md | full sha256 in lab census |
 | `modem/verinfo` | 1 | results/census.md | full sha256 in lab census |
 | `vendor/firmware` (CAMERA_ICP family, vpu family, GPU gen7/gen8, haptic, codec, sensor fw) | 57 | results/census.md | full sha256 in lab census |
 | `dsp/adsp`, `dsp/cdsp` (fastrpc compute-PD libraries) | 77 | results/census.md | full sha256 in lab census |
-| `radio`: xbl, xbl_config, xbl_ramdump, uefi, abl, imagefv, shrm, aop, aop_config, cpucp, cpucp_dtb, qupfw, boot, vendor_boot, dtbo, pvmfw, vbmeta, vbmeta_system | 18 | [docs/bootchain-census.md](../qualcomm-fp6/docs/bootchain-census.md) + results/bootchain-census.json | sha256 (16-hex) in results JSON (table below) |
-| `radio`: tz.img, hyp.img, keymaster.img, devcfg.img, uefisecapp.img, multiimgoem.img, featenabler.img | 7 | [docs/trustzone-census.md](../qualcomm-fp6/docs/trustzone-census.md) + results/bt-tz-census.json | sha256 (16-hex) in results JSON (table below) |
-| `radio`: bluetooth.img (FAT16 partition image) + `bluetooth/image` (11 files) | 12 | [docs/bt-firmware-census.md](../qualcomm-fp6/docs/bt-firmware-census.md) + results/bt-tz-census.json | bluetooth.img has a **full sha256** (`274cc6812df59a7cd33b50d8bda117e2e55d639e0c4a891d5c8192ec5be3507f`); the 11 files 16-hex (table below) |
+| `radio`: xbl, xbl_config, xbl_ramdump, uefi, abl, imagefv, shrm, aop, aop_config, cpucp, cpucp_dtb, qupfw, boot, vendor_boot, dtbo, pvmfw, vbmeta, vbmeta_system | 18 | [docs/bootchain-census.md](../research/qualcomm/docs/bootchain-census.md) + results/bootchain-census.json | sha256 (16-hex) in results JSON (table below) |
+| `radio`: tz.img, hyp.img, keymaster.img, devcfg.img, uefisecapp.img, multiimgoem.img, featenabler.img | 7 | [docs/trustzone-census.md](../research/qualcomm/docs/trustzone-census.md) + results/bt-tz-census.json | sha256 (16-hex) in results JSON (table below) |
+| `radio`: bluetooth.img (FAT16 partition image) + `bluetooth/image` (11 files) | 12 | [docs/bt-firmware-census.md](../research/qualcomm/docs/bt-firmware-census.md) + results/bt-tz-census.json | bluetooth.img has a **full sha256** (`274cc6812df59a7cd33b50d8bda117e2e55d639e0c4a891d5c8192ec5be3507f`); the 11 files 16-hex (table below) |
 
 Row-count checks: the 665-row census table parses byte-identically to
 its committed header (`files: 665 · total bytes: 240,352,566` — the
@@ -869,7 +869,7 @@ For cross-checking these 37 rows before the md5 re-hash (source:
   hdcp* → DRM; dsp/adsp + dsp/cdsp fastrpc libraries → COMPUTE;
   GPU gen7*/gen8* zap/gmu/sqe/aqe → GPU; CAMERA_ICP*/vpu* → UNKNOWN
   (their ISA/structure is documented in
-  [docs/fp6-architecture-census.md](../qualcomm-fp6/docs/fp6-architecture-census.md),
+  [docs/fp6-architecture-census.md](../research/qualcomm/docs/fp6-architecture-census.md),
   but no upstream CAMERA type exists to map onto).
 
 ## Flags (honest scoping)

@@ -9,7 +9,7 @@ through QMI at startup; `struct service_to_pipe { service_id, pipedir,
 pipenum }` `__le32`; `PIPEDIR_NONE 0 / IN 1 / OUT 2 / INOUT 3 / INOUT_H2H 4`;
 `CE_COUNT_MAX 12`; `CE_RING_IDX_INCR(nentries_mask, idx) = ((idx)+1) &
 (nentries_mask)`. Reference pipe shape from the lab note
-[interface-copyengine.md](../../../qualcomm-fp6/docs/interface-copyengine.md)
+[interface-copyengine.md](../../../research/qualcomm/docs/interface-copyengine.md)
 (ipq8074 table, same CE service model).
 
 Implements: 24-byte descriptor pack/unpack (LE), validation (pipe < 12,

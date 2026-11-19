@@ -17,7 +17,7 @@ OTA manifest (dumped but not hashed this session — listed in
 `data-fetch/enchilada/payload manifest`, kept out of the committed matrix
 to keep the census to what was actually hashed; next session can extend).
 The lab's TrustZone census method
-([qualcomm-fp6/docs/trustzone-census.md](../../qualcomm-fp6/docs/trustzone-census.md))
+([qualcomm-fp6/docs/trustzone-census.md](../../../../research/qualcomm/docs/trustzone-census.md))
 applies.
 
 ## Other

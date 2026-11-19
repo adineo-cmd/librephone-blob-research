@@ -9,7 +9,7 @@ exemplar pipelines:
 
 - **Qualcomm exemplar:** FP6 (QCM6490) — container walk → ISA
   identification → per-family census → interface decode
-  ([fp6-architecture-census.md](../qualcomm-fp6/docs/fp6-architecture-census.md);
+  ([fp6-architecture-census.md](../research/qualcomm/docs/fp6-architecture-census.md);
   already packaged upstream as pr1–pr8 + pr10 texts and pr7
   sizes.csv rows).
 - **MediaTek exemplar:** MT6785 ("rosemary") — vendor container
@@ -19,10 +19,10 @@ exemplar pipelines:
 
 Companion files (read-only references, not duplicated here): the
 device-universe distribution + data-quality findings live in
-[blob-matrix/per-soc-method-plans.md](../blob-matrix/per-soc-method-plans.md);
+[blob-matrix/per-soc-method-plans.md](../research/soc/per-soc-method-plans.md);
 the shared-blob fleets (QCA BT ×29 devices, ADSP bm2nXX ×22–26,
 Adreno GMU) live in `blob-matrix/laptop/`; the device matrix is
-[blob-database/coverage-matrix.csv](blob-database/).
+[blob-database/coverage-matrix.csv](../upstream-contribution/blob-database/).
 
 ## Data basis (all committed, no re-fetch needed)
 

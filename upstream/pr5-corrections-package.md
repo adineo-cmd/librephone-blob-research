@@ -178,11 +178,11 @@ https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/do
 ## Update (2026-11)
 
 The ATmega8 reading is not supported by the MDT structure documented in
-[mdt.md](mdt.md): the wpss.mdt program headers mark exactly
+`mdt.md`: the wpss.mdt program headers mark exactly
 b01/b02/b03/b05/b06 as executable and declare e_machine = 164
 (EM_HEXAGON), so b01 is one of the executable code segments of a single
 Hexagon (DSP6) image — matching the Current Research note in
-[wireless.md](wireless.md) that the sections are probably split from
+`wireless.md` that the sections are probably split from
 one DSP6 file.
 
 The `-a avr` disassembly that "looks good" is a wrong-architecture
@@ -202,7 +202,7 @@ segments (b04, b08, b09, b10, b12).
 The firmware runs on a 32-bit RISC-V core (wpss.b07, verified at
 instruction level) with Hexagon (QDSP6) code segments in the same MDT
 image — see the Wireless Chipset section above and
-[docs/wmi-dispatch.md](wmi-dispatch.md). No AVR core is present: the
+`docs/wmi-dispatch.md`. No AVR core is present: the
 earlier AVR readings came from forcing `-a avr` on raw segment files
 whose ELF headers are junk (the method note in the Wireless Chipset
 section). The blob that seems to be an Intel x86_32 (wpss.b08) is a

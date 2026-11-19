@@ -1,7 +1,7 @@
 # wmi/dispatch-registry — the decoded two-level WMI dispatch architecture, as a reference implementation
 
 Implements the lab's decoded WCN6750 wpss WMI dispatch model
-([papers/wmi-dispatch-architecture.md](../../../papers/wmi-dispatch-architecture.md),
+([papers/wmi-dispatch-architecture.md](../../../research/papers/wmi-dispatch-architecture.md),
 sections 4-5; findings F-22/F-23/F-28/F-29 in open-discovery-lab):
 
 - ID space `grp<<12|cmd` (24-bit command header, per public ath11k `WMI_CMD_HDR_CMD_ID`)

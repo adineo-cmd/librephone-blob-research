@@ -5,7 +5,7 @@ for listed devices" WITHOUT downloading it, enumerate it completely from
 metadata APIs, and build the master coverage-matrix scaffold
 (`device-inventory.csv` + `coverage-matrix.csv`, both written alongside this
 file). Companion to the F-69 audit
-([../librephone-wants.md](../librephone-wants.md)); all network fetches this
+([../librephone-wants.md](../../upstream/librephone-wants.md)); all network fetches this
 session are logged below with status and byte size. Scratch space:
 `/tmp/lpdb/` (raw fetched artifacts + parser scripts).
 
@@ -292,7 +292,7 @@ different scope; both recorded.
 **Flag: dedicated documentation session required; nothing below is a
 conclusion — these are the enumerated dimensions to fill.**
 (FILLED 2026-11-16: the full document now lives at
-[../radio-regulatory-hurdles.md](../radio-regulatory-hurdles.md) — primary
+[../radio-regulatory-hurdles.md](../../upstream/radio-regulatory-hurdles.md) — primary
 texts fetched verbatim, precedents surveyed, RULE-0 query log included.
 The stub below is retained as the original dimension list.)
 

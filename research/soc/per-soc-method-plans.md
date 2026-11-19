@@ -6,7 +6,7 @@ interface decode) applied to the top device clusters of the
 LibrePhone 236-device universe, plus the **upstream-facing** section:
 what LibrePhone could accept upstream per cluster (doc stubs,
 sizes.csv rows, interface facts). This file complements the fleet docs
-in [laptop/](laptop/) (ADSP bm2nXX fleet, QCA BT fleet, Adreno GMU —
+in [laptop/](../laptop/) (ADSP bm2nXX fleet, QCA BT fleet, Adreno GMU —
 which cover shared-blob families) and the matrix scaffold
 (`upstream-contribution/blob-database/coverage-matrix.csv`); it is the
 per-SOC planning layer.
@@ -196,7 +196,7 @@ from the FP6 exemplar (which ran all four end-to-end, see
   census template** (file → vendor token NT36672C/FT3518/ILI7807S →
   panel vendor; type/size/hashes only), because touch is the family
   mass here; (b) the BT census is the *Rome* flavor — the lab's QCA
-  BT fleet doc (laptop/qualcomm-qca-bt-fleet.md) plus the crbtfw
+  BT fleet doc (../laptop/qualcomm-qca-bt-fleet.md) plus the crbtfw
   branches of btqca.c.
 - Upstream-facing: upstream's docs have no 6xx-generation content at
   all; the single highest-leverage upstream artifact for this

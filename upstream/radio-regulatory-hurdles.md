@@ -1,7 +1,7 @@
 # Radio / regulatory hurdles to replacing radio firmware — the LibrePhone hurdle map
 
 **Status:** full documentation session (2026-11-16/17), expanding the stub in
-[upstream-contribution/blob-database/recon.md](blob-database/recon.md) §"Radio /
+[upstream-contribution/blob-database/recon.md](../upstream-contribution/blob-database/recon.md) §"Radio /
 regulatory stub" (the stub's six enumerated dimensions are filled below, one
 section each, plus the queried sources).
 

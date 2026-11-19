@@ -3,7 +3,7 @@
 **Evidence class: census** (payload extracted, files hashed; no ISA decode this session).
 Source: LineageOS 22.2 nightly 2026-11-11 for enchilada, payload partition `vendor`
 (`/vendor/firmware`, mount root `/firmware`), extracted 2026-11-16; sha256 per file in
-[blob-matrix/desktop/devices-001-222.csv](../../blob-matrix/desktop/devices-001-222.csv).
+[tools/fleet/phase1_build.py](../../../../tools/fleet/phase1_build.py).
 
 ## Container layout
 
@@ -18,7 +18,7 @@ Source: LineageOS 22.2 nightly 2026-11-11 for enchilada, payload partition `vend
 | `a630_zap.elf` | 14,256 | elf32-le | zap monolithic ELF |
 
 The MDT/bNN split matches the lab's FP6 boot-chain census pattern
-([qualcomm-fp6/docs/bootchain-census.md](../../qualcomm-fp6/docs/bootchain-census.md)):
+([qualcomm-fp6/docs/bootchain-census.md](../../../../research/qualcomm/docs/bootchain-census.md)):
 one ELF header (`.mdt`) plus numbered segment payloads (`.bNN`), here for the
 zap shader rather than the boot chain.
 

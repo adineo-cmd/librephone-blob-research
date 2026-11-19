@@ -15,14 +15,14 @@ Companion docs (all new, in `qualcomm-fp6/docs/`):
 
 | doc | issue(s) | file |
 |---|---|---|
-| NFC driver ↔ blob | #17 | [interface-nfc.md](../qualcomm-fp6/docs/interface-nfc.md) |
-| Cellular driver ↔ blob | #18 | [interface-cellular.md](../qualcomm-fp6/docs/interface-cellular.md) |
-| CopyEngine API | #26 | [interface-copyengine.md](../qualcomm-fp6/docs/interface-copyengine.md) |
-| WPSS PCIe bridge | #37 | [interface-pcie-bridge.md](../qualcomm-fp6/docs/interface-pcie-bridge.md) |
-| Gunyah purpose | #39 | [interface-gunyah.md](../qualcomm-fp6/docs/interface-gunyah.md) |
-| readelf vs mdt_loader | #40 | [interface-mdtloader-vs-readelf.md](../qualcomm-fp6/docs/interface-mdtloader-vs-readelf.md) |
-| FTM instrumentation + doc expansion | #44, #45 | [interface-ftm-diag.md](../qualcomm-fp6/docs/interface-ftm-diag.md) |
-| QMMI / Diag mode | #46 | [interface-qmmi-diag.md](../qualcomm-fp6/docs/interface-qmmi-diag.md) |
+| NFC driver ↔ blob | #17 | [interface-nfc.md](../research/qualcomm/docs/interface-nfc.md) |
+| Cellular driver ↔ blob | #18 | [interface-cellular.md](../research/qualcomm/docs/interface-cellular.md) |
+| CopyEngine API | #26 | [interface-copyengine.md](../research/qualcomm/docs/interface-copyengine.md) |
+| WPSS PCIe bridge | #37 | [interface-pcie-bridge.md](../research/qualcomm/docs/interface-pcie-bridge.md) |
+| Gunyah purpose | #39 | [interface-gunyah.md](../research/qualcomm/docs/interface-gunyah.md) |
+| readelf vs mdt_loader | #40 | [interface-mdtloader-vs-readelf.md](../research/qualcomm/docs/interface-mdtloader-vs-readelf.md) |
+| FTM instrumentation + doc expansion | #44, #45 | [interface-ftm-diag.md](../research/qualcomm/docs/interface-ftm-diag.md) |
+| QMMI / Diag mode | #46 | [interface-qmmi-diag.md](../research/qualcomm/docs/interface-qmmi-diag.md) |
 
 Not executable from public data this session (honest skips):
 
