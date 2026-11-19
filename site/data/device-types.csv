@@ -2,7 +2,7 @@ model,type,build_variant,note
 6.1_2018,phone,mobile,
 7_Plus,phone,mobile,
 8,phone,mobile,
-ADT_3,devkit,atv,"deadpool, Google ADT-3 developer kit on Amlogic S905Y2; Amlogic TV boxes are Android-TV images (boot/recovery + dtb.img, no per-subsystem partitions) per blob-matrix/per-soc-method-plans.md:116; 8 upstream blobs, the only Amlogic device in count.csv"
+ADT_3,devkit,atv,"deadpool, Google ADT-3 developer kit on Amlogic S905Y2; Amlogic TV boxes are Android-TV images (boot/recovery + dtb.img, no per-subsystem partitions) per research/soc/per-soc-method-plans.md:116; 8 upstream blobs, the only Amlogic device in count.csv"
 Axon_9_Pro,phone,mobile,
 Black_Shark,phone,mobile,
 Defy_2021,phone,mobile,
