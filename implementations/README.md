@@ -64,9 +64,14 @@ wpss dispatch spec — the exact gap the PR names.
   RE-status coverage matrix; delta recorded, not rebuilt.
 - `"bm2n" bin adsp firmware reverse engineering qualcomm` — no direct hits for
   the bm2nXX fleet; adjacent: linux-msm/hexagon-dsp-binaries, TR25 hexagon RE,
-  SRLabs hexagon fuzzing, bkerler QDSP walkthrough. **Re-run 2026-11-19:
-  `websearch` returned HTTP 402 and GitHub code search 401, so this re-check is
-  weaker than RULE 0 requires and must be repeated before publishing.**
+  SRLabs hexagon fuzzing, bkerler QDSP walkthrough. **Partially re-run
+  2026-11-19** once GitHub code search recovered: `"ConcreteTensorIN5Tdefs10QuantUint8EE"`
+  -> 0 results, `"1337BEEF" qnn pickle` -> 0, `"tensor.pickle" qualcomm` -> 0;
+  `"bm2n13"` -> 1,044 hits but all are `proprietary-files.txt`/`*-vendor.mk`
+  inventory, none is RE. Conclusion: the fleet is publicly *listed* and
+  publicly *undecoded*. **Still open: the prose/web leg (XDA, Reddit, LWN,
+  arXiv).** `websearch` returned HTTP 402 again, so that part of RULE 0 remains
+  unexecuted and must be repeated before publishing.**
 - `Qualcomm Bluetooth hpbtfw hmtbtfw QCA2066 WCN7850 firmware format` (2026-11-19)
   — no dedicated RE writeup; the format facts here come from `btqca.c` plus
   measurement, as with the `cr*`/`ap*` family.

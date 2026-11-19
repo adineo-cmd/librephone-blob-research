@@ -303,10 +303,41 @@ this fleet; adjacent work is `linux-msm/hexagon-dsp-binaries`, TR25 hexagon RE,
 SRLabs hexagon fuzzing, and the bkerler QDSP walkthrough. None of those
 documents this container.
 
-**Caveat, stated plainly:** during the session that produced this document,
-`websearch` returned HTTP 402 and GitHub code search returned 401, so the
-prior-art re-check is **weaker than RULE 0 requires**. A fresh public search
-must be run before these findings are published outside the lab.
+During the drafting session, `websearch` returned HTTP 402 and GitHub code
+search returned 401, so that re-check was weaker than RULE 0 requires. **A
+second pass was run on 2026-11-19 once GitHub code search was working again.**
+`websearch` still returned HTTP 402 (no web-search quota that day), so the
+web and arXiv legs of RULE 0 remain unexecuted — that limitation is stated
+rather than papered over.
+
+GitHub code search, 2026-11-19, exact query strings and results:
+
+| query | total | verdict |
+|---|---|---|
+| `"ConcreteTensorIN5Tdefs10QuantUint8EE"` | 0 | **the exact RTTI string this fleet carries appears nowhere on GitHub** |
+| `"1337BEEF" qnn pickle` | 0 | no public linking of the record magic to QNN serialisation |
+| `"tensor.pickle" qualcomm` | 0 | no public writeup under that name |
+| `"bm2n13"` | 1,044 | all hits are `proprietary-files.txt` / `*-vendor.mk` **file-listing manifests**, i.e. build-system inventory. Not one is RE or format work |
+| `"bm2n" adsp` | 9,312 | same picture — vendor trees and `proprietary-files.txt` lists |
+| `"1337BEEF"` (all languages) | 336 | every hit checked is unrelated: PPSSPP MMIO, x64dbg signature check, RPCS3 RSX, WebKit FTL thunks, REFramework. None is Qualcomm or QNN |
+| `"BEEFF00D"` | 2,800 | unrelated (stgit tests, mongo json tests, blade) |
+| `"fa0000fa"` | 2,868 | unrelated; no firmware container documentation |
+
+Two conclusions follow, and they are worth separating:
+
+1. **The container is not publicly documented.** Searching the exact RTTI
+   type string — the single most distinctive 34-byte constant in the fleet —
+   returns zero results. If anyone had written this format up, that string
+   would be in their notes.
+2. **The fleet is publicly *known* but not publicly *understood*.** The 1,044
+   `bm2n13` hits show the files are catalogued across dozens of device trees.
+   Everyone lists them; nobody has decoded them. That is precisely the delta
+   RULE 0 asks for, and it is why `implementations/adsp-fleet/` exists.
+
+Residual RULE-0 gap, stated honestly: the **web/arXiv/XDA/Reddit/LWN leg was
+not run** because `websearch` was unavailable. GitHub indexes source code, not
+prose. Before this analysis is published outside the lab, the prose search
+must still be executed.
 
 ## 11. Reproduce
 
