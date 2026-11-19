@@ -97,8 +97,10 @@ AGENTS.md         standing rules, including the issue-claim protocol (Rule 2)
 SCOPE.md          legal and ethical boundary
 ```
 
-Work is decomposed into atomic GitHub issues; claim one with a `CLAIM` comment
-before touching its files. See Rule 2 in `AGENTS.md`.
+Work is decomposed into 2,836 atomic GitHub issues. Read
+`docs/ISSUE-WORKFLOW.md` for the claim protocol and harness partition, then claim
+one with a `CLAIM` comment before touching its files. The machine-readable
+catalog is `docs/issue-catalog/issues.jsonl`; Rule 2 in `AGENTS.md` is binding.
 
 ## Two findings worth the trip
 
