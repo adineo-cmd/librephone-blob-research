@@ -20,8 +20,9 @@ single-board computers and developer boards are not yet catalogued per file.
 ---
 
 Work for the FSF's [LibrePhone](https://www.fsf.org/news/librephone-project)
-initiative: identify what the proprietary firmware on two production phones
-actually is, and write it down.
+initiative: identify what proprietary firmware actually is, and write it down.
+The measured corpus is 33,917 blob rows across 123 devices; the wider inventory
+holds 245 device models of which 122 have no per-file rows yet.
 
 **Facts are documented; blobs are never committed.** Every analysis ships derived
 metadata only — headers, segment tables, hashes, version strings, protocol
@@ -68,34 +69,36 @@ Python 3.10+, `capstone` for disassembly. You supply your own device dump; none 
 **Qualcomm — Fairphone FP6**
 
 ```bash
-cat qualcomm-fp6/README.md
-python3 qualcomm-fp6/tools/census.py --help
-python3 qualcomm-fp6/tools/wpss_disasm.py --help
+python3 tools/qualcomm/census.py --help
+python3 tools/qualcomm/wpss_disasm.py --help
 ```
 
 **MediaTek — Redmi Note 10S**
 
 ```bash
-cat mediatek/README.md
-python3 mediatek/tools/isa_probe.py --help
-python3 mediatek/tools/region_scan.py --help
+python3 tools/mediatek/isa_probe.py --help
+python3 tools/mediatek/region_scan.py --help
 ```
 
 ## Project structure
 
 ```text
-qualcomm-fp6/
-  docs/           19 analysis documents
-  tools/          extraction, census, disassembly
-  results/        derived metadata
-mediatek/
-  docs/           3 analysis documents
-  tools/          ISA probe, payload walk, region scan
-  results/        derived metadata
-papers/           research notes
-upstream-contribution/  paste-ready upstream PRs
+research/         evidence-classed findings, grouped by subject
+                  fleet/ qualcomm/ mediatek/ soc/ laptop/ papers/ historic/
+tools/            analysis scripts by substrate
+                  fleet/ qualcomm/ mediatek/
+data/             derived CSV/JSON data; the frozen matrix and inventory stay
+                  under upstream-contribution/blob-database/
+implementations/  clean-room, spec-derived components
+docs/devices/     per-device family notes
+upstream/         paste-ready upstream PRs and issue filings
+site/             the Open Device static-site generator
+AGENTS.md         standing rules, including the issue-claim protocol (Rule 2)
 SCOPE.md          legal and ethical boundary
 ```
+
+Work is decomposed into atomic GitHub issues; claim one with a `CLAIM` comment
+before touching its files. See Rule 2 in `AGENTS.md`.
 
 ## Two findings worth the trip
 
