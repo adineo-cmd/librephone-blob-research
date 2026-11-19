@@ -68,10 +68,17 @@ wpss dispatch spec — the exact gap the PR names.
   2026-11-19** once GitHub code search recovered: `"ConcreteTensorIN5Tdefs10QuantUint8EE"`
   -> 0 results, `"1337BEEF" qnn pickle` -> 0, `"tensor.pickle" qualcomm` -> 0;
   `"bm2n13"` -> 1,044 hits but all are `proprietary-files.txt`/`*-vendor.mk`
-  inventory, none is RE. Conclusion: the fleet is publicly *listed* and
-  publicly *undecoded*. **Still open: the prose/web leg (XDA, Reddit, LWN,
-  arXiv).** `websearch` returned HTTP 402 again, so that part of RULE 0 remains
-  unexecuted and must be repeated before publishing.**
+  inventory, none is RE. **Prose leg then completed 2026-11-19 through a
+  browser (the `websearch` tool was returning HTTP 402):** DuckDuckGo gave
+  "No results" for `"bm2n" firmware reverse engineering`, `"bm2n" adsp
+  firmware qualcomm` and the exact RTTI string; XDA and Reddit `site:` queries
+  returned only generic flashing threads, none mentioning `bm2n`. The one
+  genuinely adjacent writeup — "Reverse engineering the Qualcomm NPU
+  compiler" (datavorous, 2026-06) — was read in full and attacks the QNN SDK
+  `*.so` files with Ghidra, never the serialised container (its counts for
+  `1337BEEF`, `BEEFF00D`, `ConcreteTensor`, `pickle`, `bm2n` and `0xfa0000fa`
+  are all zero). **RULE 0 satisfied on both legs: the bm2n fleet is publicly
+  listed and publicly undecoded.**
 - `Qualcomm Bluetooth hpbtfw hmtbtfw QCA2066 WCN7850 firmware format` (2026-11-19)
   — no dedicated RE writeup; the format facts here come from `btqca.c` plus
   measurement, as with the `cr*`/`ap*` family.

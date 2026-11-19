@@ -334,10 +334,42 @@ Two conclusions follow, and they are worth separating:
    Everyone lists them; nobody has decoded them. That is precisely the delta
    RULE 0 asks for, and it is why `implementations/adsp-fleet/` exists.
 
-Residual RULE-0 gap, stated honestly: the **web/arXiv/XDA/Reddit/LWN leg was
-not run** because `websearch` was unavailable. GitHub indexes source code, not
-prose. Before this analysis is published outside the lab, the prose search
-must still be executed.
+### The prose leg, finally executed (2026-11-19)
+
+The web leg was blocked by a broken `websearch` tool, not by an absence of
+sources, so it was run through a real browser instead. DuckDuckGo, exact
+queries and outcomes:
+
+| query | outcome |
+|---|---|
+| `"bm2n13.bin" OR "bm2n" firmware reverse engineering` | **"No results"** — the engine returned zero documents |
+| `"bm2n" adsp firmware qualcomm` | **"No results"** |
+| `"ConcreteTensorIN5Tdefs10QuantUint8EE"` | **"No results"** — same zero as GitHub |
+| `"1337BEEF" qualcomm qnn tensor` | 2 hits, both unrelated: a LeetCode username and a YouTube handle |
+| `site:xda-developers.com bm2n firmware` | 10 hits, all generic flashing/firmware-download articles; none mentions `bm2n` |
+| `site:reddit.com qualcomm adsp firmware reverse engineering bm2n` | 10 hits, all generic "how do I reverse firmware" threads; none mentions `bm2n` |
+| `qualcomm adsp firmware container 0xfa0000fa segment table reverse engineering` | 10 hits — see below |
+| `qualcomm QNN HTP tensor pickle file format reverse engineering` | 10 hits — see below |
+
+Two results were examined in full rather than dismissed on their titles,
+because RULE 0 says partial overlap is still overlap:
+
+1. **`datavorous.github.io/writing/qairt/` — "Reverse engineering the
+   Qualcomm NPU compiler" (June 2026).** The closest thing to prior art that
+   the internet offers. Read in full: it attacks the QNN SDK **shared
+   objects** (`*.so`, QAIRT v2.46.0.260424) with Ghidra to recover compiler
+   behaviour — VTCM sizing, quantisation, graph optimisation. Its own word
+   counts for `1337BEEF`, `BEEFF00D`, `ConcreteTensor`, `pickle`, `bm2n`,
+   `tensor.h` and `0xfa0000fa` are **all zero**. It reverse-engineers the
+   *compiler*, not the *serialised output*. **No overlap.**
+2. **`mzakocs/qualcomm_baseband_scripts`** and the generic Qualcomm RE
+   guides — baseband/bootloader extraction, not the ADSP container.
+
+**RULE 0 is now satisfied for this finding on both legs:** zero code hits on
+the distinctive constants, zero prose hits on the names, and the one adjacent
+public writeup does not touch the serialised container. The conclusion is
+that the `bm2n` fleet is indexed by thousands of build manifests and decoded
+by nobody.
 
 ## 11. Reproduce
 
