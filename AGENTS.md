@@ -32,9 +32,9 @@ than it found them.
 
 ## Rule 2 — ISSUE CLAIMS ARE EXCLUSIVE (owner directive, 2026-11-19)
 
-The repo's work is decomposed into atomic GitHub issues in
-`adineo-cmd/librephone-blob-research`. Every agent — opencode on key 1 or key 2,
-or zcode on any model — MUST claim an issue before touching files for it.
+The repo's work is decomposed into GitHub work packages in `adineo-cmd/open-device`.
+Every agent — opencode on key 1 or key 2, or zcode on any model — MUST claim an
+issue before touching files for it. ONE ISSUE = ONE OWNER. NO EXCEPTIONS.
 
 Before any file work, post the first comment on the issue:
 
@@ -42,15 +42,19 @@ Before any file work, post the first comment on the issue:
 CLAIM <agent-id> <provider> <UTC ISO-8601 timestamp>
 ```
 
-Then re-read the comments. The FIRST valid claim wins. If yours is not first,
-comment `RELEASE <agent-id> conflict` and pick another issue. One agent holds
-one issue at a time in this repository. A claim older than 24 h with no `DONE`
-comment is stale; the first `STALE` comment releases it. Finish with
-`DONE <commit-sha> <one-line result>`.
+Then RE-READ the comments. The FIRST valid claim wins. If yours is not first,
+you MUST comment `RELEASE <agent-id> conflict` and STOP — do not work the issue.
+One agent holds one issue at a time in this repository. A claim older than 48 h
+with no `DONE` comment is stale; the first `STALE` comment releases it. After
+pushing (Rule 3), finish with `DONE <remote-sha> <one-line result>`.
 
-No agent may work an issue claimed by another agent, on any provider or in any
-harness. A commit made without a winning claim is a protocol violation. The
-lead verifies by reading issue comments and may reassign violating commits.
+NO agent may work an issue already claimed by another agent — on any provider,
+any model, or any harness. If you see a CLAIM comment that is not yours, leave
+the issue alone, even if the other agent is idle or slow. A commit made without
+a winning claim, or any work on a claimed issue by a second agent, is a protocol
+violation. The lead verifies by reading issue comments and may revert or
+reassign violating commits. Two agents on one issue is always a violation,
+never a collaboration.
 
 Claims have a race window, so work is also partitioned by label. An agent may
 only start issues whose `area:` label is assigned to its harness:
