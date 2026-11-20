@@ -90,6 +90,31 @@ claimant; an expired claim is revoked by the lead with
 
 Full contract: `docs/ISSUE-ASSIGNMENT.md`.
 
+## Rule 2a — REPO-STATE GATE BEFORE THE INTERNET
+
+Before Gate 0, check whether this issue's deliverable already exists in THIS
+repository at the current HEAD. Previous work is not prior art to be excluded;
+it is the first thing to look for.
+
+1. Record the HEAD SHA: `git rev-parse HEAD`.
+2. Resolve the issue's deliverable path from its body. If the body has no
+   explicit path, derive it from the title using the catalog conventions
+   (`docs/devices/<vendor>/<device>/<family>.md`, `research/soc/<soc>-cpu.md`,
+   `research/drivers/<family>.md`, `research/devices/<device>.md`,
+   `implementations/<component>/`).
+3. If the path exists and is substantive, post
+   `ALREADY-DONE <path> <sha> <evidence>` and close the issue. Evidence is the
+   test command and its result, or the committed analysis with its byte counts.
+4. If the path exists but is a stub (for example a `leverage-families.md` that
+   says "Deep-RE status: none yet"), post `STUB <path> <what is missing>` and
+   scope the work to the missing part only. Never rebuild what exists.
+5. If the path does not exist, post `NO-REPO-WORK <paths checked>` and continue
+   to Gate 0.
+
+A component with committed code and a passing self-test is done, even if its
+`[OPEN]` register still lists semantic gaps; those gaps are separate issues,
+not a reason to rewrite the component.
+
 ## Rule 2b — PRIOR-ART GATE BEFORE ANY WORK (owner directive, 2026-11-20)
 
 Immediately after claiming an issue, and before touching any repository file,

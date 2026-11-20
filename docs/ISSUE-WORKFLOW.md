@@ -50,6 +50,24 @@ RELEASE <agent-id> conflict
 
 Then pick another issue. One agent holds one issue at a time in this repo.
 
+## 2a. Check the repo before the internet
+
+Previous work is not prior art to exclude; it is the first place to look.
+
+1. Record `git rev-parse HEAD`.
+2. Resolve the deliverable path from the issue body, or derive it from the
+   title conventions (`docs/devices/<vendor>/<device>/<family>.md`,
+   `research/soc/<soc>-cpu.md`, `research/drivers/<family>.md`,
+   `research/devices/<device>.md`, `implementations/<component>/`).
+3. If it exists and is substantive, post `ALREADY-DONE <path> <sha> <evidence>`
+   and close the issue.
+4. If it exists as a stub, post `STUB <path> <what is missing>` and do only the
+   missing part.
+5. If it does not exist, post `NO-REPO-WORK <paths checked>` and go to Gate 0.
+
+A component with committed code and a passing self-test is done; its `[OPEN]`
+register lists separate future work, not a reason to rewrite it.
+
 ## 3. Work under the standing rules
 
 - RULE 0: search first, record exact queries and dates. Prior art means find

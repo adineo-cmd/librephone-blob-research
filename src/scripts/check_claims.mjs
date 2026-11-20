@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 
 const REPO = 'adineo-cmd/open-device';
 const START_HERE = 379;
@@ -48,11 +49,31 @@ const now = Date.now();
 let violations = 0;
 let stale = 0;
 let claims = 0;
+let preSatisfied = 0;
+
+function deliverable(issue) {
+  const m = issue.body && issue.body.match(/Deliverable: `([^`<>]+)`/);
+  if (m) return m[1];
+  if (issue.title.startsWith('Clean-room implementation: ')) return 'implementations/' + issue.title.split(': ')[1];
+  return null;
+}
+
+function substantive(p) {
+  if (!fs.existsSync(p)) return false;
+  const st = fs.statSync(p);
+  if (st.isFile()) return st.size > 200;
+  return fs.readdirSync(p).some((f) => /\.(py|c|h|rs|js)$/.test(f));
+}
 
 for (const issue of issues) {
   const comments = await allPages(`/repos/${REPO}/issues/${issue.number}/comments`);
   const shard = issue.number % 6;
   const allowed = owners[shard] || [];
+  const dep = deliverable(issue);
+  if (dep && substantive(dep)) {
+    console.log(`PRE-SATISFIED #${issue.number}: ${dep}`);
+    preSatisfied++;
+  }
   const claimComments = comments.filter((c) => /^CLAIM\s+/.test(c.body.trim()));
 
   for (const c of claimComments) {
@@ -95,5 +116,5 @@ for (const issue of issues) {
   }
 }
 
-console.log(`checked ${issues.length} open issues, ${claims} claims, ${violations} violations, ${stale} stale leases`);
+console.log(`checked ${issues.length} open issues, ${claims} claims, ${violations} violations, ${stale} stale leases, ${preSatisfied} pre-satisfied`);
 process.exit(violations ? 1 : 0);

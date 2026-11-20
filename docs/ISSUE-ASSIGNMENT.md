@@ -93,18 +93,23 @@ does not leave that issue frozen.
    files. Re-read the comments.
    - If another valid claim is first: post `RELEASE <slot> conflict`, pick
      another issue, never work this one.
-3. **Gate 0 — prior art (mandatory, before any work)**: search GitHub code
+3. **Gate -1 — repo state (mandatory, before the internet)**: record
+   `git rev-parse HEAD`, resolve the deliverable path, and check it. Exists and
+   substantive → `ALREADY-DONE <path> <sha> <evidence>` and close. Exists as a
+   stub → `STUB <path> <what is missing>` and do only the missing part. Does
+   not exist → `NO-REPO-WORK <paths checked>`. Never rebuild committed work.
+4. **Gate 0 — prior art (mandatory, before any work)**: search GitHub code
    (excluding `adineo-cmd/*`), the web (XDA, LWN, HN, Reddit, arXiv/Scholar),
    kernel source and linux-firmware. Record exact queries and date. Then post
    exactly one of:
    - `PRIOR-ART <urls>` → **close the issue as duplicate**, do not rebuild;
    - `DELTA <one line>` → partial overlap, state the new contribution;
    - `NO-PRIOR-ART <queries + date>` → proceed.
-4. **Work** under RULE 0/1, facts-not-blobs, clean-room, stdlib-only,
+5. **Work** under RULE 0/1, facts-not-blobs, clean-room, stdlib-only,
    `python3 -I`, no code comments, every number verified by command output.
-5. **Push** (Rule 3) to `feat/open-device-site`; never force-push; never push
+6. **Push** (Rule 3) to `feat/open-device-site`; never force-push; never push
    `main` from a worker. Post `WIP <slot> <remote-sha>` after each push.
-6. **Finish** with `DONE <slot> <remote-sha> <one-line result>`.
+7. **Finish** with `DONE <slot> <remote-sha> <one-line result>`.
 
 ## Enforcement
 
