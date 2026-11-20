@@ -19,3 +19,6 @@ __pycache__/
 dist/
 node_modules/
 .astro/
+tools/issue-publisher/*.jsonl
+tools/issue-publisher/*.log
+tools/issue-publisher/FULL_PUBLISH_DONE
