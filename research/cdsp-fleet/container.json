@@ -1,0 +1,2238 @@
+{
+  "b01_metadata": {
+    "all_zero_records": 6,
+    "der_chain": [
+      {
+        "length": 1037,
+        "offset": 1048
+      },
+      {
+        "length": 1095,
+        "offset": 2085
+      },
+      {
+        "length": 1089,
+        "offset": 3180
+      }
+    ],
+    "distinct_records": 128,
+    "prefix_hex": "0c000000060000000000000000000000701b000070020000",
+    "prefix_u32": [
+      12,
+      6,
+      0,
+      0,
+      7024,
+      624
+    ],
+    "record_count": 224,
+    "sample_hash_record_hex": "5c702af1ec8d77773becc99ef659b0ab"
+  },
+  "corpus": {
+    "concat_holds": 12,
+    "distinct_e_flags": [
+      "0x00000003",
+      "0x00000066"
+    ],
+    "distinct_e_flags_low12": [
+      "0x003",
+      "0x066"
+    ],
+    "images": 12,
+    "relocatable_images": 12,
+    "rows": [
+      {
+        "bytes": 6708,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 3,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 1,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/larry/tree-vendor/firmware/a660_zap.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 6868,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 5,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 3,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/larry/tree-vendor/firmware/ipa_fws.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 6708,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 3,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 1,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/larry/tree-vendor/firmware/a615_zap.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 8460,
+        "e_flags": "0x00000066",
+        "e_flags_low12": "0x066",
+        "e_machine": 164,
+        "e_phnum": 23,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 20,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/instantnoodle/modem-fat-lfn/image_slpi.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 1,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 7660,
+        "e_flags": "0x00000066",
+        "e_flags_low12": "0x066",
+        "e_machine": 164,
+        "e_phnum": 13,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 8,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/instantnoodle/modem-fat-lfn/image_cdsp.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 3,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 7260,
+        "e_flags": "0x00000066",
+        "e_flags_low12": "0x066",
+        "e_machine": 164,
+        "e_phnum": 8,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 5,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/instantnoodle/modem-fat-lfn/image_npu.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 1,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 8220,
+        "e_flags": "0x00000066",
+        "e_flags_low12": "0x066",
+        "e_machine": 164,
+        "e_phnum": 20,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 17,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/instantnoodle/modem-fat-lfn/image_adsp.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 1,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 7020,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 5,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 3,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/instantnoodle/tree-vendor/firmware/ipa_fws.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 6860,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 3,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 1,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/instantnoodle/tree-vendor/firmware/ipa_uc.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 6860,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 3,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 1,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "second-device/instantnoodle/tree-vendor/firmware/a650_zap.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 6812,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 5,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 3,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "enchilada/tree_firmware/ipa_fws.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      },
+      {
+        "bytes": 6684,
+        "e_flags": "0x00000003",
+        "e_flags_low12": "0x003",
+        "e_machine": 164,
+        "e_phnum": 3,
+        "loadable_rule_holds": true,
+        "loadable_rule_violations": [],
+        "loadable_segments": 1,
+        "mdt_equals_b00_plus_b01": true,
+        "path": "enchilada/tree_firmware/a630_zap.mdt",
+        "relocatable": true,
+        "zero_filesz_segments": 0,
+        "zero_filesz_sibling_nonzero": 0,
+        "zero_filesz_with_sibling": 0
+      }
+    ],
+    "rule_holds": 12,
+    "violations": []
+  },
+  "elf_header": {
+    "e_flags": 102,
+    "e_flags_hex": "0x00000066",
+    "e_flags_high": "0x00000000",
+    "e_flags_isa_name": "V66",
+    "e_flags_isa_nibble": "0x066",
+    "e_ident_hex": "7f454c46010101000000000000000000",
+    "fields": [
+      {
+        "field": "e_ident",
+        "note": "ELF32, little-endian, EV_CURRENT, System V ABI",
+        "offset": 0,
+        "size": 16,
+        "value": "7f454c46010101000000000000000000"
+      },
+      {
+        "field": "e_type",
+        "note": "ET_EXEC",
+        "offset": 16,
+        "size": 2,
+        "value": 2
+      },
+      {
+        "field": "e_machine",
+        "note": "EM_HEXAGON / EM_QDSP6 (include/uapi/linux/elf-em.h)",
+        "offset": 18,
+        "size": 2,
+        "value": 164
+      },
+      {
+        "field": "e_version",
+        "note": "",
+        "offset": 20,
+        "size": 4,
+        "value": 1
+      },
+      {
+        "field": "e_entry",
+        "note": "",
+        "offset": 24,
+        "size": 4,
+        "value": 2273312768
+      },
+      {
+        "field": "e_phoff",
+        "note": "",
+        "offset": 28,
+        "size": 4,
+        "value": 52
+      },
+      {
+        "field": "e_shoff",
+        "note": "",
+        "offset": 32,
+        "size": 4,
+        "value": 0
+      },
+      {
+        "field": "e_flags",
+        "note": "Hexagon ISA nibble = V66; high bits 0x00000000",
+        "offset": 36,
+        "size": 4,
+        "value": 102
+      },
+      {
+        "field": "e_ehsize",
+        "note": "== 52, matches Elf32_Ehdr",
+        "offset": 40,
+        "size": 2,
+        "value": 52
+      },
+      {
+        "field": "e_phentsize",
+        "note": "== 32, matches Elf32_Phdr",
+        "offset": 42,
+        "size": 2,
+        "value": 32
+      },
+      {
+        "field": "e_phnum",
+        "note": "13 program headers",
+        "offset": 44,
+        "size": 2,
+        "value": 13
+      },
+      {
+        "field": "e_shentsize",
+        "note": "",
+        "offset": 46,
+        "size": 2,
+        "value": 40
+      },
+      {
+        "field": "e_shnum",
+        "note": "no section headers",
+        "offset": 48,
+        "size": 2,
+        "value": 0
+      },
+      {
+        "field": "e_shstrndx",
+        "note": "",
+        "offset": 50,
+        "size": 2,
+        "value": 0
+      }
+    ],
+    "phdr_table_bytes": 416,
+    "phdr_table_end": 468,
+    "phdr_table_offset": 52
+  },
+  "isa": {
+    "all_16_iclass_present": true,
+    "e_flags_isa_name": "V66",
+    "e_flags_isa_nibble": "0x066",
+    "e_machine": 164,
+    "e_machine_name": "EM_HEXAGON/EM_QDSP6",
+    "iclass_histogram": {
+      "0x0": {
+        "count": 64153,
+        "name": "EXTENDER"
+      },
+      "0x1": {
+        "count": 17901,
+        "name": "J_1"
+      },
+      "0x2": {
+        "count": 26578,
+        "name": "J_2"
+      },
+      "0x3": {
+        "count": 18232,
+        "name": "LD_ST_1"
+      },
+      "0x4": {
+        "count": 20309,
+        "name": "LD_ST_2"
+      },
+      "0x5": {
+        "count": 68671,
+        "name": "J_3"
+      },
+      "0x6": {
+        "count": 29066,
+        "name": "CR"
+      },
+      "0x7": {
+        "count": 77785,
+        "name": "ALU32_1"
+      },
+      "0x8": {
+        "count": 9589,
+        "name": "XTYPE_1"
+      },
+      "0x9": {
+        "count": 31314,
+        "name": "LD"
+      },
+      "0xa": {
+        "count": 20063,
+        "name": "ST"
+      },
+      "0xb": {
+        "count": 13741,
+        "name": "ALU32_2"
+      },
+      "0xc": {
+        "count": 16089,
+        "name": "XTYPE_2"
+      },
+      "0xd": {
+        "count": 3668,
+        "name": "XTYPE_3"
+      },
+      "0xe": {
+        "count": 7040,
+        "name": "XTYPE_4"
+      },
+      "0xf": {
+        "count": 276628,
+        "name": "ALU32_3"
+      }
+    },
+    "largest_segment_alignment_sweep": [
+      {
+        "byte_offset": 0,
+        "gap_over4_fraction": 0.026817,
+        "gap_packets": 401689,
+        "parse": {
+          "p00": 0.107687,
+          "p01": 0.319149,
+          "p10": 0.0075,
+          "p11": 0.565665
+        }
+      },
+      {
+        "byte_offset": 1,
+        "gap_over4_fraction": 0.05868,
+        "gap_packets": 365115,
+        "parse": {
+          "p00": 0.331771,
+          "p01": 0.147251,
+          "p10": 0.092431,
+          "p11": 0.428547
+        }
+      },
+      {
+        "byte_offset": 2,
+        "gap_over4_fraction": 0.054902,
+        "gap_packets": 378131,
+        "parse": {
+          "p00": 0.181021,
+          "p01": 0.279429,
+          "p10": 0.106598,
+          "p11": 0.432952
+        }
+      },
+      {
+        "byte_offset": 3,
+        "gap_over4_fraction": 0.066299,
+        "gap_packets": 365012,
+        "parse": {
+          "p00": 0.320475,
+          "p01": 0.158694,
+          "p10": 0.077598,
+          "p11": 0.443233
+        }
+      }
+    ],
+    "largest_segment_bytes": 2803308,
+    "largest_segment_duplex_invalid": 78,
+    "largest_segment_duplex_valid": 46517,
+    "largest_segment_extender_candidates": 28875,
+    "largest_segment_iclass_entropy": 3.089502,
+    "largest_segment_index": 5,
+    "largest_segment_leading_extenders": 20466,
+    "largest_segment_length_histogram": {
+      "1": 304995,
+      "2": 42583,
+      "3": 26420,
+      "4": 16919,
+      "5": 4350,
+      "6": 2821,
+      "7": 1547,
+      "8": 519,
+      "9": 352,
+      "10": 185,
+      "11": 115,
+      "12": 80,
+      "13": 76,
+      "14": 45,
+      "15": 31,
+      "16": 38,
+      "17": 36,
+      "18": 36,
+      "19": 25,
+      "20": 21,
+      "21": 13,
+      "22": 18,
+      "23": 11,
+      "24": 21,
+      "25": 8,
+      "26": 12,
+      "27": 17,
+      "28": 7,
+      "29": 12,
+      "30": 8,
+      "31": 6,
+      "32": 5,
+      "33": 6,
+      "34": 4,
+      "35": 7,
+      "36": 12,
+      "37": 2,
+      "38": 7,
+      "39": 5,
+      "40": 7,
+      "41": 5,
+      "42": 3,
+      "43": 6,
+      "44": 2,
+      "45": 3,
+      "46": 7,
+      "47": 8,
+      "48": 6,
+      "49": 3,
+      "50": 2,
+      "51": 2,
+      "52": 8,
+      "53": 7,
+      "54": 5,
+      "55": 2,
+      "56": 1,
+      "57": 4,
+      "58": 2,
+      "59": 5,
+      "60": 2,
+      "61": 1,
+      "63": 1,
+      "64": 6,
+      "65": 3,
+      "67": 1,
+      "68": 2,
+      "69": 2,
+      "70": 2,
+      "71": 2,
+      "72": 2,
+      "73": 1,
+      "74": 1,
+      "75": 1,
+      "78": 1,
+      "80": 2,
+      "81": 3,
+      "82": 1,
+      "83": 2,
+      "85": 2,
+      "87": 2,
+      "88": 1,
+      "90": 2,
+      "91": 2,
+      "93": 1,
+      "95": 3,
+      "98": 1,
+      "99": 2,
+      "102": 2,
+      "104": 3,
+      "105": 2,
+      "106": 1,
+      "107": 1,
+      "108": 3,
+      "109": 1,
+      "111": 1,
+      "112": 1,
+      "113": 3,
+      "114": 1,
+      "115": 1,
+      "116": 1,
+      "117": 1,
+      "118": 3,
+      "119": 1,
+      "120": 1,
+      "121": 1,
+      "122": 3,
+      "126": 1,
+      "127": 2,
+      "130": 2,
+      "131": 1,
+      "134": 1,
+      "135": 2,
+      "139": 1,
+      "145": 1,
+      "148": 1,
+      "151": 2,
+      "152": 1,
+      "153": 1,
+      "155": 1,
+      "157": 1,
+      "159": 1,
+      "161": 1,
+      "167": 1,
+      "168": 1,
+      "169": 1,
+      "171": 1,
+      "175": 2,
+      "178": 1,
+      "183": 1,
+      "184": 2,
+      "190": 1,
+      "191": 1,
+      "193": 1,
+      "194": 1,
+      "198": 2,
+      "201": 3,
+      "202": 1,
+      "203": 1,
+      "204": 2,
+      "210": 1,
+      "226": 1,
+      "227": 1,
+      "229": 1,
+      "232": 1,
+      "236": 1,
+      "237": 2,
+      "240": 1,
+      "243": 1,
+      "248": 1,
+      "257": 1,
+      "258": 1,
+      "263": 1,
+      "265": 1,
+      "267": 1,
+      "270": 2,
+      "274": 1,
+      "275": 1,
+      "282": 1,
+      "283": 1,
+      "284": 1,
+      "286": 1,
+      "287": 1,
+      "290": 1,
+      "291": 1,
+      "294": 1,
+      "313": 1,
+      "331": 1,
+      "339": 1,
+      "342": 1,
+      "344": 1,
+      "346": 1,
+      "352": 1,
+      "354": 2,
+      "358": 1,
+      "361": 1,
+      "372": 1,
+      "400": 1,
+      "402": 1,
+      "406": 1,
+      "421": 1,
+      "433": 1,
+      "434": 1,
+      "436": 2,
+      "438": 1,
+      "444": 2,
+      "482": 1,
+      "485": 1,
+      "495": 1,
+      "498": 1,
+      "501": 1,
+      "509": 1,
+      "510": 1,
+      "512": 1,
+      "523": 1,
+      "538": 1,
+      "551": 1,
+      "558": 1,
+      "568": 1,
+      "598": 1,
+      "627": 1,
+      "657": 1,
+      "683": 1,
+      "689": 1,
+      "709": 1,
+      "713": 1,
+      "723": 1,
+      "753": 1,
+      "761": 1,
+      "765": 1,
+      "773": 1,
+      "808": 1,
+      "818": 1,
+      "834": 1,
+      "868": 1,
+      "923": 1,
+      "948": 1,
+      "1002": 1,
+      "1100": 1,
+      "1106": 1,
+      "1224": 1,
+      "1284": 1,
+      "1302": 1,
+      "1398": 1,
+      "1449": 1,
+      "1509": 1,
+      "1533": 1,
+      "1535": 1,
+      "1612": 1,
+      "1798": 1,
+      "1975": 1,
+      "2125": 1,
+      "2719": 1,
+      "2945": 1,
+      "9840": 1
+    },
+    "largest_segment_over4_fraction": 0.026817,
+    "largest_segment_packets": 401689,
+    "negative_control": {
+      "bytes": 300000,
+      "sweep": [
+        {
+          "byte_offset": 0,
+          "gap_over4_fraction": 0.063856,
+          "parse": {
+            "p00": 0.249,
+            "p01": 0.25384,
+            "p10": 0.247707,
+            "p11": 0.249453
+          }
+        },
+        {
+          "byte_offset": 1,
+          "gap_over4_fraction": 0.061809,
+          "parse": {
+            "p00": 0.247843,
+            "p01": 0.251683,
+            "p10": 0.251163,
+            "p11": 0.24931
+          }
+        },
+        {
+          "byte_offset": 2,
+          "gap_over4_fraction": 0.06336,
+          "parse": {
+            "p00": 0.250177,
+            "p01": 0.25087,
+            "p10": 0.248777,
+            "p11": 0.250177
+          }
+        },
+        {
+          "byte_offset": 3,
+          "gap_over4_fraction": 0.062144,
+          "parse": {
+            "p00": 0.24727,
+            "p01": 0.251737,
+            "p10": 0.25071,
+            "p11": 0.250283
+          }
+        }
+      ]
+    },
+    "parse_bits_field": "bits [15:14] of the little-endian 32-bit word",
+    "parse_bits_source": "llvm/lib/Target/Hexagon/MCTargetDesc/HexagonBaseInfo.h INST_PARSE_*",
+    "per_segment": [
+      {
+        "alignment_best_byte_offset": 0,
+        "bytes": 468,
+        "gap_over4_fraction": 0.45,
+        "gap_packets": 20,
+        "gap_sweep": [
+          0.45,
+          0.764706,
+          0.590909,
+          1.0
+        ],
+        "hexagon_like": false,
+        "iclass_entropy": 1.067335,
+        "index": 0,
+        "parse_fractions": {
+          "p00": 0.7264957264957265,
+          "p01": 0.10256410256410256,
+          "p10": 0.11965811965811966,
+          "p11": 0.05128205128205128
+        },
+        "words": 117
+      },
+      {
+        "alignment_best_byte_offset": 0,
+        "bytes": 7192,
+        "gap_over4_fraction": 0.037771,
+        "gap_packets": 1059,
+        "gap_sweep": [
+          0.037771,
+          0.037771,
+          0.039511,
+          0.042333
+        ],
+        "hexagon_like": true,
+        "iclass_entropy": 3.046917,
+        "index": 1,
+        "parse_fractions": {
+          "p00": 0.27363737486095663,
+          "p01": 0.13737486095661847,
+          "p10": 0.09510567296996662,
+          "p11": 0.4938820912124583
+        },
+        "words": 1798
+      },
+      {
+        "alignment_best_byte_offset": 0,
+        "bytes": 235420,
+        "gap_over4_fraction": 0.038312,
+        "gap_packets": 15452,
+        "gap_sweep": [
+          0.038312,
+          0.132564,
+          0.153183,
+          0.278483
+        ],
+        "hexagon_like": true,
+        "iclass_entropy": 2.759926,
+        "index": 2,
+        "parse_fractions": {
+          "p00": 0.4907824313992014,
+          "p01": 0.24667402939427407,
+          "p10": 0.016243309829241357,
+          "p11": 0.24630022937728316
+        },
+        "words": 58855
+      },
+      {
+        "alignment_best_byte_offset": 2,
+        "bytes": 105980,
+        "gap_over4_fraction": 0.75,
+        "gap_packets": 4,
+        "gap_sweep": [
+          0.75,
+          1.0,
+          0.666667,
+          0.8
+        ],
+        "hexagon_like": false,
+        "iclass_entropy": 0.19318,
+        "index": 3,
+        "parse_fractions": {
+          "p00": 0.9716927722211738,
+          "p01": 0.02815625589733912,
+          "p10": 0.0,
+          "p11": 0.00015097188148707302
+        },
+        "words": 26495
+      },
+      {
+        "alignment_best_byte_offset": 0,
+        "bytes": 1076,
+        "gap_over4_fraction": 0.0,
+        "gap_packets": 164,
+        "gap_sweep": [
+          0.0,
+          0.190476,
+          0.233333,
+          0.621622
+        ],
+        "hexagon_like": true,
+        "iclass_entropy": 2.468243,
+        "index": 4,
+        "parse_fractions": {
+          "p00": 0.0,
+          "p01": 0.3903345724907063,
+          "p10": 0.0,
+          "p11": 0.6096654275092936
+        },
+        "words": 269
+      },
+      {
+        "alignment_best_byte_offset": 0,
+        "bytes": 2803308,
+        "gap_over4_fraction": 0.026817,
+        "gap_packets": 401689,
+        "gap_sweep": [
+          0.026817,
+          0.05868,
+          0.054902,
+          0.066299
+        ],
+        "hexagon_like": true,
+        "iclass_entropy": 3.089502,
+        "index": 5,
+        "parse_fractions": {
+          "p00": 0.10768706114347763,
+          "p01": 0.31914866293678756,
+          "p10": 0.007499711055652822,
+          "p11": 0.565664564864082
+        },
+        "words": 700827
+      },
+      {
+        "alignment_best_byte_offset": 1,
+        "bytes": 83426,
+        "gap_over4_fraction": 0.181818,
+        "gap_packets": 22,
+        "gap_sweep": [
+          0.181818,
+          0.083333,
+          0.235294,
+          0.235294
+        ],
+        "hexagon_like": false,
+        "iclass_entropy": 2.442823,
+        "index": 6,
+        "parse_fractions": {
+          "p00": 0.23806098964326813,
+          "p01": 0.7608841580360568,
+          "p10": 0.0005274261603375527,
+          "p11": 0.0005274261603375527
+        },
+        "words": 20856
+      },
+      {
+        "alignment_best_byte_offset": 0,
+        "bytes": 830592,
+        "gap_over4_fraction": 0.061982,
+        "gap_packets": 75135,
+        "gap_sweep": [
+          0.061982,
+          0.157655,
+          0.111632,
+          0.23892
+        ],
+        "hexagon_like": true,
+        "iclass_entropy": 3.683015,
+        "index": 8,
+        "parse_fractions": {
+          "p00": 0.23008167668361842,
+          "p01": 0.40808002003390353,
+          "p10": 0.020414355062413316,
+          "p11": 0.3414239482200647
+        },
+        "words": 207648
+      },
+      {
+        "alignment_best_byte_offset": 1,
+        "bytes": 2800,
+        "gap_over4_fraction": 0.12931,
+        "gap_packets": 232,
+        "gap_sweep": [
+          0.12931,
+          0.05614,
+          0.172775,
+          0.153153
+        ],
+        "hexagon_like": false,
+        "iclass_entropy": 3.164868,
+        "index": 9,
+        "parse_fractions": {
+          "p00": 0.5128571428571429,
+          "p01": 0.15571428571428572,
+          "p10": 0.13857142857142857,
+          "p11": 0.19285714285714287
+        },
+        "words": 700
+      },
+      {
+        "alignment_best_byte_offset": 0,
+        "bytes": 59156,
+        "gap_over4_fraction": 0.056643,
+        "gap_packets": 5773,
+        "gap_sweep": [
+          0.056643,
+          0.175316,
+          0.163964,
+          0.293489
+        ],
+        "hexagon_like": true,
+        "iclass_entropy": 3.541995,
+        "index": 11,
+        "parse_fractions": {
+          "p00": 0.17073500574751505,
+          "p01": 0.4389072959632159,
+          "p10": 0.010818851849347487,
+          "p11": 0.3795388464399216
+        },
+        "words": 14789
+      }
+    ],
+    "positive_control": [
+      {
+        "file": "libnn_preproc.so",
+        "offset_0": {
+          "gap_over4_fraction": 0.06242350061199511,
+          "gap_packets": 1634,
+          "parse": {
+            "p00": 0.09181929181929183,
+            "p01": 0.5091575091575091,
+            "p10": 0.003663003663003663,
+            "p11": 0.39536019536019534
+          }
+        },
+        "offset_1": {
+          "gap_over4_fraction": 0.14285714285714285,
+          "gap_packets": 1428,
+          "parse": {
+            "p00": 0.49291646311675624,
+            "p01": 0.15828041035661944,
+            "p10": 0.22838299951148022,
+            "p11": 0.12042012701514411
+          }
+        },
+        "offset_2": {
+          "gap_over4_fraction": 0.13551401869158877,
+          "gap_packets": 1498,
+          "parse": {
+            "p00": 0.340009770395701,
+            "p01": 0.2940889106008793,
+            "p10": 0.252076209086468,
+            "p11": 0.11382510991695163
+          }
+        },
+        "offset_3": {
+          "gap_over4_fraction": 0.28721174004192873,
+          "gap_packets": 954,
+          "parse": {
+            "p00": 0.6582804103566194,
+            "p01": 0.10869565217391304,
+            "p10": 0.11651196873473375,
+            "p11": 0.11651196873473375
+          }
+        },
+        "sha256": "ae92a786fa3ef84c34df61b165aa796ad44c5ef1adc7db395359d9cee0ecd66a",
+        "text_offset": 10176,
+        "text_size": 16380
+      },
+      {
+        "file": "libsysmon_skel.so",
+        "offset_0": {
+          "gap_over4_fraction": 0.095246296934206,
+          "gap_packets": 5806,
+          "parse": {
+            "p00": 0.08094435075885328,
+            "p01": 0.5564299544063457,
+            "p10": 0.001873711823121604,
+            "p11": 0.3607519830116795
+          }
+        },
+        "offset_1": {
+          "gap_over4_fraction": 0.24363854938890003,
+          "gap_packets": 4991,
+          "parse": {
+            "p00": 0.4739537788881949,
+            "p01": 0.21430356027482822,
+            "p10": 0.16951905059337913,
+            "p11": 0.14222361024359775
+          }
+        },
+        "offset_2": {
+          "gap_over4_fraction": 0.24148671096345514,
+          "gap_packets": 4816,
+          "parse": {
+            "p00": 0.25165521549031855,
+            "p01": 0.4475327920049969,
+            "p10": 0.23941286695815114,
+            "p11": 0.061399125546533415
+          }
+        },
+        "offset_3": {
+          "gap_over4_fraction": 0.235217106698669,
+          "gap_packets": 4583,
+          "parse": {
+            "p00": 0.5582760774515928,
+            "p01": 0.15546533416614616,
+            "p10": 0.150843222985634,
+            "p11": 0.1354153653966271
+          }
+        },
+        "sha256": "a0c0606be66f3d2c8c920628ec3da43378d0da61307f7e4a75d0596a8e3e4ab0",
+        "text_offset": 11040,
+        "text_size": 64044
+      }
+    ]
+  },
+  "jsn": {
+    "bytes": 403,
+    "declared_domain": "msm/cdsp/root_pd",
+    "md5": "f2bd80d5f0b19b5b0d36d28383948149",
+    "mentions_mdt_or_segments": false,
+    "path": "/home/aditya/.zcode/workspace/draft-edfb884f-51a0-40a6-ae53-6cf6375c0730/data-fetch/second-device/instantnoodle/modem-fat-lfn/image_cdspr.jsn",
+    "qmi_instance_id": 76,
+    "repo_crossref": "research/laptop/qualcomm-pil-manifest-family.md",
+    "sha256": "15e148599165b38f68e62302d63c87caa5f0b164deb81aa419bbb4ecf920bc4b",
+    "sr_domain": {
+      "domain": "cdsp",
+      "qmi_instance_id": 76,
+      "soc": "msm",
+      "subdomain": "root_pd"
+    },
+    "sr_service": [
+      {
+        "provider": "tms",
+        "service": "servreg",
+        "service_data": 0,
+        "service_data_valid": 0
+      }
+    ],
+    "sr_version": {
+      "major": 1,
+      "minor": 1,
+      "patch": 1
+    }
+  },
+  "layout": {
+    "largest_segment_bytes": 2803308,
+    "largest_segment_index": 5,
+    "mdt_bytes": 7660,
+    "sum_p_filesz": 4129418,
+    "total_sibling_bytes": 4129418
+  },
+  "pflags": {
+    "access_values": [
+      0,
+      1
+    ],
+    "bit27_on_all_loadable": true,
+    "corpus_census": {
+      "access_values": [
+        0,
+        1,
+        3
+      ],
+      "by_role": {
+        "bss": {
+          "0x00000004": 19,
+          "0x00000006": 197,
+          "0x08000004": 18,
+          "0x08000005": 4,
+          "0x08000006": 88
+        },
+        "other": {
+          "0x00000004": 3054,
+          "0x00000006": 1800,
+          "0x08000000": 4
+        },
+        "phdr0_ptnull": {
+          "0x07000000": 753
+        },
+        "pt_load": {
+          "0x00000000": 11,
+          "0x00000004": 771,
+          "0x00000005": 1024,
+          "0x00000006": 2192,
+          "0x00000007": 21,
+          "0x00100004": 2,
+          "0x00100005": 2,
+          "0x00100006": 2,
+          "0x01000000": 2,
+          "0x01000004": 2,
+          "0x01000005": 2,
+          "0x01000006": 4,
+          "0x01000007": 20,
+          "0x01600006": 2,
+          "0x03000005": 4,
+          "0x03000006": 4,
+          "0x04000006": 49,
+          "0x05000005": 6,
+          "0x05000006": 2,
+          "0x08000000": 80,
+          "0x08000004": 62,
+          "0x08000005": 242,
+          "0x08000006": 136,
+          "0x08000007": 90,
+          "0x80000007": 2,
+          "0x81200005": 2
+        },
+        "type_hash": {
+          "0x02200000": 753
+        }
+      },
+      "distinct_words": 28,
+      "files": 1692,
+      "low3_values": [
+        0,
+        4,
+        5,
+        6,
+        7
+      ],
+      "relocatable_words": 724,
+      "total_words": 11426,
+      "type_values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7
+      ],
+      "values": {
+        "0x00000000": 11,
+        "0x00000004": 3844,
+        "0x00000005": 1024,
+        "0x00000006": 4189,
+        "0x00000007": 21,
+        "0x00100004": 2,
+        "0x00100005": 2,
+        "0x00100006": 2,
+        "0x01000000": 2,
+        "0x01000004": 2,
+        "0x01000005": 2,
+        "0x01000006": 4,
+        "0x01000007": 20,
+        "0x01600006": 2,
+        "0x02200000": 753,
+        "0x03000005": 4,
+        "0x03000006": 4,
+        "0x04000006": 49,
+        "0x05000005": 6,
+        "0x05000006": 2,
+        "0x07000000": 753,
+        "0x08000000": 84,
+        "0x08000004": 80,
+        "0x08000005": 246,
+        "0x08000006": 224,
+        "0x08000007": 90,
+        "0x80000007": 2,
+        "0x81200005": 2
+      }
+    },
+    "low3_values": [
+      0,
+      4,
+      5,
+      6,
+      7
+    ],
+    "segments": [
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          24,
+          25,
+          26
+        ],
+        "index": 0,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": false,
+        "pf_w": false,
+        "pf_x": false,
+        "pool_index": 0,
+        "raw": 117440512,
+        "raw_hex": "0x07000000",
+        "relocatable_bit27": false,
+        "rwx": "-",
+        "seg_type": 7,
+        "seg_type_hex": "0x07",
+        "seg_type_name": "PHDR",
+        "unknown_high": "0x00000000"
+      },
+      {
+        "access_type": 1,
+        "access_type_hex": "0x1",
+        "access_type_name": "RO",
+        "bit31": false,
+        "bits_set": [
+          21,
+          25
+        ],
+        "index": 1,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": false,
+        "pf_w": false,
+        "pf_x": false,
+        "pool_index": 0,
+        "raw": 35651584,
+        "raw_hex": "0x02200000",
+        "relocatable_bit27": false,
+        "rwx": "-",
+        "seg_type": 2,
+        "seg_type_hex": "0x02",
+        "seg_type_name": "HASH",
+        "unknown_high": "0x00000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          0,
+          2,
+          27
+        ],
+        "index": 2,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": false,
+        "pf_x": true,
+        "pool_index": 1,
+        "raw": 134217733,
+        "raw_hex": "0x08000005",
+        "relocatable_bit27": true,
+        "rwx": "RX",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          0,
+          2,
+          27
+        ],
+        "index": 3,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": false,
+        "pf_x": true,
+        "pool_index": 1,
+        "raw": 134217733,
+        "raw_hex": "0x08000005",
+        "relocatable_bit27": true,
+        "rwx": "RX",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          0,
+          2,
+          27
+        ],
+        "index": 4,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": false,
+        "pf_x": true,
+        "pool_index": 1,
+        "raw": 134217733,
+        "raw_hex": "0x08000005",
+        "relocatable_bit27": true,
+        "rwx": "RX",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          0,
+          1,
+          2,
+          27
+        ],
+        "index": 5,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": true,
+        "pf_x": true,
+        "pool_index": 1,
+        "raw": 134217735,
+        "raw_hex": "0x08000007",
+        "relocatable_bit27": true,
+        "rwx": "RWX",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          1,
+          2,
+          27
+        ],
+        "index": 6,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": true,
+        "pf_x": false,
+        "pool_index": 1,
+        "raw": 134217734,
+        "raw_hex": "0x08000006",
+        "relocatable_bit27": true,
+        "rwx": "RW",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          2,
+          27
+        ],
+        "index": 7,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": false,
+        "pf_x": false,
+        "pool_index": 1,
+        "raw": 134217732,
+        "raw_hex": "0x08000004",
+        "relocatable_bit27": true,
+        "rwx": "R",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          0,
+          1,
+          2,
+          27
+        ],
+        "index": 8,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": true,
+        "pf_x": true,
+        "pool_index": 1,
+        "raw": 134217735,
+        "raw_hex": "0x08000007",
+        "relocatable_bit27": true,
+        "rwx": "RWX",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          1,
+          2,
+          27
+        ],
+        "index": 9,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": true,
+        "pf_x": false,
+        "pool_index": 1,
+        "raw": 134217734,
+        "raw_hex": "0x08000006",
+        "relocatable_bit27": true,
+        "rwx": "RW",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          2,
+          27
+        ],
+        "index": 10,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": false,
+        "pf_x": false,
+        "pool_index": 1,
+        "raw": 134217732,
+        "raw_hex": "0x08000004",
+        "relocatable_bit27": true,
+        "rwx": "R",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          0,
+          1,
+          2,
+          27
+        ],
+        "index": 11,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": true,
+        "pf_x": true,
+        "pool_index": 1,
+        "raw": 134217735,
+        "raw_hex": "0x08000007",
+        "relocatable_bit27": true,
+        "rwx": "RWX",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      },
+      {
+        "access_type": 0,
+        "access_type_hex": "0x0",
+        "access_type_name": "RW",
+        "bit31": false,
+        "bits_set": [
+          2,
+          27
+        ],
+        "index": 12,
+        "page_mode": 0,
+        "page_mode_name": "NON_PAGED",
+        "pf_r": true,
+        "pf_w": false,
+        "pf_x": false,
+        "pool_index": 1,
+        "raw": 134217732,
+        "raw_hex": "0x08000004",
+        "relocatable_bit27": true,
+        "rwx": "R",
+        "seg_type": 0,
+        "seg_type_hex": "0x00",
+        "seg_type_name": "L4/AMSS",
+        "unknown_high": "0x08000000"
+      }
+    ],
+    "segtype_values": [
+      0,
+      2,
+      7
+    ]
+  },
+  "program_headers": {
+    "b00_bytes": 468,
+    "b01_bytes": 7192,
+    "mdt_is_b00_plus_b01": true,
+    "nonzero_filesz_count": 10,
+    "nonzero_filesz_with_exact_sibling": 10,
+    "rule_holds_all_nonzero": true,
+    "segments": [
+      {
+        "index": 0,
+        "p_align": 0,
+        "p_filesz": 468,
+        "p_flags": 117440512,
+        "p_flags_hex": "0x07000000",
+        "p_memsz": 0,
+        "p_offset": 0,
+        "p_paddr": 0,
+        "p_type": 0,
+        "p_vaddr": 0,
+        "phdr_file_offset": 52,
+        "role": "header/phdr-table",
+        "role_evidence": "PT_NULL seg-0; p_filesz == e_ehsize + e_phnum*e_phentsize; type-bits 7",
+        "sibling_bytes": 468,
+        "sibling_name": "image_cdsp.b00",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 1,
+        "p_align": 4096,
+        "p_filesz": 7192,
+        "p_flags": 35651584,
+        "p_flags_hex": "0x02200000",
+        "p_memsz": 8192,
+        "p_offset": 4096,
+        "p_paddr": 2294284288,
+        "p_type": 0,
+        "p_vaddr": 2294284288,
+        "phdr_file_offset": 84,
+        "role": "hash/cert-segment",
+        "role_evidence": "type-bits == 2 (QCOM_MDT_TYPE_HASH); skipped by mdt_phdr_loadable()",
+        "sibling_bytes": 7192,
+        "sibling_name": "image_cdsp.b01",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 2,
+        "p_align": 1048576,
+        "p_filesz": 235420,
+        "p_flags": 134217733,
+        "p_flags_hex": "0x08000005",
+        "p_memsz": 720896,
+        "p_offset": 12288,
+        "p_paddr": 2273312768,
+        "p_type": 1,
+        "p_vaddr": 4261412864,
+        "phdr_file_offset": 116,
+        "role": "data (parse bits inconsistent with code)",
+        "role_evidence": "p10=0.0162, p00=0.491 do not match a compiled Hexagon stream",
+        "sibling_bytes": 235420,
+        "sibling_name": "image_cdsp.b02",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 3,
+        "p_align": 4096,
+        "p_filesz": 105980,
+        "p_flags": 134217733,
+        "p_flags_hex": "0x08000005",
+        "p_memsz": 106496,
+        "p_offset": 249856,
+        "p_paddr": 2274033664,
+        "p_type": 1,
+        "p_vaddr": 4262133760,
+        "phdr_file_offset": 148,
+        "role": "data (sparse / zero-heavy)",
+        "role_evidence": "entropy 0.205 bits/byte",
+        "sibling_bytes": 105980,
+        "sibling_name": "image_cdsp.b03",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 4,
+        "p_align": 4096,
+        "p_filesz": 1076,
+        "p_flags": 134217733,
+        "p_flags_hex": "0x08000005",
+        "p_memsz": 4096,
+        "p_offset": 356352,
+        "p_paddr": 2274140160,
+        "p_type": 1,
+        "p_vaddr": 3222052864,
+        "phdr_file_offset": 180,
+        "role": "data (too small for packet statistics)",
+        "role_evidence": "269 words; below the 2048-word threshold for a stable parse-bit estimate",
+        "sibling_bytes": 1076,
+        "sibling_name": "image_cdsp.b04",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 5,
+        "p_align": 4096,
+        "p_filesz": 2803308,
+        "p_flags": 134217735,
+        "p_flags_hex": "0x08000007",
+        "p_memsz": 5218304,
+        "p_offset": 360448,
+        "p_paddr": 2274144256,
+        "p_type": 1,
+        "p_vaddr": 3222056960,
+        "phdr_file_offset": 212,
+        "role": "code-like (Hexagon packet statistics)",
+        "role_evidence": "p10=0.0075 (loop-end rare), p00=0.108 (extender/duplex), iClassH=3.09",
+        "sibling_bytes": 2803308,
+        "sibling_name": "image_cdsp.b05",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 6,
+        "p_align": 4096,
+        "p_filesz": 83426,
+        "p_flags": 134217734,
+        "p_flags_hex": "0x08000006",
+        "p_memsz": 86016,
+        "p_offset": 3166208,
+        "p_paddr": 2279362560,
+        "p_type": 1,
+        "p_vaddr": 3227275264,
+        "phdr_file_offset": 244,
+        "role": "data (string/table blob)",
+        "role_evidence": "91.5% of bytes lie in printable runs >= 8",
+        "sibling_bytes": 83426,
+        "sibling_name": "image_cdsp.b06",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 7,
+        "p_align": 4096,
+        "p_filesz": 0,
+        "p_flags": 134217732,
+        "p_flags_hex": "0x08000004",
+        "p_memsz": 155648,
+        "p_offset": 3252224,
+        "p_paddr": 2279448576,
+        "p_type": 1,
+        "p_vaddr": 3227361280,
+        "phdr_file_offset": 276,
+        "role": "BSS (zero-fill)",
+        "role_evidence": "p_filesz == 0 and p_memsz > 0; no sibling file",
+        "sibling_bytes": null,
+        "sibling_name": "image_cdsp.b07",
+        "sibling_present": false,
+        "size_matches_p_filesz": false,
+        "verdict": "ABSENT-as-predicted"
+      },
+      {
+        "index": 8,
+        "p_align": 4096,
+        "p_filesz": 830592,
+        "p_flags": 134217735,
+        "p_flags_hex": "0x08000007",
+        "p_memsz": 11603968,
+        "p_offset": 3252224,
+        "p_paddr": 2279604224,
+        "p_type": 1,
+        "p_vaddr": 16777216,
+        "phdr_file_offset": 308,
+        "role": "code-like (Hexagon packet statistics)",
+        "role_evidence": "p10=0.0204 (loop-end rare), p00=0.230 (extender/duplex), iClassH=3.68",
+        "sibling_bytes": 830592,
+        "sibling_name": "image_cdsp.b08",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 9,
+        "p_align": 4096,
+        "p_filesz": 2800,
+        "p_flags": 134217734,
+        "p_flags_hex": "0x08000006",
+        "p_memsz": 4096,
+        "p_offset": 4083712,
+        "p_paddr": 2291208192,
+        "p_type": 1,
+        "p_vaddr": 28381184,
+        "phdr_file_offset": 340,
+        "role": "data (too small for packet statistics)",
+        "role_evidence": "700 words; below the 2048-word threshold for a stable parse-bit estimate",
+        "sibling_bytes": 2800,
+        "sibling_name": "image_cdsp.b09",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 10,
+        "p_align": 4096,
+        "p_filesz": 0,
+        "p_flags": 134217732,
+        "p_flags_hex": "0x08000004",
+        "p_memsz": 974848,
+        "p_offset": 4087808,
+        "p_paddr": 2291212288,
+        "p_type": 1,
+        "p_vaddr": 3227516928,
+        "phdr_file_offset": 372,
+        "role": "BSS (zero-fill)",
+        "role_evidence": "p_filesz == 0 and p_memsz > 0; no sibling file",
+        "sibling_bytes": null,
+        "sibling_name": "image_cdsp.b10",
+        "sibling_present": false,
+        "size_matches_p_filesz": false,
+        "verdict": "ABSENT-as-predicted"
+      },
+      {
+        "index": 11,
+        "p_align": 4096,
+        "p_filesz": 59156,
+        "p_flags": 134217735,
+        "p_flags_hex": "0x08000007",
+        "p_memsz": 274432,
+        "p_offset": 4087808,
+        "p_paddr": 2292187136,
+        "p_type": 1,
+        "p_vaddr": 1946157056,
+        "phdr_file_offset": 404,
+        "role": "code-like (Hexagon packet statistics)",
+        "role_evidence": "p10=0.0108 (loop-end rare), p00=0.171 (extender/duplex), iClassH=3.54",
+        "sibling_bytes": 59156,
+        "sibling_name": "image_cdsp.b11",
+        "sibling_present": true,
+        "size_matches_p_filesz": true,
+        "verdict": "MATCH"
+      },
+      {
+        "index": 12,
+        "p_align": 4096,
+        "p_filesz": 0,
+        "p_flags": 134217732,
+        "p_flags_hex": "0x08000004",
+        "p_memsz": 1822720,
+        "p_offset": 4149248,
+        "p_paddr": 2292461568,
+        "p_type": 1,
+        "p_vaddr": 3228491776,
+        "phdr_file_offset": 436,
+        "role": "BSS (zero-fill)",
+        "role_evidence": "p_filesz == 0 and p_memsz > 0; no sibling file",
+        "sibling_bytes": null,
+        "sibling_name": "image_cdsp.b12",
+        "sibling_present": false,
+        "size_matches_p_filesz": false,
+        "verdict": "ABSENT-as-predicted"
+      }
+    ],
+    "zero_filesz_indices": [
+      7,
+      10,
+      12
+    ],
+    "zero_filesz_with_sibling": []
+  },
+  "provenance": {
+    "data_root": "/home/aditya/.zcode/workspace/draft-edfb884f-51a0-40a6-ae53-6cf6375c0730/data-fetch",
+    "date": "2026-11-20",
+    "issue": "adineo-cmd/open-device#595",
+    "mdt": "/home/aditya/.zcode/workspace/draft-edfb884f-51a0-40a6-ae53-6cf6375c0730/data-fetch/second-device/instantnoodle/modem-fat-lfn/image_cdsp.mdt",
+    "mdt_bytes": 7660,
+    "mdt_md5": "bb2c76540ca66d4a248c200b89a2cbb8",
+    "mdt_sha256": "f6565bb5d676903b51412d518d10888e6be815547bd7ceca0e16bec6b9e1d71a"
+  },
+  "roles": [
+    {
+      "evidence": "PT_NULL seg-0; p_filesz == e_ehsize + e_phnum*e_phentsize; type-bits 7",
+      "index": 0,
+      "packet_stats": {
+        "gap": {
+          "over4": 9,
+          "over4_fraction": 0.45,
+          "packets": 20
+        },
+        "iclass_entropy": 1.0673346909835728,
+        "parse": {
+          "p00": 0.7264957264957265,
+          "p01": 0.10256410256410256,
+          "p10": 0.11965811965811966,
+          "p11": 0.05128205128205128
+        },
+        "words": 117
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.087607,
+        "bytes": 468,
+        "entropy_bits_per_byte": 3.149704,
+        "md5": "29ee2a117966ea61bac604060d7ce12b",
+        "printable_run_fraction": 0.0,
+        "sha256": "f2e70c6cf025aff0b72bfd6e3d31f294e892f69f1fd79ede21428263a485565f",
+        "zero_fraction": 0.59188
+      },
+      "role": "header/phdr-table"
+    },
+    {
+      "evidence": "type-bits == 2 (QCOM_MDT_TYPE_HASH); skipped by mdt_phdr_loadable()",
+      "index": 1,
+      "packet_stats": {
+        "gap": {
+          "over4": 40,
+          "over4_fraction": 0.03777148253068933,
+          "packets": 1059
+        },
+        "iclass_entropy": 3.0469165277730457,
+        "parse": {
+          "p00": 0.27363737486095663,
+          "p01": 0.13737486095661847,
+          "p10": 0.09510567296996662,
+          "p11": 0.4938820912124583
+        },
+        "words": 1798
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.219828,
+        "bytes": 7192,
+        "entropy_bits_per_byte": 5.283111,
+        "md5": "7ba7687e77270893af6863c02355cc0d",
+        "printable_run_fraction": 0.060484,
+        "sha256": "dde5583d75088ee6dafa24c141163b42b8f3b91dc55f347940d98cb0939baeb2",
+        "zero_fraction": 0.049917
+      },
+      "role": "hash/cert-segment"
+    },
+    {
+      "evidence": "p10=0.0162, p00=0.491 do not match a compiled Hexagon stream",
+      "index": 2,
+      "packet_stats": {
+        "gap": {
+          "over4": 592,
+          "over4_fraction": 0.038312192596427645,
+          "packets": 15452
+        },
+        "iclass_entropy": 2.759925740795693,
+        "parse": {
+          "p00": 0.4907824313992014,
+          "p01": 0.24667402939427407,
+          "p10": 0.016243309829241357,
+          "p11": 0.24630022937728316
+        },
+        "words": 58855
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.193378,
+        "bytes": 235420,
+        "entropy_bits_per_byte": 4.504495,
+        "md5": "b94327480f17b05f60cdde0d3ee95336",
+        "printable_run_fraction": 0.011435,
+        "sha256": "0e81bc2154373bdeddcd642f737182e8baa7709ac03c11c42c4376c6c7e818b4",
+        "zero_fraction": 0.501873
+      },
+      "role": "data (parse bits inconsistent with code)"
+    },
+    {
+      "evidence": "entropy 0.205 bits/byte",
+      "index": 3,
+      "packet_stats": {
+        "gap": {
+          "over4": 3,
+          "over4_fraction": 0.75,
+          "packets": 4
+        },
+        "iclass_entropy": 0.1931802989493525,
+        "parse": {
+          "p00": 0.9716927722211738,
+          "p01": 0.02815625589733912,
+          "p10": 0.0,
+          "p11": 0.00015097188148707302
+        },
+        "words": 26495
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.000878,
+        "bytes": 105980,
+        "entropy_bits_per_byte": 0.204585,
+        "md5": "73057cd38e671c3495bc0cf6fe51bfa7",
+        "printable_run_fraction": 0.00067,
+        "sha256": "ffdb55e51bf39b2d45a31b460bc9a19a99078f01a1bd14cbb221cf4b92b3b986",
+        "zero_fraction": 0.971174
+      },
+      "role": "data (sparse / zero-heavy)"
+    },
+    {
+      "evidence": "269 words; below the 2048-word threshold for a stable parse-bit estimate",
+      "index": 4,
+      "packet_stats": {
+        "gap": {
+          "over4": 0,
+          "over4_fraction": 0.0,
+          "packets": 164
+        },
+        "iclass_entropy": 2.46824342506203,
+        "parse": {
+          "p00": 0.0,
+          "p01": 0.3903345724907063,
+          "p10": 0.0,
+          "p11": 0.6096654275092936
+        },
+        "words": 269
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.29368,
+        "bytes": 1076,
+        "entropy_bits_per_byte": 4.505533,
+        "md5": "caef250a229124e32cc0d0f6c65629a1",
+        "printable_run_fraction": 0.0,
+        "sha256": "ceb11f87af22fd6f54154295b870d089c4f98a76ff1cd69cfbab193d9857a449",
+        "zero_fraction": 0.29461
+      },
+      "role": "data (too small for packet statistics)"
+    },
+    {
+      "evidence": "p10=0.0075 (loop-end rare), p00=0.108 (extender/duplex), iClassH=3.09",
+      "index": 5,
+      "packet_stats": {
+        "gap": {
+          "over4": 10772,
+          "over4_fraction": 0.02681676620470065,
+          "packets": 401689
+        },
+        "iclass_entropy": 3.0895019905689267,
+        "parse": {
+          "p00": 0.10768706114347763,
+          "p01": 0.31914866293678756,
+          "p10": 0.007499711055652822,
+          "p11": 0.565664564864082
+        },
+        "words": 700827
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.284917,
+        "bytes": 2803308,
+        "entropy_bits_per_byte": 5.18004,
+        "md5": "525d9c4ed934658c6a0cbd93900c20df",
+        "printable_run_fraction": 0.103496,
+        "sha256": "5bce5dfd3e1e883c7b1c07cc93b38627df96a8685c4948505e67e32aa2b3ac46",
+        "zero_fraction": 0.074564
+      },
+      "role": "code-like (Hexagon packet statistics)"
+    },
+    {
+      "evidence": "91.5% of bytes lie in printable runs >= 8",
+      "index": 6,
+      "packet_stats": {
+        "gap": {
+          "over4": 4,
+          "over4_fraction": 0.18181818181818182,
+          "packets": 22
+        },
+        "iclass_entropy": 2.4428225782898307,
+        "parse": {
+          "p00": 0.23806098964326813,
+          "p01": 0.7608841580360568,
+          "p10": 0.0005274261603375527,
+          "p11": 0.0005274261603375527
+        },
+        "words": 20856
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.915434,
+        "bytes": 83426,
+        "entropy_bits_per_byte": 5.100703,
+        "md5": "d192ac478c73495ac5fb4edaba5dafaf",
+        "printable_run_fraction": 0.914655,
+        "sha256": "366a7ca94fdf83b12f7696b7ea4216b9f5f9567f7622e59e4d8dad926d08f1fd",
+        "zero_fraction": 0.08236
+      },
+      "role": "data (string/table blob)"
+    },
+    {
+      "evidence": "p_filesz == 0 and p_memsz > 0; no sibling file",
+      "index": 7,
+      "packet_stats": {
+        "gap": {
+          "over4": 0,
+          "over4_fraction": 0.0,
+          "packets": 0
+        },
+        "iclass_entropy": 0.0,
+        "parse": {
+          "p00": 0.0,
+          "p01": 0.0,
+          "p10": 0.0,
+          "p11": 0.0
+        },
+        "words": 0
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.0,
+        "bytes": 0,
+        "entropy_bits_per_byte": 0.0,
+        "md5": null,
+        "sha256": null,
+        "zero_fraction": 0.0
+      },
+      "role": "BSS (zero-fill)"
+    },
+    {
+      "evidence": "p10=0.0204 (loop-end rare), p00=0.230 (extender/duplex), iClassH=3.68",
+      "index": 8,
+      "packet_stats": {
+        "gap": {
+          "over4": 4657,
+          "over4_fraction": 0.06198176615425567,
+          "packets": 75135
+        },
+        "iclass_entropy": 3.6830147771552793,
+        "parse": {
+          "p00": 0.23008167668361842,
+          "p01": 0.40808002003390353,
+          "p10": 0.020414355062413316,
+          "p11": 0.3414239482200647
+        },
+        "words": 207648
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.337654,
+        "bytes": 830592,
+        "entropy_bits_per_byte": 6.758369,
+        "md5": "45fa0d106db4633b91f09bbf9c5d4995",
+        "printable_run_fraction": 0.052346,
+        "sha256": "ae81a6bcd3056a6e0794029d66945da53878581b88c34e9a305e7d130d0c13df",
+        "zero_fraction": 0.166511
+      },
+      "role": "code-like (Hexagon packet statistics)"
+    },
+    {
+      "evidence": "700 words; below the 2048-word threshold for a stable parse-bit estimate",
+      "index": 9,
+      "packet_stats": {
+        "gap": {
+          "over4": 30,
+          "over4_fraction": 0.12931034482758622,
+          "packets": 232
+        },
+        "iclass_entropy": 3.164867992132205,
+        "parse": {
+          "p00": 0.5128571428571429,
+          "p01": 0.15571428571428572,
+          "p10": 0.13857142857142857,
+          "p11": 0.19285714285714287
+        },
+        "words": 700
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.264286,
+        "bytes": 2800,
+        "entropy_bits_per_byte": 5.926728,
+        "md5": "853c313eff2687774e0f7e1271e08029",
+        "printable_run_fraction": 0.008571,
+        "sha256": "537f442b7a94387c481c7f1102626bb1cb325fdebb3395e7285a13fa99cd228f",
+        "zero_fraction": 0.323571
+      },
+      "role": "data (too small for packet statistics)"
+    },
+    {
+      "evidence": "p_filesz == 0 and p_memsz > 0; no sibling file",
+      "index": 10,
+      "packet_stats": {
+        "gap": {
+          "over4": 0,
+          "over4_fraction": 0.0,
+          "packets": 0
+        },
+        "iclass_entropy": 0.0,
+        "parse": {
+          "p00": 0.0,
+          "p01": 0.0,
+          "p10": 0.0,
+          "p11": 0.0
+        },
+        "words": 0
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.0,
+        "bytes": 0,
+        "entropy_bits_per_byte": 0.0,
+        "md5": null,
+        "sha256": null,
+        "zero_fraction": 0.0
+      },
+      "role": "BSS (zero-fill)"
+    },
+    {
+      "evidence": "p10=0.0108 (loop-end rare), p00=0.171 (extender/duplex), iClassH=3.54",
+      "index": 11,
+      "packet_stats": {
+        "gap": {
+          "over4": 327,
+          "over4_fraction": 0.05664299324441365,
+          "packets": 5773
+        },
+        "iclass_entropy": 3.541994624662786,
+        "parse": {
+          "p00": 0.17073500574751505,
+          "p01": 0.4389072959632159,
+          "p10": 0.010818851849347487,
+          "p11": 0.3795388464399216
+        },
+        "words": 14789
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.35452,
+        "bytes": 59156,
+        "entropy_bits_per_byte": 6.486831,
+        "md5": "984f73dffc93c35894e182a8c1b06515",
+        "printable_run_fraction": 0.036023,
+        "sha256": "12124e23ac16ae8267870589eb4d24e1a743c14b04d172ed0d81c2d9aaed8f34",
+        "zero_fraction": 0.175096
+      },
+      "role": "code-like (Hexagon packet statistics)"
+    },
+    {
+      "evidence": "p_filesz == 0 and p_memsz > 0; no sibling file",
+      "index": 12,
+      "packet_stats": {
+        "gap": {
+          "over4": 0,
+          "over4_fraction": 0.0,
+          "packets": 0
+        },
+        "iclass_entropy": 0.0,
+        "parse": {
+          "p00": 0.0,
+          "p01": 0.0,
+          "p10": 0.0,
+          "p11": 0.0
+        },
+        "words": 0
+      },
+      "profile": {
+        "ascii_printable_fraction": 0.0,
+        "bytes": 0,
+        "entropy_bits_per_byte": 0.0,
+        "md5": null,
+        "sha256": null,
+        "zero_fraction": 0.0
+      },
+      "role": "BSS (zero-fill)"
+    }
+  ]
+}

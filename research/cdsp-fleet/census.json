@@ -1,0 +1,5501 @@
+{
+  "issue": 595,
+  "scope": "cross-device census of family=cdsp in data/fleet/devices-001-222.csv",
+  "source": {
+    "path": "data/fleet/devices-001-222.csv",
+    "sha256": "6f717a6cf57f903aafc632c4913ff809842913df39cebe5642a3b43eda4cd1dc",
+    "rows_total": 34053,
+    "rows_cdsp": 950,
+    "devices_total": 219
+  },
+  "inventory": {
+    "raw_distinct_files": 33,
+    "raw_file_list": [
+      "<modem-fat:IMAGE/cdsp.b00>",
+      "<modem-fat:IMAGE/cdsp.b01>",
+      "<modem-fat:IMAGE/cdsp.b02>",
+      "<modem-fat:IMAGE/cdsp.b03>",
+      "<modem-fat:IMAGE/cdsp.b04>",
+      "<modem-fat:IMAGE/cdsp.b05>",
+      "<modem-fat:IMAGE/cdsp.b06>",
+      "<modem-fat:IMAGE/cdsp.b08>",
+      "<modem-fat:IMAGE/cdsp.b10>",
+      "<modem-fat:IMAGE/cdsp.mdt>",
+      "cdsp.b00",
+      "cdsp.b01",
+      "cdsp.b02",
+      "cdsp.b03",
+      "cdsp.b04",
+      "cdsp.b05",
+      "cdsp.b06",
+      "cdsp.b07",
+      "cdsp.b08",
+      "cdsp.b09",
+      "cdsp.b10",
+      "cdsp.b11",
+      "cdsp.b12",
+      "cdsp.b13",
+      "cdsp.b14",
+      "cdsp.b15",
+      "cdsp.b17",
+      "cdsp.mdt",
+      "cdsp_dtb.b00",
+      "cdsp_dtb.b01",
+      "cdsp_dtb.b02",
+      "cdsp_dtb.mdt",
+      "cdspr.jsn"
+    ],
+    "alias_rows": 10,
+    "alias_distinct_raw_values": 10,
+    "alias_raw_list": [
+      "<modem-fat:IMAGE/cdsp.b00>",
+      "<modem-fat:IMAGE/cdsp.b01>",
+      "<modem-fat:IMAGE/cdsp.b02>",
+      "<modem-fat:IMAGE/cdsp.b03>",
+      "<modem-fat:IMAGE/cdsp.b04>",
+      "<modem-fat:IMAGE/cdsp.b05>",
+      "<modem-fat:IMAGE/cdsp.b06>",
+      "<modem-fat:IMAGE/cdsp.b08>",
+      "<modem-fat:IMAGE/cdsp.b10>",
+      "<modem-fat:IMAGE/cdsp.mdt>"
+    ],
+    "alias_canonical_targets": [
+      "cdsp.b00",
+      "cdsp.b01",
+      "cdsp.b02",
+      "cdsp.b03",
+      "cdsp.b04",
+      "cdsp.b05",
+      "cdsp.b06",
+      "cdsp.b08",
+      "cdsp.b10",
+      "cdsp.mdt"
+    ],
+    "canonical_targets_only_from_alias": [],
+    "canonical_files": 23,
+    "canonical_file_list": [
+      "cdsp.b00",
+      "cdsp.b01",
+      "cdsp.b02",
+      "cdsp.b03",
+      "cdsp.b04",
+      "cdsp.b05",
+      "cdsp.b06",
+      "cdsp.b07",
+      "cdsp.b08",
+      "cdsp.b09",
+      "cdsp.b10",
+      "cdsp.b11",
+      "cdsp.b12",
+      "cdsp.b13",
+      "cdsp.b14",
+      "cdsp.b15",
+      "cdsp.b17",
+      "cdsp.mdt",
+      "cdsp_dtb.b00",
+      "cdsp_dtb.b01",
+      "cdsp_dtb.b02",
+      "cdsp_dtb.mdt",
+      "cdspr.jsn"
+    ],
+    "arithmetic": "33 raw distinct file values - 10 <modem-fat:IMAGE/...> alias values = 23 canonical files",
+    "claim_23_holds": true
+  },
+  "universe": {
+    "distinct_devices": 64,
+    "device_list": [
+      "Defy_2021",
+      "Edge_30",
+      "Edge_30_Fusion",
+      "Edge_30_Neo",
+      "Edge_40_Pro",
+      "FP4",
+      "FP5",
+      "FP6",
+      "G_Stylus_5G-2-2022",
+      "Mi_12",
+      "Mi_12S",
+      "Mi_12S_Pro",
+      "Mi_12S_Ultra",
+      "Mi_12T_Pro",
+      "Mi_12_Pro",
+      "Mi_13",
+      "Mi_13_Pro",
+      "Mi_A3",
+      "Moto_E7_Plus",
+      "Moto_G10",
+      "Moto_G200",
+      "Moto_G30",
+      "Moto_G32",
+      "Moto_G34_5G",
+      "Moto_G42",
+      "Moto_G52",
+      "Moto_G82_5G",
+      "Moto_G84_5G",
+      "Moto_G9",
+      "Moto_G9_Power",
+      "Moto_G_5G_2024",
+      "Moto_G_Power",
+      "Moto_G_Stylus_5G",
+      "Nord_4",
+      "Nord_CE2",
+      "Nord_CE3",
+      "Nord_CE4",
+      "OnePlus_11_5G",
+      "OnePlus_12",
+      "OnePlus_13",
+      "OnePlus_6",
+      "OnePlus_7",
+      "OnePlus_7T",
+      "OnePlus_7T_Pro",
+      "OnePlus_7_Pro",
+      "OnePlus_8",
+      "OnePlus_8_Pro",
+      "OnePlus_9",
+      "OnePlus_9RT",
+      "OnePlus_9_Pro",
+      "Pad_2_Pro",
+      "Pad_Pro",
+      "Phone_1",
+      "Phone_2",
+      "Pixel_4A_5G",
+      "Pixel_5",
+      "Pixel_5A",
+      "Poco_F5",
+      "Poco_F5_Pro",
+      "Poco_F6_PRo",
+      "Pro_1X",
+      "Realme_10_Pro",
+      "Realme_9_Pro",
+      "Redmi_K60_Pro"
+    ],
+    "instances": 950,
+    "total_bytes": 283509579,
+    "cdsp_share_of_repo_devices_pct": 29.2
+  },
+  "per_file": [
+    {
+      "file": "cdsp.mdt",
+      "devices": 64,
+      "instances": 64,
+      "reach_pct": 100.0,
+      "bytes_min": 4464,
+      "bytes_max": 7980,
+      "bytes_median": 7580,
+      "distinct_md5": 59,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Pixel_4A_5G",
+        "Pixel_5",
+        "Pixel_5A",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b08",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 816,
+      "bytes_max": 2827764,
+      "bytes_median": 116918,
+      "distinct_md5": 46,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b05",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 1000,
+      "bytes_max": 2803308,
+      "bytes_median": 2170428,
+      "distinct_md5": 51,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b04",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 220,
+      "bytes_max": 2119844,
+      "bytes_median": 1100,
+      "distinct_md5": 26,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b06",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 160,
+      "bytes_max": 1834724,
+      "bytes_median": 23164,
+      "distinct_md5": 44,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b02",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 8488,
+      "bytes_max": 1663741,
+      "bytes_median": 235672,
+      "distinct_md5": 32,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b03",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 1172,
+      "bytes_max": 1070949,
+      "bytes_median": 106620,
+      "distinct_md5": 31,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b01",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 6696,
+      "bytes_max": 27572,
+      "bytes_median": 7192,
+      "distinct_md5": 42,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b00",
+      "devices": 61,
+      "instances": 61,
+      "reach_pct": 95.3,
+      "bytes_min": 436,
+      "bytes_max": 628,
+      "bytes_median": 468,
+      "distinct_md5": 35,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdspr.jsn",
+      "devices": 60,
+      "instances": 60,
+      "reach_pct": 93.8,
+      "bytes_min": 403,
+      "bytes_max": 513,
+      "bytes_median": 458,
+      "distinct_md5": 2,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_5G_2024",
+        "Moto_G_Power",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b09",
+      "devices": 49,
+      "instances": 49,
+      "reach_pct": 76.6,
+      "bytes_min": 280,
+      "bytes_max": 3043668,
+      "bytes_median": 63937,
+      "distinct_md5": 30,
+      "device_list": [
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G_5G_2024",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b11",
+      "devices": 49,
+      "instances": 49,
+      "reach_pct": 76.6,
+      "bytes_min": 3152,
+      "bytes_max": 86064,
+      "bytes_median": 54932,
+      "distinct_md5": 29,
+      "device_list": [
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_30_Neo",
+        "Edge_40_Pro",
+        "FP4",
+        "FP5",
+        "FP6",
+        "G_Stylus_5G-2-2022",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Moto_G200",
+        "Moto_G30",
+        "Moto_G32",
+        "Moto_G34_5G",
+        "Moto_G42",
+        "Moto_G52",
+        "Moto_G82_5G",
+        "Moto_G84_5G",
+        "Moto_G_5G_2024",
+        "Moto_G_Stylus_5G",
+        "Nord_4",
+        "Nord_CE2",
+        "Nord_CE3",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_8",
+        "OnePlus_8_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Pro_1X",
+        "Realme_10_Pro",
+        "Realme_9_Pro",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b10",
+      "devices": 42,
+      "instances": 42,
+      "reach_pct": 65.6,
+      "bytes_min": 2816,
+      "bytes_max": 2803220,
+      "bytes_median": 58900,
+      "distinct_md5": 30,
+      "device_list": [
+        "Defy_2021",
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_40_Pro",
+        "FP5",
+        "FP6",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Mi_A3",
+        "Moto_E7_Plus",
+        "Moto_G10",
+        "Moto_G200",
+        "Moto_G9",
+        "Moto_G9_Power",
+        "Moto_G_Power",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_6",
+        "OnePlus_7",
+        "OnePlus_7T",
+        "OnePlus_7T_Pro",
+        "OnePlus_7_Pro",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b07",
+      "devices": 30,
+      "instances": 30,
+      "reach_pct": 46.9,
+      "bytes_min": 2648,
+      "bytes_max": 2674696,
+      "bytes_median": 100952,
+      "distinct_md5": 23,
+      "device_list": [
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_40_Pro",
+        "FP5",
+        "FP6",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Moto_G200",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b12",
+      "devices": 30,
+      "instances": 30,
+      "reach_pct": 46.9,
+      "bytes_min": 2728,
+      "bytes_max": 114256,
+      "bytes_median": 3656,
+      "distinct_md5": 18,
+      "device_list": [
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_40_Pro",
+        "FP5",
+        "FP6",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Moto_G200",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b13",
+      "devices": 30,
+      "instances": 30,
+      "reach_pct": 46.9,
+      "bytes_min": 4576,
+      "bytes_max": 80720,
+      "bytes_median": 61952,
+      "distinct_md5": 15,
+      "device_list": [
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_40_Pro",
+        "FP5",
+        "FP6",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Moto_G200",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b15",
+      "devices": 30,
+      "instances": 30,
+      "reach_pct": 46.9,
+      "bytes_min": 4520,
+      "bytes_max": 12288,
+      "bytes_median": 8192,
+      "distinct_md5": 19,
+      "device_list": [
+        "Edge_30",
+        "Edge_30_Fusion",
+        "Edge_40_Pro",
+        "FP5",
+        "FP6",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Moto_G200",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b14",
+      "devices": 17,
+      "instances": 17,
+      "reach_pct": 26.6,
+      "bytes_min": 1436,
+      "bytes_max": 4504,
+      "bytes_median": 4504,
+      "distinct_md5": 7,
+      "device_list": [
+        "Edge_30",
+        "Edge_30_Fusion",
+        "FP5",
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Moto_G200",
+        "OnePlus_9",
+        "OnePlus_9RT",
+        "OnePlus_9_Pro",
+        "Phone_1",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro"
+      ]
+    },
+    {
+      "file": "cdsp_dtb.b01",
+      "devices": 13,
+      "instances": 13,
+      "reach_pct": 20.3,
+      "bytes_min": 512,
+      "bytes_max": 62952,
+      "bytes_median": 512,
+      "distinct_md5": 6,
+      "device_list": [
+        "Edge_40_Pro",
+        "FP6",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp_dtb.mdt",
+      "devices": 13,
+      "instances": 13,
+      "reach_pct": 20.3,
+      "bytes_min": 4044,
+      "bytes_max": 4044,
+      "bytes_median": 4044,
+      "distinct_md5": 13,
+      "device_list": [
+        "Edge_40_Pro",
+        "FP6",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp_dtb.b02",
+      "devices": 13,
+      "instances": 13,
+      "reach_pct": 20.3,
+      "bytes_min": 3896,
+      "bytes_max": 3896,
+      "bytes_median": 3896,
+      "distinct_md5": 13,
+      "device_list": [
+        "Edge_40_Pro",
+        "FP6",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp_dtb.b00",
+      "devices": 13,
+      "instances": 13,
+      "reach_pct": 20.3,
+      "bytes_min": 148,
+      "bytes_max": 148,
+      "bytes_median": 148,
+      "distinct_md5": 6,
+      "device_list": [
+        "Edge_40_Pro",
+        "FP6",
+        "Mi_13",
+        "Mi_13_Pro",
+        "Nord_4",
+        "Nord_CE4",
+        "OnePlus_11_5G",
+        "OnePlus_12",
+        "OnePlus_13",
+        "Pad_2_Pro",
+        "Pad_Pro",
+        "Poco_F6_PRo",
+        "Redmi_K60_Pro"
+      ]
+    },
+    {
+      "file": "cdsp.b17",
+      "devices": 9,
+      "instances": 9,
+      "reach_pct": 14.1,
+      "bytes_min": 3836,
+      "bytes_max": 4616,
+      "bytes_median": 4136,
+      "distinct_md5": 9,
+      "device_list": [
+        "Mi_12",
+        "Mi_12S",
+        "Mi_12S_Pro",
+        "Mi_12S_Ultra",
+        "Mi_12T_Pro",
+        "Mi_12_Pro",
+        "Phone_2",
+        "Poco_F5",
+        "Poco_F5_Pro"
+      ]
+    }
+  ],
+  "device_totals": {
+    "heaviest": [
+      {
+        "device": "Phone_2",
+        "bytes": 9387575
+      },
+      {
+        "device": "Poco_F5",
+        "bytes": 7835730
+      },
+      {
+        "device": "Poco_F5_Pro",
+        "bytes": 7834770
+      }
+    ],
+    "lightest": [
+      {
+        "device": "Pixel_4A_5G",
+        "bytes": 7660
+      },
+      {
+        "device": "Pixel_5",
+        "bytes": 7660
+      },
+      {
+        "device": "Pixel_5A",
+        "bytes": 7660
+      }
+    ],
+    "median_bytes": 3528575,
+    "min_file_count": 1,
+    "max_file_count": 21,
+    "min_bytes": 7660,
+    "max_bytes": 9387575
+  },
+  "jsn_halves": {
+    "clusters": [
+      {
+        "md5": "49003ffcd10ec16dee11caad22b11b42",
+        "devices": 30,
+        "vendors": [
+          "fairphone",
+          "motorola",
+          "nothing",
+          "oneplus",
+          "xiaomi"
+        ],
+        "socs": [
+          "",
+          "Qualcomm QCM6490",
+          "Qualcomm SM7250 Snapdragon 765G",
+          "Qualcomm SM7325-AE Snapdragon 778G+ 5G",
+          "Qualcomm SM8250 Snapdragon 865",
+          "Qualcomm SM8350 Snapdragon 888",
+          "Qualcomm SM8350-AC Snapdragon 888+",
+          "Qualcomm SM8475 Snapdragon 8+ Gen1",
+          "Qualcomm SM8550 Snapdragon 8 Gen2"
+        ]
+      },
+      {
+        "md5": "f2bd80d5f0b19b5b0d36d28383948149",
+        "devices": 30,
+        "vendors": [
+          "fairphone",
+          "fxtec",
+          "motorola",
+          "oneplus",
+          "realme",
+          "xiaomi"
+        ],
+        "socs": [
+          "",
+          "Qualcomm MSM8998 Snapdragon 835",
+          "Qualcomm SM4250 Snapdragon 460",
+          "Qualcomm SM4375 Snapdragon 4 Gen 1",
+          "Qualcomm SM6115 Snapdragon 662",
+          "Qualcomm SM6225 Snapdragon 680 4G",
+          "Qualcomm SM6375 Snapdragon 695",
+          "Qualcomm SM6375 Snapdragon 695 5G",
+          "Qualcomm SM7225 Snapdragon 750G",
+          "Qualcomm SM8150 Snapdragon 855",
+          "Qualcomm SM8150-AC Snapdragon 855",
+          "Qualcomm SM8250 Snapdragon 865"
+        ]
+      }
+    ],
+    "shared_vendors": [
+      "fairphone",
+      "motorola",
+      "oneplus",
+      "xiaomi"
+    ]
+  },
+  "reach_checks": {
+    "raw_string_cdsp.mdt_devices": 63,
+    "alias_only_cdsp.mdt_devices": [
+      "OnePlus_6"
+    ],
+    "cdsp.mdt_devices": 64,
+    "cdsp.mdt_reach_pct": 100.0,
+    "cdsp.mdt_missing_devices": [],
+    "cdspr.jsn_devices": 60,
+    "cdspr.jsn_reach_pct": 93.8,
+    "cdspr.jsn_missing_devices": [
+      "OnePlus_6",
+      "Pixel_4A_5G",
+      "Pixel_5",
+      "Pixel_5A"
+    ],
+    "claim_mdt_63_holds_literally": true,
+    "claim_mdt_63_holds_after_canonicalisation": false
+  },
+  "clusters": {
+    "distinct_md5": 586,
+    "shared_md5_ge2_devices": 128,
+    "singleton_md5": 458,
+    "instances_in_shared_clusters": 492,
+    "sharing_rate_pct_instances": 51.8,
+    "shared_bytes": 70325534,
+    "total_bytes": 283509579,
+    "sharing_rate_pct_bytes": 24.8,
+    "size_histogram": [
+      {
+        "cluster_size": 1,
+        "clusters": 458,
+        "instances": 458
+      },
+      {
+        "cluster_size": 2,
+        "clusters": 63,
+        "instances": 126
+      },
+      {
+        "cluster_size": 3,
+        "clusters": 13,
+        "instances": 39
+      },
+      {
+        "cluster_size": 4,
+        "clusters": 27,
+        "instances": 108
+      },
+      {
+        "cluster_size": 5,
+        "clusters": 7,
+        "instances": 35
+      },
+      {
+        "cluster_size": 6,
+        "clusters": 6,
+        "instances": 36
+      },
+      {
+        "cluster_size": 7,
+        "clusters": 1,
+        "instances": 7
+      },
+      {
+        "cluster_size": 8,
+        "clusters": 3,
+        "instances": 24
+      },
+      {
+        "cluster_size": 9,
+        "clusters": 4,
+        "instances": 36
+      },
+      {
+        "cluster_size": 10,
+        "clusters": 1,
+        "instances": 10
+      },
+      {
+        "cluster_size": 11,
+        "clusters": 1,
+        "instances": 11
+      },
+      {
+        "cluster_size": 30,
+        "clusters": 2,
+        "instances": 60
+      }
+    ],
+    "top_clusters": [
+      {
+        "md5": "49003ffcd10ec16dee11caad22b11b42",
+        "file": "cdspr.jsn",
+        "devices": 30,
+        "bytes": [
+          513
+        ],
+        "device_head": [
+          "Edge_30",
+          "Edge_30_Fusion",
+          "Edge_40_Pro",
+          "FP5",
+          "FP6",
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro"
+        ],
+        "device_more": 22,
+        "device_list": [
+          "Edge_30",
+          "Edge_30_Fusion",
+          "Edge_40_Pro",
+          "FP5",
+          "FP6",
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "Moto_G200",
+          "Nord_4",
+          "Nord_CE4",
+          "OnePlus_11_5G",
+          "OnePlus_12",
+          "OnePlus_13",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro",
+          "Pad_2_Pro",
+          "Pad_Pro",
+          "Phone_1",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "f2bd80d5f0b19b5b0d36d28383948149",
+        "file": "cdspr.jsn",
+        "devices": 30,
+        "bytes": [
+          403
+        ],
+        "device_head": [
+          "Defy_2021",
+          "Edge_30_Neo",
+          "FP4",
+          "G_Stylus_5G-2-2022",
+          "Mi_A3",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G30"
+        ],
+        "device_more": 22,
+        "device_list": [
+          "Defy_2021",
+          "Edge_30_Neo",
+          "FP4",
+          "G_Stylus_5G-2-2022",
+          "Mi_A3",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G30",
+          "Moto_G32",
+          "Moto_G34_5G",
+          "Moto_G42",
+          "Moto_G52",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_5G_2024",
+          "Moto_G_Power",
+          "Moto_G_Stylus_5G",
+          "Nord_CE2",
+          "Nord_CE3",
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro",
+          "OnePlus_8",
+          "OnePlus_8_Pro",
+          "Pro_1X",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "5a6394e3e1889607dbb3020d8a88caec",
+        "file": "cdsp.b11",
+        "devices": 11,
+        "bytes": [
+          54932
+        ],
+        "device_head": [
+          "Edge_30_Neo",
+          "G_Stylus_5G-2-2022",
+          "Moto_G34_5G",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024",
+          "Moto_G_Stylus_5G",
+          "Nord_CE2"
+        ],
+        "device_more": 3,
+        "device_list": [
+          "Edge_30_Neo",
+          "G_Stylus_5G-2-2022",
+          "Moto_G34_5G",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024",
+          "Moto_G_Stylus_5G",
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "1411cc4aae50e6b671e4fa886b8ce6fa",
+        "file": "cdsp.b04",
+        "devices": 10,
+        "bytes": [
+          1100
+        ],
+        "device_head": [
+          "Edge_30_Neo",
+          "G_Stylus_5G-2-2022",
+          "Moto_G34_5G",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024",
+          "Nord_CE2",
+          "Nord_CE3"
+        ],
+        "device_more": 2,
+        "device_list": [
+          "Edge_30_Neo",
+          "G_Stylus_5G-2-2022",
+          "Moto_G34_5G",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024",
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "14eb07f574826b7c3504734684d29572",
+        "file": "cdsp.b03",
+        "devices": 9,
+        "bytes": [
+          1172
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5"
+        ],
+        "device_more": 1,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "3209c0463dc7ffcdeeb05b21ed67bf61",
+        "file": "cdsp.b01",
+        "devices": 9,
+        "bytes": [
+          7464
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5"
+        ],
+        "device_more": 1,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "6ac427c5351d7c6231cdc133f8f05a52",
+        "file": "cdsp.b09",
+        "devices": 9,
+        "bytes": [
+          93460
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5"
+        ],
+        "device_more": 1,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "be34bb139199359e4123264694adcbe1",
+        "file": "cdsp.b15",
+        "devices": 9,
+        "bytes": [
+          12288
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5"
+        ],
+        "device_more": 1,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "5c3eb8e5c751cad2017d8b5abb4259f9",
+        "file": "cdsp.b14",
+        "devices": 8,
+        "bytes": [
+          4504
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "6ba66561f962d2351d3b8ec819056c9d",
+        "file": "cdsp.b13",
+        "devices": 8,
+        "bytes": [
+          80720
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "c69dd780be80b22abce11cec49f37903",
+        "file": "cdsp.b04",
+        "devices": 8,
+        "bytes": [
+          1068
+        ],
+        "device_head": [
+          "Defy_2021",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G30",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power",
+          "Pro_1X"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Defy_2021",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G30",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power",
+          "Pro_1X"
+        ]
+      },
+      {
+        "md5": "3307465f9b5ffe74956e69b547f6db17",
+        "file": "cdsp.b02",
+        "devices": 7,
+        "bytes": [
+          1581865
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "063e55ea48ffe7baaab4d35b829c7926",
+        "file": "cdsp.b10",
+        "devices": 6,
+        "bytes": [
+          58900
+        ],
+        "device_head": [
+          "Defy_2021",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Defy_2021",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ]
+      },
+      {
+        "md5": "6d97cece7ff5467a19c7916da1b47834",
+        "file": "cdsp.b03",
+        "devices": 6,
+        "bytes": [
+          1192
+        ],
+        "device_head": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "8ef92426e900be5e4cda260bcd8cd506",
+        "file": "cdsp_dtb.b01",
+        "devices": 6,
+        "bytes": [
+          512
+        ],
+        "device_head": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "a4fa90de9560c7d36a8b72e8b5d457d0",
+        "file": "cdsp_dtb.b00",
+        "devices": 6,
+        "bytes": [
+          148
+        ],
+        "device_head": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "f0c7e76005fdce637c5b5f4971705485",
+        "file": "cdsp.b01",
+        "devices": 6,
+        "bytes": [
+          6696
+        ],
+        "device_head": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "fdc5f5a759c421aad8b10b64fc05ac76",
+        "file": "cdsp.b12",
+        "devices": 6,
+        "bytes": [
+          2896
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "074aa5ca1131ff3432b56bf82e472f7a",
+        "file": "cdsp.b00",
+        "devices": 5,
+        "bytes": [
+          436
+        ],
+        "device_head": [
+          "Defy_2021",
+          "Moto_G10",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Defy_2021",
+          "Moto_G10",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ]
+      },
+      {
+        "md5": "1f72d439f24dd03ded61742bded7c61b",
+        "file": "cdsp.b06",
+        "devices": 5,
+        "bytes": [
+          160
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ]
+      },
+      {
+        "md5": "26ff37a2b3eb47d783abf391b1df932d",
+        "file": "cdsp.b02",
+        "devices": 5,
+        "bytes": [
+          8584
+        ],
+        "device_head": [
+          "Edge_30_Fusion",
+          "Moto_G200",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Fusion",
+          "Moto_G200",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "78fff93ab15fe4e4519cfe9c470d6463",
+        "file": "cdsp.b11",
+        "devices": 5,
+        "bytes": [
+          58900
+        ],
+        "device_head": [
+          "Moto_G30",
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52",
+          "Pro_1X"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G30",
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52",
+          "Pro_1X"
+        ]
+      },
+      {
+        "md5": "8e6e0a93ca7899a8c2c9d8e01f63a856",
+        "file": "cdsp.b04",
+        "devices": 5,
+        "bytes": [
+          1172
+        ],
+        "device_head": [
+          "Edge_30_Fusion",
+          "Moto_G200",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Fusion",
+          "Moto_G200",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "b8d1ab1b557fc1b98f9110e8880cfede",
+        "file": "cdsp.b05",
+        "devices": 5,
+        "bytes": [
+          1096
+        ],
+        "device_head": [
+          "Edge_30_Fusion",
+          "Moto_G200",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Fusion",
+          "Moto_G200",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "cfc9f3b0b862325f79b50aeb3445f776",
+        "file": "cdsp.b04",
+        "devices": 5,
+        "bytes": [
+          220
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ]
+      },
+      {
+        "md5": "0983dfca9885d44cf2ad71ed310405a3",
+        "file": "cdsp.b08",
+        "devices": 4,
+        "bytes": [
+          1552
+        ],
+        "device_head": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ]
+      },
+      {
+        "md5": "1f5da9d6b93b28b2c281ad6ef7b7c995",
+        "file": "cdsp.b02",
+        "devices": 4,
+        "bytes": [
+          228148
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "2374c76b2422a1cbe8dc12014bcdc6fa",
+        "file": "cdsp.b02",
+        "devices": 4,
+        "bytes": [
+          1663741
+        ],
+        "device_head": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "24b6c8b61df97ca19330d8f642c6ae42",
+        "file": "cdsp.b02",
+        "devices": 4,
+        "bytes": [
+          234904
+        ],
+        "device_head": [
+          "Defy_2021",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Defy_2021",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ]
+      },
+      {
+        "md5": "27f2873d32107368cf9565310b97aed8",
+        "file": "cdsp.b00",
+        "devices": 4,
+        "bytes": [
+          468
+        ],
+        "device_head": [
+          "Edge_30_Neo",
+          "Moto_G34_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Neo",
+          "Moto_G34_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024"
+        ]
+      },
+      {
+        "md5": "2d2d87d8e1bebde05862ff67a1fe44cd",
+        "file": "cdsp.b10",
+        "devices": 4,
+        "bytes": [
+          54932
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "3fa84f82895eb402a889b66b7023b2a4",
+        "file": "cdsp.b00",
+        "devices": 4,
+        "bytes": [
+          564
+        ],
+        "device_head": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "43f9db9902efb9d53c5950f6406117cb",
+        "file": "cdsp.b06",
+        "devices": 4,
+        "bytes": [
+          23164
+        ],
+        "device_head": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "56f16ad81270521c09ec176f4d4d20a7",
+        "file": "cdsp.b03",
+        "devices": 4,
+        "bytes": [
+          106620
+        ],
+        "device_head": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "5cebe1f7b26adb874434fd1d32ac95d7",
+        "file": "cdsp.b11",
+        "devices": 4,
+        "bytes": [
+          85968
+        ],
+        "device_head": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "6bc324f799c0d821c086fc99015d148f",
+        "file": "cdsp.b04",
+        "devices": 4,
+        "bytes": [
+          1200
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "75f54e5cc4d61c97ac4e43a142d36946",
+        "file": "cdsp.b13",
+        "devices": 4,
+        "bytes": [
+          63824
+        ],
+        "device_head": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "7ff84e8c6fbad7ff2354fc52d867d58e",
+        "file": "cdsp.b08",
+        "devices": 4,
+        "bytes": [
+          94488
+        ],
+        "device_head": [
+          "Defy_2021",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Defy_2021",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ]
+      },
+      {
+        "md5": "93ca932c20d51b3585608f493394a702",
+        "file": "cdsp.b12",
+        "devices": 4,
+        "bytes": [
+          4632
+        ],
+        "device_head": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "94b60035952ce61ba860be9b1551da1d",
+        "file": "cdsp.b15",
+        "devices": 4,
+        "bytes": [
+          8192
+        ],
+        "device_head": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "9733692ad12a04076eeb52baa5990e23",
+        "file": "cdsp.b06",
+        "devices": 4,
+        "bytes": [
+          48596
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "aab0b4089d4831255dc3e7cbcfa47c9f",
+        "file": "cdsp.b03",
+        "devices": 4,
+        "bytes": [
+          104284
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "b34b1cd8fca8aba17d1622ac1be84516",
+        "file": "cdsp.b02",
+        "devices": 4,
+        "bytes": [
+          235928
+        ],
+        "device_head": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "c37aa2a09f2494b9c954fde594408f86",
+        "file": "cdsp.b13",
+        "devices": 4,
+        "bytes": [
+          12288
+        ],
+        "device_head": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "c53d62d49c6d60ebd4cd9c998198023d",
+        "file": "cdsp.b03",
+        "devices": 4,
+        "bytes": [
+          106620
+        ],
+        "device_head": [
+          "Defy_2021",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Defy_2021",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ]
+      },
+      {
+        "md5": "c5d6849dac7cf60a78a22c4f17e2b9b6",
+        "file": "cdsp.b10",
+        "devices": 4,
+        "bytes": [
+          4024
+        ],
+        "device_head": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "c71b4d5a2d54cedd3c4125dccda53c5d",
+        "file": "cdsp.b09",
+        "devices": 4,
+        "bytes": [
+          2712
+        ],
+        "device_head": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "ca796f329241ae9aebfd3454a3bb11da",
+        "file": "cdsp.b07",
+        "devices": 4,
+        "bytes": [
+          99604
+        ],
+        "device_head": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "md5": "cd2cce1a96ce04d76fd68af577e55836",
+        "file": "cdsp.b14",
+        "devices": 4,
+        "bytes": [
+          1564
+        ],
+        "device_head": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "d6e8c7ce9abe9e7ebc029c73783bacd7",
+        "file": "cdsp.b09",
+        "devices": 4,
+        "bytes": [
+          91457
+        ],
+        "device_head": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Fusion",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "eac78b144c9dc803b187f6a8dac7a4f2",
+        "file": "cdsp.b00",
+        "devices": 4,
+        "bytes": [
+          436
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "fc8eb7019dcd8e77b7676c18512dae70",
+        "file": "cdsp.b00",
+        "devices": 4,
+        "bytes": [
+          468
+        ],
+        "device_head": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "022229590ad6ca7005783feaeb8f1c26",
+        "file": "cdsp.b08",
+        "devices": 3,
+        "bytes": [
+          840
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "1980cde366cac0a36b6c55be7130a906",
+        "file": "cdsp.b04",
+        "devices": 3,
+        "bytes": [
+          1172
+        ],
+        "device_head": [
+          "Edge_30",
+          "FP5",
+          "Phone_1"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30",
+          "FP5",
+          "Phone_1"
+        ]
+      },
+      {
+        "md5": "650f15b88cbc50760341a5f6afe9d264",
+        "file": "cdsp.b00",
+        "devices": 3,
+        "bytes": [
+          596
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "678837a6164764808aaec2de298ff5a8",
+        "file": "cdsp.b02",
+        "devices": 3,
+        "bytes": [
+          8488
+        ],
+        "device_head": [
+          "Edge_30",
+          "FP5",
+          "Phone_1"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30",
+          "FP5",
+          "Phone_1"
+        ]
+      },
+      {
+        "md5": "728eb7ce283e30f64cf9a20ee63818d7",
+        "file": "cdsp.b00",
+        "devices": 3,
+        "bytes": [
+          628
+        ],
+        "device_head": [
+          "Mi_12S",
+          "Mi_12T_Pro",
+          "Poco_F5_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12S",
+          "Mi_12T_Pro",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "73d08353cdbecf61c195e7aecb0aafac",
+        "file": "cdsp.b04",
+        "devices": 3,
+        "bytes": [
+          1100
+        ],
+        "device_head": [
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52"
+        ]
+      },
+      {
+        "md5": "906d72b575b3a8cc7846e3977fd8fac0",
+        "file": "cdsp.b05",
+        "devices": 3,
+        "bytes": [
+          1000
+        ],
+        "device_head": [
+          "Edge_30",
+          "FP5",
+          "Phone_1"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30",
+          "FP5",
+          "Phone_1"
+        ]
+      },
+      {
+        "md5": "91c262d5f16f7779cfca63d7b6b57bc3",
+        "file": "cdsp.b12",
+        "devices": 3,
+        "bytes": [
+          3656
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "9e654565133aa8c63084ddba9bdb7cf9",
+        "file": "cdsp.b09",
+        "devices": 3,
+        "bytes": [
+          2712
+        ],
+        "device_head": [
+          "Moto_G34_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G34_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024"
+        ]
+      },
+      {
+        "md5": "b1a9ce0be2c3cac05890ee7119b93b31",
+        "file": "cdsp.b00",
+        "devices": 3,
+        "bytes": [
+          468
+        ],
+        "device_head": [
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52"
+        ]
+      },
+      {
+        "md5": "d5d04c6ff807be9084dd6aabaf30f3dd",
+        "file": "cdsp.b07",
+        "devices": 3,
+        "bytes": [
+          106288
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "e27708ba419052a10502e37e1241278a",
+        "file": "cdsp.b03",
+        "devices": 3,
+        "bytes": [
+          1070949
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "fc12d6cf4704812e90b0a5adaf874439",
+        "file": "cdsp.b06",
+        "devices": 3,
+        "bytes": [
+          23392
+        ],
+        "device_head": [
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52"
+        ]
+      },
+      {
+        "md5": "056d38f54f8ab9284db14b382b08aae1",
+        "file": "cdsp.b00",
+        "devices": 2,
+        "bytes": [
+          564
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "0637cfa6abc0cc235c626ff73b0ed81f",
+        "file": "cdsp.b01",
+        "devices": 2,
+        "bytes": [
+          7040
+        ],
+        "device_head": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "09cb7e38a7380857f00314e98559d354",
+        "file": "cdsp.b08",
+        "devices": 2,
+        "bytes": [
+          340264
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "0c2470bfb124a457d8246fd300bf10bb",
+        "file": "cdsp.b02",
+        "devices": 2,
+        "bytes": [
+          235928
+        ],
+        "device_head": [
+          "Moto_G34_5G",
+          "Moto_G_5G_2024"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G34_5G",
+          "Moto_G_5G_2024"
+        ]
+      },
+      {
+        "md5": "1615767fa4211fc5bdbaed79a7431fe7",
+        "file": "cdsp.b03",
+        "devices": 2,
+        "bytes": [
+          106620
+        ],
+        "device_head": [
+          "Moto_G42",
+          "Moto_G52"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G42",
+          "Moto_G52"
+        ]
+      },
+      {
+        "md5": "16f7044e23a37e275773e424e941a5ad",
+        "file": "cdsp.b03",
+        "devices": 2,
+        "bytes": [
+          106620
+        ],
+        "device_head": [
+          "G_Stylus_5G-2-2022",
+          "Moto_G82_5G"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "G_Stylus_5G-2-2022",
+          "Moto_G82_5G"
+        ]
+      },
+      {
+        "md5": "1b50d6f2df97fc7d6ea93e3b103b2fd6",
+        "file": "cdsp.b05",
+        "devices": 2,
+        "bytes": [
+          2735588
+        ],
+        "device_head": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ]
+      },
+      {
+        "md5": "2592da25f493c04be24498b68f580b85",
+        "file": "cdsp.b11",
+        "devices": 2,
+        "bytes": [
+          4272
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "2795c3ba6f047679a96ecb4174db20c0",
+        "file": "cdsp.b07",
+        "devices": 2,
+        "bytes": [
+          2776
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "288f2b5db48b0de47600186361d137ba",
+        "file": "cdsp.b05",
+        "devices": 2,
+        "bytes": [
+          2174524
+        ],
+        "device_head": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "29619861abddc6dafa54cfbce043d9d6",
+        "file": "cdsp.b06",
+        "devices": 2,
+        "bytes": [
+          160
+        ],
+        "device_head": [
+          "Mi_12S_Pro",
+          "Poco_F5_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12S_Pro",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "29ee2a117966ea61bac604060d7ce12b",
+        "file": "cdsp.b00",
+        "devices": 2,
+        "bytes": [
+          468
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "2ca89f92008e99ba271118123917c11a",
+        "file": "cdsp.b07",
+        "devices": 2,
+        "bytes": [
+          99828
+        ],
+        "device_head": [
+          "Edge_40_Pro",
+          "OnePlus_11_5G"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_40_Pro",
+          "OnePlus_11_5G"
+        ]
+      },
+      {
+        "md5": "2cef5e5b4175484f8e79c33bd844e95a",
+        "file": "cdsp.b08",
+        "devices": 2,
+        "bytes": [
+          340264
+        ],
+        "device_head": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ]
+      },
+      {
+        "md5": "2d163efff329aee9a1e50ea3b9d19f5d",
+        "file": "cdsp.b04",
+        "devices": 2,
+        "bytes": [
+          220
+        ],
+        "device_head": [
+          "Mi_12S_Pro",
+          "Poco_F5_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12S_Pro",
+          "Poco_F5_Pro"
+        ]
+      },
+      {
+        "md5": "305a316e85f4be0a6a70713653afe009",
+        "file": "cdsp_dtb.b01",
+        "devices": 2,
+        "bytes": [
+          29812
+        ],
+        "device_head": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ]
+      },
+      {
+        "md5": "329bb66eded113efa82c3c1bbb366d6c",
+        "file": "cdsp.b02",
+        "devices": 2,
+        "bytes": [
+          84452
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "3621a8e6261aff1f9c96010d623e40e4",
+        "file": "cdsp.mdt",
+        "devices": 2,
+        "bytes": [
+          7508
+        ],
+        "device_head": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "36851f1bf3b67336d32d43bce6c3e0a4",
+        "file": "cdsp.b10",
+        "devices": 2,
+        "bytes": [
+          2739368
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "40acb8ecdc5a6b508e30d5659dba57c7",
+        "file": "cdsp.b01",
+        "devices": 2,
+        "bytes": [
+          7144
+        ],
+        "device_head": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ]
+      },
+      {
+        "md5": "45fa0d106db4633b91f09bbf9c5d4995",
+        "file": "cdsp.b08",
+        "devices": 2,
+        "bytes": [
+          830592
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "49682d0c7c7a3725ac1e107d40279872",
+        "file": "cdsp.mdt",
+        "devices": 2,
+        "bytes": [
+          7580
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "498d5d173ceaed113ff0d444c19ce9ba",
+        "file": "cdsp.b08",
+        "devices": 2,
+        "bytes": [
+          1552
+        ],
+        "device_head": [
+          "Mi_12S_Pro",
+          "Mi_12T_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Mi_12S_Pro",
+          "Mi_12T_Pro"
+        ]
+      },
+      {
+        "md5": "525d9c4ed934658c6a0cbd93900c20df",
+        "file": "cdsp.b05",
+        "devices": 2,
+        "bytes": [
+          2803308
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "583269d3a2a0ea4fee5dd194d2ae1c4b",
+        "file": "cdsp.b06",
+        "devices": 2,
+        "bytes": [
+          23164
+        ],
+        "device_head": [
+          "Moto_G34_5G",
+          "Moto_G_5G_2024"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G34_5G",
+          "Moto_G_5G_2024"
+        ]
+      },
+      {
+        "md5": "5fab0dcdf6227af895ae2b05a5842f96",
+        "file": "cdsp.b03",
+        "devices": 2,
+        "bytes": [
+          106620
+        ],
+        "device_head": [
+          "Edge_30_Neo",
+          "Moto_G84_5G"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Edge_30_Neo",
+          "Moto_G84_5G"
+        ]
+      },
+      {
+        "md5": "678a7076c932bd43deee0e9e8ab63de9",
+        "file": "cdsp.b00",
+        "devices": 2,
+        "bytes": [
+          564
+        ],
+        "device_head": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ]
+      },
+      {
+        "md5": "70e5a1b87c92e92a672641e74b13e0f6",
+        "file": "cdsp.b13",
+        "devices": 2,
+        "bytes": [
+          5600
+        ],
+        "device_head": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ]
+      },
+      {
+        "md5": "72af5f8f2e7140594c907e4b3134503f",
+        "file": "cdsp.b08",
+        "devices": 2,
+        "bytes": [
+          116918
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "72d52a9bd3ac38aa0519ea3ec49f4fd4",
+        "file": "cdsp.b12",
+        "devices": 2,
+        "bytes": [
+          104240
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "73057cd38e671c3495bc0cf6fe51bfa7",
+        "file": "cdsp.b03",
+        "devices": 2,
+        "bytes": [
+          105980
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "753706ed57f68dd31a0a7bd19192d658",
+        "file": "cdsp_dtb.b01",
+        "devices": 2,
+        "bytes": [
+          31200
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "7ba7687e77270893af6863c02355cc0d",
+        "file": "cdsp.b01",
+        "devices": 2,
+        "bytes": [
+          7192
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "7c38e8a90f5e73e0bc5eef5b6721b87f",
+        "file": "cdsp.b08",
+        "devices": 2,
+        "bytes": [
+          447492
+        ],
+        "device_head": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "md5": "7e64e3fb5f24238b459658eb72dc4c13",
+        "file": "cdsp.b08",
+        "devices": 2,
+        "bytes": [
+          123894
+        ],
+        "device_head": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ]
+      },
+      {
+        "md5": "7f6d02497bc43b12af16c687f0057e3f",
+        "file": "cdsp.b09",
+        "devices": 2,
+        "bytes": [
+          280
+        ],
+        "device_head": [
+          "Moto_G30",
+          "Pro_1X"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G30",
+          "Pro_1X"
+        ]
+      },
+      {
+        "md5": "853c313eff2687774e0f7e1271e08029",
+        "file": "cdsp.b09",
+        "devices": 2,
+        "bytes": [
+          2800
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "8c3552a485871b69f8e0246698fe35d5",
+        "file": "cdsp_dtb.b00",
+        "devices": 2,
+        "bytes": [
+          148
+        ],
+        "device_head": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ]
+      },
+      {
+        "md5": "90e6c28ffe84634f18af413e91b93314",
+        "file": "cdsp.b02",
+        "devices": 2,
+        "bytes": [
+          235672
+        ],
+        "device_head": [
+          "Moto_G42",
+          "Moto_G52"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G42",
+          "Moto_G52"
+        ]
+      },
+      {
+        "md5": "984f73dffc93c35894e182a8c1b06515",
+        "file": "cdsp.b11",
+        "devices": 2,
+        "bytes": [
+          59156
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "9b52f603782433ecd172ebe6e56d80ff",
+        "file": "cdsp.b03",
+        "devices": 2,
+        "bytes": [
+          106620
+        ],
+        "device_head": [
+          "Moto_G34_5G",
+          "Moto_G_5G_2024"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G34_5G",
+          "Moto_G_5G_2024"
+        ]
+      },
+      {
+        "md5": "a05695c89a5ab620949a684a1b4e91f4",
+        "file": "cdsp.b02",
+        "devices": 2,
+        "bytes": [
+          235928
+        ],
+        "device_head": [
+          "G_Stylus_5G-2-2022",
+          "Moto_G82_5G"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "G_Stylus_5G-2-2022",
+          "Moto_G82_5G"
+        ]
+      },
+      {
+        "md5": "a2d685f3fb503eab08840b08531688be",
+        "file": "cdsp.b00",
+        "devices": 2,
+        "bytes": [
+          468
+        ],
+        "device_head": [
+          "G_Stylus_5G-2-2022",
+          "Moto_G82_5G"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "G_Stylus_5G-2-2022",
+          "Moto_G82_5G"
+        ]
+      },
+      {
+        "md5": "a7fbd752d768f6f8b363c8150e5d4cd8",
+        "file": "cdsp.b05",
+        "devices": 2,
+        "bytes": [
+          2735588
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "ac3aee8d53f99882cec9b5ed753a028a",
+        "file": "cdsp.b03",
+        "devices": 2,
+        "bytes": [
+          122610
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "ad77508daec5d07321db176038330ad8",
+        "file": "cdsp.b06",
+        "devices": 2,
+        "bytes": [
+          1834724
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "b1e07ce30edb7e496a31b5b0cb5aa18d",
+        "file": "cdsp.b04",
+        "devices": 2,
+        "bytes": [
+          1376
+        ],
+        "device_head": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ]
+      },
+      {
+        "md5": "b87e76ac0256fe4990a675f305b78e72",
+        "file": "cdsp.b13",
+        "devices": 2,
+        "bytes": [
+          4704
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "b94327480f17b05f60cdde0d3ee95336",
+        "file": "cdsp.b02",
+        "devices": 2,
+        "bytes": [
+          235420
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "bb2c76540ca66d4a248c200b89a2cbb8",
+        "file": "cdsp.mdt",
+        "devices": 2,
+        "bytes": [
+          7660
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "bd16c8985754ced883f98c17cc0a4546",
+        "file": "cdsp.b11",
+        "devices": 2,
+        "bytes": [
+          60488
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "bd93fc24037ea5480d7d1ea9d5039245",
+        "file": "cdsp.b06",
+        "devices": 2,
+        "bytes": [
+          22896
+        ],
+        "device_head": [
+          "Moto_G9",
+          "Moto_G_Power"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G9",
+          "Moto_G_Power"
+        ]
+      },
+      {
+        "md5": "bf969553feea1d090ff95ab3f9777983",
+        "file": "cdsp.mdt",
+        "devices": 2,
+        "bytes": [
+          7580
+        ],
+        "device_head": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7T",
+          "OnePlus_7T_Pro"
+        ]
+      },
+      {
+        "md5": "caef250a229124e32cc0d0f6c65629a1",
+        "file": "cdsp.b04",
+        "devices": 2,
+        "bytes": [
+          1076
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "d192ac478c73495ac5fb4edaba5dafaf",
+        "file": "cdsp.b06",
+        "devices": 2,
+        "bytes": [
+          83426
+        ],
+        "device_head": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro"
+        ]
+      },
+      {
+        "md5": "d7e18011b56be588aa8363a08f912f8d",
+        "file": "cdsp.b01",
+        "devices": 2,
+        "bytes": [
+          26508
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "d8cc1c1dcbf1fbbe7b70d9fb2708d7ac",
+        "file": "cdsp.b01",
+        "devices": 2,
+        "bytes": [
+          7144
+        ],
+        "device_head": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "md5": "dbd4a46964435af7c8c44a26a68ffbd1",
+        "file": "cdsp.b04",
+        "devices": 2,
+        "bytes": [
+          1192
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "e02c61132156956a5ab83bf370ba1516",
+        "file": "cdsp.mdt",
+        "devices": 2,
+        "bytes": [
+          7828
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "md5": "e3b94c408b72f365ef5cad1559495a3f",
+        "file": "cdsp.b12",
+        "devices": 2,
+        "bytes": [
+          114256
+        ],
+        "device_head": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_13",
+          "Pad_2_Pro"
+        ]
+      },
+      {
+        "md5": "e6fa5a70c0f1b4a869862db8825d891e",
+        "file": "cdsp.b09",
+        "devices": 2,
+        "bytes": [
+          2592
+        ],
+        "device_head": [
+          "Moto_G42",
+          "Moto_G52"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "Moto_G42",
+          "Moto_G52"
+        ]
+      },
+      {
+        "md5": "ed3532d14bdabef2cdf00a827569674d",
+        "file": "cdsp_dtb.b00",
+        "devices": 2,
+        "bytes": [
+          148
+        ],
+        "device_head": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_12",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "md5": "f541b57c1dabc4c35f516438838e93f1",
+        "file": "cdsp.b01",
+        "devices": 2,
+        "bytes": [
+          7232
+        ],
+        "device_head": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ],
+        "device_more": 0,
+        "device_list": [
+          "OnePlus_9",
+          "OnePlus_9_Pro"
+        ]
+      }
+    ],
+    "max_cluster_per_file": [
+      {
+        "file": "cdspr.jsn",
+        "md5": "49003ffcd10ec16dee11caad22b11b42",
+        "devices": 30,
+        "bytes": [
+          513
+        ],
+        "device_list": [
+          "Edge_30",
+          "Edge_30_Fusion",
+          "Edge_40_Pro",
+          "FP5",
+          "FP6",
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "Moto_G200",
+          "Nord_4",
+          "Nord_CE4",
+          "OnePlus_11_5G",
+          "OnePlus_12",
+          "OnePlus_13",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro",
+          "Pad_2_Pro",
+          "Pad_Pro",
+          "Phone_1",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "ties": 2
+      },
+      {
+        "file": "cdsp.b11",
+        "md5": "5a6394e3e1889607dbb3020d8a88caec",
+        "devices": 11,
+        "bytes": [
+          54932
+        ],
+        "device_list": [
+          "Edge_30_Neo",
+          "G_Stylus_5G-2-2022",
+          "Moto_G34_5G",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024",
+          "Moto_G_Stylus_5G",
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b04",
+        "md5": "1411cc4aae50e6b671e4fa886b8ce6fa",
+        "devices": 10,
+        "bytes": [
+          1100
+        ],
+        "device_list": [
+          "Edge_30_Neo",
+          "G_Stylus_5G-2-2022",
+          "Moto_G34_5G",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G_5G_2024",
+          "Nord_CE2",
+          "Nord_CE3",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b01",
+        "md5": "3209c0463dc7ffcdeeb05b21ed67bf61",
+        "devices": 9,
+        "bytes": [
+          7464
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b03",
+        "md5": "14eb07f574826b7c3504734684d29572",
+        "devices": 9,
+        "bytes": [
+          1172
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b09",
+        "md5": "6ac427c5351d7c6231cdc133f8f05a52",
+        "devices": 9,
+        "bytes": [
+          93460
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b15",
+        "md5": "be34bb139199359e4123264694adcbe1",
+        "devices": 9,
+        "bytes": [
+          12288
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Phone_2",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b13",
+        "md5": "6ba66561f962d2351d3b8ec819056c9d",
+        "devices": 8,
+        "bytes": [
+          80720
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b14",
+        "md5": "5c3eb8e5c751cad2017d8b5abb4259f9",
+        "devices": 8,
+        "bytes": [
+          4504
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b02",
+        "md5": "3307465f9b5ffe74956e69b547f6db17",
+        "devices": 7,
+        "bytes": [
+          1581865
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b10",
+        "md5": "063e55ea48ffe7baaab4d35b829c7926",
+        "devices": 6,
+        "bytes": [
+          58900
+        ],
+        "device_list": [
+          "Defy_2021",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b12",
+        "md5": "fdc5f5a759c421aad8b10b64fc05ac76",
+        "devices": 6,
+        "bytes": [
+          2896
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp_dtb.b00",
+        "md5": "a4fa90de9560c7d36a8b72e8b5d457d0",
+        "devices": 6,
+        "bytes": [
+          148
+        ],
+        "device_list": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp_dtb.b01",
+        "md5": "8ef92426e900be5e4cda260bcd8cd506",
+        "devices": 6,
+        "bytes": [
+          512
+        ],
+        "device_list": [
+          "Edge_40_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "OnePlus_11_5G",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b00",
+        "md5": "074aa5ca1131ff3432b56bf82e472f7a",
+        "devices": 5,
+        "bytes": [
+          436
+        ],
+        "device_list": [
+          "Defy_2021",
+          "Moto_G10",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Power"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b05",
+        "md5": "b8d1ab1b557fc1b98f9110e8880cfede",
+        "devices": 5,
+        "bytes": [
+          1096
+        ],
+        "device_list": [
+          "Edge_30_Fusion",
+          "Moto_G200",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b06",
+        "md5": "1f72d439f24dd03ded61742bded7c61b",
+        "devices": 5,
+        "bytes": [
+          160
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b07",
+        "md5": "ca796f329241ae9aebfd3454a3bb11da",
+        "devices": 4,
+        "bytes": [
+          99604
+        ],
+        "device_list": [
+          "Mi_13",
+          "Mi_13_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ],
+        "ties": 1
+      },
+      {
+        "file": "cdsp.b08",
+        "md5": "0983dfca9885d44cf2ad71ed310405a3",
+        "devices": 4,
+        "bytes": [
+          1552
+        ],
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12_Pro",
+          "Poco_F5"
+        ],
+        "ties": 2
+      },
+      {
+        "file": "cdsp.mdt",
+        "md5": "3621a8e6261aff1f9c96010d623e40e4",
+        "devices": 2,
+        "bytes": [
+          7508
+        ],
+        "device_list": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ],
+        "ties": 5
+      },
+      {
+        "file": "cdsp.b17",
+        "md5": "20d73ebe4f40e4e20ce0836ca55b18e7",
+        "devices": 1,
+        "bytes": [
+          4136
+        ],
+        "device_list": [
+          "Mi_12S_Ultra"
+        ],
+        "ties": 9
+      },
+      {
+        "file": "cdsp_dtb.b02",
+        "md5": "22f4e930fbada04705725d9e2895af3b",
+        "devices": 1,
+        "bytes": [
+          3896
+        ],
+        "device_list": [
+          "Pad_2_Pro"
+        ],
+        "ties": 13
+      },
+      {
+        "file": "cdsp_dtb.mdt",
+        "md5": "1acc4f39cfd5560debf9cff0d43f0223",
+        "devices": 1,
+        "bytes": [
+          4044
+        ],
+        "device_list": [
+          "Poco_F6_PRo"
+        ],
+        "ties": 13
+      }
+    ]
+  },
+  "slice": {
+    "devices_present": 219,
+    "reach_of_slice_pct": 29.2
+  },
+  "sharing": {
+    "within_device_duplicate_groups": 0,
+    "excl_jsn_instances": 890,
+    "excl_jsn_shared": 432,
+    "excl_jsn_pct": 48.5,
+    "mdt_only_instances": 64,
+    "mdt_only_shared": 10,
+    "mdt_only_pct": 15.6
+  },
+  "per_soc": {
+    "distinct_soc_strings": 20,
+    "soc_strings_with_value": 19,
+    "table": [
+      {
+        "soc": "",
+        "devices": 25,
+        "rows": 458,
+        "canonical_files": 23,
+        "device_list": [
+          "FP6",
+          "G_Stylus_5G-2-2022",
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "Mi_A3",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_Stylus_5G",
+          "Nord_4",
+          "Nord_CE4",
+          "OnePlus_12",
+          "OnePlus_13",
+          "OnePlus_9",
+          "Pad_2_Pro",
+          "Pad_Pro",
+          "Poco_F5",
+          "Poco_F5_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM6375 Snapdragon 695",
+        "devices": 7,
+        "rows": 84,
+        "canonical_files": 12,
+        "device_list": [
+          "Edge_30_Neo",
+          "Moto_G34_5G",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Nord_CE2",
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM7250 Snapdragon 765G",
+        "devices": 5,
+        "rows": 39,
+        "canonical_files": 18,
+        "device_list": [
+          "Edge_30",
+          "Edge_30_Fusion",
+          "Pixel_4A_5G",
+          "Pixel_5",
+          "Pixel_5A"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM6115 Snapdragon 662",
+        "devices": 4,
+        "rows": 46,
+        "canonical_files": 13,
+        "device_list": [
+          "Defy_2021",
+          "Moto_G30",
+          "Moto_G_Power",
+          "Pro_1X"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM6225 Snapdragon 680 4G",
+        "devices": 3,
+        "rows": 36,
+        "canonical_files": 12,
+        "device_list": [
+          "Moto_G32",
+          "Moto_G42",
+          "Moto_G52"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM8250 Snapdragon 865",
+        "devices": 3,
+        "rows": 42,
+        "canonical_files": 18,
+        "device_list": [
+          "OnePlus_8",
+          "OnePlus_8_Pro",
+          "OnePlus_9RT"
+        ]
+      },
+      {
+        "soc": "Qualcomm MSM8998 Snapdragon 835",
+        "devices": 2,
+        "rows": 22,
+        "canonical_files": 11,
+        "device_list": [
+          "OnePlus_7",
+          "OnePlus_7T"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM4250 Snapdragon 460",
+        "devices": 2,
+        "rows": 22,
+        "canonical_files": 11,
+        "device_list": [
+          "Moto_E7_Plus",
+          "Moto_G10"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM8550 Snapdragon 8 Gen2",
+        "devices": 2,
+        "rows": 42,
+        "canonical_files": 21,
+        "device_list": [
+          "Edge_40_Pro",
+          "OnePlus_11_5G"
+        ]
+      },
+      {
+        "soc": "Qualcomm QCM6490",
+        "devices": 1,
+        "rows": 18,
+        "canonical_files": 18,
+        "device_list": [
+          "FP5"
+        ]
+      },
+      {
+        "soc": "Qualcomm SDM845 Snapdragon 845",
+        "devices": 1,
+        "rows": 10,
+        "canonical_files": 10,
+        "device_list": [
+          "OnePlus_6"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM4375 Snapdragon 4 Gen 1",
+        "devices": 1,
+        "rows": 12,
+        "canonical_files": 12,
+        "device_list": [
+          "Moto_G_5G_2024"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM6375 Snapdragon 695 5G",
+        "devices": 1,
+        "rows": 12,
+        "canonical_files": 12,
+        "device_list": [
+          "Nord_CE3"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM7225 Snapdragon 750G",
+        "devices": 1,
+        "rows": 12,
+        "canonical_files": 12,
+        "device_list": [
+          "FP4"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM7325-AE Snapdragon 778G+ 5G",
+        "devices": 1,
+        "rows": 18,
+        "canonical_files": 18,
+        "device_list": [
+          "Phone_1"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM8150 Snapdragon 855",
+        "devices": 1,
+        "rows": 11,
+        "canonical_files": 11,
+        "device_list": [
+          "OnePlus_7_Pro"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM8150-AC Snapdragon 855",
+        "devices": 1,
+        "rows": 11,
+        "canonical_files": 11,
+        "device_list": [
+          "OnePlus_7T_Pro"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM8350 Snapdragon 888",
+        "devices": 1,
+        "rows": 18,
+        "canonical_files": 18,
+        "device_list": [
+          "OnePlus_9_Pro"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM8350-AC Snapdragon 888+",
+        "devices": 1,
+        "rows": 18,
+        "canonical_files": 18,
+        "device_list": [
+          "Moto_G200"
+        ]
+      },
+      {
+        "soc": "Qualcomm SM8475 Snapdragon 8+ Gen1",
+        "devices": 1,
+        "rows": 19,
+        "canonical_files": 19,
+        "device_list": [
+          "Phone_2"
+        ]
+      }
+    ],
+    "empty_soc_rows": 458,
+    "empty_soc_devices": 25,
+    "empty_soc_device_list": [
+      "FP6",
+      "G_Stylus_5G-2-2022",
+      "Mi_12",
+      "Mi_12S",
+      "Mi_12S_Pro",
+      "Mi_12S_Ultra",
+      "Mi_12T_Pro",
+      "Mi_12_Pro",
+      "Mi_13",
+      "Mi_13_Pro",
+      "Mi_A3",
+      "Moto_G9",
+      "Moto_G9_Power",
+      "Moto_G_Stylus_5G",
+      "Nord_4",
+      "Nord_CE4",
+      "OnePlus_12",
+      "OnePlus_13",
+      "OnePlus_9",
+      "Pad_2_Pro",
+      "Pad_Pro",
+      "Poco_F5",
+      "Poco_F5_Pro",
+      "Poco_F6_PRo",
+      "Redmi_K60_Pro"
+    ],
+    "empty_soc_vendors": {
+      "fairphone": 21,
+      "motorola": 46,
+      "xiaomi": 247,
+      "oneplus": 144
+    },
+    "empty_soc_canonical_files": 23,
+    "empty_soc_with_db_path": 458,
+    "empty_soc_distinct_db_path": 25,
+    "empty_soc_codenames": [
+      {
+        "device": "FP6",
+        "codename": "FP6"
+      },
+      {
+        "device": "G_Stylus_5G-2-2022",
+        "codename": "milanf"
+      },
+      {
+        "device": "Mi_12",
+        "codename": "cupid"
+      },
+      {
+        "device": "Mi_12S",
+        "codename": "mayfly"
+      },
+      {
+        "device": "Mi_12S_Pro",
+        "codename": "unicorn"
+      },
+      {
+        "device": "Mi_12S_Ultra",
+        "codename": "thor"
+      },
+      {
+        "device": "Mi_12T_Pro",
+        "codename": "diting"
+      },
+      {
+        "device": "Mi_12_Pro",
+        "codename": "zeus"
+      },
+      {
+        "device": "Mi_13",
+        "codename": "fuxi"
+      },
+      {
+        "device": "Mi_13_Pro",
+        "codename": "nuwa"
+      },
+      {
+        "device": "Mi_A3",
+        "codename": "laurel_sprout"
+      },
+      {
+        "device": "Moto_G9",
+        "codename": "guamp"
+      },
+      {
+        "device": "Moto_G9_Power",
+        "codename": "cebu"
+      },
+      {
+        "device": "Moto_G_Stylus_5G",
+        "codename": "denver"
+      },
+      {
+        "device": "Nord_4",
+        "codename": "avalon"
+      },
+      {
+        "device": "Nord_CE4",
+        "codename": "benz"
+      },
+      {
+        "device": "OnePlus_12",
+        "codename": "waffle"
+      },
+      {
+        "device": "OnePlus_13",
+        "codename": "dodge"
+      },
+      {
+        "device": "OnePlus_9",
+        "codename": "lemonade"
+      },
+      {
+        "device": "Pad_2_Pro",
+        "codename": "erhai"
+      },
+      {
+        "device": "Pad_Pro",
+        "codename": "caihong"
+      },
+      {
+        "device": "Poco_F5",
+        "codename": "marble"
+      },
+      {
+        "device": "Poco_F5_Pro",
+        "codename": "mondrian"
+      },
+      {
+        "device": "Poco_F6_PRo",
+        "codename": "vermeer"
+      },
+      {
+        "device": "Redmi_K60_Pro",
+        "codename": "socrates"
+      }
+    ],
+    "near_duplicate_pairs": [
+      [
+        "Qualcomm SM6375 Snapdragon 695",
+        "Qualcomm SM6375 Snapdragon 695 5G"
+      ],
+      [
+        "Qualcomm SM8150 Snapdragon 855",
+        "Qualcomm SM8150-AC Snapdragon 855"
+      ],
+      [
+        "Qualcomm SM8350 Snapdragon 888",
+        "Qualcomm SM8350-AC Snapdragon 888+"
+      ]
+    ]
+  },
+  "vendors": {
+    "distinct_vendor_strings": 9,
+    "distinct_vendors_casefold": 8,
+    "table": [
+      {
+        "vendor": "oneplus",
+        "rows": 293,
+        "devices": 18,
+        "device_list": [
+          "Nord_4",
+          "Nord_CE2",
+          "Nord_CE3",
+          "Nord_CE4",
+          "OnePlus_11_5G",
+          "OnePlus_12",
+          "OnePlus_13",
+          "OnePlus_7",
+          "OnePlus_7T",
+          "OnePlus_7T_Pro",
+          "OnePlus_7_Pro",
+          "OnePlus_8",
+          "OnePlus_8_Pro",
+          "OnePlus_9",
+          "OnePlus_9RT",
+          "OnePlus_9_Pro",
+          "Pad_2_Pro",
+          "Pad_Pro"
+        ]
+      },
+      {
+        "vendor": "motorola",
+        "rows": 273,
+        "devices": 21,
+        "device_list": [
+          "Defy_2021",
+          "Edge_30",
+          "Edge_30_Fusion",
+          "Edge_30_Neo",
+          "Edge_40_Pro",
+          "G_Stylus_5G-2-2022",
+          "Moto_E7_Plus",
+          "Moto_G10",
+          "Moto_G200",
+          "Moto_G30",
+          "Moto_G32",
+          "Moto_G34_5G",
+          "Moto_G42",
+          "Moto_G52",
+          "Moto_G82_5G",
+          "Moto_G84_5G",
+          "Moto_G9",
+          "Moto_G9_Power",
+          "Moto_G_5G_2024",
+          "Moto_G_Power",
+          "Moto_G_Stylus_5G"
+        ]
+      },
+      {
+        "vendor": "xiaomi",
+        "rows": 247,
+        "devices": 13,
+        "device_list": [
+          "Mi_12",
+          "Mi_12S",
+          "Mi_12S_Pro",
+          "Mi_12S_Ultra",
+          "Mi_12T_Pro",
+          "Mi_12_Pro",
+          "Mi_13",
+          "Mi_13_Pro",
+          "Mi_A3",
+          "Poco_F5",
+          "Poco_F5_Pro",
+          "Poco_F6_PRo",
+          "Redmi_K60_Pro"
+        ]
+      },
+      {
+        "vendor": "fairphone",
+        "rows": 51,
+        "devices": 3,
+        "device_list": [
+          "FP4",
+          "FP5",
+          "FP6"
+        ]
+      },
+      {
+        "vendor": "nothing",
+        "rows": 37,
+        "devices": 2,
+        "device_list": [
+          "Phone_1",
+          "Phone_2"
+        ]
+      },
+      {
+        "vendor": "realme",
+        "rows": 24,
+        "devices": 2,
+        "device_list": [
+          "Realme_10_Pro",
+          "Realme_9_Pro"
+        ]
+      },
+      {
+        "vendor": "fxtec",
+        "rows": 12,
+        "devices": 1,
+        "device_list": [
+          "Pro_1X"
+        ]
+      },
+      {
+        "vendor": "OnePlus",
+        "rows": 10,
+        "devices": 1,
+        "device_list": [
+          "OnePlus_6"
+        ]
+      },
+      {
+        "vendor": "google",
+        "rows": 3,
+        "devices": 3,
+        "device_list": [
+          "Pixel_4A_5G",
+          "Pixel_5",
+          "Pixel_5A"
+        ]
+      }
+    ]
+  },
+  "db_type": {
+    "table": [
+      {
+        "db_type": "COMPUTE",
+        "rows": 880,
+        "devices": 63
+      },
+      {
+        "db_type": "UNKNOWN",
+        "rows": 60,
+        "devices": 60
+      },
+      {
+        "db_type": "<absent>",
+        "rows": 10,
+        "devices": 1
+      }
+    ],
+    "unknown_files": [
+      "cdspr.jsn"
+    ],
+    "compute_files": [
+      "cdsp.b00",
+      "cdsp.b01",
+      "cdsp.b02",
+      "cdsp.b03",
+      "cdsp.b04",
+      "cdsp.b05",
+      "cdsp.b06",
+      "cdsp.b07",
+      "cdsp.b08",
+      "cdsp.b09",
+      "cdsp.b10",
+      "cdsp.b11",
+      "cdsp.b12",
+      "cdsp.b13",
+      "cdsp.b14",
+      "cdsp.b15",
+      "cdsp.b17",
+      "cdsp.mdt",
+      "cdsp_dtb.b00",
+      "cdsp_dtb.b01",
+      "cdsp_dtb.b02",
+      "cdsp_dtb.mdt"
+    ],
+    "absent_files": [
+      "cdsp.b00",
+      "cdsp.b01",
+      "cdsp.b02",
+      "cdsp.b03",
+      "cdsp.b04",
+      "cdsp.b05",
+      "cdsp.b06",
+      "cdsp.b08",
+      "cdsp.b10",
+      "cdsp.mdt"
+    ],
+    "isa_tagged_rows": 2
+  },
+  "data_quality": {
+    "empty_soc_rows": 458,
+    "empty_soc_devices": 25,
+    "alias_rows": 10,
+    "alias_devices": [
+      "OnePlus_6"
+    ],
+    "notes_deviant_rows": 12,
+    "notes_deviant_devices": {
+      "FP6": 2,
+      "OnePlus_6": 10
+    },
+    "notes_deviant_shapes": {
+      "md5_db=<32hex>; P1; db_path=fairphone/FP6/modem/image; db_type=COMPUTE; isa=QDSP6 / Hexagon": 2,
+      "md5_db=<32hex>; source=LineageOS-22.2-20261111-nightly-enchilada modem.img FAT IMAGE dir": 10
+    },
+    "constant_bytes_multi_md5": [
+      {
+        "file": "cdsp_dtb.b00",
+        "bytes": 148,
+        "instances": 13,
+        "distinct_md5": 6
+      },
+      {
+        "file": "cdsp_dtb.b02",
+        "bytes": 3896,
+        "instances": 13,
+        "distinct_md5": 13
+      },
+      {
+        "file": "cdsp_dtb.mdt",
+        "bytes": 4044,
+        "instances": 13,
+        "distinct_md5": 13
+      }
+    ],
+    "bimodal_files": [
+      {
+        "file": "cdsp.b04",
+        "instances": 61,
+        "gap_ratio": 1284.2,
+        "small_n": 54,
+        "small_max": 1376,
+        "large_n": 7,
+        "large_min": 1767108
+      },
+      {
+        "file": "cdsp.b05",
+        "instances": 61,
+        "gap_ratio": 89.7,
+        "small_n": 8,
+        "small_max": 1096,
+        "large_n": 53,
+        "large_min": 98312
+      },
+      {
+        "file": "cdsp.b03",
+        "instances": 61,
+        "gap_ratio": 87.4,
+        "small_n": 16,
+        "small_max": 1192,
+        "large_n": 45,
+        "large_min": 104160
+      },
+      {
+        "file": "cdsp_dtb.b01",
+        "instances": 13,
+        "gap_ratio": 58.2,
+        "small_n": 7,
+        "small_max": 512,
+        "large_n": 6,
+        "large_min": 29812
+      },
+      {
+        "file": "cdsp.b08",
+        "instances": 61,
+        "gap_ratio": 45.0,
+        "small_n": 17,
+        "small_max": 1552,
+        "large_n": 44,
+        "large_min": 69800
+      },
+      {
+        "file": "cdsp.b07",
+        "instances": 30,
+        "gap_ratio": 34.8,
+        "small_n": 6,
+        "small_max": 2840,
+        "large_n": 24,
+        "large_min": 98876
+      },
+      {
+        "file": "cdsp.b12",
+        "instances": 30,
+        "gap_ratio": 22.3,
+        "small_n": 24,
+        "small_max": 4632,
+        "large_n": 6,
+        "large_min": 103280
+      },
+      {
+        "file": "cdsp.b06",
+        "instances": 61,
+        "gap_ratio": 14.5,
+        "small_n": 53,
+        "small_max": 114696,
+        "large_n": 8,
+        "large_min": 1660260
+      }
+    ],
+    "median_outlier_rows": 186,
+    "vendor_case_split": {
+      "oneplus": 293,
+      "OnePlus": 10
+    },
+    "soc_near_duplicate_pairs": [
+      [
+        "Qualcomm SM6375 Snapdragon 695",
+        "Qualcomm SM6375 Snapdragon 695 5G"
+      ],
+      [
+        "Qualcomm SM8150 Snapdragon 855",
+        "Qualcomm SM8150-AC Snapdragon 855"
+      ],
+      [
+        "Qualcomm SM8350 Snapdragon 888",
+        "Qualcomm SM8350-AC Snapdragon 888+"
+      ]
+    ],
+    "segment_index_missing": [
+      16
+    ],
+    "sparse_devices": [
+      "Pixel_4A_5G",
+      "Pixel_5",
+      "Pixel_5A"
+    ],
+    "dense_devices": [
+      "Edge_40_Pro",
+      "FP6",
+      "Mi_13",
+      "Mi_13_Pro",
+      "Nord_4",
+      "Nord_CE4",
+      "OnePlus_11_5G",
+      "OnePlus_12",
+      "OnePlus_13",
+      "Pad_2_Pro",
+      "Pad_Pro",
+      "Poco_F6_PRo",
+      "Redmi_K60_Pro"
+    ],
+    "dense_device_file_count": 21,
+    "public_status": {
+      "metadata-only": 940,
+      "populated-local-session": 10
+    },
+    "sha256_present": 4,
+    "distinct_db_path": 63,
+    "devices_with_multiple_db_path": [],
+    "devices_without_db_path": [
+      "OnePlus_6"
+    ]
+  },
+  "honest_negatives": {
+    "repo_rows_metadata_only": 33481,
+    "repo_rows_total": 34053,
+    "cdsp_rows_metadata_only": 940,
+    "cdsp_rows_total": 950,
+    "mdt_name_count": 50,
+    "mdt_name_hexagon": 12,
+    "mdt_iname_count": 82,
+    "mdt_iname_hexagon": 16,
+    "repo_rows_with_bytes": 33882,
+    "catalogue_slice": "devices 001-222 only",
+    "repo_devices_present": 219
+  },
+  "segments": {
+    "table": [
+      {
+        "index": 0,
+        "devices": 61
+      },
+      {
+        "index": 1,
+        "devices": 61
+      },
+      {
+        "index": 2,
+        "devices": 61
+      },
+      {
+        "index": 3,
+        "devices": 61
+      },
+      {
+        "index": 4,
+        "devices": 61
+      },
+      {
+        "index": 5,
+        "devices": 61
+      },
+      {
+        "index": 6,
+        "devices": 61
+      },
+      {
+        "index": 7,
+        "devices": 30
+      },
+      {
+        "index": 8,
+        "devices": 61
+      },
+      {
+        "index": 9,
+        "devices": 49
+      },
+      {
+        "index": 10,
+        "devices": 42
+      },
+      {
+        "index": 11,
+        "devices": 49
+      },
+      {
+        "index": 12,
+        "devices": 30
+      },
+      {
+        "index": 13,
+        "devices": 30
+      },
+      {
+        "index": 14,
+        "devices": 17
+      },
+      {
+        "index": 15,
+        "devices": 30
+      },
+      {
+        "index": 17,
+        "devices": 9
+      }
+    ],
+    "missing_indices": [
+      16
+    ],
+    "mdt_vs_segment_count": [
+      {
+        "segments": 0,
+        "devices": 3,
+        "mdt_min": 7660,
+        "mdt_max": 7660,
+        "mdt_median": 7660
+      },
+      {
+        "segments": 9,
+        "devices": 12,
+        "mdt_min": 7260,
+        "mdt_max": 7580,
+        "mdt_median": 7580
+      },
+      {
+        "segments": 10,
+        "devices": 19,
+        "mdt_min": 7508,
+        "mdt_max": 7660,
+        "mdt_median": 7660
+      },
+      {
+        "segments": 15,
+        "devices": 13,
+        "mdt_min": 5084,
+        "mdt_max": 5084,
+        "mdt_median": 5084
+      },
+      {
+        "segments": 16,
+        "devices": 8,
+        "mdt_min": 7828,
+        "mdt_max": 7980,
+        "mdt_median": 7828
+      },
+      {
+        "segments": 17,
+        "devices": 9,
+        "mdt_min": 4464,
+        "mdt_max": 5244,
+        "mdt_median": 4764
+      }
+    ],
+    "correlation": {
+      "segments_vs_mdt_bytes": -0.622,
+      "segments_vs_segment_bytes": 0.85,
+      "pairs": 64
+    }
+  },
+  "device_file_counts": {
+    "1": 3,
+    "10": 1,
+    "11": 11,
+    "12": 19,
+    "18": 8,
+    "19": 9,
+    "21": 13
+  }
+}
