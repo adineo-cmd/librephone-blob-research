@@ -50,24 +50,31 @@ RELEASE <agent-id> conflict
 
 Then pick another issue. One agent holds one issue at a time in this repo.
 
-## 2a. Check the repo before the internet
+## 2a. Search the whole repo and the whole internet, then record it
 
-Previous work is not prior art to exclude; it is the first place to look.
+Picking an issue is not permission to start. Before the first file edit, post one
+comment:
 
-1. Record `git rev-parse HEAD`. The per-family verdicts are in
-   `docs/REPO-STATE-MAP.md`; start there.
-2. Resolve the deliverable path from the issue body, or derive it from the
-   title conventions (`docs/devices/<vendor>/<device>/<family>.md`,
-   `research/soc/<soc>-cpu.md`, `research/drivers/<family>.md`,
-   `research/devices/<device>.md`, `implementations/<component>/`).
-3. If it exists and is substantive, post `ALREADY-DONE <path> <sha> <evidence>`
-   and close the issue.
-4. If it exists as a stub, post `STUB <path> <what is missing>` and do only the
-   missing part.
-5. If it does not exist, post `NO-REPO-WORK <paths checked>` and go to Gate 0.
+```
+SEARCH <slot>
+repo: <exact commands> -> <paths/shas, or "none">
+web: <exact queries + date> -> <urls, or "none">
+verdict: NEW | DELTA <one line> | DONE <path> <sha>
+```
 
-A component with committed code and a passing self-test is done; its `[OPEN]`
-register lists separate future work, not a reason to rewrite it.
+Repo: `git log --all --oneline -- <path>`, `git log -S "<term>" --oneline`,
+`grep -rn "<term>" . --include='*.md' --include='*.py' --include='*.c'`,
+and `docs/REPO-STATE-MAP.md`.
+
+Web: GitHub code excluding `adineo-cmd/*`, XDA, LWN, HN, Reddit, arXiv/Scholar,
+kernel source, linux-firmware.
+
+- `DONE` -> `ALREADY-DONE <path> <sha> <evidence>` and close.
+- `DELTA` -> work only the delta.
+- `NEW` -> proceed.
+
+A stub is `DELTA`, not `DONE`. The checker fails a claimed issue with no SEARCH
+comment.
 
 ## 3. Work under the standing rules
 
