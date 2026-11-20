@@ -27,7 +27,7 @@ awk -F, '$1=="Galaxy_F62" && $4=="boot"{print $6"|"$7"|"$8"|"$13"|"$14}' coverag
 | dtbo.img | 8,388,608 (8 MiB) | `45553939f944bc940f58ec1221f18dda` | DTB | radio | device-tree overlay image |
 | vbmeta.img | 4,096 | `f6759b32e72155a568b336fa7e76c46a` | AVB | radio | AVB metadata (corpus's 4,096-B class) |
 
-Distinct bytes: 61,865,984 + 71,102,464 + 4,644 + 8,388,608 + 4,096 = 141,865,796 [F]. All 5 distinct md5s **corpus-unique to Galaxy_F62** [F] — per-build signed images.
+Distinct bytes: 61,865,984 + 71,102,464 + 4,644 + 8,388,608 + 4,096 = 141,365,796 [F]. All 5 distinct md5s **corpus-unique to Galaxy_F62** [F] — per-build signed images.
 
 ## Samsung-shape observations [F]
 
