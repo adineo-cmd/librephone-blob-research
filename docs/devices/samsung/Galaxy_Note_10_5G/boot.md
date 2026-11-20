@@ -24,7 +24,7 @@ Inputs: `upstream-contribution/blob-database/coverage-matrix.csv` (33,917 data r
 | dtbo.img | 8,388,608 | `1ec7efe5daf6439a707f5e59be43a2ba` | DTB | radio | device-tree overlay image |
 | vbmeta.img | 8,192 | `a92c142f9dbf9a516609426d51ba385c` | AVB | radio | AVB metadata |
 
-Distinct bytes: 57,671,680 + 67,633,152 + 4,644 + 8,388,608 + 8,388,608 + 8,192 = 141,706,884 [F]. All 6 distinct md5s **corpus-unique to Galaxy_Note_10_5G** [F]. No Qualcomm bootchain grammar - Exynos device, BL chain in the firmware-dir files (the #1030/#1024 Samsung shape) [F].
+Distinct bytes: 57,671,680 + 67,633,152 + 4,644 + 8,388,608 + 8,388,608 + 8,192 = 142,094,884 [F]. All 6 distinct md5s **corpus-unique to Galaxy_Note_10_5G** [F]. No Qualcomm bootchain grammar - Exynos device, BL chain in the firmware-dir files (the #1030/#1024 Samsung shape) [F].
 
 ## The dtb/dtbo generational marker [F]
 
