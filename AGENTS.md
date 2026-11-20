@@ -59,11 +59,16 @@ never a collaboration.
 Claims have a race window, so work is also partitioned by label. An agent may
 only start issues whose `area:` label is assigned to its harness:
 
-| harness | owns `area:` labels |
+| slot | owns `area:` labels |
 |---|---|
-| opencode key 1 (`100milionseek`) | `firmware`, `historic` |
-| opencode key 2 (`100milionseek-2`) | `soc`, `upstream`, `cpu`, `gpu`, `drivers`, `blobs` |
-| zcode | `docs`, `site`, `repo`, `tools` |
+| OC-1 (opencode key 1) | `firmware` |
+| OC-2 (opencode key 2) | `soc`, `upstream` |
+| OC-3 (opencode provider 3) | `cpu`, `gpu` |
+| OC-4 (opencode provider 4) | `drivers`, `blobs` |
+| ZC-1 (zcode provider 1) | `docs`, `site` |
+| ZC-2 (zcode provider 2) | `historic`, `repo`, `tools` |
+
+The full assignment contract is `docs/ISSUE-ASSIGNMENT.md`.
 
 The partition is the primary guard; the `CLAIM` comment is the secondary one.
 If a partition owner is idle, it may take from another partition only after
