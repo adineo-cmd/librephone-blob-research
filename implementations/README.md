@@ -27,6 +27,8 @@ component carries a clean-room statement header and a self-test.
 | [adreno650-fleet](adreno650-fleet/) | public `a6xx_gmu.c`/`a6xx_gpu.c`/`a6xx_catalog.c` + linux-firmware `WHENCE` (GPL/redistributable) — a650 GMU container + SQE fleet | unittest suite passing (113 tests); **container** class (not raw-TCM like a619); SQE floor `0x095` confirmed at `a6xx_gpu.c:1032`, multiple sub-0.95 builds circulate; 9 live of 14 carried (`pdx215` mislabel corrected) |
 | [historic](historic/) | public `mdt_loader.c`, prima driver GPL sources, Replicant/samsung-ipc — FP2, hammerhead, m0 | FP2 parsers passing (**28 tests**); historic-device queue first pass. **Run as `python3 -I test_parsers.py` in `historic/fp2/` — `unittest discover` collects none**, because the suite is a `check()` harness, not `unittest.TestCase` (discover exits 5, "NO TESTS RAN", so it fails loudly rather than silently passing). |
 | [wifi-cpp-fleet](wifi-cpp-fleet/) | public `msm_cpp.c`/`msm_cpp.h` (GPL-2.0-only, LineageOS msm8953 @ lineage-21) + userspace `cpp_hardware.c` — `cpp_firmware_vN_N_N.fw` fixed-window images | unittest suite passing (88 tests); **not WiFi** — MSM Camera Post-Processing microcode; version = `0x1000\|BCD(minor)` u16, not ASCII |
+| [camera-effect-fleet](camera-effect-fleet/) | public vendor tree listing + own byte measurements — Xiaomi `resources/render/Effect/` assets | unittest suite passing (11 tests); **28-byte header + raw `W×H×4` pixels, exact on 35/35**; artistic assets, not firmware; channel order `[OPEN]` |
+| [camera-cfr-fleet](camera-cfr-fleet/) | public vendor tree listings + own byte measurements — OnePlus/Xiaomi `CFR_*.bin` | unittest suite passing (11 tests); **four distinct grammars under one prefix** (1079/2126/3645/8128); `imx766` vs `imx766_uw` differ in one byte |
 | [big-clusters](big-clusters/) | metadata + public partition/fstab sources — largest sharing clusters | `vm-bootsys.img` = Qualcomm Trusted VM image (analysis only, no suite) |
 
 Build (C components): `cd <comp> && gcc -std=c99 -Wall -Wextra -O2 -o test
@@ -46,7 +48,8 @@ Without that step a fresh clone reports `FileNotFoundError` on
 is a bootstrap gap, not a code failure. The Python
 components (`qca-bt`, `qca-bt-gen2`, `adsp-fleet`, `adreno-fleet`,
 `adreno650`, `adreno650-fleet`, `data-blob-fleet`, `pil-manifests`, `hbt-fleet`,
-`wifi-cpp-fleet`, the `mediatek/*` trio) are stdlib-only;
+`wifi-cpp-fleet`, `camera-effect-fleet`, `camera-cfr-fleet`, the `mediatek/*`
+trio) are stdlib-only;
 run each with `cd <comp> && python3 -m unittest discover -q`. **Exception:
 `historic/fp2`** is a plain `check()` harness rather than `unittest.TestCase`
 classes, so it must be run as `cd historic/fp2 && python3 -I test_parsers.py`;
