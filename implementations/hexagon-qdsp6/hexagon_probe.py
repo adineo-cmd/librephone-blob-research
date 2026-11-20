@@ -38,17 +38,21 @@ Two container generations ship the same Hexagon image:
     ``.bNN`` sibling files holding the segments. This is what
     ``mdt_loader.c`` documents.
 
-The distinguishing structural invariant, measured on 236 ``EM_QDSP6``
-objects in this corpus: a *header-only* image has program header 0 as
+The distinguishing structural invariant, measured on the `EM_QDSP6` objects in this
+corpus: a *header-only* image has program header 0 as
 ``p_type=PT_NULL, p_offset=0, p_memsz=0, p_filesz=ehsize+phnum*phentsize,
 p_flags=0x07000000``, i.e. segment 0 *is* the ELF header plus the program
 header table. Monolithic images instead open with a real ``PT_LOAD`` at
 file offset 0.
 
-The vendor's private ``p_flags`` bit ``0x08000000`` marks a segment as
-"belongs to the MBN image" in both generations; the low three bits remain
-the standard R/W/X. Segment 1 (``p_type=PT_NULL``, ``p_flags=0x02200000``)
-is a metadata block, not loadable.
+The vendor's ``p_flags`` bits are the ones mainline Linux names: the type
+field ``bits[26:24]`` (``QCOM_MDT_TYPE_MASK``) with ``0x2`` meaning "this is
+the hash/metadata segment" (``QCOM_MDT_TYPE_HASH``), and ``BIT(27)``
+(``QCOM_MDT_RELOCATABLE``) marking the image relocatable. Both are defined in
+``include/linux/soc/qcom/mdt_loader.h`` since v4.11 and used by
+``mdt_loader.c``; the low three bits remain the standard R/W/X. The kernel
+finds the metadata segment by the *type field*, not by ``p_type``, which is
+why segment 1 can be ``PT_NULL`` and still be the one that gets validated.
 
 USAGE
     python3 -I hexagon_probe.py <file> [--json out.json] [--brief] [--quiet]
@@ -71,7 +75,9 @@ ET_EXEC = 2
 ET_DYN = 3
 PT_NULL = 0
 PT_LOAD = 1
-QC_IMAGE_FLAG = 0x08000000
+MDT_TYPE_MASK = 0x07000000
+MDT_TYPE_HASH = 0x02000000
+MDT_RELOCATABLE = 0x08000000
 HDR_SEG_FLAGS = 0x07000000
 META_SEG_FLAGS = 0x02200000
 EHDR = struct.Struct("<16sHHIIIIIHHHHHH")
@@ -180,7 +186,9 @@ def parse_phdrs(data, hdr):
             "p_memsz": p_memsz,
             "p_flags": p_flags,
             "p_align": p_align,
-            "qc_image": bool(p_flags & QC_IMAGE_FLAG),
+            "mdt_type": (p_flags & MDT_TYPE_MASK) >> 24,
+            "mdt_type_hash": (p_flags & MDT_TYPE_MASK) == MDT_TYPE_HASH,
+            "mdt_relocatable": bool(p_flags & MDT_RELOCATABLE),
             "read": bool(p_flags & 4),
             "write": bool(p_flags & 2),
             "execute": bool(p_flags & 1),
@@ -208,7 +216,7 @@ def classify_phdr(ph, hdr, data):
                 return "zlib-compressed"
             return "embedded-" + name
     if entropy(body) < 0.5:
-        return "zero-fill"
+        return "fill"
     if ph["execute"]:
         return "code"
     if ph["read"] and not ph["write"]:
@@ -266,9 +274,51 @@ def gap_analysis(phdrs, filesize):
     return gaps
 
 
+def split_siblings(path, phdrs, hdr):
+    stem = os.path.splitext(os.path.basename(path))[0]
+    directory = os.path.dirname(os.path.abspath(path))
+    found = {}
+    for name in os.listdir(directory):
+        base, ext = os.path.splitext(name)
+        if base != stem:
+            continue
+        if len(ext) == 4 and ext[1] == "b" and ext[2:].isdigit():
+            found[int(ext[2:])] = os.path.join(directory, name)
+    if not found:
+        return None
+    table_end = hdr["e_ehsize"] + hdr["e_phnum"] * hdr["e_phentsize"]
+    rows = []
+    for index in sorted(found):
+        size = os.path.getsize(found[index])
+        ph = phdrs[index] if index < len(phdrs) else None
+        expected = ph["p_filesz"] if ph else None
+        if index == 0:
+            expected = table_end
+        rows.append({
+            "index": index,
+            "file": os.path.basename(found[index]),
+            "bytes": size,
+            "p_filesz": ph["p_filesz"] if ph else None,
+            "expected_bytes": expected,
+            "size_matches": (size == expected),
+        })
+    present = set(found)
+    absent = []
+    for index, ph in enumerate(phdrs):
+        if index in present:
+            continue
+        absent.append({
+            "index": index,
+            "p_filesz": ph["p_filesz"],
+            "p_memsz": ph["p_memsz"],
+            "reason": "p_filesz==0" if ph["p_filesz"] == 0 else "missing",
+        })
+    return {"present": rows, "absent": absent}
+
+
 def overlap_check(phdrs):
     spans = sorted((p["p_offset"], p["p_offset"] + p["p_filesz"], p["index"])
-                   for p in phdrs if p["p_filesz"] > 0)
+                   for p in phdrs if p["p_filesz"] > 0 and p["p_type"] == PT_LOAD)
     bad = []
     for i in range(1, len(spans)):
         if spans[i][0] < spans[i - 1][1]:
@@ -302,9 +352,18 @@ def probe(path):
         if z is not None:
             ph["zlib"] = z
     first = phdrs[0] if phdrs else None
-    header_only = bool(first and first["kind"] == "header-table")
+    header_table_first = bool(first and first["kind"] == "header-table")
+    inline = all(p["p_offset"] + p["p_filesz"] <= len(data)
+                 for p in phdrs if p["p_filesz"])
+    if not header_table_first:
+        generation = "monolithic"
+    elif inline:
+        generation = "self-contained"
+    else:
+        generation = "split-mdt"
     loads = [p for p in phdrs if p["p_type"] == PT_LOAD]
     total_filesz = sum(p["p_filesz"] for p in phdrs)
+    siblings = split_siblings(path, phdrs, hdr) if generation == "split-mdt" else None
     result = {
         "path": os.path.abspath(path),
         "bytes": len(data),
@@ -322,15 +381,17 @@ def probe(path):
         "e_phnum": hdr["e_phnum"],
         "e_shnum": hdr["e_shnum"],
         "has_section_headers": hdr["e_shnum"] > 0,
-        "generation": "split-mdt-header" if header_only else "monolithic",
+        "generation": generation,
         "load_segments": len(loads),
         "total_p_filesz": total_filesz,
         "uncovered_bytes": len(data) - total_filesz,
         "gaps": gap_analysis(phdrs, len(data)),
         "overlaps": overlap_check(phdrs),
         "program_headers": phdrs,
+        "split_siblings": siblings,
         "embedded_elf_offsets": find_embedded(data, b"\x7fELF"),
-        "qc_image_segments": sum(1 for p in phdrs if p["qc_image"]),
+        "relocatable_segments": sum(1 for p in phdrs if p["mdt_relocatable"]),
+        "hash_segment": next((p["index"] for p in phdrs if p["mdt_type_hash"]), None),
     }
     violations = []
     if hdr["e_phoff"] != hdr["e_ehsize"] and hdr["e_phnum"]:
@@ -339,10 +400,13 @@ def probe(path):
     if result["overlaps"]:
         violations.append("%d overlapping file ranges" % len(result["overlaps"]))
     for ph in phdrs:
-        if ph["p_filesz"] and ph["p_offset"] + ph["p_filesz"] > len(data):
+        if ph["p_filesz"] and ph["p_offset"] + ph["p_filesz"] > len(data) \
+                and generation != "split-mdt":
             violations.append("segment %d runs past EOF" % ph["index"])
         if ph["p_memsz"] and ph["p_memsz"] < ph["p_filesz"]:
             violations.append("segment %d p_memsz < p_filesz" % ph["index"])
+    if generation == "split-mdt" and not siblings:
+        violations.append("split-MDT header with no .bNN siblings found")
     result["violations"] = violations
     return result
 
@@ -370,7 +434,10 @@ def render(res):
     out.append("shdrs           %d%s" % (res["e_shnum"],
                "" if res["has_section_headers"] else "  (none: no section headers)"))
     out.append("generation      %s" % res["generation"])
-    out.append("qc-image segs   %d" % res["qc_image_segments"])
+    out.append("hash segment    %s  (p_flags TYPE field == QCOM_MDT_TYPE_HASH)"
+               % ("none" if res["hash_segment"] is None else res["hash_segment"]))
+    out.append("relocatable     %d segments (QCOM_MDT_RELOCATABLE, BIT(27))"
+               % res["relocatable_segments"])
     out.append("covered bytes   %d of %d (%d uncovered)"
                % (res["total_p_filesz"], res["bytes"], res["uncovered_bytes"]))
     out.append("")

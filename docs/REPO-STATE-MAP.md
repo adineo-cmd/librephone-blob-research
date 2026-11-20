@@ -34,7 +34,7 @@ work committed, a named delta remains; **NEW** = no committed deliverable.
 | bt | `research/fleet/qca-bt-format.md` (field-level spec, 29 devices), `research/fleet/patch-stream-structure.md`; parser `implementations/qca-bt/` (30 tests) | PARTIAL | signature/manifest semantics marked open; 24-byte vs vendor-extended header |
 | cdsp | none dedicated; `research/fleet/dsp-tz-map.md` touches `dsp.img` | NEW | full spec + parser |
 | gpu | `research/laptop/qualcomm-adreno-gmu.md`, `-gmu-content.md`, `-a650-fleet.md`, `research/fleet/gpu-bdwlan.md`; parsers `implementations/adreno650/` (4 tests), `adreno-fleet/` (62 tests) | PARTIAL | signature rules absent; no bdwlan GPU parser |
-| modem | `research/laptop/qualcomm-pil-manifest-family.md`, `research/fleet/pil-metadata-sweep.md`; parser `implementations/pil-manifests/` (41 tests) | PARTIAL | `qdsp6sw.mbn` (84,123,868 B, 47.7% of SM8250 modem volume) undecoded — issue #606 |
+| modem | `research/laptop/qualcomm-pil-manifest-family.md`, `research/fleet/pil-metadata-sweep.md`, `research/fleet/qdsp6sw-container.md`; parsers `implementations/pil-manifests/` (41 tests), `implementations/hexagon-qdsp6/` (47 tests) | PARTIAL | `qdsp6sw.mbn` (84,123,868 B) container + metadata + embedded QuRT XML decoded; CLADE payload bytes, `.clade.dict`/`.clade.comp` offsets, per-segment instruction decode still open |
 | other | `research/laptop/qualcomm-data-blob-fleet.md` (hrtf5c, dax_param); parser `implementations/data-blob-fleet/` (54 tests) | PARTIAL | rest of the "other" bucket |
 | tz | `research/fleet/dsp-tz-map.md` (QSEE ELF64 segment map, enchilada), `research/qualcomm/docs/trustzone-census.md` (FP6) | PARTIAL | cross-device spec, signature, `seg[10]` entropy 6.64 question |
 | wifi | `research/fleet/bdwlan-format.md` (container RESOLVED, 34-file IE map, record structure) | PARTIAL | no stdlib parser, single-device scope |
@@ -48,7 +48,7 @@ work committed, a named delta remains; **NEW** = no committed deliverable.
 | bt | `research/laptop/qualcomm-qca-bt-fleet.md`, `-content.md` (gen-1/gen-2, SHA-256 invariant), `research/fleet/qca-bt-format.md`, `patch-stream-structure.md` | PARTIAL | cross-device beyond laptop/mobile half |
 | cdsp | none | NEW | full |
 | gpu | `research/laptop/qualcomm-adreno-a650-fleet.md`, `qualcomm-adreno-gmu-content.md`, `research/fleet/gpu-bdwlan.md` | PARTIAL | bdwlan GPU fleet |
-| modem | `research/fleet/pil-metadata-sweep.md` (SDM845 + SM8250), `research/laptop/qualcomm-pil-manifest-family.md` | PARTIAL | `qdsp6sw.mbn` |
+| modem | `research/fleet/pil-metadata-sweep.md` (SDM845 + SM8250), `research/fleet/qdsp6sw-container.md` (SM8250/SDX55M), `research/laptop/qualcomm-pil-manifest-family.md`; parser `implementations/hexagon-qdsp6/` | PARTIAL | CLADE payload decode, cross-device `qdsp6sw.mbn` |
 | other | `research/laptop/qualcomm-data-blob-fleet.md` (2 blobs) | PARTIAL | rest |
 | tz | `research/fleet/dsp-tz-map.md`, `research/fleet/qsee-crossgen.md` (SDM845 vs SM8250) | PARTIAL | cross-device |
 | wifi | `research/fleet/bdwlan-format.md` (enchilada) | PARTIAL | cross-device |
@@ -68,7 +68,7 @@ work committed, a named delta remains; **NEW** = no committed deliverable.
 | patch-stream section boundary | `research/fleet/patch-stream-structure.md` line 181: "section boundary semantics unknown" | NEW |
 | PIL `B01[40+32*n]` signing | `research/fleet/pil-metadata-sweep.md` | PARTIAL |
 | PIL `.jsn` manifest extension | `research/laptop/qualcomm-pil-manifest-family.md`; `implementations/pil-manifests/` (41 tests) | DONE — only `[OPEN]` list |
-| `qdsp6sw.mbn` | none | NEW — issue #606, claimed |
+| `qdsp6sw.mbn` | `research/fleet/qdsp6sw-container.md`; `implementations/hexagon-qdsp6/` (47 tests) | DONE — container, metadata segment, embedded QuRT XML; CLADE byte layout still `[OPEN]` |
 | QSEE PSS blocks | `research/fleet/qsee-crossgen.md` | PARTIAL |
 | Tensor radio-directory inventory | none | NEW |
 | `tz.img` `seg[10]` entropy 6.64 | `research/fleet/dsp-tz-map.md` open item | NEW |

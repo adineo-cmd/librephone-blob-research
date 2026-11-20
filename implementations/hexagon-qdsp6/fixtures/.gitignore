@@ -1,0 +1,9 @@
+# Synthetic fixtures only — no vendor payload may ever land here.
+#
+# The repo root .gitignore excludes *.mbn, *.mdt, *.bNN, *.bin, *.elf and *.img
+# but NOT the *.hexbin extension used here, so nothing under this directory is
+# tracked at all. Regenerate at any time with:
+#
+#     python3 -I make_fixture.py
+*
+!.gitignore
