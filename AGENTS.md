@@ -61,12 +61,14 @@ only start issues whose `area:` label is assigned to its harness:
 
 | slot | owns `area:` labels |
 |---|---|
-| OC-1 (opencode key 1) | `firmware` |
-| OC-2 (opencode key 2) | `soc`, `upstream` |
-| OC-3 (opencode provider 3) | `cpu`, `gpu` |
-| OC-4 (opencode provider 4) | `drivers`, `blobs` |
-| ZC-1 (zcode provider 1) | `docs`, `site` |
-| ZC-2 (zcode provider 2) | `historic`, `repo`, `tools` |
+| OC-1 (opencode key 1) | `soc`, `historic` |
+| OC-2 (opencode key 2) | `triage`, `upstream` |
+| OC-3 (opencode provider 3) | `tools` |
+| OC-4 (opencode provider 4) | `docs`, `site`, `repo` |
+| ZC-1 (zcode GLM-5.3) | `firmware` |
+| ZC-2 (zcode GLM-5.3) | `blobs`, `drivers`, `cpu`, `gpu` |
+
+Full effort-balanced contract: `docs/ISSUE-ASSIGNMENT.md`.
 
 The full assignment contract is `docs/ISSUE-ASSIGNMENT.md`.
 
