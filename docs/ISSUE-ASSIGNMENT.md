@@ -93,11 +93,22 @@ does not leave that issue frozen.
    files. Re-read the comments.
    - If another valid claim is first: post `RELEASE <slot> conflict`, pick
      another issue, never work this one.
-3. **Gate -1 — repo state (mandatory, before the internet)**: record
-   `git rev-parse HEAD`, resolve the deliverable path, and check it. Exists and
-   substantive → `ALREADY-DONE <path> <sha> <evidence>` and close. Exists as a
-   stub → `STUB <path> <what is missing>` and do only the missing part. Does
-   not exist → `NO-REPO-WORK <paths checked>`. Never rebuild committed work.
+3. **Gate -1 — search the whole repo AND the whole internet, then record it.**
+   Before any file edit, post one comment:
+
+   ```
+   SEARCH <slot>
+   repo: <exact commands> -> <paths/shas, or "none">
+   web: <exact queries + date> -> <urls, or "none">
+   verdict: NEW | DELTA <one line> | DONE <path> <sha>
+   ```
+
+   Repo search covers the whole checkout (`git log --all`, `git log -S`,
+   `grep -rn`, `docs/REPO-STATE-MAP.md`). Web search covers GitHub code
+   excluding `adineo-cmd/*`, XDA, LWN, HN, Reddit, arXiv/Scholar, kernel source
+   and linux-firmware. `DONE` -> close as ALREADY-DONE. `DELTA` -> work only the
+   delta. `NEW` -> proceed. No SEARCH comment, no work.
+
 4. **Gate 0 — prior art (mandatory, before any work)**: search GitHub code
    (excluding `adineo-cmd/*`), the web (XDA, LWN, HN, Reddit, arXiv/Scholar),
    kernel source and linux-firmware. Record exact queries and date. Then post

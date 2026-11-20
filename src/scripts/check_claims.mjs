@@ -105,6 +105,15 @@ for (const issue of issues) {
       console.log(`STALE #${issue.number}: ${slot} claim idle since ${last}`);
       stale++;
     }
+    const search = comments.find((c) => /^SEARCH\s+/.test(c.body.trim()) && c.created_at >= first.created_at);
+    if (!search) {
+      console.log(`VIOLATION #${issue.number}: claim by ${slot} has no SEARCH comment`);
+      violations++;
+    } else if (!/repo:/.test(search.body) || !/web:/.test(search.body) || !/verdict:/.test(search.body)) {
+      console.log(`VIOLATION #${issue.number}: SEARCH comment missing repo:/web:/verdict:`);
+      violations++;
+    }
+
     const done = comments.find((c) => /^DONE\s+/.test(c.body.trim()));
     if (done) {
       const doneSlot = done.body.trim().split(/\s+/)[1];

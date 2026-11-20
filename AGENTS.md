@@ -90,31 +90,41 @@ claimant; an expired claim is revoked by the lead with
 
 Full contract: `docs/ISSUE-ASSIGNMENT.md`.
 
-## Rule 2a — REPO-STATE GATE BEFORE THE INTERNET
+## Rule 2a — NO WORK WITHOUT A RECORDED SEARCH (owner directive, 2026-11-20)
 
-Before Gate 0, check whether this issue's deliverable already exists in THIS
-repository at the current HEAD. Previous work is not prior art to be excluded;
-it is the first thing to look for.
+Picking an issue is not permission to start. Before the first file edit, post
+exactly one comment that records BOTH searches:
 
-1. Record the HEAD SHA: `git rev-parse HEAD`. The per-family verdicts are in
-   `docs/REPO-STATE-MAP.md`; start there.
-2. Resolve the issue's deliverable path from its body. If the body has no
-   explicit path, derive it from the title using the catalog conventions
-   (`docs/devices/<vendor>/<device>/<family>.md`, `research/soc/<soc>-cpu.md`,
-   `research/drivers/<family>.md`, `research/devices/<device>.md`,
-   `implementations/<component>/`).
-3. If the path exists and is substantive, post
-   `ALREADY-DONE <path> <sha> <evidence>` and close the issue. Evidence is the
-   test command and its result, or the committed analysis with its byte counts.
-4. If the path exists but is a stub (for example a `leverage-families.md` that
-   says "Deep-RE status: none yet"), post `STUB <path> <what is missing>` and
-   scope the work to the missing part only. Never rebuild what exists.
-5. If the path does not exist, post `NO-REPO-WORK <paths checked>` and continue
-   to Gate 0.
+```
+SEARCH <slot>
+repo: <exact commands> -> <paths/shas, or "none">
+web: <exact queries + date> -> <urls, or "none">
+verdict: NEW | DELTA <one line> | DONE <path> <sha>
+```
 
-A component with committed code and a passing self-test is done, even if its
-`[OPEN]` register still lists semantic gaps; those gaps are separate issues,
-not a reason to rewrite the component.
+The repo search covers the WHOLE checkout, not just the obvious directory:
+
+- `git log --all --oneline -- <deliverable path>`
+- `git log -S "<distinctive term>" --oneline`
+- `grep -rn "<distinctive term>" . --include='*.md' --include='*.py' --include='*.c' --include='*.csv'`
+- `docs/REPO-STATE-MAP.md` for the per-family verdict
+
+The web search covers GitHub code (excluding `adineo-cmd/*`), XDA, LWN, HN,
+Reddit, arXiv/Scholar, kernel source and linux-firmware.
+
+Verdicts:
+
+- `DONE` -> post `ALREADY-DONE <path> <sha> <evidence>` and close. Do not work.
+- `DELTA` -> a committed artifact covers part of it; work only the delta and
+  cite the existing path.
+- `NEW` -> nothing exists; proceed.
+
+A deliverable that exists only as a stub (for example a `leverage-families.md`
+that says "Deep-RE status: none yet") is `DELTA`, not `DONE`.
+
+`node src/scripts/check_claims.mjs` fails any claimed issue that has no SEARCH
+comment after its claim. No SEARCH comment, no work; a commit without one is a
+protocol violation.
 
 ## Rule 2b — PRIOR-ART GATE BEFORE ANY WORK (owner directive, 2026-11-20)
 
