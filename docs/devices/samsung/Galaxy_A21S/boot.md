@@ -35,7 +35,7 @@ awk -F, '$1=="Galaxy_A21S" && $4=="boot"{print $6"|"$7"|"$8"|"$13"|"$14}' covera
 
 ## The duplication finding [F]
 
-Every one of the 6 distinct rows appears **exactly twice** with identical `db_path`, `md5` and size — a pure upstream join artifact. Contrast: the same radio+vendor/etc dual-path pattern on Galaxy_A71/F62/Note10_5G carries **single** rows. `recon.md` already documents the upstream DB's duplication pathology in `count.csv`; this extends it to A21S's devices-table rows. The honest census for A21S boot is **6 rows / 101,424,608 distinct bytes**, not 12.
+Every one of the 6 distinct rows appears **exactly twice** with identical `db_path`, `md5` and size — a pure upstream join artifact. Contrast: the same radio+vendor/etc dual-path pattern on Galaxy_A71/F62/Note10_5G carries **single** rows. `recon.md` already documents the upstream DB's duplication pathology in `count.csv`; this extends it to A21S's devices-table rows. The honest census for A21S boot is **6 rows / 101,720,612 distinct bytes**, not 12.
 
 ## Why no Qualcomm bootchain grammar [F]
 
