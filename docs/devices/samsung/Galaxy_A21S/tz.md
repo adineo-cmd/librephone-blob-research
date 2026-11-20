@@ -21,7 +21,7 @@ awk -F, '$1=="Galaxy_A21S" && ($5 ~ /^(tz|keymaster|qsee|cmnlib|hyp|devcfg|uefis
 0
 ```
 
-- 0 of 82 rows match the tz grammar (`tz/keymaster/qsee/cmnlib|hyp|devcfg|uefisecapp|featenabler|hdcp|widevine|soter|smplap`, per `research/soc/per-soc-method-plans.md`) [F].
+- 0 of 82 rows match the tz grammar (`tz/keymaster/qsee/cmnlib/hyp/devcfg/uefisecapp/featenabler/hdcp/widevine/soter/smplap`, per `research/soc/per-soc-method-plans.md`) [F].
 - The 68 `other` rows are vendor peripherals: Exynos audio DSP (abox_tplg, calliope_*, AP*_AUDIO_SLSI), camera (setfile_*, is_lib/is_rta), NFC (sec_s3nrn4v_*), MFC video codec, PLMN tables — no TEE names [F]. A substring fallback (`tee|tz|sehos|tbase|mc`) adds no candidates beyond the camera `fimc`-class false positives excluded in #1030.
 - The all-samsung tz-grammar check (re-verified for #1030): **0 of 914 samsung rows**; the matrix's 4,264 tz rows all sit on non-samsung vendors [F].
 
