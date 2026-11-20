@@ -16,7 +16,7 @@ Inputs: `upstream-contribution/blob-database/coverage-matrix.csv` (33,917 data r
 ## Census evidence — what berlna's radio dir holds
 
 ```
-awk -F, '$1=="Edge_2021" && $13=="motorola/berlna/radio"{print $4|"|$6|"|$7|"|$8}' coverage-matrix.csv
+awk -F, '$1=="Edge_2021" && $13=="motorola/berlna/radio"{print $4"|"$6"|"$7"|"$8}' coverage-matrix.csv
 bt|bluetooth.img|2097152|ff5763bda1ebe0dcd735cd128dae68c4
 boot|boot.img|100663296|c1dacc983d68e078ff56e56ffb71bf3b
 other|dsp.img|67108864|4a82a6560998770cb7961fc37e5f5680
