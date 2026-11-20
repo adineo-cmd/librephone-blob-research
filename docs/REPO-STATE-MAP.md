@@ -68,6 +68,7 @@ work committed, a named delta remains; **NEW** = no committed deliverable.
 | patch-stream section boundary | `research/fleet/patch-stream-structure.md` line 181: "section boundary semantics unknown" | NEW |
 | PIL `B01[40+32*n]` signing | `research/fleet/pil-metadata-sweep.md` | PARTIAL |
 | PIL `.jsn` manifest extension | `research/laptop/qualcomm-pil-manifest-family.md`; `implementations/pil-manifests/` (41 tests) | DONE — only `[OPEN]` list |
+| `media` subfamily (Venus/VPU, 470 rows / 53 devices) | `research/fleet/other-media.md` | DONE — census, container identity 5/5, ISA corrected `EM_XTENSA` not RISC-V, PR-5 withdrawn; `_unsigned` SHA-256 scheme, `venus`≡`cvpss` template `[F]` |
 | `qdsp6sw.mbn` | `research/fleet/qdsp6sw-container.md`; `implementations/hexagon-qdsp6/` (47 tests) | DONE — container, metadata segment, embedded QuRT XML; CLADE byte layout still `[OPEN]` |
 | QSEE PSS blocks | `research/fleet/qsee-crossgen.md` | PARTIAL |
 | Tensor radio-directory inventory | none | NEW |

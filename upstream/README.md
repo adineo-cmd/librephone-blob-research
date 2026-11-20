@@ -659,10 +659,11 @@ Headline: all four PR target texts above re-verified unchanged on
 An **additional** filing package came out of the audit —
 [pr5-corrections-package.md](pr5-corrections-package.md), holding:
 
-- **PR-5** — `docs/other.md`: CAMERA_ICP and vpu20_2v are labeled
-  "Tensilica Xtensa" upstream; the lab's verified census (F-6) shows
-  the historic RISC-V identification (e_machine=94). Not corrected by
-  anyone upstream as of 2026-11-15.
+- **PR-5** — **WITHDRAWN 2026-11-20.** Proposed relabeling
+  `docs/other.md`'s CAMERA_ICP/vpu20 text from "Tensilica Xtensa" to
+  "historic RISC-V (e_machine=94)". That was **wrong**: 94 is
+  `EM_XTENSA`, and 243 is `EM_RISCV`, so the upstream text was already
+  correct. See issue #2058 and `research/fleet/other-media.md`.
 - **PR-6** — `docs/wpss.b01.md` ("ATmega8 embedded") + the wireless.md
   WPSS-section AVR instance: contradicted by the wpss.mdt program
   headers (b01/b02/b03/b05/b06 executable, e_machine=164 EM_HEXAGON).

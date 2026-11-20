@@ -10,7 +10,7 @@ Root: `/home/aditya/.zcode/workspace/draft-6b0eaffc-c308-4302-94d4-244a23b47158/
 | QDSP6 / Hexagon | 94 |
 | AArch64 | 34 |
 | ARM | 31 |
-| RISC-V (old, bespoke) | 12 |
+| Xtensa | 12 |
 | UNKNOWN(1) | 4 |
 | RISC-V | 1 |
 | x86 | 1 |
@@ -638,7 +638,7 @@ Root: `/home/aditya/.zcode/workspace/draft-6b0eaffc-c308-4302-94d4-244a23b47158/
 | `modem/image/winsecap.b08` | 4,184 | - | - | `626d2fc42fa8c1b9` |
 | `modem/image/winsecap.mdt` | 4,752 | ELF | AArch64 | `f036ac9488945929` |
 | `modem/verinfo/ver_info.txt` | 1,233 | - | - | `4aece5b7cf88bd54` |
-| `vendor-firmware/CAMERA_ICP.b00` | 724 | ELF | RISC-V (old, bespoke) | `07c243ac00c980d3` |
+| `vendor-firmware/CAMERA_ICP.b00` | 724 | ELF | Xtensa | `07c243ac00c980d3` |
 | `vendor-firmware/CAMERA_ICP.b01` | 460 | - | - | `eee4e1ad60b4155c` |
 | `vendor-firmware/CAMERA_ICP.b02` | 16 | - | - | `f2b2a73937416bd6` |
 | `vendor-firmware/CAMERA_ICP.b03` | 16 | - | - | `17b5bbea81099aba` |
@@ -659,9 +659,9 @@ Root: `/home/aditya/.zcode/workspace/draft-6b0eaffc-c308-4302-94d4-244a23b47158/
 | `vendor-firmware/CAMERA_ICP.b18` | 21,476 | - | - | `22b099f1ae4254ec` |
 | `vendor-firmware/CAMERA_ICP.b19` | 0 | - | - | `e3b0c44298fc1c14` |
 | `vendor-firmware/CAMERA_ICP.b20` | 4,760 | - | - | `66738fef8093a5c5` |
-| `vendor-firmware/CAMERA_ICP.elf` | 3,306,937 | ELF | RISC-V (old, bespoke) | `a81b0be2c4ae3e53` |
-| `vendor-firmware/CAMERA_ICP.mbn` | 516,760 | ELF | RISC-V (old, bespoke) | `5f7dc5f898b131bf` |
-| `vendor-firmware/CAMERA_ICP.mdt` | 5,484 | ELF | RISC-V (old, bespoke) | `ececfa745874707f` |
+| `vendor-firmware/CAMERA_ICP.elf` | 3,306,937 | ELF | Xtensa | `a81b0be2c4ae3e53` |
+| `vendor-firmware/CAMERA_ICP.mbn` | 516,760 | ELF | Xtensa | `5f7dc5f898b131bf` |
+| `vendor-firmware/CAMERA_ICP.mdt` | 5,484 | ELF | Xtensa | `ececfa745874707f` |
 | `vendor-firmware/CAMERA_ICP_170.elf` | 4,179,544 | ELF | ARM | `60e1cdad7f057d18` |
 | `vendor-firmware/EPH86XX_fw.bin` | 206,490 | - | - | `b819b8196dec7b60` |
 | `vendor-firmware/aw882xx_acf.bin` | 4,328 | - | - | `af723973655ba590` |
@@ -683,14 +683,14 @@ Root: `/home/aditya/.zcode/workspace/draft-6b0eaffc-c308-4302-94d4-244a23b47158/
 | `vendor-firmware/haptic_rtp_osc_24K_5s.bin` | 120,000 | - | - | `9a413b131ecf0ccf` |
 | `vendor-firmware/haptic_rtp_silk.bin` | 1,444,518 | - | - | `75363c03e626fa05` |
 | `vendor-firmware/sec_s3nrn4v_firmware.bin` | 184,620 | - | - | `407a4d07e712397d` |
-| `vendor-firmware/vpu20_2v.mbn` | 2,036,328 | ELF | RISC-V (old, bespoke) | `55fb10137f18d9b6` |
-| `vendor-firmware/vpu20_2v_unsigned.mbn` | 2,029,140 | ELF | RISC-V (old, bespoke) | `d66a3a5e8d156e22` |
-| `vendor-firmware/vpu20_4v.mbn` | 2,036,328 | ELF | RISC-V (old, bespoke) | `1d0a2d3c4530fd91` |
-| `vendor-firmware/vpu20_4v_unsigned.mbn` | 2,027,972 | ELF | RISC-V (old, bespoke) | `2780a0b1150b8ffb` |
-| `vendor-firmware/vpu30_2v.mbn` | 2,331,336 | ELF | RISC-V (old, bespoke) | `4b613a9c89aa08ba` |
-| `vendor-firmware/vpu30_2v_unsigned.mbn` | 2,324,688 | ELF | RISC-V (old, bespoke) | `0f2d8afd27edea8f` |
-| `vendor-firmware/vpu33_4v.mbn` | 2,339,528 | ELF | RISC-V (old, bespoke) | `d08ed8d6c5ae92f8` |
-| `vendor-firmware/vpu33_4v_unsigned.mbn` | 2,331,216 | ELF | RISC-V (old, bespoke) | `2b5f003daf3c5cae` |
+| `vendor-firmware/vpu20_2v.mbn` | 2,036,328 | ELF | Xtensa | `55fb10137f18d9b6` |
+| `vendor-firmware/vpu20_2v_unsigned.mbn` | 2,029,140 | ELF | Xtensa | `d66a3a5e8d156e22` |
+| `vendor-firmware/vpu20_4v.mbn` | 2,036,328 | ELF | Xtensa | `1d0a2d3c4530fd91` |
+| `vendor-firmware/vpu20_4v_unsigned.mbn` | 2,027,972 | ELF | Xtensa | `2780a0b1150b8ffb` |
+| `vendor-firmware/vpu30_2v.mbn` | 2,331,336 | ELF | Xtensa | `4b613a9c89aa08ba` |
+| `vendor-firmware/vpu30_2v_unsigned.mbn` | 2,324,688 | ELF | Xtensa | `0f2d8afd27edea8f` |
+| `vendor-firmware/vpu33_4v.mbn` | 2,339,528 | ELF | Xtensa | `d08ed8d6c5ae92f8` |
+| `vendor-firmware/vpu33_4v_unsigned.mbn` | 2,331,216 | ELF | Xtensa | `2b5f003daf3c5cae` |
 | `vendor-firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini` | 0 | - | - | `e3b0c44298fc1c14` |
 | `vendor-firmware/wlan/qca_cld/qca6750/WCNSS_qcom_cfg.ini` | 0 | - | - | `e3b0c44298fc1c14` |
 | `vendor-firmware/wlan/qca_cld/qca6750/wlan_mac.bin` | 0 | - | - | `e3b0c44298fc1c14` |

@@ -44,16 +44,20 @@ Proposed replacement:
 > architecture identification should use the program segment's headers +
 > entry-point sanity, not segment headers.
 
-Also suggested: a new short doc `docs/fp6-riscv-cores.md` documenting the
-same finding for the camera ICP and VPUs (see our full write-up:
-https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/fp6-architecture-census.md):
+Also suggested: a new short doc documenting the camera ICP and VPUs. The
+architecture label must be **Xtensa**, not RISC-V — see
+https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/fp6-architecture-census.md
+and issue #2058:
 
 > The camera ICP firmware (`CAMERA_ICP.mbn/.elf/.mdt`,
 > `CICP.FW.7.0-00021`) and all VPU firmware (`vpu20/30/33_*.mbn`) on FP6
-> are ELF32 with `e_machine=94` — the historic RISC-V machine value used
-> by early toolchains (243 was assigned later). Public Qualcomm
-> documentation does not state the ICP/VPU ISA; this appears to be the
-> first public identification of these cores as RISC-V.
+> are ELF32 with `e_machine=94`, i.e. **`EM_XTENSA`** (Tensilica Xtensa
+> Architecture). `EM_RISCV` is 243, and 225–242 are reserved, so 94 was
+> never a RISC-V value. `drivers/media/platform/qcom/venus/firmware.c`
+> selects `WRAPPER_TZ_XTSS_SW_RESET` for IRIS2/IRIS2_1 parts and
+> `WRAPPER_A9SS_SW_RESET` ("Bring ARM9 out of reset") for earlier ones,
+> i.e. the core went ARM9 → Xtensa. Upstream `docs/other.md` already says
+> "Tensilica Xtensa" and is correct.
 
 ## Why upstream wants this
 

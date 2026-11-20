@@ -117,7 +117,7 @@ comment before touching its files. The catalog is
 | Vendor | Finding |
 | --- | --- |
 | Qualcomm | The WCN6750 WiFi core is **32-bit RISC-V** — upstream Linux had labelled it an 8-bit AVR. |
-| Qualcomm | The camera ICP and all video-processor firmware are RISC-V; the Bluetooth cores are ARM Thumb; TrustZone is monolithic AArch64. |
+| Qualcomm | The camera ICP and all video-processor firmware are **Tensilica Xtensa** (`e_machine=94`); the Bluetooth cores are ARM Thumb; TrustZone is monolithic AArch64. |
 | MediaTek | The tinysys/scp core is **ARM Cortex-M4F running FreeRTOS**, not RISC-V. |
 | MediaTek | The camera CCU is **Synopsys ARCv2** (two ARC EM4-FPU cores) — first binary-level identification on a production device. |
 | MediaTek | The modem entry is MIPS32 LE with MIPS16e islands, which overturns the nanoMIPS attribution that belongs to later Dimensity silicon. |

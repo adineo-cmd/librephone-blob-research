@@ -33,16 +33,42 @@ interpretation + family census; F-5/F-7/F-20/F-22 likewise).
 
 ---
 
-## PR-5 — docs/other.md: CAMERA_ICP and vpu20_2v are RISC-V, not Xtensa
+## PR-5 — **WITHDRAWN**: docs/other.md is correct, CAMERA_ICP and vpu20_2v *are* Xtensa
 
-- **Target file:** `docs/other.md` (the `## Camera` and `## Trusted
-  Computing Platform` sections)
-- **Branch:** `docs/other-icp-vpu-isa`
-- **Commit title:** `Correct CAMERA_ICP and vpu20_2v ISA descriptions`
-- **PR title:** `docs/other.md: camera ICP and VPU firmware are RISC-V (historic e_machine 94), not Xtensa`
-- **Depends on:** none
+**Status: do not file. Superseded 2026-11-20 by issue #2058.**
 
-Current upstream text being corrected (verified 2026-11-15):
+This package originally proposed "correcting" upstream `docs/other.md` from
+"Tensilica Xtensa" to RISC-V, on the reasoning that `e_machine = 94` is
+"the historic RISC-V value used by early toolchains (EM_RISCV=243 was
+assigned later)". **That reasoning is false and the PR would have introduced an
+error into a document that was right.**
+
+- `e_machine = 94` is **`EM_XTENSA`** (Tensilica Xtensa Architecture). The
+  value is unchanged in `/usr/include/elf.h:251`, the ELF gABI registry,
+  Linux `include/uapi/linux/elf-em.h` and LLVM `BinaryFormat/ELF.def`.
+- `EM_RISCV` is **243**, and the gABI registry reserves **225–242** for future
+  use — so 243 is the first number RISC-V could legally take. 94 was never a
+  RISC-V value at any point in its history.
+- glibc 2.3.2 (2002) already defined `EM_XTENSA 94`, eight years before
+  RISC-V was designed.
+- `drivers/media/platform/qcom/venus/firmware.c` independently selects
+  `WRAPPER_TZ_XTSS_SW_RESET` ("Bring XTSS out of reset") for IRIS2/IRIS2_1
+  parts and `WRAPPER_A9SS_SW_RESET` ("Bring ARM9 out of reset") for earlier
+  ones — the core changed ARM9 → Xtensa, not to RISC-V.
+- LibrePhone's existing text ("Tensilica Xtensa certificates", "Xtensa 32 Bit
+  executable with certs for Trusted Boot") is **correct as written**.
+
+**What survives from this PR-5 investigation**, and is worth filing separately:
+
+The per-segment `.bXX` method note below is correct and useful, and the
+`docs/other.md` "certificates" description is accurate. The only defensible
+change to upstream text would be additive detail (version string, platform
+names, program-header count), not an ISA correction.
+
+Full analysis and measurements: issue #2058,
+`research/fleet/other-media.md`.
+
+**Superseded upstream text (verified 2026-11-15, now confirmed correct):**
 
 > * CAMERA_ICP.b\[0-9\]\[0-9\]
 > 	* Tensilica Xtensa certificates
@@ -51,60 +77,6 @@ Current upstream text being corrected (verified 2026-11-15):
 
 > * vpu20_2v.mbn
 > 	* Xtensa 32 Bit executable with certs for Trusted Boot
-
-**PR description (paste-ready):**
-
-```
-Two ISA corrections in docs/other.md, from static analysis of the
-public LineageOS FP6 nightly (lineage-23.2-20261109):
-
-- The camera ICP firmware family (CAMERA_ICP.mbn/.elf/.mdt and its
-  .bXX payload segments) is not Xtensa: CAMERA_ICP.mbn is ELF32 with
-  e_machine = 94, the historic RISC-V value used by early toolchains
-  (EM_RISCV=243 was assigned later). Version CICP.FW.7.0-00021, with
-  platform strings CAMERA_640_V1 ("Mimas") and CAMERA_740_V1 ("Skye").
-- The VPU firmware family (vpu20_2v.mbn, vpu20_4v.mbn, vpu30_2v.mbn,
-  vpu33_4v.mbn and the _unsigned variants) is the same historic
-  RISC-V identification, e_machine = 94.
-
-Method note (the same one already recorded in docs/wireless.md's
-Current Research section): the per-segment .bXX files carry junk ELF
-headers (zeros, even x86=3 on wpss.b08), so the family ISA comes from
-the .mdt/.mbn headers plus entry-point sanity, not from the segment
-files. The "certificates" part of the existing text is correct — the
-MBN images carry the usual X.509 signing chain — only the processor
-label changes.
-
-The e_machine=94 raw values for these files have been publicly visible
-in enumeration dumps since 2026-10-08; what is new here is the
-interpretation (94 = early RISC-V) and the family census. Public
-Qualcomm documentation does not state the ICP/VPU ISA; kernel sources
-name the devices but not the cores.
-
-Census write-up with the full evidence chain:
-https://github.com/adineo-cmd/librephone-blob-research/blob/main/qualcomm-fp6/docs/fp6-architecture-census.md
-```
-
-**Doc change (paste-ready):**
-
-In `## Camera`, replace the two description lines with:
-
-```markdown
-* CAMERA_ICP.b\[0-9\]\[0-9\]
-	* payload segments of the camera ICP firmware (segment headers carry
-	junk e_machine values — see the wireless.md method note)
-* CAMERA_ICP.mbn
-	* ELF32, e_machine = 94 (historic RISC-V; 243 was assigned later),
-	version CICP.FW.7.0-00021, platforms "Mimas" / "Skye"
-```
-
-In `## Trusted Computing Platform`, replace the vpu line with:
-
-```markdown
-* vpu20_2v.mbn
-	* ELF32, e_machine = 94 (historic RISC-V) with certs for Trusted
-	Boot; same family as vpu20_4v, vpu30_2v, vpu33_4v
-```
 
 ---
 

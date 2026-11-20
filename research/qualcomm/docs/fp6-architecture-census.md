@@ -2,11 +2,12 @@
 
 **Claim:** The WCN6750 wpss firmware runs on a **32-bit RISC-V** core (not the
 "8-bit ATMel AVR" upstream guessed); Qualcomm's camera-ICP and all VPU
-firmware on this device are also RISC-V, built with a toolchain using the
-historic `e_machine=94` ID; and per-segment `.bXX` ELF headers carry
-untrustworthy `e_machine` values, which breaks naive automated corpus
-classification. **None of this is documented anywhere public** (checked:
-GitHub code search, ath11k docs, SRLabs 2025, LWN, XDA — 2026-11-09).
+firmware on this device carry `e_machine=94`, which is **`EM_XTENSA`** — the
+Tensilica Xtensa architecture, *not* RISC-V; and per-segment `.bXX` ELF
+headers carry untrustworthy `e_machine` values, which breaks naive automated
+corpus classification. The wpss finding is not documented anywhere public
+(checked: GitHub code search, ath11k docs, SRLabs 2025, LWN, XDA — 2026-11-09);
+the ICP/VPU architecture was already published by LibrePhone as Xtensa.
 
 **Prior art checked:** upstream `docs/wireless.md` (unverified AVR/RISCV32
 guess); [SRLabs Hexagon fuzzing](https://srlabs.de/blog/hexagon-fuzz-full-system-emulated-fuzzing-of-qualcomm-basebands)
@@ -32,7 +33,7 @@ content). All scripts in `tools/`, census in `results/census.md`.
 | Hexagon (164) | 94 | modem.b*, adsp.*, cdsp.*, ipa_fws, GPU zap shaders |
 | AArch64 (183) | 34 | hdcp, soter64, smplap64, evautil64 (modem/image) |
 | ARM (40) | 31 | bdwlan board-data ELFs (60,000 B each), CAMERA_ICP_170.elf |
-| RISC-V historic (94) | 12 | **CAMERA_ICP.mbn/.elf/.mdt, vpu20/30/33_*.mbn** |
+| Xtensa (94, `EM_XTENSA`) | 12 | **CAMERA_ICP.mbn/.elf/.mdt, vpu20/30/33_*.mbn** |
 | RISC-V (243) | 1 | **modem/image/qca6750/wpss.b07** |
 | x86 (3, header junk) | 1 | qca6750/wpss.b08 (data segment, bogus header) |
 
@@ -51,12 +52,17 @@ content). All scripts in `tools/`, census in `results/census.md`.
 
 - `CAMERA_ICP.mbn/.elf/.mdt`, `CAMERA_ICP_170.elf`, `vpu20_2v/4v.mbn`,
   `vpu30_2v.mbn`, `vpu33_4v.mbn` (+ `_unsigned` variants) — ELF32,
-  **e_machine=94**, the historic RISC-V value used by early toolchains
-  (243 was assigned later). ICP version: `CICP.FW.7.0-00021` (CRM), platform
+  **e_machine=94**, i.e. **`EM_XTENSA`** (Tensilica Xtensa Architecture;
+  `EM_RISCV` is 243 and 225–242 are reserved, so 94 was never a RISC-V
+  value). ICP version: `CICP.FW.7.0-00021` (CRM), platform
   strings `CAMERA_640_V1 (Mimas)`, `CAMERA_740_V1 (Skye)`.
-- Public Qualcomm documentation does not state the ICP/VPU ISA; kernel
-  sources name the devices but not the cores. This appears to be the first
-  public identification of FP6 ICP/VPU firmware as RISC-V.
+- Upstream `drivers/media/platform/qcom/venus/firmware.c` names the two
+  cores its reset path selects: `WRAPPER_TZ_XTSS_SW_RESET` ("Bring XTSS
+  out of reset") for IRIS2/IRIS2_1 and `WRAPPER_A9SS_SW_RESET` ("Bring
+  ARM9 out of reset") for earlier parts. XTSS is consistent with an Xtensa
+  subsystem, and the `e_machine=94` headers agree. LibrePhone
+  `docs/other.md` had already recorded `vpu20_2v.mbn` as "Xtensa 32 Bit
+  executable" — that description is correct and is retained here.
 
 ## Implications
 
