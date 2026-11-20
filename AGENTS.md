@@ -160,6 +160,11 @@ Do not leave completed work sitting only in a local commit.
   never push directly to `main`.
 - If a push is rejected, fetch, rebase, re-run the verification commands, and
   push again. Report the final remote SHA in the `DONE` comment.
+- Stage explicit paths only. NEVER run `git add -A` or `git add .` in a shared
+  worktree: another agent's in-progress files will be swept into your commit.
+  Use `git add <path> [<path>...]` and confirm with `git diff --cached --stat`
+  before committing. A commit that contains files outside your issue is a
+  protocol violation and must be reported, not silently kept.
 - A completed issue with no corresponding remote commit is not done.
 
 This supersedes the earlier "commit locally, the lead pushes" rule. That rule is
