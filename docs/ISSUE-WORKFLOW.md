@@ -54,7 +54,8 @@ Then pick another issue. One agent holds one issue at a time in this repo.
 
 Previous work is not prior art to exclude; it is the first place to look.
 
-1. Record `git rev-parse HEAD`.
+1. Record `git rev-parse HEAD`. The per-family verdicts are in
+   `docs/REPO-STATE-MAP.md`; start there.
 2. Resolve the deliverable path from the issue body, or derive it from the
    title conventions (`docs/devices/<vendor>/<device>/<family>.md`,
    `research/soc/<soc>-cpu.md`, `research/drivers/<family>.md`,

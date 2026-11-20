@@ -96,7 +96,8 @@ Before Gate 0, check whether this issue's deliverable already exists in THIS
 repository at the current HEAD. Previous work is not prior art to be excluded;
 it is the first thing to look for.
 
-1. Record the HEAD SHA: `git rev-parse HEAD`.
+1. Record the HEAD SHA: `git rev-parse HEAD`. The per-family verdicts are in
+   `docs/REPO-STATE-MAP.md`; start there.
 2. Resolve the issue's deliverable path from its body. If the body has no
    explicit path, derive it from the title using the catalog conventions
    (`docs/devices/<vendor>/<device>/<family>.md`, `research/soc/<soc>-cpu.md`,
