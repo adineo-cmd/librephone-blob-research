@@ -56,25 +56,39 @@ violation. The lead verifies by reading issue comments and may revert or
 reassign violating commits. Two agents on one issue is always a violation,
 never a collaboration.
 
-Claims have a race window, so work is also partitioned by label. An agent may
-only start issues whose `area:` label is assigned to its harness:
+Claims have a race window, so ownership is also partitioned deterministically
+by **issue number**, not by `area:` label:
 
-| slot | owns `area:` labels |
+```
+shard(issue) = issue_number % 6
+```
+
+| shard | owner |
 |---|---|
-| OC-1 (opencode key 1) | `soc`, `historic` |
-| OC-2 (opencode key 2) | `triage`, `upstream` |
-| OC-3 (opencode provider 3) | `tools` |
-| OC-4 (opencode provider 4) | `docs`, `site`, `repo` |
-| ZC-1 (zcode GLM-5.3) | `firmware` |
-| ZC-2 (zcode GLM-5.3) | `blobs`, `drivers`, `cpu`, `gpu` |
+| 0 | OC-1 (opencode key 1) |
+| 1 | OC-2 (opencode key 2) |
+| 2 | OC-3 (opencode provider 3) |
+| 3 | OC-4 (opencode provider 4) |
+| 4 | ZC-1 (zcode GLM-5.3) |
+| 5 | ZC-2 (zcode GLM-5.3) |
 
-Full effort-balanced contract: `docs/ISSUE-ASSIGNMENT.md`.
+An agent may only start an open issue in its own shard. `area:` labels are
+descriptive only and grant no ownership. Every shard carries the same mix of
+firmware, blobs, SoC, driver, CPU/GPU, docs and clean-room work, so no provider
+is left with only trivia and no provider owns an area exclusively.
 
-The full assignment contract is `docs/ISSUE-ASSIGNMENT.md`.
+The lead moves ownership with a single comment on #379:
 
-The partition is the primary guard; the `CLAIM` comment is the secondary one.
-If a partition owner is idle, it may take from another partition only after
-claiming that issue and confirming no competing claim exists.
+```
+SHARD-REASSIGN <shard> -> <slot>[,<slot>...]
+```
+
+That is the only way a shard changes hands; it needs no relabelling and no
+per-issue edits. A claim has a 4-hour lease refreshed by any comment from the
+claimant; an expired claim is revoked by the lead with
+`REVOKE <slot> <issue#> <reason>` and the issue returns to its shard pool.
+
+Full contract: `docs/ISSUE-ASSIGNMENT.md`.
 
 ## Rule 2b — PRIOR-ART GATE BEFORE ANY WORK (owner directive, 2026-11-20)
 

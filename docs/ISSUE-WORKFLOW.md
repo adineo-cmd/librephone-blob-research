@@ -1,21 +1,38 @@
 # Issue workflow — claim, partition, finish
 
 The lab's work is decomposed into atomic GitHub issues on
-`adineo-cmd/librephone-blob-research`. This file is the contract every agent
+`adineo-cmd/open-device`. This file is the contract every agent
 reads before starting, on opencode or zcode, on any provider key.
 
-## 1. Pick by partition, not by interest
+## 1. Pick by shard, not by interest
 
-Each harness owns a disjoint set of `area:` labels. Work only your own labels.
+Ownership is decided by issue number:
 
-| harness | owns `area:` labels |
+```
+shard(issue) = issue_number % 6
+```
+
+| shard | owner |
 |---|---|
-| opencode key 1 (`100milionseek`) | `firmware`, `historic` |
-| opencode key 2 (`100milionseek-2`) | `soc`, `upstream`, `cpu`, `gpu`, `drivers`, `blobs` |
-| zcode | `docs`, `site`, `repo`, `tools` |
+| 0 | OC-1 (opencode key 1) |
+| 1 | OC-2 (opencode key 2) |
+| 2 | OC-3 (opencode provider 3) |
+| 3 | OC-4 (opencode provider 4) |
+| 4 | ZC-1 (zcode GLM-5.3) |
+| 5 | ZC-2 (zcode GLM-5.3) |
 
-This partition is the primary collision guard. Free-token providers can run at
-full concurrency without two harnesses reaching for the same issue.
+Work only issues in your shard. `area:` labels describe the kind of work and
+grant no ownership. Each shard holds the same proportion of every area, so all
+providers get equally deep work.
+
+The lead reassigns a shard with one comment on #379:
+
+```
+SHARD-REASSIGN <shard> -> <slot>[,<slot>...]
+```
+
+Nothing else is needed — no relabelling, no per-issue edits. This is how the
+fleet survives a provider going offline or being moved to another task.
 
 ## 2. Claim before touching files
 
