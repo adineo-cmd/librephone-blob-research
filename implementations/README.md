@@ -29,8 +29,21 @@ component carries a clean-room statement header and a self-test.
 | [wifi-cpp-fleet](wifi-cpp-fleet/) | public `msm_cpp.c`/`msm_cpp.h` (GPL-2.0-only, LineageOS msm8953 @ lineage-21) + userspace `cpp_hardware.c` — `cpp_firmware_vN_N_N.fw` fixed-window images | unittest suite passing (88 tests); **not WiFi** — MSM Camera Post-Processing microcode; version = `0x1000\|BCD(minor)` u16, not ASCII |
 | [big-clusters](big-clusters/) | metadata + public partition/fstab sources — largest sharing clusters | `vm-bootsys.img` = Qualcomm Trusted VM image (analysis only, no suite) |
 
-Build: `gcc -std=c99 -Wall -Wextra -O2 -o test <comp>/test_*.c <comp>/*.c` (each
-test binary self-validates and exits non-zero on any failure). The Python
+Build (C components): `cd <comp> && gcc -std=c99 -Wall -Wextra -O2 -o test
+test_*.c $(ls *.c | grep -v '^test_') && ./test` — the non-test sources must be
+listed explicitly, otherwise `*.c` includes the test file twice and the linker
+fails on a duplicate `main`. Each test binary self-validates and exits non-zero
+on any failure.
+
+Python components need their synthetic fixtures materialised first:
+
+```
+cd <comp> && python3 -I make_fixture.py && python3 -I test_*.py
+```
+
+Without that step a fresh clone reports `FileNotFoundError` on
+`fixtures/*_synthetic.bin`, because every payload extension is gitignored. This
+is a bootstrap gap, not a code failure. The Python
 components (`qca-bt`, `qca-bt-gen2`, `adsp-fleet`, `adreno-fleet`,
 `adreno650`, `adreno650-fleet`, `data-blob-fleet`, `pil-manifests`, `hbt-fleet`,
 `wifi-cpp-fleet`, the `mediatek/*` trio) are stdlib-only;
