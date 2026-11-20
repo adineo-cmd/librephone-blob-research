@@ -10,9 +10,9 @@ Each harness owns a disjoint set of `area:` labels. Work only your own labels.
 
 | harness | owns `area:` labels |
 |---|---|
-| opencode key 1 (`100milionseek`) | `firmware`, `historic`, `blobs` |
-| opencode key 2 (`100milionseek-2`) | `soc`, `upstream`, `cpu`, `gpu`, `drivers` |
-| zcode | `docs`, `site`, `blobs`, `repo`, `tools` |
+| opencode key 1 (`100milionseek`) | `firmware`, `historic` |
+| opencode key 2 (`100milionseek-2`) | `soc`, `upstream`, `cpu`, `gpu`, `drivers`, `blobs` |
+| zcode | `docs`, `site`, `repo`, `tools` |
 
 This partition is the primary collision guard. Free-token providers can run at
 full concurrency without two harnesses reaching for the same issue.

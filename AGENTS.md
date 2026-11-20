@@ -61,9 +61,9 @@ only start issues whose `area:` label is assigned to its harness:
 
 | harness | owns `area:` labels |
 |---|---|
-| opencode key 1 (`100milionseek`) | `firmware`, `historic`, `blobs` |
-| opencode key 2 (`100milionseek-2`) | `soc`, `upstream`, `cpu`, `gpu`, `drivers` |
-| zcode | `docs`, `site`, `blobs`, `repo`, `tools` |
+| opencode key 1 (`100milionseek`) | `firmware`, `historic` |
+| opencode key 2 (`100milionseek-2`) | `soc`, `upstream`, `cpu`, `gpu`, `drivers`, `blobs` |
+| zcode | `docs`, `site`, `repo`, `tools` |
 
 The partition is the primary guard; the `CLAIM` comment is the secondary one.
 If a partition owner is idle, it may take from another partition only after
