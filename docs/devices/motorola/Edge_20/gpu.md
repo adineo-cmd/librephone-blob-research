@@ -32,7 +32,7 @@ Missing for mainline (set difference from #2030 §3): `a660_sqe.fw`, `a660_gmu.b
 
 | md5 | file | devices sharing it byte-identically |
 |---|---|---|
-| `252630742d895255d66b5be984bdabda` | `sequence_manifest.bin` | **25** — every SM7325/SM7325-AE-class Moto Edge + G-family device, FP5, Moto G200, OnePlus 9/9 Pro/9RT, Nothing Phone 1, Nord CE2/CE3/200, Realme 9/10 Pro, Xperia 10 IV/V and 5 III, G Stylus 5G-2 |
+| `252630742d895255d66b5be984bdabda` | `sequence_manifest.bin` | **25** — the Moto Edge + G fleet, FP5, Moto G200, OnePlus 9/9 Pro/9RT, Nothing Phone 1, Nord CE2/CE3/200, Realme 9/10 Pro, Xperia 10 IV/V and 5 III, G Stylus 5G-2 — spanning SM7325, SM8350 and SM6375 SoC classes |
 | `9e23c52057bb573dee9ba31f1fdba4fa` | `a619_gmu.bin` | **26 rows under two filenames** — 24 as `a619_gmu.bin` (same fleet plus Pixel 4A_5G/5/5A, Xperia 1 II/5 II/5 III) and 2 as `a618_gmu.bin` (Galaxy_A71, Mi_A3): the corpus's a618/a619 GMU "files" are one byte-identical build shipped under two names |
 | `21693ef6f2d686ce79ebb3716a099970` | `a630_sqe.fw` | **19** — the 32,456-B gen-2 SQE build (Edge_2021/30/30_Fusion/30_Neo, Moto G200/34_5G/5G-2024/82_5G/84_5G, Nord CE2/CE3/CE4, Realme 9/10 Pro, Xperia 10 IV/V, Xperia 5 III, G Stylus 5G-2) |
 | `222f87861803bae8de24f0eb28bfc0d2` | `a615_zap.mdt` | **5** — Edge_20, Edge_2021, Edge_30, Edge_30_Fusion, Moto_G200 |

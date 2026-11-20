@@ -39,14 +39,17 @@ The census's five berlna radio rows are precisely that pair plus the boot/dtbo/v
 
 ## Sibling proof that the family exists on this hardware generation
 
-`android_device_motorola_rhodep` (Edge 30 Neo — same 2021 Moto generation, SM7325-AE) lineage-22.2 `proprietary-firmware.txt` lists **17** firmware images from its factory release, including:
+Two independent sibling lines, both corrected for identity against the LineageOS wiki (fetched 2026-11-20):
+
+1. **Same SoC class, same vendor, corpus-attested**: Edge_30 (dubai, SM7325-AE Snapdragon 778G+ — the closest sibling to berlna's SM7325) carries **77 tz-family rows** in this corpus (tz.img, hyp.img, keymaster.img, uefisecapp.img, devcfg.img + 8 PIL-split TZ apps — see `docs/devices/motorola/Edge_30/tz.md`). Moto ships the full TEE set on the SM7325 generation.
+2. **Extract-list corroboration on other Moto hardware**: `android_device_motorola_rhodep` (Moto G82 5G, SM6375 Snapdragon 695 — rhodep is *not* the Edge 30 Neo; that codename is `miami`) lineage-22.2 `proprietary-firmware.txt` lists **17** firmware images from its factory release, including:
 
 ```
 tz.mbn:tz.img;AB   devcfg.mbn:devcfg.img;AB   hyp.mbn:hyp.img;AB
 keymaster.mbn:keymaster.img;AB   uefi_sec.mbn:uefisecapp.img;AB
 ```
 
-and the corpus agrees: Edge_30_Neo carries **50 tz-family rows** (tz.img, devcfg.img, hyp.img, keymaster.img, uefisecapp.img, featenabler*, dxhdcp2*, hdcpsrm*, soter64, loadalgota64*) under `motorola/miami/radio` + `motorola/miami/modem/image`. Moto ships the tz family on every SM7325-class device whose census source extracts the boot chain; berlna's source doesn't. (Census-quality note, RULE 1: Edge_30_Neo's rows sit under the `motorola/miami` path — `miami` is the Edge 30 codename, not rhodep — an upstream path/family-sharing quirk worth a lead-level review; recorded here, not edited in the shared stream.)
+and the corpus agrees: Edge_30_Neo (miami, SM6375) carries **50 tz-family rows** under `motorola/miami/radio` + `motorola/miami/modem/image`. Moto ships the tz family on every device whose census source extracts the boot chain; berlna's source doesn't.
 
 ## The lab's tz grammar — in-repo context
 
@@ -57,6 +60,7 @@ The repo's tz RE artifacts (`research/fleet/dsp-tz-map.md` — QSEE ELF64 segmen
 - **On-device presence of tz.img/devcfg/hyp/keymaster/uefisecapp on berlna's factory image is expected but unverified** — no public extract list for berlna includes them (its LineageOS extract has 2 entries), and the factory flashfile partition list was not retrievable from public mirrors this session (mirror listing denied). [OPEN]
 - Sizes/md5s of the expected berlna TEE images are unknown until such a list or payload lands — no numbers can be honestly stated for files that no public source enumerates.
 - The `uefi_sec.mbn`→`uefisecapp.img` naming on rhodep confirms the corpus's `uefisecapp` grammar name; berlna would use the same Qualcomm build shape if present. Inference, not fact — [OPEN].
+- Correction history (2026-11-20, Rule 1): an earlier revision of this doc called rhodep "Edge 30 Neo, SM7325-AE" — wrong on both counts (rhodep = Moto G82 5G, SM6375; Edge 30 Neo = miami). Corrected here after verifying the LineageOS wiki device pages; the sibling argument now rests on dubai (same SM7325 class, 77 tz rows) plus the rhodep extract as a Moto-wide naming corroboration.
 
 ## What would upgrade this finding
 

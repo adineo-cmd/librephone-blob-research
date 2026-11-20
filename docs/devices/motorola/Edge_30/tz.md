@@ -3,14 +3,14 @@
 Analysis date: 2026-11-20. Analyst: ZC-1 (issue [#940](https://github.com/adineo-cmd/open-device/issues/940)).
 Inputs: `upstream-contribution/blob-database/coverage-matrix.csv` (33,917 data rows, feat/open-device-site 847135c), `research/fleet/dsp-tz-map.md` + `research/fleet/qsee-crossgen.md` (in-repo QSEE method), torvalds/linux code search (2026-11-20). Evidence classes: [F] fact (command output) / [I] inference (labeled). No payloads fetched.
 
-**Verdict: the tz family is PRESENT and structurally complete for an SM7250 device** — 77 rows, 16,213,083 B: the 5 boot-chain TEE images at radio (tz, hyp, keymaster, uefisecapp, devcfg) plus 8 nine-row PIL-split TrustZone applications (mdt + b00..b07) on the modem path. Every checked md5 is corpus-unique (per-build signed); sizes are partition magnitudes shared across the Moto fleet.
+**Verdict: the tz family is PRESENT and structurally complete for an SM7325-AE device** — 77 rows, 16,213,083 B: the 5 boot-chain TEE images at radio (tz, hyp, keymaster, uefisecapp, devcfg) plus 8 nine-row PIL-split TrustZone applications (mdt + b00..b07) on the modem path. Every checked md5 is corpus-unique (per-build signed); sizes are partition magnitudes shared across the Moto fleet.
 
 ## Device identity
 
 | fact | value | source |
 |---|---|---|
-| model | Motorola Edge 30; codename `dubai` | `device-inventory.csv` [F] |
-| SoC | Qualcomm SM7250 Snapdragon 765G | device-inventory.csv [F]; mainline SoC support verified for #934 |
+| model | Motorola Edge 30; codename `dubai` | `device-inventory.csv` (`build_codename=dubai`) [F]; [LineageOS wiki](https://wiki.lineageos.org/devices/dubai) (fetched 2026-11-20) [F] |
+| SoC | Qualcomm **SM7325-AE Snapdragon 778G+ 5G** (Adreno 642L) | LineageOS wiki + GSMArena (2026-11-20) [F]. **The upstream DB's SoC cell says "SM7250 Snapdragon 765G" — wrong**; recorded here (Rule 1), the shared matrix stream is lead-owned. See `research/soc/Qualcomm-SM7325-Snapdragon-778G-5G-gpu.md` (#2030) for the SM7325 GPU identity [F] |
 | census scope | 338 rows in 9 families; tz = 77 rows, 16,213,083 B | coverage-matrix.csv [F] |
 
 ## Decomposition [F]
@@ -56,7 +56,7 @@ Structure law [F]: each split set is exactly mdt + b00..b07 (9 rows) — the Qua
 
 ## ISA proof and interface facts
 
-- The matrix's `isa_identified` field is **empty for all 77 dubai tz rows** — honestly un-RE'd per the upstream DB convention (`recon.md`: "Everything else: empty = honestly un-RE'd") [F]. The ELF64 mdt+bXX shape is established for this family by the in-repo QSEE artifacts on other devices, not proven for dubai's payloads. Full segment census needs payloads; the in-repo toolset (`analysis/tools/qsee_tz_map.py`, `qsee_metadata_decode.py` per `qsee-crossgen.md`, currently SDM845/SM8250-scoped) is the ready-made method for an SM7250 pass. [OPEN]
+- The matrix's `isa_identified` field is **empty for all 77 dubai tz rows** — honestly un-RE'd per the upstream DB convention (`recon.md`: "Everything else: empty = honestly un-RE'd") [F]. The ELF64 mdt+bXX shape is established for this family by the in-repo QSEE artifacts on other devices, not proven for dubai's payloads. Full segment census needs payloads; the in-repo toolset (`analysis/tools/qsee_tz_map.py`, `qsee_metadata_decode.py` per `qsee-crossgen.md`, currently SDM845/SM8250-scoped) is the ready-made method for an SM7325 pass. [OPEN]
 - Interface [I, labeled]: QTEE loads via the secure boot chain (XBL→ABL→XBL SEC image loading); keymaster serves KeyMint to Android via QTEE IPC; HDCP apps serve the DPU/HDMI content-protection paths; featenabler gates vendor features. All standard Qualcomm TEE practice, none dubai-verified.
 
 ## Honest negatives
@@ -67,11 +67,11 @@ Structure law [F]: each split set is exactly mdt + b00..b07 (9 rows) — the Qua
 
 ## What would upgrade this finding
 
-1. Payload fetch (LineageOS dubai radio extract): run the QSEE census on tz.img + the 8 split sets → first SM7250 TZ segment map; cross-gen the metadata against `qsee-crossgen.md`'s SDM845/SM8250 tables.
+1. Payload fetch (LineageOS dubai radio extract): run the QSEE census on tz.img + the 8 split sets → first SM7325 TZ segment map; cross-gen the metadata against `qsee-crossgen.md`'s SDM845/SM8250 tables.
 2. Corpus pass: tabulate the 8 split-app components across the 11 same-size tz.img devices to establish fleet build identity (md5 checks here show per-build uniqueness for dubai — check whether siblings share the app splits even when tz.img differs).
 
 ## RULE 0 record (2026-11-20)
 
-Queries in the SEARCH/NO-PRIOR-ART comments. Check: `dubai tz.img keymaster uefisecapp hyp` (GitHub code search, adineo-cmd/* excluded) → guides only; the QSEE method exists in-repo (SDM845/SM8250 scope), no SM7250 artifact. Nobody documents dubai's TEE rows.
+Queries in the SEARCH/NO-PRIOR-ART comments. Check: `dubai tz.img keymaster uefisecapp hyp` (GitHub code search, adineo-cmd/* excluded) → guides only; the QSEE method exists in-repo (SDM845/SM8250 scope), no SM7325 artifact. Nobody documents dubai's TEE rows.
 
 Not legal advice; no proprietary payload accessed or committed — all facts are metadata plus the cited in-repo method.
