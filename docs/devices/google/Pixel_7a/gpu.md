@@ -412,8 +412,26 @@ across all 8 devices, and the fifth is the discriminator.
 
 [F] The firmware's 3/5 split is `{Pixel_8, Pixel_8A, Pixel_8_Pro}` vs
 `{Pixel_9, Pixel_9A, Pixel_9_Pro, Pixel_9_Pro_Fold, Pixel_9_Pro_XL}` — i.e. precisely
-the Pixel 8 family vs the Pixel 9 family. **The `soc` column contradicts that split for
-4 of the 8 devices:**
+the Pixel 8 family vs the Pixel 9 family.
+
+**Scope qualifier, added 2026-11-21 while working #1712 — this split is a property of
+the branch, not of the matrix.** Everything in this section was measured on
+lineage-24.0. On lineage-23.0 — which is what the coverage matrix actually snapshots —
+**all 8 G3/G4 devices are byte-identical and the split does not exist at all**:
+
+```
+matrix per-device md5 signatures: 2 across all 13 Pixel devices
+  sig 1  4887611e fcb33781 acd5ceb0 56b489dd 7d1d546c  -> 5 GS201 devices
+  sig 2  27c9b2b9 10d86c50 f34ea071 02e26e69 23cdc2df  -> 8 G3/G4 devices
+```
+
+[F] So the 3/5 partition below is real but **branch-specific**: any claim about it must
+name the branch, and the matrix alone cannot show it. The `soc` disagreement argued below
+still stands on lineage-24.0, where the partition is observable — but it is not
+observable in the matrix, and I originally wrote it as though it were. See
+`docs/devices/google/Pixel_9/gpu.md` §3 for the full correction.
+
+**The `soc` column contradicts that split for 4 of the 8 devices:**
 
 1. **`Pixel_9_Pro` and `Pixel_9_Pro_Fold` are labelled "Google Tensor G3"** — but their
    firmware is byte-identical to `Pixel_9`, which is labelled G4. A Pixel 9 Pro cannot
