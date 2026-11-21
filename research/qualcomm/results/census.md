@@ -15,6 +15,18 @@ Root: `/home/aditya/.zcode/workspace/draft-6b0eaffc-c308-4302-94d4-244a23b47158/
 | RISC-V | 1 |
 | x86 | 1 |
 
+> **Caveat on the single `x86` entry (added 2026-11-20).** That row is
+> `modem/image/qca6750/wpss.b08`. The label is only the raw `e_machine` value:
+> `3` is `EM_386`. It is **not** evidence of an x86 code body. On two verified
+> WCN6750 builds (`sc7280`, `qcm6490` from linux-firmware) the segment carrying
+> `e_machine=3` has a Cortex-M3 body — `.data` at `0x4ff00000`, 262,144 B, entropy
+> 5.524, and `.strtab` symbols `_binary_padded_pcss_m3_tx_rx_bin_start/_end/_size`.
+> Whether this 275,644 B FP6 blob is the same construct is **unverified**: the
+> extraction tree this census was built from is no longer present on the machine.
+> Treat `x86` here as "an embedded header self-identifies as `EM_386`", not as a
+> host architecture claim. See
+> [`../../fleet/wifi-wpss.md`](../../fleet/wifi-wpss.md) §2.6.
+
 ## Families
 
 | family | files | bytes |
@@ -589,7 +601,7 @@ Root: `/home/aditya/.zcode/workspace/draft-6b0eaffc-c308-4302-94d4-244a23b47158/
 | `modem/image/qca6750/wpss.b05` | 4,096 | - | - | `3ce1105a389f246a` |
 | `modem/image/qca6750/wpss.b06` | 6,074,641 | - | - | `d9fc20c5ff0e4dbd` |
 | `modem/image/qca6750/wpss.b07` | 139,316 | ELF | RISC-V | `68286a283c349845` |
-| `modem/image/qca6750/wpss.b08` | 275,644 | ELF | x86 | `9744c05dd2dd0c42` |
+| `modem/image/qca6750/wpss.b08` | 275,644 | ELF | EM_386 header, Cortex-M3 body | `9744c05dd2dd0c42` |
 | `modem/image/qca6750/wpss.b09` | 360,960 | - | - | `e44e650643694871` |
 | `modem/image/qca6750/wpss.b10` | 909,398 | - | - | `9d88aba17b5f8feb` |
 | `modem/image/qca6750/wpss.b12` | 4,376 | - | - | `57dbe03ba3c5a458` |

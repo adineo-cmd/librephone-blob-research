@@ -148,6 +148,21 @@ every offset (0 diffs), i.e. it *is* the consensus template.
    A second field, u16 LE at abs [408,410) (tag-1 payload [404,406)), takes only
    **3 distinct values** across the fleet — a coarse selector (e.g. region/SKU
    class) `[H]`.
+
+   > **Hypothesis refuted (2026-11-20).** The field is *not* the board id. Measured
+   > on upstream `board-2.bin` bodies: WCN6750's 11 entries (board ids 1…255) give
+   > 10 distinct values and the mapping is not injective — board id 6 and board id
+   > 255 both carry 3,754, while board id 1 carries 59,475. WCN3990 is stronger
+   > still: board id `67` alone carries **6 distinct** values, board id `ff`
+   > carries **16**, and the two generic entries `qmi-board-id=67` and
+   > `qmi-board-id=ff` are **byte-identical**, so one physical body is registered
+   > under two different ids. A field that cannot separate two identically-served
+   > ids is not the id. `u16@408` is a better but still imperfect discriminator
+   > (all 12 `board-id=67` bodies carry 545, but 545 also appears under `ff`).
+   > Board selection is by **filename** (see §10, resolved) and `board-2.bin`
+   > entries are keyed by the `bus=…,qmi-board-id=…` **text string**, not by any
+   > body field. Full measurement and reproduction:
+   > [`wifi-wpss.md`](wifi-wpss.md) §4 and §9.8.
 2. **Minimal-diff pairs prove the template model.** Distinct md5 clusters that
    differ from each other in only a handful of bytes:
    - `107` vs `108`: **2 bytes** (abs 11 and 27, both tag-1 payload)
@@ -224,9 +239,15 @@ No checksum or CRC field identified:
 
 - Decode the tag enumeration 1..17 (needs a Qualcomm BDF tool/spec or firmware
   strings; tag semantics unknown).
-- Confirm the §5 ID field hypothesis against the loader (cnss/firmware board-ID
+- ~~Confirm the §5 ID field hypothesis against the loader (cnss/firmware board-ID
   selection) — the value does not match the filename number directly, so either
-  it is a different namespace or it is not the ID at all.
+  it is a different namespace or it is not the ID at all.~~
+  **Resolved 2026-11-20 — hypothesis refuted, question answered.** The field is not
+  the board id (§5 note above). The loader never reads it: the filename *is* the
+  board id in lowercase hex, per downstream `cnss2/qmi.c` `cnss_get_bdf_file_name()`
+  (`"bdwlan.b" "%02x"`, with `0xFF` → `bdwlan.bin`) and the independent
+  reimplementation `wlfwd`. Confirmed against upstream `.strtab` symbols, which
+  embed the source name as `bdwlan_b<hex>`. See [`wifi-wpss.md`](wifi-wpss.md) §4.
 - Field semantics inside the big IEs (8/9/11/12): record tables A–D have clear
   geometry but unknown field meaning; tag 14's stride-4-per-2-byte pattern
   ([15748,16002), 43 spans) looks like another per-record table.
