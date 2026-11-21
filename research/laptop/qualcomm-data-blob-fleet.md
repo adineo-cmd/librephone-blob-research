@@ -83,9 +83,11 @@ so the 164,480 B cluster is 11 devices confirmed + vermeer unconfirmed
 ## What is still open
 
 - `vermeer`'s second md5 attribution (§ above).
-- Which `dax_param.bin` md5 the `a21s`/`a71`/`f62`/`gta4l*`/`gta4xl*` trees
-  carry — the CSV says `70727b64…`, but those trees returned no
-  `dax_param.bin` hit in this pass.
+- RESOLVED 2026-11-21 (issue #509): `dax_param.bin` md5 `70727b648c00a14bad7ede05ba9b4bd3`
+  (34,736 B) is md5-verified in the public TheMuppets
+  `proprietary_vendor_samsung_gta4xl-common` tree @ lineage-23.2
+  (`proprietary/vendor/firmware/dax_param.bin`) — the `gta4xlwifi` DB row
+  and the 11-device `70727b64…` cluster stand.
 - Header words `706` and `342` in `dax_param.bin`.
 - `BLSG`/`INVM` semantics in the 4CC HRTF container.
 - Which DSP path consumes which `hrtf5c.bin` family.

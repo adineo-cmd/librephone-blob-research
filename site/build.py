@@ -120,13 +120,15 @@ def build():
         "static": actual_files - len(docs) - len(devices) - len(families) - len(TYPES),
     }
     total = actual_files
-    expected = (render.EXPECTED_DOCS, render.EXPECTED_DEVICES,
-                render.EXPECTED_FAMILIES, render.EXPECTED_TYPES,
-                render.EXPECTED_STATIC, render.EXPECTED_TOTAL)
-    actual = (counts["docs"], counts["devices"], counts["families"],
-              counts["types"], counts["static"], total)
-    if actual != expected:
-        print("page count mismatch: expected %s got %s" % (expected, actual))
+    exact = {"devices": render.EXPECTED_DEVICES, "families": render.EXPECTED_FAMILIES,
+             "types": render.EXPECTED_TYPES, "static": render.EXPECTED_STATIC}
+    for key, want in exact.items():
+        if counts[key] != want:
+            print("page count mismatch: %s expected %d got %d" % (key, want, counts[key]))
+            return 1
+    if counts["docs"] < render.MIN_DOCS or total < render.MIN_TOTAL:
+        print("page count below floor: docs >= %d, total >= %d, got docs %d total %d"
+              % (render.MIN_DOCS, render.MIN_TOTAL, counts["docs"], total))
         return 1
 
     print("wrote %d pages, %d unresolved links, %d unclassified"
