@@ -424,11 +424,27 @@ varies is **`e_shnum` (5, 6 or 7)** and the string-table sizes:
 | 6 | + `.noinit` | 1,784 – 1,792 | 10 |
 | 7 | + `.noinit` **+ `.persistent`** | 1,796 – 1,956 | 73 |
 
-**The wrapper is stripped of section names.** `e_shstrndx = 0` on all 129 entries,
-so per the ELF spec no section has a name — yet the last `STRTAB` physically holds
-`.symtab .strtab .shstrtab .data` (or `.noinit` / `.persistent`), and nothing points
-at it. So the section list above is read from a *vestigial* string table; a parser
-must not rely on `e_shstrndx` to name sections here `[F]`.
+**The wrapper's sections are named normally — the opposite of what an earlier draft
+of this document claimed.** `e_shstrndx` is **4, 5 or 6** (tracking `e_shnum`), and on
+all 129 entries it indexes a genuine `SHT_STRTAB` whose contents are
+`\0.symtab\0.strtab\0.shstrtab\0.data\0[.persistent\0][.noinit\0]`. So `.data`,
+`.noinit` and `.persistent` are all resolvable by name through the standard
+mechanism, and a parser should use `e_shstrndx` exactly as the ELF spec says `[F]`.
+
+This corrects a real error: an earlier draft stated "`e_shstrndx = 0` on all 129
+entries, so sections are formally unnamed", reading the value from field index 6 of
+the unpacked header. In an ELF32 `Ehdr` laid out from offset 16, index 6 is
+**`e_flags`** (0 on all 129), not `e_shstrndx`, which is index 12. The `shnum`
+counts were unaffected because index 11 is `e_shnum` — so the decomposition
+arithmetic below always stood — but the "stripped names" conclusion was an artifact
+of that off-by-six field read. Worked example (`qmi-board-id=25`, `e_shnum = 7`):
+
+```
+e_flags 0   e_shstrndx 6   e_shnum 7
+<null>  type 0   .data  type 1 (58,180 B)   .persistent type 1 (0)
+.noinit type 8   .symtab type 2 (288)       .strtab type 3 (149)
+.shstrtab type 3 (53)
+```
 
 The symbols are real, though, and they confirm the naming rule independently. The
 `SYMTAB`'s string table carries `_binary_bdwlan_b19_start/_size/_end` on the entry
@@ -515,8 +531,9 @@ bookkeeping is wrong `[F]`.
 **Consequences for a parser `[I]`:**
 
 1. Strip a leading ARM ELF if present, then parse TLV. A parser that hardcodes one
-   form silently fails on part of the fleet, and `e_shstrndx` is 0 so sections
-   cannot be found by name.
+   form silently fails on part of the fleet. The ELF's own section names *are*
+   trustworthy here (`e_shstrndx` ∈ {4,5,6}, all valid STRTABs), so
+   `.data`/`.noinit`/`.persistent` can be located by name rather than by position.
 2. Do not compute `b → e` size by a constant. The overhead is a six-variable
    function (`e_shnum` plus three string-table sizes, a pad and a tail), observed
    spanning 1,720–1,956 B upstream and 1,656–1,820 B in the fleet (§9.4a).
@@ -971,12 +988,15 @@ for s in (59900,59964,59976):
     for name,data,dt in entries('ath11k_WCN6750_hw1.0_board-2.bin'):
         if dt!=1 or len(data)!=s: continue
         e=struct.unpack_from('<HHIIIIIHHHHHH',data,16)
-        print(s,'e_shstrndx',e[6],[x for x in entries('ath11k_WCN6750_hw1.0_board-2.bin') if x[1]==data][0][0][:46])
+        print(s,'e_shstrndx',e[12],'e_flags',e[6],[x for x in entries('ath11k_WCN6750_hw1.0_board-2.bin') if x[1]==data][0][0][:46])
         break
 PY
 ```
 Output: `entries 129 violations 0 shnum counts {5: 46, 6: 10, 7: 73}`, and
-`e_shstrndx 0` for each sampled size — sections are formally unnamed.
+`e_shstrndx` 6 / 5 / 4 for the 59,976 / 59,964 / 59,900 B samples — each a valid
+`SHT_STRTAB`, so sections **are** named (see §3.3 for the corrected reading; an
+earlier draft printed `e[6]`, which is `e_flags`, and wrongly concluded the
+opposite).
 
 **The `assert` on entry count is not decoration — it is the difference between a
 real result and a plausible wrong one.** Both failure modes produce a *shorter
