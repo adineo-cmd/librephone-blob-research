@@ -106,7 +106,7 @@ identity exact:
 | 7 | 1,176,368 | 1,188,656 | 1,180,464 | 1,180,464 | **1,176,368** |
 | 8 | 0 | 0 | — | — | — |
 
-Command §9.5. Exact-match counts, out of 8 non-zero phdrs:
+Command §9.5b. Exact-match counts, out of 8 non-zero phdrs:
 
 ```
 against sc7280 : Edge_30 4/8, FP5 5/8, Phone_1 6/8
