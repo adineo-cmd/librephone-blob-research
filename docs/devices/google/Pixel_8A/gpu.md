@@ -169,9 +169,17 @@ GEOMETRY: hdr.size = 972,  CONFIG sizes 60 + 60 + 60 + 32 + 24 = 236
 ```
 
 [I] So "Tiler" and "Geometry" are the **same hardware unit under two names**, and the
-rename is visible in the firmware's own descriptor table. This is a small but genuinely
-useful result: it means a parser keyed on the *name string* would break across builds,
-while one keyed on the numeric key id would not.
+rename is visible in the firmware's own descriptor table.
+
+**Correction added after #1712.** My first draft of this section said a parser should key
+CONFIG entries on the "numeric key id" rather than the name string. **That is backwards,
+and I retract it.** The first field is not an identity — it is a **VA (a location inside
+the `0x410000` config IFACE)**, and it *does* move between builds. Across 24 builds,
+`Log verbosity`'s first field takes **13 different values** (`0x4112c4`, `0x4112cc`,
+`0x4112e4`, `0x4112ec`, `0x41131c`, `0x41132c`, `0x4114bc`, `0x4114dc`, `0x4114e4`,
+`0x411504`, `0x411514`, `0x4118a8`, `0x411a98`). The **name string is the stable
+identifier**; the first field is where the entry lives. Verified: every CONFIG first field
+falls inside an IFACE VA range (87/87), and no build has duplicate CONFIG VAs.
 
 ### 3.2 The CONFIG entry size is fully determined — 288/288
 
@@ -182,24 +190,25 @@ size:
 size == 4 + align4(12 + strlen(name) + 1)
 ```
 
-[F] **288 matched, 0 mismatched.** The payload is `u32 key_id; u32 zero; u32 value;
+[F] **288 matched, 0 mismatched.** The payload is `u32 va; u32 zero; u32 value;
 char name[];` NUL-terminated and padded to a 4-byte boundary, and the whole entry
 (including its 4-byte `ehdr`) is that plus 4.
 
 [F] Sample decode from `akita/r49p0`:
 
 ```
-key_id=0x00410000 zero=0 value=7  name="Compute iterator suspend stage skip mask"   size=60
-key_id=0x00410004 zero=0 value=7  name="Fragment iterator suspend stage skip mask"  size=60
-key_id=0x00410008 zero=0 value=7  name="Tiler iterator suspend stage skip mask"     size=56
-key_id=0x00411504 zero=0 value=3  name="Log verbosity"                              size=32
-key_id=0x0041000c zero=0 value=0xffffffff name="WA_CFG0"                            size=24
+va=0x00410000 zero=0 value=7  name="Compute iterator suspend stage skip mask"   size=60
+va=0x00410004 zero=0 value=7  name="Fragment iterator suspend stage skip mask"  size=60
+va=0x00410008 zero=0 value=7  name="Tiler iterator suspend stage skip mask"     size=56
+va=0x00411504 zero=0 value=3  name="Log verbosity"                              size=32
+va=0x0041000c zero=0 value=0xffffffff name="WA_CFG0"                            size=24
 ```
 
 [N, OPEN] `panthor_fw.c` does **not** define a struct for CONFIG entries — it explicitly
 skips them (`/* FIXME: handle those entry types? */`). So the layout above is **my
 reverse-engineering from 288 consistent instances**, not a vendor or kernel statement.
-The size rule is proven; the *meaning* of `key_id` and `value` is not.
+The size rule is proven; the *meaning* of `va` and `value` is not. (`va` is at least
+demonstrably a VA: it always falls inside an IFACE range.)
 
 [N] The `WA_CFG0` entry has `value = 0xffffffff`, which reads as "all workarounds". I did
 not verify that interpretation.
@@ -266,8 +275,9 @@ between two secondary sources*, not a measurement [I].
 3. **`docs/REPO-STATE-MAP.md:18`** still reads "GPU core ID | 27 | PARTIAL | 5 per-SoC GPU
    docs"; the `gpu` family now has two device-level Mali notes in addition to the five
    Adreno SoC notes.
-4. **Any parser of this format should key CONFIG entries on `key_id`, not on the name
-   string** — §3 shows the name changes between builds while the id does not.
+4. **A parser of this format should key CONFIG entries on the name string**, not on the
+   first field — §3 shows the first field is a VA that moves between builds while the
+   name is stable.
 
 ## 8. Reproduce
 
@@ -337,8 +347,9 @@ print('hdr.size uniquely determines schema:', all(len(v)==1 for v in by.values()
 
 1. Read `GPU_ID` on a Pixel 8A and apply `panthor_hw.c:120` — converts §5 from a quoted
    consistency check into a measured fact.
-2. Determine what `key_id` and `value` mean for CONFIG entries — the 288-instance size
-   rule is solid, the semantics are open.
+2. Determine what the CONFIG `va` and `value` fields mean — the 288-instance size rule is
+   solid, the semantics are open. (`va` is proven to be a VA: it always lands inside an
+   IFACE range.)
 3. Check whether the TILER→GEOMETRY rename correlates with a GPU stepping or an ARM
    release, which would make it a build fingerprint.
 
