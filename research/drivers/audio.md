@@ -286,10 +286,17 @@ linux-firmware under `cirrus/` [I].
 5. **No payload bytes were read.** Every fact above comes from the committed
    matrix CSVs and from `torvalds/linux` master source. The corpus itself is
    not publicly fetchable, so no hash was recomputed [F].
-6. **`cs35l41` `.bin` vs `.wmfw` pairing is [I], not [F].** The kernel proves
-   the driver requests both a `.wmfw` and a `.bin` with derived names; that the
-   Android `*-dsp1-spk-prot.bin` is specifically the coeff half of that pair is
-   inferred from the name grammar, not from a byte-level comparison [I].
+6. ~~**`cs35l41` `.bin` vs `.wmfw` pairing is [I], not [F].**~~ **Resolved to
+   [F]** by `research/fleet/other-audio.md` (#2052). The inference from the name
+   grammar is now backed by a size-band measurement against the local
+   linux-firmware corpus: the 25 distinct `.wmfw` payloads span 25,808-41,364 B
+   and the 742 distinct coefficient `.bin` payloads span 948-13,404 B, with
+   **zero overlap** between the two size sets. The matrix's 263 Cirrus
+   `cs35*`/`cs40l2*` rows span 48-8,732 B, of which 228 fall inside the
+   coefficient band and **none** reach the `.wmfw` band. So the Android
+   `*-dsp1-spk-prot.bin` files are coefficient payloads, confirmed by size
+   distribution rather than by name grammar alone [F]. See
+   `research/fleet/other-audio.md` §3.
 
 ## Reproduce
 
