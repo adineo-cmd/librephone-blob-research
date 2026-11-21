@@ -942,7 +942,13 @@ def entries(p):
             dt,dl=struct.unpack_from('<II',b,off)
             out.append((name,b[off+8:off+8+dl],dt))
         pos+=8+n
+    assert pos==len(d),('walk did not consume file',p,pos,len(d))
+    ne=sum(1 for x in out if x[2]==1 and x[1][:4]==b'\x7fELF')
+    assert (len(out),ne)==EXP[p],('stale or truncated container',p,len(out),ne,EXP[p])
+    print(p,'entries',len(out),'elf',ne,'build guard OK')
     return out
+EXP={'ath11k_WCN6750_hw1.0_board-2.bin':(11,11),
+     'ath11k_WCN6855_hw2.0_board-2.bin':(123,118)}
 shn=Counter(); bad=0; tot=0
 for p in ('ath11k_WCN6750_hw1.0_board-2.bin','ath11k_WCN6855_hw2.0_board-2.bin'):
     for name,data,dt in entries(p):
@@ -971,6 +977,26 @@ PY
 ```
 Output: `entries 129 violations 0 shnum counts {5: 46, 6: 10, 7: 73}`, and
 `e_shstrndx 0` for each sampled size — sections are formally unnamed.
+
+**The `assert` on entry count is not decoration — it is the difference between a
+real result and a plausible wrong one.** Both failure modes produce a *shorter
+container that parses cleanly*, so `consumed == len(file)` catches neither:
+
+| failure | symptom | caught by |
+|---|---|---|
+| truncated download | walk ends early, `consumed < len` | `consumed == len` |
+| **stale packaged build** | `consumed == len`, zero remainder, **fewer entries** | entry-count assert **only** |
+
+The second case is the dangerous one. A distro `linux-firmware` package a few
+months behind yields 106 ELF entries from WCN6855 and 10 from WCN6750 — a
+self-consistent container that decomposes with zero violations and reproduces
+every *qualitative* claim while making the *quantitative* ones (129 entries,
+`shnum {5:46, 6:10, 7:73}`) silently wrong. A reader who checks only the grammar
+would "confirm" a decomposition that is off by thirteen entries `[F]`. So the
+script asserts `(entries, elf) == (11, 11)` and `(123, 118)`; the md5 of the
+current WCN6855 container is `2ac84328cf0b69f373817a6faf2a24e4` (7,479,440 B).
+(`entries` counts only `ie_id == 0` records, so WCN6855's 126 on-disk records are
+123 `ie_id=0` + 3 `ie_id=1`; the 118 ELF bodies all sit in the `ie_id=0` set.)
 
 Appending this to the same script prints the measured knob space and shows which
 fleet deltas it can reconstruct (§3.3):
