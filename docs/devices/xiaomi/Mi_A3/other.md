@@ -121,7 +121,7 @@ All 5 files are listed in the LineageOS laurel_sprout manifest (lines 796, 807, 
 
 | devices sharing an md5 | rows | bytes | who |
 |---|---|---|---|
-| 1 | 106 | 43,922,487 | everything else: all 11 mdt heads, all 10 b00 heads, all trustlet bodies except the shared segments below, dsp.img, storsec.img, goodix_firmware.bin, sdm_ys/goldResult/CFR camera bins, data.msc, gptauuid.xml, mbn_sw.txt/mbn_hw.txt/mbn_sw.dig, oem_sw.txt, cmbtfw12.tlv, cmnv12.bin |
+| 1 | 106 | 43,922,487 | everything else: all 11 mdt heads, all 10 b00 heads, all trustlet bodies except the 10 shared segments below, dsp.img, storsec.img, goodix_firmware.bin, sdm_ys/goldResult/CFR camera bins, data.msc, gptauuid.xml, mbn_sw.txt/mbn_hw.txt/mbn_sw.dig, oem_sw.txt, cmbtfw12.tlv, cmnv12.bin |
 | 34 | 2 | 32 | venus.b04 (32 B fleet stub, incl. the b19-named copies) and oem_hw.txt (0 B empty-file placeholder) |
 | 14 | 4 | 23,760 | cmnv10.bin, cmnv11.bin, cmbtfw10.tlv, cmbtfw11.tlv - the cross-vendor WCN3950-generation Bluetooth set |
 | 10 | 1 | 240 | haventkn.b03 (Edge_30_Fusion, Moto_G200, OnePlus 7/7T/7 Pro/9/9RT/9 Pro) |
